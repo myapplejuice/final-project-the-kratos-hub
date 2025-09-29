@@ -25,6 +25,7 @@ export default function MealsLog() {
     const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
     const { user, setUser, setAdditionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
+    const [scrollToTop, setScrollToTop] = useState(false);
 
     const [fabVisible, setFabVisible] = useState(true);
     const [datePickerOpen, setDatePickerOpen] = useState(false);
@@ -319,105 +320,118 @@ export default function MealsLog() {
                 position={{ bottom: insets.bottom + 50, right: 20 }}
                 icon={Images.plus}
             />
-            <View style={{ marginTop: 15, padding: 15, backgroundColor: colors.cardBackground, paddingTop: insets.top + 45 }}>
-                <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
-                    <TouchableOpacity onPress={() => handleDate(-1, 'prev')} style={{ justifyContent: 'center', width: '25%', alignItems: 'center' }}>
-                        <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white', transform: [{ scaleX: -1 }] }} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setDatePickerOpen(true)} style={{ height: 30, width: '50%', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
-                        {(dateComparisons.isToday || dateComparisons.isYesterday || dateComparisons.isTomorrow) &&
-                            (
-                                <AppText style={{ color: 'white', fontSize: scaleFont(dateComparisons.isToday || dateComparisons.isYesterday || dateComparisons.isTomorrow ? 16 : 14), fontWeight: 'bold' }}>
-                                    {dateComparisons.isToday ? 'Today' : dateComparisons.isYesterday ? 'Yesterday' : 'Tomorrow'}
-                                </AppText>
-                            )}
-                        {(!dateComparisons.isToday && !dateComparisons.isYesterday && !dateComparisons.isTomorrow) &&
-                            <DateDisplay
-                                styles={{ textAlign: 'center', marginBottom: 0, marginTop: 0 }} dateStyle={{ color: 'white', fontSize: scaleFont(16) }}
-                                dayStyle={{ color: 'white' }}
-                                centered={true}
-                                uppercaseDate={false}
-                                uppercaseDay={false}
-                                date={pageDate}
-                                showDay={!dateComparisons.isToday && !dateComparisons.isYesterday && !dateComparisons.isTomorrow} />}
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleDate(1, 'next')} style={{ justifyContent: 'center', width: '25%', alignItems: 'center' }}>
-                        <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white' }} />
-                    </TouchableOpacity>
-                </View>
 
-                <Divider orientation="horizontal" style={{ marginVertical: 15 }} />
+            <FloatingActionButton
+                onPress={() => setScrollToTop(true)}
+                visible={!dateComparisons.isPast && !fabVisible}
+                position={{ bottom: insets.bottom + 50, left: 20 }}
+                icon={Images.arrow}
+                iconStyle={{transform: [{rotate: '-90deg'}], marginBottom: 2}}
+                iconSize={20}
+                size={40}
+            />
 
-                <View style={{ marginBottom: 15 }}>
-                    <ProgressBar
-                        title="Energy"
-                        current={convertEnergy(currentDayLog?.consumedEnergyKcal ?? 0, 'kcal', user.preferences.energyUnit.key)}
-                        max={convertEnergy(currentDayLog?.targetEnergyKcal ?? user.nutrition.setEnergyKcal, 'kcal', user.preferences.energyUnit.key)}
-                        unit={user.preferences.energyUnit.field}
-                        color={nutritionColors.energy1}
-                        styleType="header"
-                        height={10}
-                        borderRadius={5}
-                    />
-                </View>
+            <AppScroll extraBottom={150} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
+                {/* Header */}
+                <View style={{ padding: 15, backgroundColor: colors.cardBackground }}>
+                    <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
+                        <TouchableOpacity onPress={() => handleDate(-1, 'prev')} style={{ justifyContent: 'center', width: '25%', alignItems: 'center' }}>
+                            <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white', transform: [{ scaleX: -1 }] }} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setDatePickerOpen(true)} style={{ height: 30, width: '50%', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
+                            {(dateComparisons.isToday || dateComparisons.isYesterday || dateComparisons.isTomorrow) &&
+                                (
+                                    <AppText style={{ color: 'white', fontSize: scaleFont(dateComparisons.isToday || dateComparisons.isYesterday || dateComparisons.isTomorrow ? 16 : 14), fontWeight: 'bold' }}>
+                                        {dateComparisons.isToday ? 'Today' : dateComparisons.isYesterday ? 'Yesterday' : 'Tomorrow'}
+                                    </AppText>
+                                )}
+                            {(!dateComparisons.isToday && !dateComparisons.isYesterday && !dateComparisons.isTomorrow) &&
+                                <DateDisplay
+                                    styles={{ textAlign: 'center', marginBottom: 0, marginTop: 0 }} dateStyle={{ color: 'white', fontSize: scaleFont(16) }}
+                                    dayStyle={{ color: 'white' }}
+                                    centered={true}
+                                    uppercaseDate={false}
+                                    uppercaseDay={false}
+                                    date={pageDate}
+                                    showDay={!dateComparisons.isToday && !dateComparisons.isYesterday && !dateComparisons.isTomorrow} />}
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleDate(1, 'next')} style={{ justifyContent: 'center', width: '25%', alignItems: 'center' }}>
+                            <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white' }} />
+                        </TouchableOpacity>
+                    </View>
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    {[
-                        { label: 'Carbs', consumed: currentDayLog?.consumedCarbGrams ?? 0, target: currentDayLog?.targetCarbGrams ?? user.nutrition.carbGrams, color: nutritionColors.carbs1 },
-                        { label: 'Protein', consumed: currentDayLog?.consumedProteinGrams ?? 0, target: currentDayLog?.targetProteinGrams ?? user.nutrition.proteinGrams, color: nutritionColors.protein1 },
-                        { label: 'Fat', consumed: currentDayLog?.consumedFatGrams ?? 0, target: currentDayLog?.targetFatGrams ?? user.nutrition.fatGrams, color: nutritionColors.fat1 },
-                    ].map((macro, i) => {
-                        return (
-                            <ProgressBar
-                                key={i}
-                                title={macro.label}
-                                current={macro.consumed}
-                                max={macro.target}
-                                unit={'g'}
-                                color={macro.color}
-                                styleType="inline"
-                                height={10}
-                                width={"30%"}
-                                borderRadius={5}
-                                valueStyle={{ fontSize: scaleFont(12) }}
-                            />
-                        );
-                    })}
-                </View>
-                {dateComparisons.isPast && (
-                    <>
-                        <Divider orientation="horizontal" style={{ marginVertical: 15 }} />
+                    <Divider orientation="horizontal" style={{ marginVertical: 15 }} />
+
+                    <View style={{ marginBottom: 15 }}>
                         <ProgressBar
-                            title="Water"
-                            current={convertFluid(currentDayLog?.consumedWaterMl ?? 0, 'ml', user.preferences.fluidUnit.key)}
-                            max={convertFluid(currentDayLog?.targetWaterMl ?? user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)}
-                            unit={user.preferences.fluidUnit.field}
-                            color={nutritionColors.water1}
+                            title="Energy"
+                            current={convertEnergy(currentDayLog?.consumedEnergyKcal ?? 0, 'kcal', user.preferences.energyUnit.key)}
+                            max={convertEnergy(currentDayLog?.targetEnergyKcal ?? user.nutrition.setEnergyKcal, 'kcal', user.preferences.energyUnit.key)}
+                            unit={user.preferences.energyUnit.field}
+                            color={nutritionColors.energy1}
                             styleType="header"
                             height={10}
                             borderRadius={5}
                         />
-                    </>
-                )}
-            </View>
+                    </View>
 
-            <View style={styles.container}>
-                <AppScroll topPadding={false} extraBottom={150} onScrollSetStates={setFabVisible}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        {[
+                            { label: 'Carbs', consumed: currentDayLog?.consumedCarbGrams ?? 0, target: currentDayLog?.targetCarbGrams ?? user.nutrition.carbGrams, color: nutritionColors.carbs1 },
+                            { label: 'Protein', consumed: currentDayLog?.consumedProteinGrams ?? 0, target: currentDayLog?.targetProteinGrams ?? user.nutrition.proteinGrams, color: nutritionColors.protein1 },
+                            { label: 'Fat', consumed: currentDayLog?.consumedFatGrams ?? 0, target: currentDayLog?.targetFatGrams ?? user.nutrition.fatGrams, color: nutritionColors.fat1 },
+                        ].map((macro, i) => {
+                            return (
+                                <ProgressBar
+                                    key={i}
+                                    title={macro.label}
+                                    current={macro.consumed}
+                                    max={macro.target}
+                                    unit={'g'}
+                                    color={macro.color}
+                                    styleType="inline"
+                                    height={10}
+                                    width={"30%"}
+                                    borderRadius={5}
+                                    valueStyle={{ fontSize: scaleFont(12) }}
+                                />
+                            );
+                        })}
+                    </View>
+                    {dateComparisons.isPast && (
+                        <>
+                            <Divider orientation="horizontal" style={{ marginVertical: 15 }} />
+                            <ProgressBar
+                                title="Water"
+                                current={convertFluid(currentDayLog?.consumedWaterMl ?? 0, 'ml', user.preferences.fluidUnit.key)}
+                                max={convertFluid(currentDayLog?.targetWaterMl ?? user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)}
+                                unit={user.preferences.fluidUnit.field}
+                                color={nutritionColors.water1}
+                                styleType="header"
+                                height={10}
+                                borderRadius={5}
+                            />
+                        </>
+                    )}
+                </View>
+
+                {/* Meals Log*/}
+                <View style={{ backgroundColor: colors.background }}>
                     {!dateComparisons.isPast && (
                         <>
-                            <View style={[styles.card, {padding: 0, marginTop: 20}]} >
-                                <View style={{padding: 15}}>
-                                <ProgressBar
-                                    title="Water"
-                                    current={convertFluid(currentDayLog.consumedWaterMl ?? 0, 'ml', user.preferences.fluidUnit.key)}
-                                    max={convertFluid(currentDayLog.targetWaterMl ?? user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)}
-                                    unit={user.preferences.fluidUnit.field}
-                                    color={nutritionColors.water1}
-                                    styleType="header"
-                                    height={10}
-                                    borderRadius={5}
+                            <View style={[styles.card, { padding: 0, marginTop: 20 }]} >
+                                <View style={{ padding: 15 }}>
+                                    <ProgressBar
+                                        title="Water"
+                                        current={convertFluid(currentDayLog.consumedWaterMl ?? 0, 'ml', user.preferences.fluidUnit.key)}
+                                        max={convertFluid(currentDayLog.targetWaterMl ?? user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)}
+                                        unit={user.preferences.fluidUnit.field}
+                                        color={nutritionColors.water1}
+                                        styleType="header"
+                                        height={10}
+                                        borderRadius={5}
 
-                                />
+                                    />
                                 </View>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
                                     {/* Minus Button */}
@@ -431,7 +445,7 @@ export default function MealsLog() {
                                         </AppText>
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity onPress={() => handleWater(waterAmount)} style={{ backgroundColor: colors.main,borderBottomRightRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}  >
+                                    <TouchableOpacity onPress={() => handleWater(waterAmount)} style={{ backgroundColor: colors.main, borderBottomRightRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}  >
                                         <Image source={Images.plus} style={{ width: 20, height: 20, tintColor: 'white' }} />
                                     </TouchableOpacity>
                                 </View>
@@ -472,8 +486,8 @@ export default function MealsLog() {
                                 }
                             </View>
                         )}
-                </AppScroll >
-            </View>
+                </View>
+            </AppScroll >
         </>
     );
 }

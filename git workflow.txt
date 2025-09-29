@@ -1,0 +1,150 @@
+===============================
+GIT WORKFLOW GUIDE - GENERAL
+===============================
+
+1. Project Structure (Recommended)
+---------------------------------
+ProjectName/
+│
+├─ client/       # React or React Native frontend
+├─ server/       # Node.js backend
+├─ public/       # Static assets for frontend
+├─ docs/         # Optional documentation
+├─ .gitignore
+├─ README.md
+├─ package.json
+├─ git-workflow.txt
+
+> Adjust folders to your project needs. Root is where `.git` lives.
+
+---------------------------------
+2. .gitignore Example (React, React Native, Node.js, Vite)
+---------------------------------
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Expo / React Native
+.expo/
+.expo-shared/
+android/
+ios/
+.vscode/
+*.log
+
+# Build folders
+dist/
+build/
+out/
+.cache/
+.temp/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor folders
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Vite / React specific
+vite.config.js
+
+> Add more lines depending on extra folders or temp files in your projects.
+
+---------------------------------
+3. Initial Git Setup
+---------------------------------
+# Navigate to project root
+cd /path/to/ProjectName
+
+# Initialize Git (once per project)
+git init
+
+# Connect remote repository (GitHub/GitLab/Bitbucket)
+git remote add origin https://github.com/username/repo.git
+
+# Remove nested .git folders in subprojects (if any)
+rm -rf client/.git
+rm -rf server/.git
+
+# Stage and commit initial files
+git add .
+git commit -m "Initial commit"
+
+# Set branch to main
+git branch -M main
+
+# Push to remote
+git push -u origin main
+
+---------------------------------
+4. Daily Git Workflow
+---------------------------------
+# Check modified/untracked files
+git status
+
+# Stage changes
+git add .
+
+# Commit with a descriptive message
+git commit -m "Describe your changes"
+
+# Push to remote
+git push
+
+> This updates only changed files, skipping unchanged files.
+
+---------------------------------
+5. Checking Differences and History
+---------------------------------
+# Unstaged changes
+git diff
+
+# Staged changes
+git diff --staged
+
+# Current branch status
+git status
+
+# Commit history
+git log --oneline
+
+---------------------------------
+6. Installing Dependencies After Cloning
+---------------------------------
+# Node.js / React / React Native / Vite projects
+npm install
+# or
+yarn install
+
+> This restores all dependencies according to package-lock.json or yarn.lock, including exact versions.
+
+---------------------------------
+7. Optional Quick Backup Command
+---------------------------------
+# Commit and push all changes in one line
+git add . && git commit -m "Update YYYY-MM-DD" && git push
+> Replace YYYY-MM-DD with date or meaningful message.
+
+---------------------------------
+8. Tips
+---------------------------------
+- Commit frequently.
+- Keep .gitignore updated to avoid pushing temp files.
+- Always commit package-lock.json / yarn.lock for exact dependency versions.
+- For big projects, consider branching (feature/*, bugfix/*) to keep main branch clean.
+
+=======================================
+End of Git Workflow Guide
+=======================================

@@ -1,0 +1,104 @@
+# =====================
+# Node.js
+# =====================
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# =====================
+# React / Vite / Frontend
+# =====================
+dist/
+build/
+out/
+.cache/
+.temp/
+.vite/
+
+# =====================
+# React Native / Expo
+# =====================
+.expo/
+.expo-shared/
+android/
+ios/
+*.jks
+*.keystore
+*.iml
+*.hprof
+*.log
+
+# =====================
+# Environment / Secrets
+# =====================
+.env
+.env.local
+.env.*.local
+.env.production
+.env.production.local
+.env.development
+.env.development.local
+
+# =====================
+# OS Files
+# =====================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# =====================
+# IDE / Editor
+# =====================
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+
+# =====================
+# Test / Coverage / Logs
+# =====================
+coverage/
+*.log
+*.tmp
+*.temp
+jest.config.js
+
+# =====================
+# Generated / Cache
+# =====================
+*.bak
+*.orig
+*.rej
+*.sublime-project
+*.sublime-workspace
+*.tmproj
+*.project
+*.class
+*.jar
+*.war
+*.iml
+.cache/
+.tmp/
+
+# =====================
+# Mobile / Misc
+# =====================
+*.keystore
+*.apk
+*.ipa
+*.app
+*.xcworkspace
+*.xcuserdata
+Pods/
+DerivedData/
+build/

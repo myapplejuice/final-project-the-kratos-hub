@@ -1,0 +1,11 @@
+// commit new changes (all three commands)
+git add .
+git commit -m "Describe your changes"
+git push
+
+// checking diff between commitments (each its own)
+
+git status /	Last commit	Which files are modified, staged, or untracked
+git diff / 	Last commit	Actual content changes in unstaged files
+git diff / --staged	Staged files	Content changes that are staged for next commit
+git log /	History	Past commits and messages

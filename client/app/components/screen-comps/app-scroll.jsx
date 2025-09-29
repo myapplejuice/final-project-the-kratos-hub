@@ -1,4 +1,4 @@
-import React, { useRef, useContext } from "react";
+import React, { useRef, useContext, useEffect } from "react";
 import { Platform, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -22,6 +22,7 @@ export default function AppScroll({
     hideTopBarOnScroll = false,
     hideNavBarOnScroll = false,
     onScrollSetStates = [],
+    scrollToTop = false, // <-- new prop
     ...props
 }) {
     const insets = useSafeAreaInsets();
@@ -33,6 +34,15 @@ export default function AppScroll({
     const { keyboardActive } = useContext(KeyboardContext);
     const { setNavBarVisibility } = useContext(NavBarContext);
     const { setTopBarVisibility } = useContext(TopBarContext);
+
+    const scrollRef = useRef(null);
+
+    // scroll to top when prop is true
+    useEffect(() => {
+        if (scrollToTop && scrollRef.current) {
+            scrollRef.current.scrollToPosition(0, 0, true);
+        }
+    }, [scrollToTop]);
 
     function handleScroll(event) {
         if (keyboardActive) return;
@@ -71,6 +81,7 @@ export default function AppScroll({
 
     return (
         <KeyboardAwareScrollView
+            ref={scrollRef}
             contentContainerStyle={{
                 paddingTop: topPadding ? insets.top + extraTop : 0,
                 flexGrow: 1,

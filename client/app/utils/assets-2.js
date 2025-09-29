@@ -72,4 +72,5 @@ export const Images_2 = {
     specialDotOuline: require('../../assets/images/special-dot-outline.png'),
     mealTwoOutline: require('../../assets/images/meal-2-outline.png'),
     mealThreeOutline: require('../../assets/images/meal-3-outline.png'),
+    arrowUp: require('../../assets/images/arrow-up.png'),
 };

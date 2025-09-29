@@ -7,8 +7,9 @@ export default function FloatingActionButton({
     icon,
     size = 60,
     style = {},
-    onPress = () => {},
+    onPress = () => { },
     iconSize = 24,
+    iconStyle = {},
     position = { bottom: 20, right: 20 },
     visible = true,
     syncWithNavBar = false,
@@ -69,7 +70,7 @@ export default function FloatingActionButton({
                 <Animated.View style={{ flexDirection: "row", alignItems: "center" }}>
                     <Image
                         source={icon}
-                        style={{ width: iconSize, height: iconSize, tintColor: "white" }}
+                        style={{ width: iconSize, height: iconSize, tintColor: "white", ...iconStyle }}
                     />
                     {label ? (
                         <Animated.Text
