@@ -98,6 +98,7 @@ export default class NutritionMealsDBService {
                 for (const key in meal) {
                     obj[ObjectMapper.toCamelCase(key)] = meal[key];
                 }
+                obj.foods = [];
                 return obj;
             });
         } catch (err) {

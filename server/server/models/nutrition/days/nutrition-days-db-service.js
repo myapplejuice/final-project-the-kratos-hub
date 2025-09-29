@@ -39,7 +39,7 @@ export default class NutritionDaysDBService {
 
                 // Fetch meals for this day
                 const meals = await NutritionMealsDBService.fetchMealsByNutritionLogId(dayId);
-                camelCaseDay.meals = meals.map(meal => ({ ...meal, foods: [] }));
+                camelCaseDay.meals = meals.map(meal => ({ ...meal }));
 
                 // Key by date
                 const dateKey = this.normalizeDate(day.Date);
@@ -80,7 +80,7 @@ export default class NutritionDaysDBService {
 
             // Fetch meals for this day
             const meals = await NutritionMealsDBService.fetchMealsByNutritionLogId(day.Id);
-            camelCaseDay.meals = meals.map(meal => ({ ...meal, foods: [] }));
+            camelCaseDay.meals = meals.map(meal => ({ ...meal }));
 
             return camelCaseDay;
         } catch (err) {
@@ -128,7 +128,7 @@ export default class NutritionDaysDBService {
 
                 // Fetch meals for the updated day
                 const meals = await NutritionMealsDBService.fetchMealsByNutritionLogId(row.Id);
-                camelCaseRow.meals = meals.map(meal => ({ ...meal, foods: [] }));
+                camelCaseRow.meals = meals.map(meal => ({ ...meal }));
 
                 const dayKey = this.normalizeDate(row.Date);
                 updatedDays[dayKey] = camelCaseRow;
@@ -181,7 +181,7 @@ export default class NutritionDaysDBService {
 
             // Fetch meals
             const meals = await NutritionMealsDBService.fetchMealsByNutritionLogId(result.recordset[0].Id);
-            updatedDay.meals = meals.map(meal => ({ ...meal, foods: [] }));
+            updatedDay.meals = meals.map(meal => ({ ...meal }));
 
             return { success: true, updated: updatedDay };
         } catch (err) {
@@ -266,7 +266,7 @@ export default class NutritionDaysDBService {
                 }
 
                 const meals = await NutritionMealsDBService.fetchMealsByNutritionLogId(dayId);
-                dayData.meals = meals.map(meal => ({ ...meal, foods: [] }));
+                dayData.meals = meals.map(meal => ({ ...meal }));
 
                 const dayKey = this.normalizeDate(currentDate);
                 insertedDays[dayKey] = dayData;

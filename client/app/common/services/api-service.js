@@ -77,9 +77,9 @@ export default class APIService {
             updateLabel: (payload) => APIService.request(`/nutrition/meals/${APIService.USER_ID}`, 'PUT', payload),
             delete: (payload) => APIService.request(`/nutrition/meals/${APIService.USER_ID}`, 'DELETE', payload),
             foods: {
-                add: (payload) => APIService.request(`/nutrition/meals/foods/${APIService.USER_ID}`, 'POST', payload),
-                update: (payload) => APIService.request(`/nutrition/meals/foods/${APIService.USER_ID}`, 'PUT', payload),
-                delete: (payload) => APIService.request(`/nutrition/meals/foods/${APIService.USER_ID}`, 'DELETE', payload)
+                add: (payload) => APIService.request(`/nutrition/meals/food/${APIService.USER_ID}`, 'POST', payload),
+                update: (payload) => APIService.request(`/nutrition/meals/food/${APIService.USER_ID}`, 'PUT', payload),
+                delete: (payload) => APIService.request(`/nutrition/meals/food/${APIService.USER_ID}`, 'DELETE', payload)
             }
         },
         foods: {
