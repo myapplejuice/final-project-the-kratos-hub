@@ -66,7 +66,7 @@ export default class APIService {
 
     static nutrition = {
         days: {
-            allDays: () => APIService.request(`/nutrition/all/${APIService.USER_ID}`, 'GET'),
+            days: () => APIService.request(`/nutrition/all/${APIService.USER_ID}`, 'GET'),
             dayByDate: (date) => APIService.request(`/nutrition/day/${date}/${APIService.USER_ID}`, 'GET'),
             futureDays: (date) => APIService.request(`/nutrition/ensure/${date}/${APIService.USER_ID}`, 'POST'),
             updateDay: (date, payload) => APIService.request(`/nutrition/update-day/${date}/${APIService.USER_ID}`, 'PUT', payload),
@@ -78,7 +78,7 @@ export default class APIService {
             delete: (payload) => APIService.request(`/nutrition/meals/${APIService.USER_ID}`, 'DELETE', payload)
         },
         foods: {
-            all: () => APIService.request(`/nutrition/foods/${APIService.USER_ID}`, 'GET'),
+            foods: (scope) => APIService.request(`/nutrition/foods/${APIService.USER_ID}?scope=${scope}`, 'GET'),
             create: (payload) => APIService.request(`/nutrition/foods/${APIService.USER_ID}`, 'POST', payload),
             update: (payload) => APIService.request(`/nutrition/foods/${APIService.USER_ID}`, 'PUT', payload),
             delete: (payload) => APIService.request(`/nutrition/foods/${APIService.USER_ID}`, 'DELETE', payload)

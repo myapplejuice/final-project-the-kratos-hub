@@ -1,14 +1,30 @@
 import NutritionFoodsDBService from "./nutrition-foods-db-service.js";
 
 export default class NutritionFoodsController {
-    static async allFoods(req, res) {
+    static async fetchFoods(req, res) {
+        const { scope } = req.query;
+        if (scope === 'community') {
+            return NutritionFoodsController.allCommunityFoods(req, res);
+        }
+        if (scope === 'user') {
+            return NutritionFoodsController.allFoods(req, res);
+        }
+        return res.status(400).json({ success: false, error: "Invalid type. Use 'user' or 'community'." });
+
+    }
+
+    static async allCommunityFoods(req, res) {
         const userId = req.params.id;
-
-        const foods = await NutritionFoodsDBService.fetchFoods(userId);
-        if (!foods) return res.status(500).json({ success: false, error: "Failed to fetch foods" });
-
+        const foods = await NutritionFoodsDBService.fetchCommunityFoods(userId);
         return res.status(200).json({ success: true, foods });
     }
+
+    static async allFoods(req, res) {
+        const userId = req.params.id;
+        const foods = await NutritionFoodsDBService.fetchFoods(userId);
+        return res.status(200).json({ success: true, foods });
+    }
+
     static async createFood(req, res) {
         const userId = req.params.id;
         const payload = req.body;
@@ -21,7 +37,7 @@ export default class NutritionFoodsController {
 
     static async updateFood(req, res) {
         const payload = req.body;
-        
+
         const food = await NutritionFoodsDBService.updateFood(payload);
         if (!food) return res.status(404).json({ success: false, error: "Food not found or could not update" });
 

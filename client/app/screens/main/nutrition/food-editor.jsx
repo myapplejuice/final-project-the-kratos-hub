@@ -196,7 +196,7 @@ export default function FoodEditor() {
                     foods: prev.foods.map(f => f.id === food.id ? food : f)
                 }));
                 setAdditionalContexts(prev => ({ ...prev, selectedFood: food }));
-                return createAlert({ title: 'Success', text: "Successfully created food", onPress: () => router.back() });
+                return createAlert({ title: 'Success', text: "Successfully edited food", onPress: () => router.back() });
             }
             else
                 return createAlert({ title: 'Error', text: result.message });

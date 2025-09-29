@@ -12,9 +12,9 @@ import { convertEnergy } from '../../utils/helper-functions/unit-converter';
 import ExpandInOut from '../effects/expand-in-out';
 import Invert from '../effects/invert';
 
-export default function Meal({ title = 'Meal', num, onDeletePress = () => { }, onRenamePress = () => { }, onAddPress = () => { }, onFoodPress = () => { }, onAddPressVisible = true, onRenamePressVisible = true, onFoodPressVisible = true, onDeletePressVisible = true, foods = [], }) {
+export default function Meal({ title = 'Meal', num, onDeletePress = () => { }, onRenamePress = () => { }, onAddPress = () => { }, onFoodPress = () => { }, onAddPressVisible = true, onRenamePressVisible = true, onFoodPressVisible = true, onDeletePressVisible = true, foods = [], expandedOnStart = false }) {
     const { user } = useContext(UserContext);
-    const [expanded, setExpanded] = useState(false);
+    const [expanded, setExpanded] = useState(expandedOnStart);
 
     const totals = foods.reduce(
         (acc, food) => {

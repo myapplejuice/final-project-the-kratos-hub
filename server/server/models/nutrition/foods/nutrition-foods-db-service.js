@@ -3,6 +3,44 @@ import Database from '../../database/database.js';
 import ObjectMapper from '../../../utils/object-mapper.js';
 
 export default class NutritionFoodsDBService {
+    static async
+
+    static async fetchCommunityFoods(userId) {
+        if (!userId) return [];
+
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'CreatorId', sql.UniqueIdentifier, userId);
+
+            const query = `
+            SELECT *
+            FROM dbo.UserFoods
+            WHERE CreatorId != @CreatorId AND IsPublic = 1
+            ORDER BY Id DESC;`;
+
+            const result = await request.query(query);
+            if (!result.recordset || result.recordset.length === 0) return [];
+
+            return result.recordset.map(row => {
+                const food = {};
+                for (const key in row) {
+                    food[ObjectMapper.toCamelCase(key)] = row[key];
+                }
+
+                if (food.additionalProps) {
+                    try {
+                        food.additionalProps = JSON.parse(food.additionalProps);
+                    } catch { }
+                }
+
+                return food;
+            });
+        } catch (err) {
+            console.error('fetchCommunityFoods error:', err);
+            return [];
+        }
+    }
+
     static async fetchFoods(userId) {
         if (!userId) return [];
 
@@ -37,7 +75,6 @@ export default class NutritionFoodsDBService {
             console.error('fetchFoods error:', err);
             return [];
         }
-
     }
 
     static async createFood(userId, payload) {

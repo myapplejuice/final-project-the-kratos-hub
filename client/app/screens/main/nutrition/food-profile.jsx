@@ -88,7 +88,20 @@ export default function FoodProfile() {
             additionalProps
         };
 
-        
+        try{
+            showSpinner();
+            // ! const result = something;
+
+            if(result.success){
+                createAlert({ title: 'Success', text: "Food addition success, click OK to go back", onPress: () => router.back() });
+            } else {
+                createAlert({ title: 'Failure', text: "Food addition failed!\n" + result.message });
+            }
+        }catch(err){
+            console.log(err);
+        }finally{
+            hideSpinner();
+        }
     }
 
 

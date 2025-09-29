@@ -15,6 +15,7 @@ import { scaleFont } from "../../../utils/scale-fonts";
 import { routes } from "../../../utils/settings/constants";
 import { colors, nutritionColors } from "../../../utils/settings/styling";
 import FadeInOut from "../../../components/effects/fade-in-out";
+import APIService from '../../../utils/services/api-service';
 
 export default function FoodSelection() {
     const { user, additionalContexts, setAdditionalContexts } = useContext(UserContext);
@@ -22,34 +23,35 @@ export default function FoodSelection() {
     const insets = useSafeAreaInsets();
     const [fabVisible, setFabVisible] = useState(true);
 
-    const [selectedFood, setSelectedFood] = useState({});
     const [selectedList, setSelectedList] = useState('My Foods');
-    const [userFoods, setUserFoods] = useState([]);
-    const [foodList, setFoodList] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
 
+    const [foodList, setFoodList] = useState([]);
+    const [userFoods, setUserFoods] = useState([]);
+    const [communityFoods, setCommunityFoods] = useState([]);
+
     useEffect(() => {
-        const list = user.foods || [];
+        async function fetchCommunityFoods() {
+            const result = await APIService.nutrition.foods.foods('community');
+            const foods = result.data.foods;
+            setCommunityFoods(foods);
+        }
 
-        setUserFoods(list);
+        fetchCommunityFoods();
+    }, []);
+
+    useEffect(() => {
+        const foods = user.foods || [];
+
+        setUserFoods(foods);
         if (selectedList === 'My Foods') {
-            setFoodList(list);
-        }
-    }, [user.foods]);
-
-    async function handleListSwitch(list) {
-        if (list === selectedList) return;
-
-        if (list === 'My Foods') {
-            setFoodList(userFoods);
-
-        } else if (list === 'Library') {
+            setFoodList(foods);
+        } else if (selectedList === 'Library') {
             setFoodList([]);
-        } else if (list === 'Community') {
-            setFoodList([]);
+        } else if (selectedList === 'Community') {
+            setFoodList(communityFoods);
         }
-        setSelectedList(list);
-    }
+    }, [user.foods, selectedList, communityFoods]);
 
     function handleFoodSelection(food) {
         setAdditionalContexts(prev => ({ ...prev, selectedFood: food }));
@@ -71,9 +73,9 @@ export default function FoodSelection() {
             <AppView style={styles.container}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 15, }}>
                     {[
-                        { title: 'My Foods', onPress: () => handleListSwitch('My Foods') },
-                        { title: 'Library', onPress: () => handleListSwitch('Library') },
-                        { title: 'Community', onPress: () => handleListSwitch('Community') }
+                        { title: 'My Foods', onPress: () => setSelectedList('My Foods') },
+                        { title: 'Library', onPress: () => setSelectedList('Library') },
+                        { title: 'Community', onPress: () => setSelectedList('Community') }
                     ].map((item, i) => (
                         <TouchableOpacity
                             key={i}

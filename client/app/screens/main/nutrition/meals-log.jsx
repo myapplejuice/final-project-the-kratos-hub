@@ -27,6 +27,7 @@ export default function MealsLog() {
     const insets = useSafeAreaInsets();
     const [scrollToTop, setScrollToTop] = useState(false);
 
+    const [lastAddedMeal, setLastAddedMeal] = useState(-1);
     const [fabVisible, setFabVisible] = useState(true);
     const [datePickerOpen, setDatePickerOpen] = useState(false);
     const [currentDayLog, setCurrentDayLog] = useState({});
@@ -182,6 +183,7 @@ export default function MealsLog() {
                     if (result.success) {
                         const meal = result.data.meal;
 
+                        setLastAddedMeal(meal.id);
                         setUser(prev => ({
                             ...prev,
                             nutritionLogs: {
@@ -468,6 +470,7 @@ export default function MealsLog() {
                                     onRenamePressVisible={!dateComparisons.isPast}
                                     onDeletePressVisible={!dateComparisons.isPast}
                                     key={meal.id}
+                                    expandedOnStart={meal.id === lastAddedMeal}
                                 />
                             )
                         })
