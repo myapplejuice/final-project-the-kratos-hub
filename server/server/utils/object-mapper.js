@@ -58,7 +58,8 @@ export default class ObjectMapper {
             Protein: 'protein',
             Fat: 'fat',
             Label: 'label',
-            CreatorId: 'creatorId'
+            CreatorId: 'creatorId',
+            Time: 'time',
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -120,7 +121,8 @@ export default class ObjectMapper {
             protein: 'Protein',
             fat: 'Fat',
             label: 'Label',
-            creatorId: 'CreatorId'
+            creatorId: 'CreatorId',
+            time: 'Time',
         };
         return map[key] || key;
     }

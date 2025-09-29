@@ -21,6 +21,7 @@ import { colors, nutritionColors } from "../../../common/settings/styling";
 import { getDayComparisons } from '../../../common/utils/date-time'
 import { router } from 'expo-router';
 import { routes } from '../../../common/settings/constants';
+import { getSQLTime } from '../../../common/utils/date-time';
 
 export default function MealsLog() {
     const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
@@ -176,10 +177,11 @@ export default function MealsLog() {
                 if (!label)
                     label = `Meal ${currentDayLog?.meals?.length + 1}`;
 
+                const time = getSQLTime();
                 showSpinner();
                 try {
                     // Backend call
-                    const result = await APIService.nutrition.meals.create({ nutritionLogId: currentDayLog.id, label });
+                    const result = await APIService.nutrition.meals.create({ nutritionLogId: currentDayLog.id, label, time });
 
                     if (result.success) {
                         const meal = result.data.meal;
@@ -440,8 +442,9 @@ export default function MealsLog() {
                         currentDayLog.meals.map((meal, i) => {
                             return (
                                 <Meal
-                                    title={meal.label}
+                                    label={meal.label}
                                     foods={meal.foods}
+                                    time={meal.time}
                                     num={i + 1}
                                     onRenamePress={() => handleMealRelabel(meal.id)}
                                     onDeletePress={() => handleMealRemoval(meal.id)}

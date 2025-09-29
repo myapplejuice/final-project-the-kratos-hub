@@ -11,10 +11,10 @@ import { UserContext } from '../../common/contexts/user-context';
 import { convertEnergy } from '../../common/utils/unit-converter';
 import ExpandInOut from '../effects/expand-in-out';
 import Invert from '../effects/invert';
+import { formatTime, toDateFromSQLTime } from '../../common/utils/date-time';
 
-export default function Meal({ title = 'Meal', num, onDeletePress = () => { }, onRenamePress = () => { }, onAddPress = () => { }, onFoodPress = () => { },
-    onAddPressVisible = true, onRenamePressVisible = true, onFoodPressVisible = true, onDeletePressVisible = true,
-    foods = [], expandedOnStart = false, onExpand = () => { } }) {
+export default function Meal({ label, time, foods = [], num, onDeletePress = () => { }, onRenamePress = () => { }, onAddPress = () => { }, onFoodPress = () => { },
+    onAddPressVisible = true, onRenamePressVisible = true, onFoodPressVisible = true, onDeletePressVisible = true, expandedOnStart = false, onExpand = () => { } }) {
 
     const { user } = useContext(UserContext);
     const [expanded, setExpanded] = useState(expandedOnStart);
@@ -37,6 +37,8 @@ export default function Meal({ title = 'Meal', num, onDeletePress = () => { }, o
         fat: Math.round((totals.fat / totalMacros) * 100),
     };
 
+    const formattedTime = formatTime(time, { format: user.preferences.timeFormat.key });
+
     return (
         <View style={styles.card}>
             {/* Header */}
@@ -45,8 +47,8 @@ export default function Meal({ title = 'Meal', num, onDeletePress = () => { }, o
                 style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', zIndex: 9999 }}
             >
                 <View>
-                    <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold' }}>Meal {num}</AppText>
-                    <AppText style={{ fontSize: scaleFont(9), color: colors.mutedText }}>{title}</AppText>
+                    <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold' }}>{label}</AppText>
+                    <AppText style={{ fontSize: scaleFont(9), color: colors.mutedText }}>{formattedTime}</AppText>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                     {onRenamePressVisible && onDeletePressVisible && (

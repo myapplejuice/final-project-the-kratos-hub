@@ -7,16 +7,17 @@ export default class NutritionMealsDBService {
         return new Date(date).toISOString().split('T')[0];
     }
 
-    static async createMeal(nutritionLogId, label) {
+    static async createMeal(nutritionLogId, label, time) {
         try {
             const request = Database.getRequest();
             Database.addInput(request, "NutritionLogId", sql.Int, nutritionLogId);
             Database.addInput(request, "Label", sql.VarChar(100), label);
+            Database.addInput(request, "Time", sql.Time, time);
 
             const query = `
-                INSERT INTO dbo.MealLog (NutritionLogId, Label)
+                INSERT INTO dbo.MealLog (NutritionLogId, Label, Time)
                 OUTPUT INSERTED.*
-                VALUES (@NutritionLogId, @Label);
+                VALUES (@NutritionLogId, @Label, @Time);
             `;
 
             const result = await request.query(query);
