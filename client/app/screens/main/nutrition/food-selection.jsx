@@ -109,11 +109,11 @@ export default function FoodSelection() {
                                 </View>
                                 <View style={{ alignItems: 'flex-end', width: '40%' }}>
                                     <AppText style={{ color: nutritionColors.energy1, fontSize: scaleFont(12) }}>{convertEnergy(food.energyKcal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}</AppText>
-                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '46%', marginTop: 0 }}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 0 }}>
                                         <AppText style={{ color: nutritionColors.carbs1, fontSize: scaleFont(8) }}>C: {food.carbs}</AppText>
-                                        <Divider orientation="vertical" thickness={1} color={colors.divider} />
+                                        <Divider orientation="vertical" thickness={1} color={colors.divider} style={{marginHorizontal: 5}} />
                                         <AppText style={{ color: nutritionColors.protein1, fontSize: scaleFont(8) }}>P: {food.protein}</AppText>
-                                        <Divider orientation="vertical" thickness={1} color={colors.divider} />
+                                        <Divider orientation="vertical" thickness={1} color={colors.divider}  style={{marginHorizontal: 5}} />
                                         <AppText style={{ color: nutritionColors.fat1, fontSize: scaleFont(8) }}>F: {food.fat}</AppText>
                                     </View>
                                 </View>
