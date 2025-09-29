@@ -1,0 +1,158 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+//USER TABLES
+Table User {
+  user_id varchar [primary key]
+  username varchar [not null]
+  firstname varchar [not null]
+  lastname varchar [not null]
+  date_of_birth datetime [not null]
+  email varchar [not null]
+  password varchar [not null]
+  employed_coach_id varchar
+  is_coach boolean [not null]
+  is_moderator boolean [not null]
+  mod_role varchar
+  is_admin boolean [not null]
+  admin_role varchar
+}
+
+Table User_Preferences {
+  fill_later_not_sure_what_to_put_here varchar
+}
+
+Table User_Chats{
+  chat_id varchar [primary key]
+  user_id varchar [not null]
+  chatted_user_id varchar [not null]
+}
+
+Table User_Chats_Logs{
+  chat_id varchar [primary key]
+  log_order_number int [not null]
+  log varchar [not null]
+  sender int [not null]
+}
+
+//WORKOUT TABLES
+Table Activity {
+  activity_id varchar [primary key]
+  name varchar [not null]
+  main_muscle_group varchar [not null]
+  type varchar [not null]
+  isolation_type varchar [not null]
+  description varchar
+  ref_img_uri nvarchar
+  ref_vid_uri nvarchar
+}
+
+Table Workout_Log {
+  plan_id varchar [primary key]
+  workout_id varchar [not null]
+  user_id varchar [not null]
+  date_of_workout datetime [not null]
+}
+
+Table Workout_Log_Exercises{
+  workout_id varchar [primary key]
+  activity_id int [not null]
+  num_sets int
+  num_reps int
+  exercise_duration int
+  rest_time_seconds int
+  max_time_minutes int
+}
+
+Table Workout_Plan {
+  plan_id varchar [primary key]
+  user_id varchar [not null]
+  plan_split varchar [not null]
+  date_of_assignment datetime [not null]
+  title varchar
+  description varchar
+  coach_id varchar
+}
+
+Table Workout_Plan_Workouts {
+  plan_id varchar [primary key]
+  workout_id varchar [not null]
+  title varchar
+  day_of_week int
+}
+
+Table Workout_Plan_Workout_Exercises {
+  workout_id varchar [primary key]
+  activity_id int [not null]
+  num_sets int 
+  num_reps int
+  exercise_duration int
+  rest_time_seconds int
+  max_time_minutes int
+}
+
+Ref: Workout_Log.user_id - User.user_id
+Ref: Workout_Log.workout_id - Workout_Log_Exercises.workout_id
+Ref: Workout_Plan.plan_id - Workout_Plan_Workouts.plan_id
+Ref: Workout_Plan_Workouts.workout_id - Workout_Plan_Workout_Exercises.workout_id
+Ref: Workout_Plan_Workout_Exercises.activity_id > Activity.activity_id
+Ref: Workout_Log_Exercises.activity_id - Activity.activity_id
+Ref: Workout_Plan.user_id > User.user_id
+
+//NUTRITION TABLES
+Table Nutrition_Plan {
+  plan_id varchar [primary key]
+  user_id varchar [not null]
+  title varchar
+  type varchar
+  date_of_assignment datetime [not null]
+  description varchar
+  coach_id varchar
+}
+
+Table Nutrition_Plan_Meals {
+  meal_id varchar [primary key]
+  plan_id varchar [not null]
+  title varchar
+  meal_order_number int [not null]
+}
+
+Table Nutrition_Plan_Meals_Foods {
+  meal_id varchar [primary key]
+  food_id varchar [not null]
+}
+
+Table Food {
+  food_id varchar [primary key]
+  type varchar [not null]
+  main_nutrient_group varchar [not null]
+  carbohydrates_g int [not null]
+  protein_g int [not null]
+  fat_g int [not null]
+  description varchar
+}
+
+Table Daily_Meals_Log{
+  log_id varchar [primary key]
+  user_id varchar [not null]
+  date_of_log datetime [not null]
+}
+
+Table Daily_Meals_Log_Meals {
+  log_id varchar [primary key]
+  food_id varchar [not null]
+  title varchar
+  meal_order_number int [not null]
+  description varchar
+}
+
+Ref: Nutrition_Plan.user_id > User.user_id
+Ref: Nutrition_Plan.plan_id < Nutrition_Plan_Meals.plan_id
+Ref: Nutrition_Plan_Meals_Foods.meal_id > Nutrition_Plan_Meals.meal_id
+Ref: Nutrition_Plan_Meals_Foods.food_id > Food.food_id
+Ref: Daily_Meals_Log.user_id > User.user_id
+Ref: Daily_Meals_Log.log_id > Daily_Meals_Log_Meals.log_id
+Ref: Daily_Meals_Log_Meals.food_id > Food.food_id
+
+
+

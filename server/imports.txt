@@ -1,0 +1,6 @@
+npm i express
+npm i bcrypt
+npm i bcryptjs
+npm i crypto
+npm i multer
+npm i jsonwebtoken

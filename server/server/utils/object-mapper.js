@@ -1,0 +1,288 @@
+import sql from 'mssql/msnodesqlv8.js';
+
+export default class ObjectMapper {
+    static toCamelCase(key) {
+        const map = {
+            Id: 'id',
+            DateOfCreation: 'dateOfCreation',
+            UserId: 'userId',
+            Firstname: 'firstname',
+            Lastname: 'lastname',
+            Age: 'age',
+            Gender: 'gender',
+            Email: 'email',
+            Phone: 'phone',
+            ImageBase64: 'imageBase64',
+            Password: 'password',
+            HeightCm: 'heightCm',
+            WeightKg: 'weightKg',
+            BMI: 'bmi',
+            BMR: 'bmr',
+            TDEE: 'tdee',
+            BodyFat: 'bodyFat',
+            LeanBodyMass: 'leanBodyMass',
+            ActivityLevel: 'activityLevel',
+            Goal: 'goal',
+            RecommendedEnergyKcal: 'recommendedEnergyKcal',
+            SetEnergyKcal: 'setEnergyKcal',
+            WaterMl: 'waterMl',
+            Diet: 'diet',
+            CarbRate: 'carbRate',
+            ProteinRate: 'proteinRate',
+            ProteinRequirement: 'proteinRequirement',
+            FatRate: 'fatRate',
+            CarbGrams: 'carbGrams',
+            ProteinGrams: 'proteinGrams',
+            FatGrams: 'fatGrams',
+            HistoryId: 'historyId',
+            DateOfUpdate: 'dateOfUpdate',
+            ChangedFields: 'changedFields',
+            TargetEnergyKcal: 'targetEnergyKcal',
+            TargetCarbGrams: 'targetCarbGrams',
+            TargetProteinGrams: 'targetProteinGrams',
+            TargetFatGrams: 'targetFatGrams',
+            TargetWaterMl: 'targetWaterMl',
+            ConsumedEnergyKcal: 'consumedEnergyKcal',
+            ConsumedCarbGrams: 'consumedCarbGrams',
+            ConsumedProteinGrams: 'consumedProteinGrams',
+            ConsumedFatGrams: 'consumedFatGrams',
+            ConsumedWaterMl: 'consumedWaterMl',
+            NutritionLogId: 'nutritionLogId',
+            Name: 'name',
+            MealLogId: 'mealLogId',
+            Creator: 'creator',
+            Type: 'type',
+            ServingAmount: 'servingAmount',
+            EnergyKcal: 'energyKcal',
+            Carbs: 'carbs',
+            Protein: 'protein',
+            Fat: 'fat',
+            Label: 'label',
+        };
+        return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
+    }
+
+    static toPascalCase(key) {
+        const map = {
+            id: 'Id',
+            dateOfCreation: 'DateOfCreation',
+            userId: 'UserId',
+            firstname: 'Firstname',
+            lastname: 'Lastname',
+            age: 'Age',
+            gender: 'Gender',
+            email: 'Email',
+            phone: 'Phone',
+            imageBase64: 'ImageBase64',
+            password: 'Password',
+            heightCm: 'HeightCm',
+            weightKg: 'WeightKg',
+            bmi: 'BMI',
+            bmr: 'BMR',
+            tdee: 'TDEE',
+            bodyFat: 'BodyFat',
+            leanBodyMass: 'LeanBodyMass',
+            activityLevel: 'ActivityLevel',
+            goal: 'Goal',
+            recommendedEnergyKcal: 'RecommendedEnergyKcal',
+            setEnergyKcal: 'SetEnergyKcal',
+            waterMl: 'WaterMl',
+            diet: 'Diet',
+            carbRate: 'CarbRate',
+            proteinRate: 'ProteinRate',
+            proteinRequirement: 'ProteinRequirement',
+            fatRate: 'FatRate',
+            carbGrams: 'CarbGrams',
+            proteinGrams: 'ProteinGrams',
+            fatGrams: 'FatGrams',
+            historyId: 'HistoryId',
+            dateOfUpdate: 'DateOfUpdate',
+            changedFields: 'ChangedFields',
+            targetEnergyKcal: 'TargetEnergyKcal',
+            targetCarbGrams: 'TargetCarbGrams',
+            targetProteinGrams: 'TargetProteinGrams',
+            targetFatGrams: 'TargetFatGrams',
+            targetWaterMl: 'TargetWaterMl',
+            consumedEnergyKcal: 'ConsumedEnergyKcal',
+            consumedCarbGrams: 'ConsumedCarbGrams',
+            consumedProteinGrams: 'ConsumedProteinGrams',
+            consumedFatGrams: 'ConsumedFatGrams',
+            consumedWaterMl: 'ConsumedWaterMl',
+            nutritionLogId: 'NutritionLogId',
+            name: 'Name',
+            mealLogId: 'MealLogId',
+            creator: 'Creator',
+            type: 'Type',
+            servingAmount: 'ServingAmount',
+            energyKcal: 'EnergyKcal',
+            carbs: 'Carbs',
+            protein: 'Protein',
+            fat: 'Fat',
+            label: 'Label'
+        };
+        return map[key] || key;
+    }
+
+    static getSQLType(column) {
+        const types = {
+            // Users
+            Id: sql.UniqueIdentifier,
+            DateOfCreation: sql.DateTime2,
+            Firstname: sql.VarChar(50),
+            Lastname: sql.VarChar(50),
+            Age: sql.Int,
+            Gender: sql.VarChar(20),
+            Email: sql.VarChar(50),
+            Phone: sql.VarChar(50),
+            Password: sql.VarChar(256),
+            ImageBase64: sql.VarChar(sql.MAX),
+
+            // UserMetrics
+            UserId: sql.UniqueIdentifier,
+            HeightCm: sql.Decimal(5, 2),
+            WeightKg: sql.Decimal(5, 2),
+            BMI: sql.Decimal(4, 1),
+            BMR: sql.Int,
+            TDEE: sql.Int,
+            BodyFat: sql.Decimal(4, 1),
+            LeanBodyMass: sql.Decimal(5, 2),
+            ActivityLevel: sql.VarChar(20),
+
+            // UserNutrition
+            Goal: sql.VarChar(20),
+            RecommendedEnergyKcal: sql.Int,
+            SetEnergyKcal: sql.Int,
+            WaterMl: sql.Decimal(6, 1),
+            Diet: sql.VarChar(50),
+            CarbRate: sql.Decimal(5, 2),
+            ProteinRate: sql.Decimal(5, 2),
+            ProteinRequirement: sql.Decimal(6, 2),
+            FatRate: sql.Decimal(5, 2),
+            CarbGrams: sql.Decimal(6, 2),
+            ProteinGrams: sql.Decimal(6, 2),
+            FatGrams: sql.Decimal(6, 2),
+
+            // History
+            HistoryId: sql.UniqueIdentifier,
+            ChangedFields: sql.VarChar(500),  // use 200 or 300 depending on table
+            DateOfUpdate: sql.DateTime2,
+            TargetEnergyKcal: sql.Decimal(7, 2),
+            TargetCarbGrams: sql.Decimal(7, 2),
+            TargetProteinGrams: sql.Decimal(7, 2),
+            TargetFatGrams: sql.Decimal(7, 2),
+            TargetWaterMl: sql.Decimal(6, 1),
+            ConsumedEnergyKcal: sql.Decimal(7, 2),
+            ConsumedCarbGrams: sql.Decimal(7, 2),
+            ConsumedProteinGrams: sql.Decimal(7, 2),
+            ConsumedFatGrams: sql.Decimal(7, 2),
+            ConsumedWaterMl: sql.Decimal(6, 1),
+
+            //Meals
+            MealLogId: sql.Int,
+            Name: sql.VarChar(100),
+            Creator: sql.VarChar(50),
+            Type: sql.VarChar(20),        
+            ServingAmount: sql.Decimal(7, 2),
+            EnergyKcal: sql.Decimal(7, 2),
+            Carbs: sql.Decimal(7, 2),
+            Protein: sql.Decimal(7, 2),
+            Fat: sql.Decimal(7, 2),
+        };
+
+        return types[column];
+    }
+
+    static mapProfileHistory(row) {
+        return {
+            userId: row.UserId,
+            firstname: row.Firstname,
+            lastname: row.Lastname,
+            age: row.Age,
+            gender: row.Gender,
+            email: row.Email,
+            phone: row.Phone,
+            changedFields: row.ChangedFields,
+            dateOfUpdate: row.DateOfUpdate,
+        };
+    }
+
+    static mapMetricsHistory(row) {
+        return {
+            userId: row.UserId,
+            heightCm: row.HeightCm,
+            weightKg: row.WeightKg,
+            bmi: row.BMI,
+            bmr: row.BMR,
+            tdee: row.TDEE,
+            bodyFat: row.BodyFat,
+            leanBodyMass: row.LeanBodyMass,
+            activityLevel: row.ActivityLevel,
+            changedFields: row.ChangedFields,
+            dateOfUpdate: row.DateOfUpdate,
+        };
+    }
+
+    static mapNutritionHistory(row) {
+        return {
+            userId: row.UserId,
+            goal: row.Goal,
+            recommendedEnergyKcal: row.RecommendedEnergyKcal,
+            setEnergyKcal: row.SetEnergyKcal,
+            waterMl: row.WaterMl,
+            diet: row.Diet,
+            carbRate: row.CarbRate,
+            proteinRate: row.ProteinRate,
+            proteinRequirement: row.ProteinRequirement,
+            fatRate: row.FatRate,
+            carbGrams: row.CarbGrams,
+            proteinGrams: row.ProteinGrams,
+            fatGrams: row.FatGrams,
+            changedFields: row.ChangedFields,
+            dateOfUpdate: row.DateOfUpdate,
+        };
+    }
+
+    static mapUser(record) {
+        return {
+            id: record.Id,
+            dateOfCreation: record.DateOfCreation,
+            firstname: record.Firstname,
+            lastname: record.Lastname,
+            age: record.Age,
+            gender: record.Gender,
+            email: record.Email,
+            phone: record.Phone,
+            imageBase64: record.ImageBase64,
+        };
+    }
+
+    static mapMetrics(record) {
+        return {
+            heightCm: record.HeightCm,
+            weightKg: record.WeightKg,
+            bmi: record.BMI,
+            bmr: record.BMR,
+            tdee: record.TDEE,
+            bodyFat: record.BodyFat,
+            leanBodyMass: record.LeanBodyMass,
+            activityLevel: record.ActivityLevel,
+        };
+    }
+
+    static mapNutrition(record) {
+        return {
+            goal: record.Goal,
+            recommendedEnergyKcal: record.RecommendedEnergyKcal,
+            setEnergyKcal: record.SetEnergyKcal,
+            waterMl: record.WaterMl,
+            diet: record.Diet,
+            carbRate: record.CarbRate,
+            proteinRate: record.ProteinRate,
+            proteinRequirement: record.ProteinRequirement,
+            fatRate: record.FatRate,
+            carbGrams: record.CarbGrams,
+            proteinGrams: record.ProteinGrams,
+            fatGrams: record.FatGrams
+        };
+    }
+}
