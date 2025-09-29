@@ -37,8 +37,6 @@ export default function FoodProfile() {
             amount: Math.round(prop.amount * factor)
         }));
 
-        console.log(energyKcal, carbs, protein, fat, additionalProps);
-
         setEnergyKcal(energyKcal);
         setCarbs(carbs);
         setProtein(protein);
@@ -71,7 +69,9 @@ export default function FoodProfile() {
 
     async function handleFoodAddition() {
         const food = additionalContexts.selectedFood;
-        const mealId = additionalContexts.selectedMealId;
+        const meal = additionalContexts.selectedMeal;
+
+        console.log(meal);
 
         const updatedFood = {
             ...food,
@@ -87,6 +87,8 @@ export default function FoodProfile() {
             fat,
             additionalProps
         };
+
+        
     }
 
 

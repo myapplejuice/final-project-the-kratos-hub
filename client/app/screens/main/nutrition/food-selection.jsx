@@ -18,7 +18,7 @@ import FadeInOut from "../../../components/effects/fade-in-out";
 
 export default function FoodSelection() {
     const { user, additionalContexts, setAdditionalContexts } = useContext(UserContext);
-    const mealId = additionalContexts.selectedMealId;
+    const meal = additionalContexts.selectedMeal;
     const insets = useSafeAreaInsets();
     const [fabVisible, setFabVisible] = useState(true);
 

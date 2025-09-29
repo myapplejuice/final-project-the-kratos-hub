@@ -10,7 +10,6 @@ import { scaleFont } from '../../utils/scale-fonts';
 import { UserContext } from '../../utils/contexts/user-context';
 import { convertEnergy } from '../../utils/helper-functions/unit-converter';
 import ExpandInOut from '../effects/expand-in-out';
-import FadeInOut from '../effects/fade-in-out';
 import Invert from '../effects/invert';
 
 export default function Meal({ title = 'Meal', num, onDeletePress = () => { }, onRenamePress = () => { }, onAddPress = () => { }, onFoodPress = () => { }, onAddPressVisible = true, onRenamePressVisible = true, onFoodPressVisible = true, onDeletePressVisible = true, foods = [], }) {

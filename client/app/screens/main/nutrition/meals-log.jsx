@@ -289,8 +289,8 @@ export default function MealsLog() {
         });
     }
 
-    async function handleFoodAddition(mealId) {
-        setAdditionalContexts(prev => ({ ...prev, selectedMealId: mealId }));
+    async function handleFoodAddition(meal) {
+        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal }));
         router.push(routes.FOOD_SELECTION);
     }
 
@@ -461,7 +461,7 @@ export default function MealsLog() {
                                     num={i + 1}
                                     onRenamePress={() => handleMealRelabel(meal.id)}
                                     onDeletePress={() => handleMealRemoval(meal.id)}
-                                    onAddPress={() => handleFoodAddition(meal.id)}
+                                    onAddPress={() => handleFoodAddition(meal)}
                                     onFoodPress={() => handleFoodRemoval(meal.id)}
                                     onAddPressVisible={!dateComparisons.isPast}
                                     onFoodPressVisible={!dateComparisons.isPast}
