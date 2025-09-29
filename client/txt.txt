@@ -1,0 +1,55 @@
+PS E:\College\Projects2025\The Kratos Hub\the-kratos-hub> npm install expo-image-manipulator
+npm error code ENOENT
+npm error syscall stat
+npm error path C:\Users\ibrah\AppData\Local\npm-cache\_cacache\content-v2\sha512\bf\e2\3486686df30d5a39f8484b7b991f7cadc06b4f1794d5590cb7c129721ed9bfb387af107c30ad0991eda78a77cdbd91f34052cb9724d497d763636139bc7d
+npm error errno ENOENT
+npm error enoent Invalid response body while trying to fetch https://registry.npmjs.org/expo-image-manipulator: ENOENT: no such file or directory, stat 'C:\Users\ibrah\AppData\Local\npm-cache\_cacache\content-v2\sha512\bf\e2\3486686df30d5a39f8484b7b991f7cadc06b4f1794d5590cb7c129721ed9bfb387af107c30ad0991eda78a77cdbd91f34052cb9724d497d763636139bc7d'
+npm error enoent This is related to npm not being able to find a file.
+npm error enoent
+npm error A complete log of this run can be found in: C:\Users\ibrah\AppData\Local\npm-cache\_logs\2025-09-12T14_16_25_938Z-debug-0.log
+
+ GROUP    === USER INFO ===
+ GROUP      Preferences
+ LOG      heightUnit: {"field": "cm", "key": "metric", "label": "Metric (cm)", "labelShort": "Metric", "placeholderLabel": "(cm)"}
+ LOG      weightUnit: {"field": "kg", "key": "metric", "label": "Kilogram (kg)", "labelShort": "Kilogram", "placeholderLabel": "(kg)"}
+ LOG      fluidUnit: {"field": "mL", "key": "ml", "label": "Milliliter (mL)", "labelShort": "Milliliter", "placeholderLabel": "(mL)"}
+ LOG      energyUnit: {"field": "kcal", "key": "kcal", "label": "Kilocalorie (kcal)", "labelShort": "Kilocalorie", "placeholderLabel": "(kcal)"}
+ LOG      dateFormat: {"key": "EU", "label": "DD/MM/YYYY", "value": "DD/MM/YYYY"}
+ LOG      timeFormat: {"key": "12h", "label": "12h", "placeholderLabel": "(12h)"}
+ LOG      language: {"format": "en-US", "standard": "en"}
+ LOG      theme: dark
+ GROUP 
+Metrics
+ LOG      heightCm: 169
+ LOG      heightFt: 5
+ LOG      heightIn: 7
+ LOG      weightKg: 89
+ LOG      weightLb: 196.2
+ LOG      bmi: 31.2
+ LOG      bmr: 1806
+ LOG      tdee: 2167
+ LOG      bodyFat: 29.1
+ LOG      leanBodyMass: 63.1
+ LOG      bmiByLeanMass: 22.1
+ LOG      activityLevel: sedentary
+ GROUP 
+Nutrition
+ LOG      goal: weightLoss
+ LOG      recommendedEnergyKcal: 1734
+ LOG      recommendedEnergyKj: 7255
+ LOG      setEnergyKcal: 4000
+ LOG      setEnergyKj: 16736
+ LOG      waterMl: 3280
+ LOG      waterFloz: 111
+ LOG      waterCups: 14
+ LOG      diet: lowCarb
+ LOG      carbRate: 20
+ LOG      proteinRate: 40
+ LOG      proteinRequirement: 75.72
+ LOG      fatRate: 40
+ LOG      carbGramsLiteral: 200
+ LOG      proteinGramsLiteral: 400
+ LOG      fatGramsLiteral: 177.78
+ LOG      carbGramsRounded: 200
+ LOG      proteinGramsRounded: 400
+ LOG      fatGramsRounded: 178

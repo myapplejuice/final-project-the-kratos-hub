@@ -1,0 +1,23 @@
+{
+    "additionalProps": [
+        {
+            "amount": 30,
+            "id": 0,
+            "label": "Vitamin K",
+            "unit": "mg"
+        }
+    ],
+    "carbs": 45,
+    "creatorName": "Ibrahem Abu Shah",
+    "dominantMacro": "Carbs",
+    "energyKcal": 251,
+    "fat": 0,
+    "id": 1,
+    "isPublic": false,
+    "label": "Addas",
+    "protein": 23,
+    "servingSize": 150,
+    "servingUnit": "grams",
+    "type": "Legume",
+    "userId": "E2EC12D7-7081-47FC-AD97-CC812B048CC4"
+}
