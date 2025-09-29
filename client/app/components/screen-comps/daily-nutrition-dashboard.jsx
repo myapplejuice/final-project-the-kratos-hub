@@ -2,9 +2,9 @@ import React, { useEffect } from "react";
 import { View, Text, StyleSheet, Platform } from "react-native";
 import Svg, {Circle} from "react-native-svg";
 import Animated, { Easing, useSharedValue, useAnimatedProps, withTiming } from "react-native-reanimated";
-import AppText from "../../components/screen-comps/app-text";
-import { scaleFont } from "../../utils/scale-fonts";
-import { colors, nutritionColors } from "../../utils/settings/styling";
+import AppText from "./app-text";
+import { scaleFont } from "../../common/utils/scale-fonts";
+import { colors, nutritionColors } from "../../common/settings/styling";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 

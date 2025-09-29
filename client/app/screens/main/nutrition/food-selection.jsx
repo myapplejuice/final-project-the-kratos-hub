@@ -8,14 +8,14 @@ import AppTextInput from "../../../components/screen-comps/app-text-input";
 import AppView from "../../../components/screen-comps/app-view";
 import Divider from "../../../components/screen-comps/divider";
 import FloatingActionButton from "../../../components/screen-comps/floating-action-button";
-import { Images } from "../../../utils/assets";
-import { UserContext } from "../../../utils/contexts/user-context";
-import { convertEnergy } from "../../../utils/helper-functions/unit-converter";
-import { scaleFont } from "../../../utils/scale-fonts";
-import { routes } from "../../../utils/settings/constants";
-import { colors, nutritionColors } from "../../../utils/settings/styling";
+import { Images } from "../../../common/settings/assets";
+import { UserContext } from "../../../common/contexts/user-context";
+import { convertEnergy } from "../../../common/utils/unit-converter";
+import { scaleFont } from "../../../common/utils/scale-fonts";
+import { routes } from "../../../common/settings/constants";
+import { colors, nutritionColors } from "../../../common/settings/styling";
 import FadeInOut from "../../../components/effects/fade-in-out";
-import APIService from '../../../utils/services/api-service';
+import APIService from '../../../common/services/api-service';
 
 export default function FoodSelection() {
     const { user, additionalContexts, setAdditionalContexts } = useContext(UserContext);

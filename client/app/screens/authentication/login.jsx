@@ -1,17 +1,17 @@
 import { Keyboard, StyleSheet, View, Dimensions, Image, TouchableOpacity } from "react-native";
 import { useState, useContext } from "react";
 import { router } from "expo-router";
-import usePopups from "../../utils/hooks/use-popups";
+import usePopups from "../../common/hooks/use-popups";
 import AnimatedButton from "../../components/screen-comps/animated-button";
 import TextButton from "../../components/screen-comps/text-button"
-import { scaleFont } from '../../utils/scale-fonts';
-import { UserContext } from "../../utils/contexts/user-context";
-import { routes } from '../../utils/settings/constants'
-import { Images } from "../../utils/assets";
+import { scaleFont } from '../../common/utils/scale-fonts';
+import { UserContext } from "../../common/contexts/user-context";
+import { routes } from '../../common/settings/constants'
+import { Images } from "../../common/settings/assets";
 import AppText from "../../components/screen-comps/app-text";
 import AppTextInput from "../../components/screen-comps/app-text-input";
-import DeviceStorageService from "../../utils/services/device-storage-service";
-import APIService from "../../utils/services/api-service";
+import DeviceStorageService from "../../common/services/device-storage-service";
+import APIService from "../../common/services/api-service";
 import AppScroll from '../../components/screen-comps/app-scroll';
 
 export default function Login() {

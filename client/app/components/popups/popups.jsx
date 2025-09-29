@@ -1,12 +1,12 @@
-import Toast from "../components/popups/toast";
-import Spinner from "../components/popups/spinner";
-import Dialog from "../components/popups/dialog";
-import Alert from "../components/popups/alert";
-import Selector from "../components/popups/selector";
-import Input from "../components/popups/input";
-import Options from "../components/popups/options";
+import Toast from "./toast";
+import Spinner from "./spinner";
+import Dialog from "./dialog";
+import Alert from "./alert";
+import Selector from "./selector";
+import Input from "./input";
+import Options from "./options";
 import { StyleSheet, View } from "react-native";
-import Picker from "../components/popups/picker";
+import Picker from "./picker";
 
 export default function Popups({
   toast, setToast, spinner,

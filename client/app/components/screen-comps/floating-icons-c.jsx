@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useMemo, useState } from 'react';
 import { Animated, Dimensions, StyleSheet } from 'react-native';
-import { Images } from '../../utils/assets';
+import { Images } from '../../common/settings/assets';
 
 export default function FloatingIconsC() {
     const OPACITY_COUNT = 29;

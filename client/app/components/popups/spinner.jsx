@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Animated, Easing, View, StyleSheet } from "react-native";
-import { scaleFont } from "../../utils/scale-fonts";
-import { colors } from "../../utils/settings/styling";
+import { scaleFont } from "../../common/utils/scale-fonts";
+import { colors } from "../../common/settings/styling";
 import AppText from "../screen-comps/app-text";
 
 export default function Spinner({ text = "Please wait..." }) {

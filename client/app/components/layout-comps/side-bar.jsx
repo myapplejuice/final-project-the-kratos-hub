@@ -7,7 +7,6 @@ import {
     Dimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors } from "../../utils/settings/styling";
 
 const { width, height } = Dimensions.get("window");
 

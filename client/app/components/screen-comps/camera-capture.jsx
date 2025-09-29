@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity, Image, StyleSheet, Text } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImageManipulator from 'expo-image-manipulator';
-import { Images } from "../../utils/assets";
-import usePopups from "../../utils/hooks/use-popups";
-import AppText from "./app-text";
+import { Images } from "../../common/settings/assets";
 
 export default function CameraCapture({ onCapture, initialFacing = "back" }) {
   const [camera, setCamera] = useState(null);

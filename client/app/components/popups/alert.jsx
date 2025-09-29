@@ -1,8 +1,8 @@
 import React from "react";
 import { Animated, StyleSheet, TouchableOpacity, Platform, View } from "react-native";
-import { scaleFont } from "../../utils/scale-fonts";
+import { scaleFont } from "../../common/utils/scale-fonts";
 import usePopupAnimation from "./popup-animation";
-import { colors } from "../../utils/settings/styling";
+import { colors } from "../../common/settings/styling";
 import AppText from "../screen-comps/app-text";
 
 export default function Alert({

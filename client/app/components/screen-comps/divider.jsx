@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { colors } from '../../utils/settings/styling';
+import { colors } from '../../common/settings/styling';
 
 export default function Divider({
   orientation = 'vertical', // 'vertical' or 'horizontal'

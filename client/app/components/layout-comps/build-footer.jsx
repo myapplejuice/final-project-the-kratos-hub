@@ -2,7 +2,7 @@ import {
     View,
     StyleSheet,
 } from "react-native";
-import { scaleFont } from "../../utils/scale-fonts";
+import { scaleFont } from "../../common/utils/scale-fonts";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppText from "../screen-comps/app-text";
 

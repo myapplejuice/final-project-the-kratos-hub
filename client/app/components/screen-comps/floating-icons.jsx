@@ -1,6 +1,6 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { Animated, Dimensions, StyleSheet, Image } from 'react-native';
-import { Images } from '../../utils/assets';
+import { Images } from '../../common/settings/assets';
 
 export default function FloatingIcons() {
   const staticGymIcons = useMemo(() => [

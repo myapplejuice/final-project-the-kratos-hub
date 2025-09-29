@@ -2,18 +2,17 @@ import { useEffect, useContext } from 'react';
 import { View, StyleSheet, ScrollView, Image } from 'react-native';
 import { Asset } from 'expo-asset';
 import { router } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { UserContext } from './utils/contexts/user-context';
-import { ImageAssets } from './utils/assets';
-import { scaleFont } from './utils/scale-fonts';
-import DeviceStorageService from './utils/services/device-storage-service';
+import { UserContext } from './common/contexts/user-context';
+import { ImageAssets } from './common/settings/assets';
+import { scaleFont } from './common/utils/scale-fonts';
+import DeviceStorageService from './common/services/device-storage-service';
 import NetInfo from "@react-native-community/netinfo";
-import usePopups from './utils/hooks/use-popups';
-import { routes } from './utils/settings/constants';
-import { Images } from './utils/assets';
-import { colors } from './utils/settings/styling';
+import usePopups from './common/hooks/use-popups';
+import { routes } from './common/settings/constants';
+import { Images } from './common/settings/assets';
+import { colors } from './common/settings/styling';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import APIService from './utils/services/api-service';
+import APIService from './common/services/api-service';
 import BuildFooter from './components/layout-comps/build-footer'
 
 export default function Index() {

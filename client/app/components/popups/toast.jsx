@@ -1,8 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, Dimensions } from "react-native";
-import { scaleFont } from "../../utils/scale-fonts";
 import AppText from "../screen-comps/app-text";
-import { colors } from "../../utils/settings/styling";
+import { scaleFont } from "../../common/utils/scale-fonts";
 
 const { height, width } = Dimensions.get("window");
 

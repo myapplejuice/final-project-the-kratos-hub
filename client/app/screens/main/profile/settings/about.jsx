@@ -2,10 +2,10 @@ import { router } from "expo-router";
 import { Image, Linking, StyleSheet, TouchableOpacity, View } from "react-native";
 import AnimatedButton from "../../../../components/screen-comps/animated-button";
 import AppText from "../../../../components/screen-comps/app-text";
-import { Images } from "../../../../utils/assets";
-import { scaleFont } from "../../../../utils/scale-fonts";
-import { routes } from "../../../../utils/settings/constants";
-import { colors } from "../../../../utils/settings/styling";
+import { Images } from "../../../../common/settings/assets";
+import { scaleFont } from "../../../../common/utils/scale-fonts";
+import { routes } from "../../../../common/settings/constants";
+import { colors } from "../../../../common/settings/styling";
 import AppScroll from "../../../../components/screen-comps/app-scroll";
 
 export default function About() {

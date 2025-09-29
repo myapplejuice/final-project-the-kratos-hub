@@ -1,16 +1,15 @@
 import {
     View,
 } from "react-native";
-import { useEffect, useContext, useState, useRef } from "react";
-import { useBackHandlerContext } from "../../utils/contexts/back-handler-context";
+import { useEffect } from "react";
+import { useBackHandlerContext } from "../../common/contexts/back-handler-context";
 import { usePathname, router } from "expo-router";
-import { routes, } from "../../utils/settings/constants";
+import { routes, } from "../../common/settings/constants";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors } from "../../utils/settings/styling";
+import { colors } from "../../common/settings/styling";
 import AppText from "../../components/screen-comps/app-text";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Platform } from "react-native";
-import NavigationBar from "../../components/layout-comps/navigation-bar";
 
 export default function TrainingHub() {
     const { setBackHandler } = useBackHandlerContext();

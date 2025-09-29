@@ -3,11 +3,10 @@ import { router, usePathname } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
-
 import React from "react";
-import { colors } from "../../utils/settings/styling";
-import { Images } from "../../utils/assets";
-import { routes } from "../../utils/settings/constants";
+import { colors } from "../../common/settings/styling";
+import { Images } from "../../common/settings/assets";
+import { routes } from "../../common/settings/constants";
 
 export default function NavigationBar({ visible }) {
     const insets = useSafeAreaInsets();

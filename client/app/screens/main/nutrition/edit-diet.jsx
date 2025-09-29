@@ -1,20 +1,21 @@
 import { useContext, useEffect, useState } from "react";
 import { View, StyleSheet, TouchableOpacity, Keyboard } from "react-native";
-import { colors, nutritionColors } from "../../../utils/settings/styling";
-import { scaleFont } from "../../../utils/scale-fonts";
-import { UserContext } from "../../../utils/contexts/user-context";
-import { dietOptions, goalOptions } from "../../../utils/helper-functions/global-options";
-import { adjustColor } from "../../../utils/helper-functions/random-functions";
+import { colors, nutritionColors } from "../../../common/settings/styling";
+import { scaleFont } from "../../../common/utils/scale-fonts";
+import { UserContext } from "../../../common/contexts/user-context";
+import { dietOptions, goalOptions } from "../../../common/utils/global-options";
+import { adjustColor } from "../../../common/utils/random-functions";
 import { Image } from "expo-image";
-import { Images } from "../../../utils/assets";
-import usePopups from "../../../utils/hooks/use-popups";
-import { macrosFromCalories, recalculateUserInformation } from "../../../utils/helper-functions/metrics-calculator";
-import { convertEnergy, formatDate } from "../../../utils/helper-functions/unit-converter";
+import { Images } from "../../../common/settings/assets";
+import usePopups from "../../../common/hooks/use-popups";
+import { macrosFromCalories, recalculateUserInformation } from "../../../common/utils/metrics-calculator";
+import { convertEnergy} from "../../../common/utils/unit-converter";
+import { formatDate } from "../../../common/utils/date-time";
 import AppText from "../../../components/screen-comps/app-text";
 import PercentageBar from "../../../components/screen-comps/percentage-bar";
 import AppTextInput from "../../../components/screen-comps/app-text-input";
 import AnimatedButton from "../../../components/screen-comps/animated-button";
-import APIService from "../../../utils/services/api-service";
+import APIService from "../../../common/services/api-service";
 import AppScroll from "../../../components/screen-comps/app-scroll";
 
 export default function EditDiet() {

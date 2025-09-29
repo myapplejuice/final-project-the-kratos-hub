@@ -1,9 +1,9 @@
 import { useContext } from "react";
 import { View } from "react-native";
-import { UserContext } from "../../utils/contexts/user-context";
-import { formatDate } from "../../utils/helper-functions/unit-converter";
-import { scaleFont } from "../../utils/scale-fonts";
-import { colors } from "../../utils/settings/styling";
+import { UserContext } from "../../common/contexts/user-context";
+import { formatDate } from "../../common/utils/date-time";
+import { scaleFont } from "../../common/utils/scale-fonts";
+import { colors } from "../../common/settings/styling";
 import AppText from "./app-text";
 
 export default function DateDisplay({

@@ -1,13 +1,12 @@
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { useContext } from "react";
-import { UserContext } from "../../../utils/contexts/user-context";
-import { scaleFont } from "../../../utils/scale-fonts";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors } from "../../../utils/settings/styling";
+import { UserContext } from "../../../common/contexts/user-context";
+import { scaleFont } from "../../../common/utils/scale-fonts";
+import { colors } from "../../../common/settings/styling";
 import { Image } from "expo-image";
-import { Images } from '../../../utils/assets'
-import usePopups from "../../../utils/hooks/use-popups";
-import APIService from "../../../utils/services/api-service";
+import { Images } from '../../../common/settings/assets'
+import usePopups from "../../../common/hooks/use-popups";
+import APIService from "../../../common/services/api-service";
 import AppText from "../../../components/screen-comps/app-text";
 import Divider from "../../../components/screen-comps/divider";
 import AppScroll from "../../../components/screen-comps/app-scroll";

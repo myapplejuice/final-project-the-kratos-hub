@@ -2,12 +2,12 @@ import React, { useRef, useContext, useEffect } from "react";
 import { Platform, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { NavBarContext } from "../../utils/contexts/nav-bar-context";
-import { TopBarContext } from "../../utils/contexts/top-bar-context";
-import { colors } from "../../utils/settings/styling";
-import { mainScreens } from "../../utils/settings/constants";
+import { NavBarContext } from "../../common/contexts/nav-bar-context";
+import { TopBarContext } from "../../common/contexts/top-bar-context";
+import { colors } from "../../common/settings/styling";
+import { mainScreens } from "../../common/settings/constants";
 import { usePathname } from "expo-router";
-import { KeyboardContext } from "../../utils/contexts/keyboard-context";
+import { KeyboardContext } from "../../common/contexts/keyboard-context";
 
 export default function AppScroll({
     children,

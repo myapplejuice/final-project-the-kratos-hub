@@ -10,16 +10,17 @@ import Divider from "../../../components/screen-comps/divider";
 import FloatingActionButton from "../../../components/screen-comps/floating-action-button";
 import Meal from "../../../components/screen-comps/meal";
 import ProgressBar from "../../../components/screen-comps/progress-bar";
-import { Images } from "../../../utils/assets";
-import { UserContext } from "../../../utils/contexts/user-context";
-import { convertEnergy, convertFluid, formatDate } from "../../../utils/helper-functions/unit-converter";
-import usePopups from "../../../utils/hooks/use-popups";
-import { scaleFont } from "../../../utils/scale-fonts";
-import APIService from "../../../utils/services/api-service";
-import { colors, nutritionColors } from "../../../utils/settings/styling";
-import { getDayComparisons } from '../../../utils/dateTimeUitls'
+import { Images } from "../../../common/settings/assets";
+import { UserContext } from '../../../common/contexts/user-context';
+import { convertEnergy, convertFluid } from "../../../common/utils/unit-converter";
+import { formatDate } from '../../../common/utils/date-time';
+import usePopups from "../../../common/hooks/use-popups";
+import { scaleFont } from "../../../common/utils/scale-fonts";
+import APIService from "../../../common/services/api-service";
+import { colors, nutritionColors } from "../../../common/settings/styling";
+import { getDayComparisons } from '../../../common/utils/date-time'
 import { router } from 'expo-router';
-import { routes } from '../../../utils/settings/constants';
+import { routes } from '../../../common/settings/constants';
 
 export default function MealsLog() {
     const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
@@ -27,7 +28,7 @@ export default function MealsLog() {
     const insets = useSafeAreaInsets();
     const [scrollToTop, setScrollToTop] = useState(false);
 
-    const [lastAddedMeal, setLastAddedMeal] = useState(-1);
+    const [openMeals, setOpenMeals] = useState([]);
     const [fabVisible, setFabVisible] = useState(true);
     const [datePickerOpen, setDatePickerOpen] = useState(false);
     const [currentDayLog, setCurrentDayLog] = useState({});
@@ -183,7 +184,7 @@ export default function MealsLog() {
                     if (result.success) {
                         const meal = result.data.meal;
 
-                        setLastAddedMeal(meal.id);
+                        setOpenMeals(prev => [...prev, meal.id]);
                         setUser(prev => ({
                             ...prev,
                             nutritionLogs: {
@@ -258,9 +259,9 @@ export default function MealsLog() {
                 if (!newLabel || newLabel === currentDayLog?.meals?.find(meal => meal.id === mealId)?.label)
                     return;
 
+                const time = new Date().getTime();
                 showSpinner();
                 try {
-                    // Backend call
                     const result = await APIService.nutrition.meals.updateLabel({ mealId, newLabel });
 
                     if (result.success) {
@@ -318,17 +319,17 @@ export default function MealsLog() {
             }
             <FloatingActionButton
                 onPress={handleMealAddition}
-                visible={!dateComparisons.isPast && fabVisible}
+                visible={fabVisible}
                 position={{ bottom: insets.bottom + 50, right: 20 }}
                 icon={Images.plus}
             />
 
             <FloatingActionButton
                 onPress={() => setScrollToTop(true)}
-                visible={!dateComparisons.isPast && !fabVisible}
+                visible={!fabVisible}
                 position={{ bottom: insets.bottom + 50, left: 20 }}
                 icon={Images.arrow}
-                iconStyle={{transform: [{rotate: '-90deg'}], marginBottom: 2}}
+                iconStyle={{ transform: [{ rotate: '-90deg' }], marginBottom: 2 }}
                 iconSize={20}
                 size={40}
             />
@@ -400,60 +401,41 @@ export default function MealsLog() {
                             );
                         })}
                     </View>
-                    {dateComparisons.isPast && (
-                        <>
-                            <Divider orientation="horizontal" style={{ marginVertical: 15 }} />
+                </View>
+
+                {/* Meals Log*/}
+                <View style={{ backgroundColor: colors.background }}>
+                    <View style={[styles.card, { padding: 0, marginTop: 20 }]} >
+                        <View style={{ padding: 15 }}>
                             <ProgressBar
                                 title="Water"
-                                current={convertFluid(currentDayLog?.consumedWaterMl ?? 0, 'ml', user.preferences.fluidUnit.key)}
-                                max={convertFluid(currentDayLog?.targetWaterMl ?? user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)}
+                                current={convertFluid(currentDayLog.consumedWaterMl ?? 0, 'ml', user.preferences.fluidUnit.key)}
+                                max={convertFluid(currentDayLog.targetWaterMl ?? user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)}
                                 unit={user.preferences.fluidUnit.field}
                                 color={nutritionColors.water1}
                                 styleType="header"
                                 height={10}
                                 borderRadius={5}
+
                             />
-                        </>
-                    )}
-                </View>
+                        </View>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+                                {/* Minus Button */}
+                                <TouchableOpacity onPress={() => handleWater(-waterAmount)} style={{ backgroundColor: colors.accentPink, borderBottomLeftRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}>
+                                    <Image source={Images.minus} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                                </TouchableOpacity>
 
-                {/* Meals Log*/}
-                <View style={{ backgroundColor: colors.background }}>
-                    {!dateComparisons.isPast && (
-                        <>
-                            <View style={[styles.card, { padding: 0, marginTop: 20 }]} >
-                                <View style={{ padding: 15 }}>
-                                    <ProgressBar
-                                        title="Water"
-                                        current={convertFluid(currentDayLog.consumedWaterMl ?? 0, 'ml', user.preferences.fluidUnit.key)}
-                                        max={convertFluid(currentDayLog.targetWaterMl ?? user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)}
-                                        unit={user.preferences.fluidUnit.field}
-                                        color={nutritionColors.water1}
-                                        styleType="header"
-                                        height={10}
-                                        borderRadius={5}
+                                <TouchableOpacity style={{ paddingHorizontal: 15, alignItems: 'center' }} onPress={handleWaterAmountChange}>
+                                    <AppText style={{ fontSize: scaleFont(16), color: nutritionColors.water1 }}>
+                                        {waterAmount} {user.preferences.fluidUnit.field}
+                                    </AppText>
+                                </TouchableOpacity>
 
-                                    />
-                                </View>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
-                                    {/* Minus Button */}
-                                    <TouchableOpacity onPress={() => handleWater(-waterAmount)} style={{ backgroundColor: colors.accentPink, borderBottomLeftRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}>
-                                        <Image source={Images.minus} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity style={{ paddingHorizontal: 15, alignItems: 'center' }} onPress={handleWaterAmountChange}>
-                                        <AppText style={{ fontSize: scaleFont(16), color: nutritionColors.water1 }}>
-                                            {waterAmount} {user.preferences.fluidUnit.field}
-                                        </AppText>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity onPress={() => handleWater(waterAmount)} style={{ backgroundColor: colors.main, borderBottomRightRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}  >
-                                        <Image source={Images.plus} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                                    </TouchableOpacity>
-                                </View>
+                                <TouchableOpacity onPress={() => handleWater(waterAmount)} style={{ backgroundColor: colors.main, borderBottomRightRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}  >
+                                    <Image source={Images.plus} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                                </TouchableOpacity>
                             </View>
-                        </>
-                    )}
+                    </View>
                     {currentDayLog?.meals?.length > 0 ?
                         currentDayLog.meals.map((meal, i) => {
                             return (
@@ -465,12 +447,9 @@ export default function MealsLog() {
                                     onDeletePress={() => handleMealRemoval(meal.id)}
                                     onAddPress={() => handleFoodAddition(meal)}
                                     onFoodPress={() => handleFoodRemoval(meal.id)}
-                                    onAddPressVisible={!dateComparisons.isPast}
-                                    onFoodPressVisible={!dateComparisons.isPast}
-                                    onRenamePressVisible={!dateComparisons.isPast}
-                                    onDeletePressVisible={!dateComparisons.isPast}
                                     key={meal.id}
-                                    expandedOnStart={meal.id === lastAddedMeal}
+                                    expandedOnStart={openMeals.includes(meal.id)}
+                                    onExpand={() => { setOpenMeals(prev => prev.includes(meal.id) ? prev.filter(id => id !== meal.id) : [...prev, meal.id]) }}
                                 />
                             )
                         })
@@ -480,13 +459,12 @@ export default function MealsLog() {
                                     source={Images.mealTwoOutline} // replace with your image
                                     style={{ width: 120, height: 120, marginBottom: 15, tintColor: colors.mutedText + '60' }}
                                 />
-                                <AppText style={{ fontSize: scaleFont(16), color: !dateComparisons.isPast ? 'white' : colors.mutedText + '80', textAlign: 'center', fontWeight: 'bold' }}>
+                                <AppText style={{ fontSize: scaleFont(16), color:colors.mutedText + '80', textAlign: 'center', fontWeight: 'bold' }}>
                                     No meals were logged on this date
                                 </AppText>
-                                {!dateComparisons.isPast && <AppText style={{ fontSize: scaleFont(14), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>
+                               <AppText style={{ fontSize: scaleFont(14), color: 'white', textAlign: 'center', marginTop: 5 }}>
                                     Tap on plus the "+" to add new meals
                                 </AppText>
-                                }
                             </View>
                         )}
                 </View>

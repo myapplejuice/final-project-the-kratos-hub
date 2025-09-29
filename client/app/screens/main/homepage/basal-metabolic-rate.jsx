@@ -1,11 +1,11 @@
 import { View, StyleSheet, } from "react-native";
 import { useContext } from "react";
-import { scaleFont } from "../../../utils/scale-fonts";
-import { UserContext } from "../../../utils/contexts/user-context";
-import { colors } from "../../../utils/settings/styling";
+import { scaleFont } from "../../../common/utils/scale-fonts";
+import { UserContext } from "../../../common/contexts/user-context";
+import { colors } from "../../../common/settings/styling";
 import AppText from "../../../components/screen-comps/app-text";
 import AppScroll from "../../../components/screen-comps/app-scroll";
-import { convertEnergy } from "../../../utils/helper-functions/unit-converter";
+import { convertEnergy } from "../../../common/utils/unit-converter";
 
 export default function BasalMetabolicRate() {
     const { user } = useContext(UserContext);

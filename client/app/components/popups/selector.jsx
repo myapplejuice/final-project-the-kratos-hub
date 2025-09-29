@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import { Animated, View, StyleSheet, TouchableOpacity, Platform } from "react-native";
-import { scaleFont } from "../../utils/scale-fonts";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { colors } from "../../utils/settings/styling";
+import { scaleFont } from "../../common/utils/scale-fonts";
+import { colors } from "../../common/settings/styling";
 import AppText from "../screen-comps/app-text";
 
 export default function Selector({

@@ -8,8 +8,8 @@ import {
     Platform,
 } from "react-native";
 import AppText from "../screen-comps/app-text";
-import { colors } from "../../utils/settings/styling";
-import { scaleFont } from "../../utils/scale-fonts";
+import { scaleFont } from "../../common/utils/scale-fonts";
+import { colors } from "../../common/settings/styling";
 import AnimatedButton from "../screen-comps/animated-button";
 
 const ITEM_HEIGHT = 50;

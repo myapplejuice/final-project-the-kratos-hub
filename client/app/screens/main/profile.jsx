@@ -1,24 +1,24 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { useContext, useState } from "react";
+import { useContext} from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import BuildFooter from "../../components/layout-comps/build-footer";
 import AppText from "../../components/screen-comps/app-text";
-import { Images } from '../../utils/assets';
-import { UserContext } from "../../utils/contexts/user-context";
-import { formatDate } from "../../utils/helper-functions/unit-converter";
-import usePopups from "../../utils/hooks/use-popups";
-import { scaleFont } from "../../utils/scale-fonts";
-import DeviceStorageService from '../../utils/services/device-storage-service';
-import APIService from '../../utils/services/api-service';
-import { routes } from "../../utils/settings/constants";
-import { colors } from "../../utils/settings/styling";
+import { Images } from '../../common/settings/assets';
+import { UserContext } from "../../common/contexts/user-context";
+import { formatDate } from '../../common/utils/date-time';
+import usePopups from "../../common/hooks/use-popups";
+import { scaleFont } from "../../common/utils/scale-fonts";
+import DeviceStorageService from '../../common/services/device-storage-service';
+import APIService from '../../common/services/api-service';
+import { routes } from "../../common/settings/constants";
+import { colors } from "../../common/settings/styling";
 import Divider from '../../components/screen-comps/divider';
 import AppScroll from '../../components/screen-comps/app-scroll'
 import ImageCapture from '../../components/screen-comps/image-capture';
-import { CameraContext } from '../../utils/contexts/camera-context';
-import { LibraryContext } from '../../utils/contexts/library-context';
+import { CameraContext } from '../../common/contexts/camera-context';
+import { LibraryContext } from '../../common/contexts/library-context';
 import AnimatedButton from '../../components/screen-comps/animated-button';
 
 export default function Profile() {

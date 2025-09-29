@@ -4,15 +4,18 @@ import AppText from './app-text';
 import PercentageBar from './percentage-bar';
 import Divider from './divider';
 import AnimatedButton from './animated-button';
-import { colors, nutritionColors } from '../../utils/settings/styling';
-import { Images } from '../../utils/assets';
-import { scaleFont } from '../../utils/scale-fonts';
-import { UserContext } from '../../utils/contexts/user-context';
-import { convertEnergy } from '../../utils/helper-functions/unit-converter';
+import { colors, nutritionColors } from '../../common/settings/styling';
+import { Images } from '../../common/settings/assets';
+import { scaleFont } from '../../common/utils/scale-fonts';
+import { UserContext } from '../../common/contexts/user-context';
+import { convertEnergy } from '../../common/utils/unit-converter';
 import ExpandInOut from '../effects/expand-in-out';
 import Invert from '../effects/invert';
 
-export default function Meal({ title = 'Meal', num, onDeletePress = () => { }, onRenamePress = () => { }, onAddPress = () => { }, onFoodPress = () => { }, onAddPressVisible = true, onRenamePressVisible = true, onFoodPressVisible = true, onDeletePressVisible = true, foods = [], expandedOnStart = false }) {
+export default function Meal({ title = 'Meal', num, onDeletePress = () => { }, onRenamePress = () => { }, onAddPress = () => { }, onFoodPress = () => { },
+    onAddPressVisible = true, onRenamePressVisible = true, onFoodPressVisible = true, onDeletePressVisible = true,
+    foods = [], expandedOnStart = false, onExpand = () => { } }) {
+
     const { user } = useContext(UserContext);
     const [expanded, setExpanded] = useState(expandedOnStart);
 
@@ -38,7 +41,7 @@ export default function Meal({ title = 'Meal', num, onDeletePress = () => { }, o
         <View style={styles.card}>
             {/* Header */}
             <TouchableOpacity
-                onPress={() => setExpanded(prev => !prev)}
+                onPress={() => { setExpanded(prev => !prev), onExpand() }}
                 style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', zIndex: 9999 }}
             >
                 <View>
@@ -78,7 +81,7 @@ export default function Meal({ title = 'Meal', num, onDeletePress = () => { }, o
             </TouchableOpacity>
 
             {/* Expandable Content */}
-            <ExpandInOut visible={expanded} >
+            <ExpandInOut visible={expanded}>
                 <PercentageBar
                     values={[
                         { percentage: percentages.carb, color: nutritionColors.carbs1 },
@@ -120,8 +123,8 @@ export default function Meal({ title = 'Meal', num, onDeletePress = () => { }, o
                     </View>
                 )}
 
-                {/* Totals & Add Button */}
-                <View style={{ padding: 15, alignItems: 'center', backgroundColor: 'rgba(58,58,58,0.49)', borderRadius: 15, marginTop: foods.length > 0 ? 7 : 15, marginBottom: onAddPressVisible ? 0 : 15 }}>
+                {/* Totals */}
+                <View style={{ padding: 15, alignItems: 'center', backgroundColor: 'rgba(58,58,58,0.49)', borderRadius: 15, marginTop: foods.length > 0 ? 7 : 15 }}>
                     <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                         <AppText style={{ color: nutritionColors.energy1, fontSize: scaleFont(10) }}>
                             {convertEnergy(totals.energy, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
@@ -147,25 +150,28 @@ export default function Meal({ title = 'Meal', num, onDeletePress = () => { }, o
                     </View>
                 </View>
 
-                {onAddPressVisible && (
-                    <AnimatedButton
-                        title="Add Food"
-                        style={{ padding: 15, backgroundColor: colors.accentGreen, borderRadius: 15, marginTop: 15 }}
-                        textStyle={{ fontSize: scaleFont(13), fontWeight: 'bold' }}
-                        leftImage={Images.plus}
-                        leftImageStyle={{ tintColor: 'white', width: 18, height: 18 }}
-                        leftImageContainerStyle={{
-                            width: 16,
-                            height: 16,
-                            padding: 5,
-                            borderRadius: 50,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            marginEnd: 8,
-                        }}
-                        onPress={onAddPress}
-                    />
-                )}
+                <AnimatedButton
+                    title="Add Food"
+                    style={{
+                        padding: 15,
+                        backgroundColor: colors.accentGreen,
+                        borderRadius: 15,
+                        marginTop: 15,
+                    }}
+                    textStyle={{ fontSize: scaleFont(13), fontWeight: 'bold' }}
+                    leftImage={Images.plus}
+                    leftImageStyle={{ tintColor: 'white', width: 18, height: 18 }}
+                    leftImageContainerStyle={{
+                        width: 16,
+                        height: 16,
+                        padding: 5,
+                        borderRadius: 50,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginEnd: 8,
+                    }}
+                    onPress={onAddPress}
+                />
             </ExpandInOut>
         </View>
     );

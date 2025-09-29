@@ -1,7 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
-import {scaleFont} from '../../utils/scale-fonts'
-import AppText from './app-text';
 
 export default function ProgressDots({
   steps = [],

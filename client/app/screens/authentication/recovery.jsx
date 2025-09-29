@@ -1,17 +1,17 @@
 import { Keyboard, StyleSheet, View, } from "react-native";
 import { useState, useEffect } from "react";
 import { router, usePathname } from "expo-router";
-import usePopups from "../../utils/hooks/use-popups";
+import usePopups from "../../common/hooks/use-popups";
 import AnimatedButton from "../../components/screen-comps/animated-button";
 import ProgressDots from "../../components/screen-comps/progress-dots";
-import { scaleFont } from "../../utils/scale-fonts";
+import { scaleFont } from "../../common/utils/scale-fonts";
 import TextButton from "../../components/screen-comps/text-button";
-import { useBackHandlerContext } from "../../utils/contexts/back-handler-context";
-import { routes } from "../../utils/settings/constants";
+import { useBackHandlerContext } from "../../common/contexts/back-handler-context";
+import { routes } from "../../common/settings/constants";
 import { Dimensions } from "react-native";
 import AppText from "../../components/screen-comps/app-text";
 import AppTextInput from "../../components/screen-comps/app-text-input";
-import APIService from "../../utils/services/api-service";
+import APIService from "../../common/services/api-service";
 import AppScroll from "../../components/screen-comps/app-scroll";
 
 export default function Recovery() {

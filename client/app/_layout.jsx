@@ -2,22 +2,22 @@ import { useState, useMemo, useEffect, useContext } from "react";
 import { usePathname, Stack, router } from "expo-router";
 import TopBar from "./components/layout-comps/top-bar"
 import NavigationBar from "./components/layout-comps/navigation-bar"
-import PopupsProvider from "./utils/providers/popups-provider";
-import { BackHandlerProvider, useBackHandlerContext } from './utils/contexts/back-handler-context';
-import { UserContext } from "./utils/contexts/user-context";
-import { CameraContext } from "./utils/contexts/camera-context";
-import Popups from "./utils/popups";
+import PopupsProvider from "./common/providers/popups-provider";
+import { BackHandlerProvider, useBackHandlerContext } from './common/contexts/back-handler-context';
+import { UserContext } from "./common/contexts/user-context";
+import { CameraContext } from "./common/contexts/camera-context";
+import Popups from "./components/popups/popups";
 import { StatusBar } from 'expo-status-bar';
-import usePopupsHandlers from './utils/hooks/use-popups-handlers'
-import { colors } from './utils/settings/styling'
-import { exitAppBackScreens, independentBackHandlerScreens } from "./utils/settings/constants";
+import usePopupsHandlers from './common/hooks/use-popups-handlers'
+import { colors } from './common/settings/styling'
+import { exitAppBackScreens, independentBackHandlerScreens } from "./common/settings/constants";
 import { BackHandler, Keyboard, View } from "react-native";
-import { TopBarContext } from "./utils/contexts/top-bar-context";
-import { NavBarContext } from "./utils/contexts/nav-bar-context";
-import { authScreens } from "./utils/settings/constants";
-import { mainScreens } from "./utils/settings/constants";
-import { LibraryContext } from "./utils/contexts/library-context";
-import { KeyboardContext } from "./utils/contexts/keyboard-context";
+import { TopBarContext } from "./common/contexts/top-bar-context";
+import { NavBarContext } from "./common/contexts/nav-bar-context";
+import { authScreens } from "./common/settings/constants";
+import { mainScreens } from "./common/settings/constants";
+import { LibraryContext } from "./common/contexts/library-context";
+import { KeyboardContext } from "./common/contexts/keyboard-context";
 
 export default function RootLayout() {
     return (

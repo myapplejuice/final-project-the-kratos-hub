@@ -1,19 +1,19 @@
 import { useContext, useEffect, useState } from "react";
 import { View, StyleSheet,  TouchableOpacity,Platform } from "react-native";
-import { colors } from "../../../utils/settings/styling"; 
-import { scaleFont } from "../../../utils/scale-fonts";
-import { UserContext } from "../../../utils/contexts/user-context";
-import { activityOptions } from "../../../utils/helper-functions/global-options";
-import { adjustColor } from "../../../utils/helper-functions/random-functions";
+import { colors } from "../../../common/settings/styling"; 
+import { scaleFont } from "../../../common/utils/scale-fonts";
+import { UserContext } from "../../../common/contexts/user-context";
+import { activityOptions } from "../../../common/utils/global-options";
+import { adjustColor } from "../../../common/utils/random-functions";
 import { Image } from "expo-image";
-import { Images } from "../../../utils/assets";
-import usePopups from "../../../utils/hooks/use-popups";
-import { BMIByLeanMass, recalculateUserInformation } from "../../../utils/helper-functions/metrics-calculator";
-import { goalsActivityTip } from "../../../utils/helper-functions/text-generator";
+import { Images } from "../../../common/settings/assets";
+import usePopups from "../../../common/hooks/use-popups";
+import { BMIByLeanMass, recalculateUserInformation } from "../../../common/utils/metrics-calculator";
+import { goalsActivityTip } from "../../../common/utils/text-generator";
 import AppText from "../../../components/screen-comps/app-text";
-import APIService from "../../../utils/services/api-service";
+import APIService from "../../../common/services/api-service";
 import AppScroll from "../../../components/screen-comps/app-scroll";
-import { convertEnergy } from "../../../utils/helper-functions/unit-converter";
+import { convertEnergy } from "../../../common/utils/unit-converter";
 
 export default function EditActivity() {
     const { createToast, hideSpinner, showSpinner } = usePopups();

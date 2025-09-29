@@ -1,8 +1,7 @@
 import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { Images } from "../../utils/assets";
+import { Images } from "../../common/settings/assets";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors } from "../../utils/settings/styling";
-import AppText from "./app-text";
+import { colors } from "../../common/settings/styling";
 
 export default function CameraImagePreview({ imageUri, onConfirm, onCancel }) {
     const insets =useSafeAreaInsets();

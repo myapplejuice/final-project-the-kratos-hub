@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { View, StyleSheet, Animated } from "react-native";
 import AppText from "./app-text";
-import { scaleFont } from "../../utils/scale-fonts";
+import { scaleFont } from "../../common/utils/scale-fonts";
 
 export default function ProgressBar({
   title,

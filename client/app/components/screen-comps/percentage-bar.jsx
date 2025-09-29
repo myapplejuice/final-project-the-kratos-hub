@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import AppText from './app-text';
-import { colors } from '../../utils/settings/styling';
+import { colors } from '../../common/settings/styling';
 
 export default function PercentageBar({
   values = [],

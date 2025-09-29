@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef } from "react";
 import { TouchableOpacity, StyleSheet, Animated } from "react-native";
 import { Image } from "expo-image";
-import { NavBarContext } from "../../utils/contexts/nav-bar-context";
+import { NavBarContext } from "../../common/contexts/nav-bar-context";
 
 export default function FloatingActionButton({
     icon,

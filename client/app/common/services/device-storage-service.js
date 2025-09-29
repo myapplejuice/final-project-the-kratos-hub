@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import APIService from './api-service';
 import { routes } from '../settings/constants';
-import { defaultPreferences } from '../helper-functions/global-options';
+import { defaultPreferences } from '../utils/global-options';
 
 export default class DeviceStorageService {
 

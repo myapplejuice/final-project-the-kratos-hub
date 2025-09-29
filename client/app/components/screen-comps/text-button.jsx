@@ -1,6 +1,5 @@
 import  { useRef } from 'react';
-import { scaleFont } from '../../utils/scale-fonts'
-import { Text, StyleSheet, Animated, TouchableWithoutFeedback, } from 'react-native';
+import {  StyleSheet, Animated, TouchableWithoutFeedback, } from 'react-native';
 import AppText from './app-text';
 
 export default function TextButton({

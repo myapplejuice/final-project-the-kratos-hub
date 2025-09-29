@@ -5,15 +5,15 @@ import AppText from "../../../components/screen-comps/app-text";
 import AppTextInput from "../../../components/screen-comps/app-text-input";
 import Divider from "../../../components/screen-comps/divider";
 import PercentageCircle from "../../../components/screen-comps/percentage-circle";
-import { Images } from "../../../utils/assets";
-import { UserContext } from "../../../utils/contexts/user-context";
-import { convertEnergy } from "../../../utils/helper-functions/unit-converter";
-import { scaleFont } from "../../../utils/scale-fonts";
-import { colors, nutritionColors } from "../../../utils/settings/styling";
-import usePopups from "../../../utils/hooks/use-popups";
-import APIService from "../../../utils/services/api-service";
+import { Images } from "../../../common/settings/assets";
+import { UserContext } from "../../../common/contexts/user-context";
+import { convertEnergy } from "../../../common/utils/unit-converter";
+import { scaleFont } from "../../../common/utils/scale-fonts";
+import { colors, nutritionColors } from "../../../common/settings/styling";
+import usePopups from "../../../common/hooks/use-popups";
+import APIService from "../../../common/services/api-service";
 import { router } from "expo-router";
-import { routes } from "../../../utils/settings/constants";
+import { routes } from "../../../common/settings/constants";
 
 export default function FoodProfile() {
     const { setUser, user, additionalContexts } = useContext(UserContext);

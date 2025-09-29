@@ -7,9 +7,9 @@ import {
     TouchableOpacity,
     Image
 } from "react-native";
-import { scaleFont } from "../../utils/scale-fonts";
+import { scaleFont } from "../../common/utils/scale-fonts";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Images } from "../../utils/assets";
+import { Images } from "../../common/settings/assets";
 import AppText from "../screen-comps/app-text";
 
 export default function DevFooter() {

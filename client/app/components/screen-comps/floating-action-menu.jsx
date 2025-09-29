@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import { Animated, TouchableOpacity, StyleSheet, View } from "react-native";
-import { Images } from "../../utils/assets"; // fallback plus image
+import { Images } from "../../common/settings/assets";
 import { Image } from "expo-image";
-import { scaleFont } from "../../utils/scale-fonts";
-import { NavBarContext } from "../../utils/contexts/nav-bar-context";
+import { scaleFont } from "../../common/utils/scale-fonts";
+import { NavBarContext } from "../../common/contexts/nav-bar-context";
 
 export default function FloatingActionMenu({
     actions = [], // array of { title, onPress, icon }

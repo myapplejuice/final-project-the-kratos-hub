@@ -1,11 +1,11 @@
 import { useContext, useEffect, useRef } from "react";
 import { View,  StyleSheet,  TouchableOpacity,  Image,} from "react-native";
-import { Images } from "../../utils/assets";
+import { Images } from "../../common/settings/assets";
 import { router, usePathname } from "expo-router";
-import { colors } from "../../utils/settings/styling";
-import { UserContext } from "../../utils/contexts/user-context";
-import { scaleFont } from "../../utils/scale-fonts";
-import { routes } from "../../utils/settings/constants";
+import { colors } from "../../common/settings/styling";
+import { UserContext } from "../../common/contexts/user-context";
+import { scaleFont } from "../../common/utils/scale-fonts";
+import { routes } from "../../common/settings/constants";
 import AppText from '../screen-comps/app-text'
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Animated } from "react-native";

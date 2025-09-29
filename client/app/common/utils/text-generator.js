@@ -1,5 +1,5 @@
-import { activityOptions } from "../helper-functions/global-options";
-import { goalOptions, bmiClasses, bodyFatRanges } from "../helper-functions/global-options";
+import { activityOptions } from "./global-options";
+import { goalOptions, bmiClasses, bodyFatRanges } from "./global-options";
 
 function unique(array) {
     const copy = [...array];

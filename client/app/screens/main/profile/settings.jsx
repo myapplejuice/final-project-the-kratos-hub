@@ -1,20 +1,20 @@
 import { View, StyleSheet, TouchableOpacity, Animated, Linking, Platform } from "react-native";
 import { useEffect, useContext, useState, useRef } from "react";
-import { UserContext } from "../../../utils/contexts/user-context";
-import { scaleFont } from "../../../utils/scale-fonts";
+import { UserContext } from "../../../common/contexts/user-context";
+import { scaleFont } from "../../../common/utils/scale-fonts";
 import { router } from "expo-router";
-import { routes } from "../../../utils/settings/constants";
-import { colors } from "../../../utils/settings/styling";
+import { routes } from "../../../common/settings/constants";
+import { colors } from "../../../common/settings/styling";
 import { Image } from "expo-image";
-import { Images } from '../../../utils/assets'
+import { Images } from '../../../common/settings/assets'
 import * as Device from 'expo-device';
 import * as Localization from 'expo-localization';
 import * as Application from 'expo-application';
-import usePopups from "../../../utils/hooks/use-popups";
-import APIService from "../../../utils/services/api-service";
+import usePopups from "../../../common/hooks/use-popups";
+import APIService from "../../../common/services/api-service";
 import AppText from "../../../components/screen-comps/app-text";
 import AnimatedButton from "../../../components/screen-comps/animated-button";
-import DeviceStorageService from "../../../utils/services/device-storage-service";
+import DeviceStorageService from "../../../common/services/device-storage-service";
 import Divider from "../../../components/screen-comps/divider";
 import AppScroll from "../../../components/screen-comps/app-scroll";
 

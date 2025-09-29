@@ -1,20 +1,20 @@
 import { useContext, useEffect, useState } from "react";
 import { View, StyleSheet, TouchableOpacity, Image, Platform, Keyboard } from "react-native";
 import AppScroll from "../../../components/screen-comps/app-scroll";
-import { colors, nutritionColors } from "../../../utils/settings/styling";
+import { colors, nutritionColors } from "../../../common/settings/styling";
 import AppText from "../../../components/screen-comps/app-text";
 import Divider from "../../../components/screen-comps/divider";
 import AppTextInput from "../../../components/screen-comps/app-text-input";
-import { scaleFont } from "../../../utils/scale-fonts";
+import { scaleFont } from "../../../common/utils/scale-fonts";
 import FloatingActionButton from "../../../components/screen-comps/floating-action-button";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import usePopups from "../../../utils/hooks/use-popups";
+import usePopups from "../../../common/hooks/use-popups";
 import PercentageBar from "../../../components/screen-comps/percentage-bar";
-import { UserContext } from "../../../utils/contexts/user-context";
-import { convertEnergy } from "../../../utils/helper-functions/unit-converter";
+import { UserContext } from "../../../common/contexts/user-context";
+import { convertEnergy } from "../../../common/utils/unit-converter";
 import { router } from "expo-router";
-import { Images } from "../../../utils/assets";
-import APIService from "../../../utils/services/api-service";
+import { Images } from "../../../common/settings/assets";
+import APIService from "../../../common/services/api-service";
 
 export default function FoodEditor() {
     const { user, setUser, setAdditionalContexts, additionalContexts } = useContext(UserContext);

@@ -1,11 +1,11 @@
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useContext } from 'react';
-import { scaleFont } from '../../../../utils/scale-fonts';
-import { UserContext } from '../../../../utils/contexts/user-context';
-import { colors } from '../../../../utils/settings/styling';
-import DeviceStorageService from '../../../../utils/services/device-storage-service';
+import { scaleFont } from '../../../../common/utils/scale-fonts';
+import { UserContext } from '../../../../common/contexts/user-context';
+import { colors } from '../../../../common/settings/styling';
+import DeviceStorageService from '../../../../common/services/device-storage-service';
 import AppText from '../../../../components/screen-comps/app-text';
-import { dateFormats, energyUnits, fluidUnits, heightUnits, timeFormats, weightUnits } from '../../../../utils/helper-functions/global-options';
+import { dateFormats, energyUnits, fluidUnits, heightUnits, timeFormats, weightUnits } from '../../../../common/utils/global-options';
 import Divider from '../../../../components/screen-comps/divider';
 import AppScroll from '../../../../components/screen-comps/app-scroll';
 

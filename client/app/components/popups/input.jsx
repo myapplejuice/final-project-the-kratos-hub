@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, View, StyleSheet, TouchableOpacity, Keyboard, TouchableWithoutFeedback, } from "react-native";
-import { scaleFont } from "../../utils/scale-fonts";
-import { colors } from "../../utils/settings/styling";
+import { scaleFont } from "../../common/utils/scale-fonts";
+import { colors } from "../../common/settings/styling";
 import AppText from "../screen-comps/app-text";
 import AppTextInput from '../screen-comps/app-text-input'
 

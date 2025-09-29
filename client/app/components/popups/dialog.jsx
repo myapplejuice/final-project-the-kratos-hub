@@ -1,8 +1,8 @@
 import React from "react";
 import { Animated, View, StyleSheet, Text, TouchableOpacity, Platform } from "react-native";
-import { scaleFont } from "../../utils/scale-fonts";
+import { scaleFont } from "../../common/utils/scale-fonts";
 import usePopupAnimation from "./popup-animation";
-import { colors } from "../../utils/settings/styling";
+import { colors } from "../../common/settings/styling";
 import AppText from "../screen-comps/app-text";
 
 export default function Dialog({ title = "", text = "", onAbort = () => { }, onConfirm = () => { }, abortText = "CANCEL", confirmText = "YES" }) {

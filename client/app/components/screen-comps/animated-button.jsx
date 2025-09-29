@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { scaleFont } from '../../utils/scale-fonts'
+import { scaleFont } from "../../common/utils/scale-fonts";
 import AppText from './app-text';
 
 import {

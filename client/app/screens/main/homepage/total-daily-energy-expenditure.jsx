@@ -1,11 +1,11 @@
 import { View, StyleSheet } from "react-native";
 import { useContext, useEffect, useState } from "react";
-import { scaleFont } from "../../../utils/scale-fonts";
-import { UserContext } from "../../../utils/contexts/user-context";
-import { colors } from "../../../utils/settings/styling";
-import { activityOptions } from "../../../utils/helper-functions/global-options";
+import { scaleFont } from "../../../common/utils/scale-fonts";
+import { UserContext } from "../../../common/contexts/user-context";
+import { colors } from "../../../common/settings/styling";
+import { activityOptions } from "../../../common/utils/global-options";
 import AppText from "../../../components/screen-comps/app-text";
-import { convertEnergy } from "../../../utils/helper-functions/unit-converter";
+import { convertEnergy } from "../../../common/utils/unit-converter";
 import AppScroll from "../../../components/screen-comps/app-scroll";
 
 export default function TotalDailyEnergyExpenditure() {

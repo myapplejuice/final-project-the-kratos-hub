@@ -1,5 +1,4 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import AppText from './app-text';
 
 export default function MultiValueBars({ data = [], barHeight = 20, showPercentage = true, style, textStyle, percentageTextStyle }) {

@@ -4,25 +4,25 @@ import { Dimensions, Image, Keyboard, StyleSheet, TouchableOpacity, View } from 
 import AnimatedButton from '../../components/screen-comps/animated-button';
 import ProgressDots from "../../components/screen-comps/progress-dots";
 import TextButton from "../../components/screen-comps/text-button";
-import { useBackHandlerContext } from "../../utils/contexts/back-handler-context";
-import { UserContext } from "../../utils/contexts/user-context";
-import usePopups from "../../utils/hooks/use-popups";
+import { useBackHandlerContext } from "../../common/contexts/back-handler-context";
+import { UserContext } from "../../common/contexts/user-context";
+import usePopups from "../../common/hooks/use-popups";
 import {
     BMI, BMR, caloriesByGoal, TDEE, macrosFromCalories, bodyFat as calcBodyFat,
     proteinRequirementFromLBM, BMIByLeanMass, leanBodyMass as calcLeanBodyMass, recommendedWaterIntake as calcRecommendedWaterIntake
-} from "../../utils/helper-functions/metrics-calculator";
-import { convertHeight, convertWeight, convertFluid, convertEnergy } from "../../utils/helper-functions/unit-converter";
-import { scaleFont } from "../../utils/scale-fonts";
-import { routes } from "../../utils/settings/constants";
-import { colors, nutritionColors } from "../../utils/settings/styling";
-import { goalOptions, activityOptions, fluidUnits, dietOptions, weightUnits, energyUnits, heightUnits, defaultPreferences } from "../../utils/helper-functions/global-options"
-import { Images } from "../../utils/assets";
+} from "../../common/utils/metrics-calculator";
+import { convertHeight, convertWeight, convertFluid, convertEnergy } from "../../common/utils/unit-converter";
+import { scaleFont } from "../../common/utils/scale-fonts";
+import { routes } from "../../common/settings/constants";
+import { colors, nutritionColors } from "../../common/settings/styling";
+import { goalOptions, activityOptions, fluidUnits, dietOptions, weightUnits, energyUnits, heightUnits, defaultPreferences } from "../../common/utils/global-options"
+import { Images } from "../../common/settings/assets";
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system/legacy";
-import DeviceStorageService from "../../utils/services/device-storage-service";
+import DeviceStorageService from "../../common/services/device-storage-service";
 import AppText from "../../components/screen-comps/app-text";
 import AppTextInput from "../../components/screen-comps/app-text-input";
-import APIService from "../../utils/services/api-service";
+import APIService from "../../common/services/api-service";
 import AppScroll from "../../components/screen-comps/app-scroll";
 import PercentageBar from "../../components/screen-comps/percentage-bar";
 

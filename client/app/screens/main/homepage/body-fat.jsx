@@ -1,10 +1,10 @@
 import { View, StyleSheet, } from "react-native";
 import { useContext, useState } from "react";
-import { scaleFont } from "../../../utils/scale-fonts";
-import { UserContext } from "../../../utils/contexts/user-context";
-import { colors } from "../../../utils/settings/styling";
+import { scaleFont } from "../../../common/utils/scale-fonts";
+import { UserContext } from "../../../common/contexts/user-context";
+import { colors } from "../../../common/settings/styling";
 import AppText from "../../../components/screen-comps/app-text";
-import { bodyFatRanges } from "../../../utils/helper-functions/global-options";
+import { bodyFatRanges } from "../../../common/utils/global-options";
 import AppScroll from "../../../components/screen-comps/app-scroll";
 import { useEffect } from "react";
 

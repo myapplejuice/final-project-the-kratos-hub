@@ -1,5 +1,5 @@
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
-import {scaleFont} from '../../utils/scale-fonts'
+import { scaleFont } from '../../common/utils/scale-fonts';
 import AppText from './app-text';
 
 export default function Button({

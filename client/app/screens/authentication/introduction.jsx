@@ -1,11 +1,11 @@
 import { View, StyleSheet, Dimensions, Image } from 'react-native';
-import { scaleFont } from '../../utils/scale-fonts';
-import { Images } from '../../utils/assets'
+import { scaleFont } from '../../common/utils/scale-fonts';
+import { Images } from '../../common/settings/assets';
 import AnimatedButton from '../../components/screen-comps/animated-button';
-import { routes } from '../../utils/settings/constants';
+import { routes } from '../../common/settings/constants';
 import { router } from 'expo-router';
 import FloatingIcons from '../../components/screen-comps/floating-icons';
-import { colors } from '../../utils/settings/styling';
+import { colors } from '../../common/settings/styling';
 import AppText from '../../components/screen-comps/app-text';
 
 export default function Introduction() {
