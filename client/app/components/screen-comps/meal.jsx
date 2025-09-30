@@ -99,7 +99,7 @@ export default function Meal({ label, time, foods = [], num, onDeletePress = () 
                     foods.map((food, index) => (
                         <TouchableOpacity
                             disabled={!onFoodPressVisible}
-                            onPress={onFoodPress}
+                            onPress={() => onFoodPress(food)}
                             key={index}
                             style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 12 }}
                         >

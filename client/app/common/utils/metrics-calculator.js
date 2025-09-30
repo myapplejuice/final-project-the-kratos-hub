@@ -206,7 +206,17 @@ export function recalculateUserInformation(user) {
     }
 }
 
+export function totalDayConsumption(dayLog) {
+  const meals = dayLog.meals || [];
+  const foods = meals.flatMap(m => m.foods || []);
 
+  return {
+    energyKcal: foods.reduce((acc, f) => acc + (Number(f.energyKcal) || 0), 0),
+    carbs: foods.reduce((acc, f) => acc + (Number(f.carbs) || 0), 0),
+    protein: foods.reduce((acc, f) => acc + (Number(f.protein) || 0), 0),
+    fat: foods.reduce((acc, f) => acc + (Number(f.fat) || 0), 0),
+  };
+}
 
 
 

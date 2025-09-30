@@ -6,10 +6,10 @@ export default class NutritionMealFoodsController {
         console.log(food)
         if (!food) return res.status(400).json({ success: false, error: "food is required" });
 
-        const success = await NutritionMealFoodsDBService.addFood(food);
-        if (!success) return res.status(500).json({ success: false, error: "Failed to add food to meal" });
+        const result = await NutritionMealFoodsDBService.addFood(food);
+        if (result === false) return res.status(500).json({ success: false, error: "Failed to add food to meal" });
 
-        return res.status(200).json({ success: true });
+        return res.status(200).json({ success: true, id: result });
     }
 
     static async deleteFood(req, res) {

@@ -22,6 +22,7 @@ import { getDayComparisons } from '../../../common/utils/date-time'
 import { router } from 'expo-router';
 import { routes } from '../../../common/settings/constants';
 import { getSQLTime } from '../../../common/utils/date-time';
+import { totalDayConsumption } from '../../../common/utils/metrics-calculator';
 
 export default function MealsLog() {
     const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
@@ -49,7 +50,14 @@ export default function MealsLog() {
     }, [pageDate]);
 
     useEffect(() => {
-        setCurrentDayLog(user.nutritionLogs[pageDateKey] || {});
+        const dayLog = user.nutritionLogs[pageDateKey] || {};
+        const { energyKcal, carbs, protein, fat } = totalDayConsumption(dayLog);
+
+        dayLog.consumedEnergyKcal = energyKcal;
+        dayLog.consumedCarbGrams = carbs;
+        dayLog.consumedProteinGrams = protein;
+        dayLog.consumedFatGrams = fat;
+        setCurrentDayLog(dayLog);
     }, [user.nutritionLogs]);
 
     async function handleDate(val, source) {
@@ -299,8 +307,9 @@ export default function MealsLog() {
         router.push(routes.FOOD_SELECTION);
     }
 
-    async function handleFoodRemoval() {
-        console.log('food removing')
+    async function handleMealFoodPress(meal, food) {
+        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, selectedFood: food, dayLogDate: pageDate, foodProfileIntent: 'update' }));
+        router.push(routes.FOOD_PROFILE);
     }
 
     return (
@@ -421,22 +430,22 @@ export default function MealsLog() {
 
                             />
                         </View>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
-                                {/* Minus Button */}
-                                <TouchableOpacity onPress={() => handleWater(-waterAmount)} style={{ backgroundColor: colors.accentPink, borderBottomLeftRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}>
-                                    <Image source={Images.minus} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                                </TouchableOpacity>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+                            {/* Minus Button */}
+                            <TouchableOpacity onPress={() => handleWater(-waterAmount)} style={{ backgroundColor: colors.accentPink, borderBottomLeftRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}>
+                                <Image source={Images.minus} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                            </TouchableOpacity>
 
-                                <TouchableOpacity style={{ paddingHorizontal: 15, alignItems: 'center' }} onPress={handleWaterAmountChange}>
-                                    <AppText style={{ fontSize: scaleFont(16), color: nutritionColors.water1 }}>
-                                        {waterAmount} {user.preferences.fluidUnit.field}
-                                    </AppText>
-                                </TouchableOpacity>
+                            <TouchableOpacity style={{ paddingHorizontal: 15, alignItems: 'center' }} onPress={handleWaterAmountChange}>
+                                <AppText style={{ fontSize: scaleFont(16), color: nutritionColors.water1 }}>
+                                    {waterAmount} {user.preferences.fluidUnit.field}
+                                </AppText>
+                            </TouchableOpacity>
 
-                                <TouchableOpacity onPress={() => handleWater(waterAmount)} style={{ backgroundColor: colors.main, borderBottomRightRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}  >
-                                    <Image source={Images.plus} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                                </TouchableOpacity>
-                            </View>
+                            <TouchableOpacity onPress={() => handleWater(waterAmount)} style={{ backgroundColor: colors.main, borderBottomRightRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}  >
+                                <Image source={Images.plus} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                            </TouchableOpacity>
+                        </View>
                     </View>
                     {currentDayLog?.meals?.length > 0 ?
                         currentDayLog.meals.map((meal, i) => {
@@ -449,7 +458,7 @@ export default function MealsLog() {
                                     onRenamePress={() => handleMealRelabel(meal.id)}
                                     onDeletePress={() => handleMealRemoval(meal.id)}
                                     onAddPress={() => handleFoodAddition(meal)}
-                                    onFoodPress={() => handleFoodRemoval(meal.id)}
+                                    onFoodPress={(food) => handleMealFoodPress(meal, food)}
                                     key={meal.id}
                                     expandedOnStart={openMeals.includes(meal.id)}
                                     onExpand={() => { setOpenMeals(prev => prev.includes(meal.id) ? prev.filter(id => id !== meal.id) : [...prev, meal.id]) }}
@@ -462,10 +471,10 @@ export default function MealsLog() {
                                     source={Images.mealTwoOutline} // replace with your image
                                     style={{ width: 120, height: 120, marginBottom: 15, tintColor: colors.mutedText + '60' }}
                                 />
-                                <AppText style={{ fontSize: scaleFont(16), color:colors.mutedText + '80', textAlign: 'center', fontWeight: 'bold' }}>
+                                <AppText style={{ fontSize: scaleFont(16), color: colors.mutedText + '80', textAlign: 'center', fontWeight: 'bold' }}>
                                     No meals were logged on this date
                                 </AppText>
-                               <AppText style={{ fontSize: scaleFont(14), color: 'white', textAlign: 'center', marginTop: 5 }}>
+                                <AppText style={{ fontSize: scaleFont(14), color: 'white', textAlign: 'center', marginTop: 5 }}>
                                     Tap on plus the "+" to add new meals
                                 </AppText>
                             </View>

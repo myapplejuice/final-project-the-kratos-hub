@@ -26,6 +26,8 @@ export default function FoodProfile() {
     const [protein, setProtein] = useState(0);
     const [fat, setFat] = useState(0);
     const [additionalProps, setAdditionalProps] = useState([]);
+    const [deleteVisible, setDeleteVisible] = useState(user.id === additionalContexts.selectedFood.creatorId || additionalContexts.foodProfileIntent === 'update');
+    const [editVisible, setEditVisible] = useState(user.id === additionalContexts.selectedFood.creatorId && additionalContexts.foodProfileIntent === 'create');
 
     useEffect(() => {
         const factor = servingSize / additionalContexts.selectedFood.servingSize;
@@ -47,23 +49,59 @@ export default function FoodProfile() {
     }, [servingSize, additionalContexts]);
 
     async function handleFoodDeletion() {
+        const intent = additionalContexts.foodProfileIntent;
+
         createDialog({
-            title: 'Delete Food',
-            text: "Are you sure you want to remove this food entry?",
+            title: intent === 'create' ? 'Delete Food' : 'Remove Food',
+            text: intent === 'create' ?
+                "Are you sure you want to delete this food entry?" :
+                "Are you sure you want to remove this food from the meal?",
             onConfirm: async () => {
                 showSpinner();
                 const foodId = additionalContexts.selectedFood.id;
-                const result = await APIService.nutrition.foods.delete({ foodId });
+                const mealId = additionalContexts.selectedMeal.id;
+                const date = additionalContexts.dayLogDate || '';
+
+                console.log(foodId, mealId, date)
+                let result
+                if (intent === 'create')
+                    result = await APIService.nutrition.foods.delete({ foodId });
+                else
+                    result = await APIService.nutrition.meals.foods.delete({ mealId, foodId });
 
                 hideSpinner();
                 if (result.success) {
-                    setUser(prev => ({
-                        ...prev,
-                        foods: prev.foods.filter(f => f.id !== foodId)
-                    }))
-                    createAlert({ title: 'Success', text: "Food removal success, click OK to go back", onPress: () => router.back() });
+                    if (intent === 'create') {
+                        setUser(prev => ({
+                            ...prev,
+                            foods: prev.foods.filter(f => f.id !== foodId)
+                        }));
+                    }
+                    else {
+                        setUser(prev => {
+                            const formattedDate = formatDate(date, { format: "YYYY-MM-DD" });
+                            const dayLog = prev.nutritionLogs[formattedDate];
+                            if (!dayLog) return prev;
+
+                            return {
+                                ...prev,
+                                nutritionLogs: {
+                                    ...prev.nutritionLogs,
+                                    [formattedDate]: {
+                                        ...dayLog,
+                                        meals: dayLog.meals.map(m =>
+                                            m.id === mealId
+                                                ? { ...m, foods: m.foods.filter(f => f.id !== foodId) }
+                                                : m
+                                        )
+                                    }
+                                }
+                            };
+                        });
+                    }
+                    createAlert({ title: 'Success', text: intent === 'create' ? "Food deleted, click OK to go back" : "Food removed, click OK to go back", onPress: () => router.back() });
                 } else {
-                    createAlert({ title: 'Failure', text: "Food removal failed!\n" + result.message });
+                    createAlert({ title: 'Failure', text: "Food delete/removal failed!\n" + result.message });
                 }
             }
         })
@@ -94,9 +132,11 @@ export default function FoodProfile() {
             showSpinner();
             showSpinner();
             const date = formatDate(additionalContexts.dayLogDate, { format: 'YYYY-MM-DD' });
-            const result = await APIService.nutrition.meals.foods.add({food: payload});
+            const result = await APIService.nutrition.meals.foods.add({ food: payload });
 
             if (result.success) {
+                payload.id = result.data.id;
+
                 setUser(prev => ({
                     ...prev,
                     nutritionLogs: {
@@ -107,14 +147,14 @@ export default function FoodProfile() {
                                 m.id === meal.id
                                     ? {
                                         ...m,
-                                        foods: [...m.foods, payload] 
+                                        foods: [...m.foods, payload]
                                     }
                                     : m
                             )
                         }
                     }
                 }));
-                
+
                 createAlert({ title: 'Success', text: "Food added to meal, click OK to go back", onPress: () => router.back() });
             } else {
                 createAlert({ title: 'Failure', text: "Food addition failed!\n" + result.message });
@@ -137,16 +177,19 @@ export default function FoodProfile() {
                     <AppText style={styles.creator}>{additionalContexts.selectedFood.creatorName}</AppText>
                     <AppText style={styles.creator}>{additionalContexts.selectedFood.isUSDA ? 'USDA' : additionalContexts.selectedFood.isPublic ? 'Public' : 'Private'}</AppText>
                 </View>
-                {user.id === additionalContexts.selectedFood.creatorId &&
-                    <View style={{ flexDirection: 'row' }}>
-                        <TouchableOpacity style={[styles.editBtn, { marginEnd: 7 }]} onPress={handleFoodDeletion}>
+                <View style={{ flexDirection: 'row' }}>
+
+                    {deleteVisible &&
+                        <TouchableOpacity style={[styles.editBtn, { marginEnd: editVisible ? 7 : 0 }]} onPress={handleFoodDeletion}>
                             <Image source={Images.trash} style={{ width: 22, height: 22, tintColor: colors.accentPink }} />
                         </TouchableOpacity>
+                    }
+                    {editVisible &&
                         <TouchableOpacity style={styles.editBtn} onPress={() => router.push(routes.FOOD_EDITOR)}>
                             <Image source={Images.edit} style={{ width: 20, height: 20, tintColor: 'white' }} />
                         </TouchableOpacity>
-                    </View>
-                }
+                    }
+                </View>
             </View>
 
             {/* Macro Circle */}

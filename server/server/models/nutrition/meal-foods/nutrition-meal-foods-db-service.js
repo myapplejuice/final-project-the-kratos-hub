@@ -38,6 +38,7 @@ export default class NutritionMealFoodsDBService {
                     OriginalEnergyKcal, OriginalCarbs, OriginalProtein, OriginalFat,
                     EnergyKcal, Carbs, Protein, Fat, DominantMacro, AdditionalProps
                 )
+                OUTPUT INSERTED.Id
                 VALUES (
                     @MealLogId, @CreatorId, @CreatorName, @USDAId, @IsPublic, @IsUSDA, @Label, @Category,
                     @ServingUnit, @OriginalServingSize, @ServingSize,
@@ -46,8 +47,12 @@ export default class NutritionMealFoodsDBService {
                 );
             `;
 
-            await request.query(query);
-            return true;
+            const affectedRows = await request.query(query);
+
+            if (affectedRows.rowsAffected[0] === 0) return false;
+            const id = affectedRows.recordset[0].Id;
+
+            return id;
         } catch (err) {
             console.error('addFood error:', err);
             return false;
