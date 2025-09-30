@@ -79,6 +79,7 @@ export default class NutritionMealsDBService {
                 meal[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
             }
 
+            meal.foods = await NutritionMealFoodsDBService.fetchFoodsByMealId(meal.id);
             return meal;
         } catch (err) {
             console.error('updateMealLabel error:', err);
