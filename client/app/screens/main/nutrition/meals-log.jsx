@@ -151,23 +151,21 @@ export default function MealsLog() {
             if (currentDayLog.consumedWaterMl === 0 && consumedWaterMl === 0)
                 return;
 
-            const savedUser = user;
-            setUser(prev => ({
-                ...prev,
-                nutritionLogs:
-                {
-                    ...prev.nutritionLogs,
-                    [pageDateKey]: {
-                        ...prev.nutritionLogs[pageDateKey],
-                        consumedWaterMl
-                    }
-                }
-            }));
-
             const result = await APIService.nutrition.days.updateConsumption(pageDateKey, { consumedWaterMl });
-            if (!result.success) {
-                setUser(savedUser);
-                console.error("Failed to update consumption:", result.message);
+            if (result.success) {
+                setUser(prev => ({
+                    ...prev,
+                    nutritionLogs:
+                    {
+                        ...prev.nutritionLogs,
+                        [pageDateKey]: {
+                            ...prev.nutritionLogs[pageDateKey],
+                            consumedWaterMl
+                        }
+                    }
+                }));
+            } else {
+                createToast({ message: `Failed to update consumption: ${result.message}` });
             }
         } catch (err) {
             console.error("Failed to update consumption:", err.message);

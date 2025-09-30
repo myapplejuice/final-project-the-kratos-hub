@@ -14,7 +14,7 @@ import { goalsDietaryFeedbackTips } from "../../common/utils/text-generator";
 import { convertEnergy, convertFluid } from "../../common/utils/unit-converter";
 import { formatDate } from "../../common/utils/date-time";
 import usePopups from "../../common/hooks/use-popups";
-import { recalculateUserInformation, recommendedWaterIntake } from "../../common/utils/metrics-calculator";
+import { recalculateUserInformation, recommendedWaterIntake, totalDayConsumption } from "../../common/utils/metrics-calculator";
 import APIService from "../../common/services/api-service";
 import FloatingActionMenu from "../../components/screen-comps/floating-action-menu";
 import ProgressBar from "../../components/screen-comps/progress-bar";
@@ -58,6 +58,11 @@ export default function NutritionHub() {
                               createToast({ message: `Server error, ${result.message}` });
                          }
                     }
+                    const {energyKcal, carbs, protein, fat} = totalDayConsumption(todayObject);
+                    todayObject.consumedEnergyKcal = energyKcal;
+                    todayObject.consumedCarbGrams = carbs;
+                    todayObject.consumedProteinGrams = protein;
+                    todayObject.consumedFatGrams = fat;
 
                     setLog(todayObject);
                } catch (err) {
