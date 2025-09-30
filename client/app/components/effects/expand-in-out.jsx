@@ -11,41 +11,24 @@ export default function ExpandInOut({
     children,
 }) {
     const [contentHeight, setContentHeight] = useState(0);
-    const [measured, setMeasured] = useState(false);
     const [shouldRender, setShouldRender] = useState(visible);
 
     const heightAnim = useRef(new Animated.Value(0)).current;
 
-    // Animate when visible changes
+    // Animate when visible or contentHeight changes
     useEffect(() => {
         if (visible) setShouldRender(true);
 
-        if (measured) {
-            Animated.timing(heightAnim, {
-                toValue: visible ? contentHeight : 0,
-                duration: visible ? inDuration : outDuration,
-                useNativeDriver: false,
-            }).start(() => {
-                if (!visible && removeWhenHidden) setShouldRender(false);
-            });
-        }
-    }, [visible, contentHeight, measured]);
+        Animated.timing(heightAnim, {
+            toValue: visible ? contentHeight : 0,
+            duration: visible ? inDuration : outDuration,
+            useNativeDriver: false,
+        }).start(() => {
+            if (!visible && removeWhenHidden) setShouldRender(false);
+        });
+    }, [visible, contentHeight]);
 
-    // Hidden measurement render (only for measuring height)
-    const measureContent = !measured && (
-        <View
-            style={styles.measure}
-            onLayout={(e) => {
-                setContentHeight(e.nativeEvent.layout.height);
-                setMeasured(true);
-                heightAnim.setValue(visible ? e.nativeEvent.layout.height : 0);
-            }}
-        >
-            {children}
-        </View>
-    );
-
-    if (!shouldRender) return measureContent || null;
+    if (!shouldRender) return null;
 
     return (
         <Animated.View
@@ -55,10 +38,21 @@ export default function ExpandInOut({
                 !visible && collapseWhenHidden ? { width: 0, height: 0 } : null,
             ]}
         >
-            {/* Actual visible content */}
-            {measured && <View style={{ width: '100%' }}>{children}</View>}
-            {/* Measurement content (only shows once if needed) */}
-            {measureContent}
+            {/* Hidden View to measure content */}
+            <View
+                style={styles.measure}
+                onLayout={(e) => {
+                    const newHeight = e.nativeEvent.layout.height;
+                    if (newHeight !== contentHeight) {
+                        setContentHeight(newHeight);
+                    }
+                }}
+            >
+                {children}
+            </View>
+
+            {/* Visible content */}
+            <View style={{ width: '100%' }}>{children}</View>
         </Animated.View>
     );
 }

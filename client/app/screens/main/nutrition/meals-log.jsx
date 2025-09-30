@@ -49,7 +49,6 @@ export default function MealsLog() {
     }, [pageDate]);
 
     useEffect(() => {
-        console.log(user.nutritionLogs[pageDateKey].meals[0].foods)
         setCurrentDayLog(user.nutritionLogs[pageDateKey] || {});
     }, [user.nutritionLogs]);
 

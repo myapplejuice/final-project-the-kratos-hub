@@ -27,7 +27,7 @@ export default function Meal({ label, time, foods = [], num, onDeletePress = () 
             acc.fat += food.fat;
             return acc;
         },
-        { energy: 0, carbs: 0, protein: 0, fat: 0 }
+        { energyKcal: 0, carbs: 0, protein: 0, fat: 0 }
     );
 
     const totalMacros = totals.carbs + totals.protein + totals.fat || 1;
@@ -104,18 +104,20 @@ export default function Meal({ label, time, foods = [], num, onDeletePress = () 
                             style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 12 }}
                         >
                             <View>
-                                <AppText style={{ color: 'white', fontSize: scaleFont(13) }}>{food.name}</AppText>
-                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11) }}>
-                                    {food.creator}, {food.amount} {food.unit || 'g'}
+                                <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{food.label}</AppText>
+                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(8) }}>
+                                    {food.category}, {food.servingSize} {food.unit || 'g'}
                                 </AppText>
                             </View>
                             <View style={{ alignItems: 'flex-end' }}>
-                                <AppText style={{ fontSize: scaleFont(13), color: nutritionColors.energy1 }}>{convertEnergy(food.energyKcal, 'kcal', user.preferences.energyUnit.key)} kcal</AppText>
-                                <AppText style={{ fontSize: scaleFont(11), color: 'white' }}>
-                                    <AppText style={{ color: nutritionColors.carbs1 }}>C: {food.carbs}g</AppText> ·{' '}
-                                    <AppText style={{ color: nutritionColors.protein1 }}>P: {food.protein}g</AppText> ·{' '}
-                                    <AppText style={{ color: nutritionColors.fat1 }}>F: {food.fat}g</AppText>
-                                </AppText>
+                                <AppText style={{ fontSize: scaleFont(12), color: nutritionColors.energy1 }}>{convertEnergy(food.energyKcal, 'kcal', user.preferences.energyUnit.key)} kcal</AppText>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <AppText style={{ color: nutritionColors.carbs1, fontSize: scaleFont(8) }}>C: {food.carbs}</AppText>
+                                    <Divider style={{ marginHorizontal: 5 }}/>
+                                    <AppText style={{ color: nutritionColors.protein1, fontSize: scaleFont(8) }}>P: {food.protein}</AppText>
+                                    <Divider style={{ marginHorizontal: 5 }}/>
+                                    <AppText style={{ color: nutritionColors.fat1, fontSize: scaleFont(8) }}>F: {food.fat}</AppText>
+                                </View>
                             </View>
                         </TouchableOpacity>
                     ))
@@ -129,7 +131,7 @@ export default function Meal({ label, time, foods = [], num, onDeletePress = () 
                 <View style={{ padding: 15, alignItems: 'center', backgroundColor: 'rgba(58,58,58,0.49)', borderRadius: 15, marginTop: foods.length > 0 ? 7 : 15 }}>
                     <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                         <AppText style={{ color: nutritionColors.energy1, fontSize: scaleFont(10) }}>
-                            {convertEnergy(totals.energy, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
+                            {convertEnergy(totals.energyKcal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
                         </AppText>
                         <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>Energy</AppText>
                     </View>
