@@ -81,7 +81,7 @@ export default class NutritionFoodsDBService {
         if (!userId || !payload) return null;
 
         const {
-            label, type, servingUnit, servingSize,
+            label, category, servingUnit, servingSize,
             energyKcal, carbs, protein, fat,
             dominantMacro, creatorName, isPublic, additionalProps
         } = payload;
@@ -94,7 +94,7 @@ export default class NutritionFoodsDBService {
             Database.addInput(request, 'IsPublic', sql.Bit, isPublic ? 1 : 0);
 
             Database.addInput(request, 'Label', sql.VarChar(50), label);
-            Database.addInput(request, 'Type', sql.VarChar(50), type);
+            Database.addInput(request, 'Category', sql.VarChar(50), category);
             Database.addInput(request, 'ServingUnit', sql.VarChar(20), servingUnit);
             Database.addInput(request, 'ServingSize', sql.Decimal(7, 2), servingSize);
 
@@ -108,11 +108,11 @@ export default class NutritionFoodsDBService {
 
             const query = `
                 INSERT INTO dbo.UserFoods
-                (CreatorId, CreatorName, IsPublic, Label, Type, ServingUnit, ServingSize,
+                (CreatorId, CreatorName, IsPublic, Label, Category, ServingUnit, ServingSize,
                  EnergyKcal, Carbs, Protein, Fat, DominantMacro, AdditionalProps)
                 OUTPUT INSERTED.*
                 VALUES
-                (@CreatorId, @CreatorName, @IsPublic, @Label, @Type, @ServingUnit, @ServingSize,
+                (@CreatorId, @CreatorName, @IsPublic, @Label, @Category, @ServingUnit, @ServingSize,
                  @EnergyKcal, @Carbs, @Protein, @Fat, @DominantMacro, @AdditionalProps);
             `;
 
@@ -141,7 +141,7 @@ export default class NutritionFoodsDBService {
         if (!payload) return null;
 
         const {
-            id, creatorId, creatorName, label, type, servingUnit, servingSize,
+            id, creatorId, creatorName, label, category, servingUnit, servingSize,
             energyKcal, carbs, protein, fat,
             dominantMacro, isPublic, additionalProps
         } = payload;
@@ -156,7 +156,7 @@ export default class NutritionFoodsDBService {
             Database.addInput(request, 'IsPublic', sql.Bit, isPublic ? 1 : 0);
 
             Database.addInput(request, 'Label', sql.VarChar(50), label);
-            Database.addInput(request, 'Type', sql.VarChar(50), type);
+            Database.addInput(request, 'Category', sql.VarChar(50), category);
             Database.addInput(request, 'ServingUnit', sql.VarChar(20), servingUnit);
             Database.addInput(request, 'ServingSize', sql.Decimal(7, 2), servingSize);
 
@@ -173,7 +173,7 @@ export default class NutritionFoodsDBService {
                 SET CreatorName = @CreatorName,
                     IsPublic = @IsPublic,
                     Label = @Label,
-                    Type = @Type,
+                    Category = @Category,
                     ServingUnit = @ServingUnit,
                     ServingSize = @ServingSize,
                     EnergyKcal = @EnergyKcal,

@@ -49,6 +49,7 @@ export default function MealsLog() {
     }, [pageDate]);
 
     useEffect(() => {
+        console.log(user.nutritionLogs[pageDateKey].meals[0].foods)
         setCurrentDayLog(user.nutritionLogs[pageDateKey] || {});
     }, [user.nutritionLogs]);
 
@@ -295,7 +296,7 @@ export default function MealsLog() {
     }
 
     async function handleFoodAddition(meal) {
-        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal }));
+        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, dayLogDate: pageDate }));
         router.push(routes.FOOD_SELECTION);
     }
 

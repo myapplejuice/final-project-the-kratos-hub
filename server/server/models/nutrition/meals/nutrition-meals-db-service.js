@@ -1,6 +1,7 @@
 import sql from 'mssql/msnodesqlv8.js';
 import Database from '../../database/database.js';
 import ObjectMapper from '../../../utils/object-mapper.js';
+import NutritionMealFoodsDBService from '../meal-foods/nutrition-meal-foods-db-service.js';
 
 export default class NutritionMealsDBService {
     static normalizeDate(date) {
@@ -27,7 +28,7 @@ export default class NutritionMealsDBService {
             for (const key in result.recordset[0]) {
                 meal[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
             }
-           
+
             return meal;
         } catch (e) {
             console.error("createMeal error:", e);
@@ -93,17 +94,20 @@ export default class NutritionMealsDBService {
             const query = `SELECT * FROM MealLog WHERE NutritionLogId = @NutritionLogId`;
             const result = await request.query(query);
 
-            return result.recordset.map(meal => {
+            const meals = await Promise.all(result.recordset.map(async meal => {
                 const obj = {};
-                for (const key in meal) {
-                    obj[ObjectMapper.toCamelCase(key)] = meal[key];
-                }
-                obj.foods = [];
+                for (const key in meal) obj[ObjectMapper.toCamelCase(key)] = meal[key];
+
+                // Fetch foods for this meal
+                obj.foods = await NutritionMealFoodsDBService.fetchFoodsByMealId(obj.id);
                 return obj;
-            });
+            }));
+
+            return meals;
         } catch (err) {
             console.error('fetchMealsByNutritionLogId error:', err);
             return [];
         }
     }
+
 }

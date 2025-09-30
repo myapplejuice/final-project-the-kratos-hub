@@ -26,7 +26,7 @@ export default function FoodEditor() {
     const [isChange, setIsChange] = useState(false);
     const [isPublic, setIsPublic] = useState(additionalContexts.selectedFood.isPublic);
     const [label, setLabel] = useState(additionalContexts.selectedFood.label);
-    const [type, setType] = useState(additionalContexts.selectedFood.type);
+    const [category, setCategory] = useState(additionalContexts.selectedFood.category);
     const [servingUnit, setServingUnit] = useState(additionalContexts.selectedFood.servingUnit);
     const [servingSize, setServingSize] = useState(additionalContexts.selectedFood.servingSize);
     const [energyKcal, setEnergyKcal] = useState(additionalContexts.selectedFood.energyKcal);
@@ -48,7 +48,7 @@ export default function FoodEditor() {
 
         const basicChanged =
             label !== original.label ||
-            type !== original.type ||
+            category !== original.category ||
             servingUnit !== original.servingUnit ||
             servingSize !== original.servingSize ||
             energyKcal !== original.energyKcal ||
@@ -61,7 +61,7 @@ export default function FoodEditor() {
 
         setIsChange(basicChanged || propsChanged);
         setFabVisible(basicChanged || propsChanged ? true : false);
-    }, [label, type, servingUnit, servingSize, energyKcal,
+    }, [label, category, servingUnit, servingSize, energyKcal,
         carbs, protein, fat, isPublic, additionalProps, additionalContexts.selectedFood]);
 
     useEffect(() => {
@@ -160,18 +160,20 @@ export default function FoodEditor() {
     }
 
     async function handleFoodEdit() {
-        const finalType = typeof type === 'string' && type.trim() ? type : 'Not specified';
+        const finalyCategory = typeof category === 'string' && category.trim() ? category : 'Not specified';
         const dominantMacro =
             carbs >= protein && carbs >= fat ? 'Carbs' :
                 protein >= carbs && protein >= fat ? 'Protein' :
                     'Fat';
         const creatorId = user.id;
         const creatorName = user.firstname + " " + user.lastname;
+        const isUSDA = additionalContexts.selectedFood.isUSDA;
+        const USDAId = additionalContexts.selectedFood.USDAId;
 
         const payload = {
             id: additionalContexts.selectedFood.id,
             label,
-            type: finalType,
+            category: finalyCategory,
             servingUnit,
             servingSize,
             energyKcal,
@@ -182,6 +184,8 @@ export default function FoodEditor() {
             creatorId,
             creatorName,
             isPublic,
+            isUSDA,
+            USDAId,
             additionalProps
         };
 
@@ -234,7 +238,7 @@ export default function FoodEditor() {
 
                 <Divider orientation="horizontal" thickness={2} color={colors.divider} style={{ borderRadius: 50, marginVertical: 15 }} />
 
-                {/* Label & Type */}
+                {/* Label & Category */}
                 <AppText style={[styles.sectionTitle]}>Food Label</AppText>
                 <AppTextInput
                     placeholder="Enter a food label"
@@ -243,12 +247,12 @@ export default function FoodEditor() {
                     value={label}
                 />
 
-                <AppText style={[styles.sectionTitle, { marginTop: 15 }]}>Food Type (optional)</AppText>
+                <AppText style={[styles.sectionTitle, { marginTop: 15 }]}>Food Category (optional)</AppText>
                 <AppTextInput
-                    placeholder="Enter the food type (e.g. Vegetable, Meat, Dairy...)"
+                    placeholder="Enter categories (e.g. Branded Food, Meat, Dairy...)"
                     style={styles.input}
-                    onChangeText={setType}
-                    value={type}
+                    onChangeText={setCategory}
+                    value={category}
                 />
 
                 <Divider orientation="horizontal" thickness={2} color={colors.divider} style={{ borderRadius: 50, marginVertical: 15 }} />

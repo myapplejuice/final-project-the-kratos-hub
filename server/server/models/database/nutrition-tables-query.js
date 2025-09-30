@@ -52,16 +52,29 @@ export function nutritionTablesQuery() {
             CREATE TABLE dbo.MealLogFoods (
                 Id INT IDENTITY(1,1) PRIMARY KEY,
                 MealLogId INT NOT NULL,
-                Creator VARCHAR(50) NOT NULL,
+                
+                CreatorId UNIQUEIDENTIFIER NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',
+                CreatorName VARCHAR(100) NOT NULL DEFAULT 'Unknown',
+                USDAId INT NOT NULL DEFAULT -1,
+                IsPublic BIT NOT NULL DEFAULT 0,
+                IsUSDA BIT NOT NULL DEFAULT 0,
 
-                Label VARCHAR(100) NOT NULL,
-                Type VARCHAR(20) NOT NULL, 
-                ServingAmount DECIMAL(7,2) NOT NULL,
-
-                EnergyKcal DECIMAL(7,2) NOT NULL,
-                Carbs DECIMAL(7,2) NOT NULL,
-                Protein DECIMAL(7,2) NOT NULL,
-                Fat DECIMAL(7,2) NOT NULL,
+                Label VARCHAR(50) NOT NULL,
+                Category VARCHAR(50) NOT NULL,
+                ServingUnit VARCHAR(20) NOT NULL,
+                OriginalServingSize DECIMAL(7,2) NOT NULL,
+                ServingSize DECIMAL(7,2) NOT NULL,
+                
+                OriginalEnergyKcal DECIMAL(7,2) NOT NULL DEFAULT 0,
+                OriginalCarbs DECIMAL(7,2) NOT NULL DEFAULT 0,
+                OriginalProtein DECIMAL(7,2) NOT NULL DEFAULT 0,
+                OriginalFat DECIMAL(7,2) NOT NULL DEFAULT 0,
+                EnergyKcal DECIMAL(7,2) NOT NULL DEFAULT 0,
+                Carbs DECIMAL(7,2) NOT NULL DEFAULT 0,
+                Protein DECIMAL(7,2) NOT NULL DEFAULT 0,
+                Fat DECIMAL(7,2) NOT NULL DEFAULT 0,
+                DominantMacro VARCHAR(20) NOT NULL DEFAULT 0,
+                AdditionalProps NVARCHAR(MAX) NULL, -- store JSON string
 
                 CONSTRAINT FK_MealLogFoods_MealLog FOREIGN KEY (MealLogId)
                     REFERENCES dbo.MealLog(Id)
@@ -74,12 +87,14 @@ export function nutritionTablesQuery() {
         BEGIN
             CREATE TABLE dbo.UserFoods (
                 Id INT IDENTITY(1,1) PRIMARY KEY,
-                CreatorId UNIQUEIDENTIFIER NOT NULL,
-                CreatorName VARCHAR(100) NOT NULL,
-                IsPublic BIT NOT NULL,
+                CreatorId UNIQUEIDENTIFIER NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',
+                CreatorName VARCHAR(100) NOT NULL DEFAULT 'Unknown',
+                USDAId INT NOT NULL DEFAULT -1,
+                IsPublic BIT NOT NULL DEFAULT 0,
+                IsUSDA BIT NOT NULL DEFAULT 0,
 
                 Label VARCHAR(50) NOT NULL,
-                Type VARCHAR(50) NOT NULL,
+                Category VARCHAR(50) NOT NULL,
                 ServingUnit VARCHAR(20) NOT NULL,
                 ServingSize DECIMAL(7,2) NOT NULL,
                 

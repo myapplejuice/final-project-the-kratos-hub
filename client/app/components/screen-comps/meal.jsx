@@ -21,7 +21,7 @@ export default function Meal({ label, time, foods = [], num, onDeletePress = () 
 
     const totals = foods.reduce(
         (acc, food) => {
-            acc.energy += food.energy;
+            acc.energyKcal += food.energyKcal;
             acc.carbs += food.carbs;
             acc.protein += food.protein;
             acc.fat += food.fat;
@@ -110,7 +110,7 @@ export default function Meal({ label, time, foods = [], num, onDeletePress = () 
                                 </AppText>
                             </View>
                             <View style={{ alignItems: 'flex-end' }}>
-                                <AppText style={{ fontSize: scaleFont(13), color: nutritionColors.energy1 }}>{food.energy} kcal</AppText>
+                                <AppText style={{ fontSize: scaleFont(13), color: nutritionColors.energy1 }}>{convertEnergy(food.energyKcal, 'kcal', user.preferences.energyUnit.key)} kcal</AppText>
                                 <AppText style={{ fontSize: scaleFont(11), color: 'white' }}>
                                     <AppText style={{ color: nutritionColors.carbs1 }}>C: {food.carbs}g</AppText> ·{' '}
                                     <AppText style={{ color: nutritionColors.protein1 }}>P: {food.protein}g</AppText> ·{' '}

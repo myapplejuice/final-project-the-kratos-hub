@@ -27,7 +27,6 @@ export default function FoodSelection() {
     const [searchQuery, setSearchQuery] = useState('');
 
     const [foodList, setFoodList] = useState([]);
-    const [userFoods, setUserFoods] = useState([]);
     const [communityFoods, setCommunityFoods] = useState([]);
 
     useEffect(() => {
@@ -43,7 +42,6 @@ export default function FoodSelection() {
     useEffect(() => {
         const foods = user.foods || [];
 
-        setUserFoods(foods);
         if (selectedList === 'My Foods') {
             setFoodList(foods);
         } else if (selectedList === 'Library') {
@@ -111,9 +109,9 @@ export default function FoodSelection() {
                                     <AppText style={{ color: nutritionColors.energy1, fontSize: scaleFont(12) }}>{convertEnergy(food.energyKcal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}</AppText>
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 0 }}>
                                         <AppText style={{ color: nutritionColors.carbs1, fontSize: scaleFont(8) }}>C: {food.carbs}</AppText>
-                                        <Divider orientation="vertical" thickness={1} color={colors.divider} style={{marginHorizontal: 5}} />
+                                        <Divider orientation="vertical" thickness={1} color={colors.divider} style={{ marginHorizontal: 5 }} />
                                         <AppText style={{ color: nutritionColors.protein1, fontSize: scaleFont(8) }}>P: {food.protein}</AppText>
-                                        <Divider orientation="vertical" thickness={1} color={colors.divider}  style={{marginHorizontal: 5}} />
+                                        <Divider orientation="vertical" thickness={1} color={colors.divider} style={{ marginHorizontal: 5 }} />
                                         <AppText style={{ color: nutritionColors.fat1, fontSize: scaleFont(8) }}>F: {food.fat}</AppText>
                                     </View>
                                 </View>
@@ -122,17 +120,31 @@ export default function FoodSelection() {
                     </AppScroll>
                 ) : (
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 }}>
-                        <View style={{ marginBottom: 200, alignItems: 'center' }}>
+                        <View style={{ justifyContent: 'flex-end', alignItems: 'center', flex: 1 }}>
                             <Image source={Images.list} style={{ tintColor: colors.mutedText, width: 100, height: 100, marginBottom: 15 }} />
-                            <AppText style={{ color: colors.mutedText, fontWeight: 'bold', fontSize: scaleFont(18), textAlign: 'center', marginBottom: 10, }}>
+                            <AppText style={{ color: colors.mutedText, fontWeight: 'bold', fontSize: scaleFont(18), textAlign: 'center' }}>
                                 Start searching for foods
                             </AppText>
-                            <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20, }}>
-                                Use the search bar above to find meals from My Foods, the Library, or Community contributions.
-                            </AppText>
-                            <FadeInOut visible={selectedList === 'My Foods'} inDuration={200} outDuration={200} removeWhenHidden={false}>
+                        </View>
+                        <View style={{ marginBottom: 200, alignItems: 'center', flex: 1, marginTop:15 }}>
+                            <FadeInOut visible={selectedList !== 'Library'} inDuration={400} outDuration={400} removeWhenHidden={false} collapseWhenHidden>
+                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20, }}>
+                                    Use the search bar above to find meals from My Foods, the Library, or Community contributions.
+                                </AppText>
+                            </FadeInOut>
+                            <FadeInOut visible={selectedList === 'Library'} inDuration={400} outDuration={400} removeWhenHidden={false} collapseWhenHidden>
+                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20 }}>
+                                    All foods in the library provided by:
+                                </AppText>
+                            </FadeInOut>
+                            <FadeInOut visible={selectedList === 'My Foods'} inDuration={400} outDuration={400} removeWhenHidden={false} collapseWhenHidden>
                                 <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20, marginTop: 15 }}>
                                     You can also add your own foods to My Foods.
+                                </AppText>
+                            </FadeInOut>
+                            <FadeInOut visible={selectedList === 'Library'} inDuration={400} outDuration={400} removeWhenHidden={false} collapseWhenHidden>
+                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20, marginTop: 8 }}>
+                                    U.S. Department of Agriculture, Agricultural Research Service. FoodData Central, 2025. fdc.nal.usda.gov.
                                 </AppText>
                             </FadeInOut>
                         </View>

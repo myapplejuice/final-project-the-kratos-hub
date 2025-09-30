@@ -14,6 +14,8 @@ import usePopups from "../../../common/hooks/use-popups";
 import APIService from "../../../common/services/api-service";
 import { router } from "expo-router";
 import { routes } from "../../../common/settings/constants";
+import { Keyboard } from "react-native";
+import { formatDate } from "../../../common/utils/date-time";
 
 export default function FoodProfile() {
     const { setUser, user, additionalContexts } = useContext(UserContext);
@@ -68,43 +70,61 @@ export default function FoodProfile() {
     }
 
     async function handleFoodAddition() {
+        Keyboard.dismiss();
         const food = additionalContexts.selectedFood;
         const meal = additionalContexts.selectedMeal;
 
-        console.log(meal);
-
-        const updatedFood = {
+        const payload = {
+            mealId: meal.id,
+            originalServingSize: food.servingSize,
+            originalEnergyKcal: food.energyKcal,
+            originalCarbs: food.carbs,
+            originalProtein: food.protein,
+            originalFat: food.fat,
             ...food,
-            originalServingSize: additionalContexts.selectedFood.servingSize,
-            originalKcal: additionalContexts.selectedFood.energyKcal,
-            originalCarbs: additionalContexts.selectedFood.carbs,
-            originalProtein: additionalContexts.selectedFood.protein,
-            originalFat: additionalContexts.selectedFood.fat,
-            servingSize,
+            servingSize: Number(servingSize),
             energyKcal,
             carbs,
             protein,
             fat,
-            additionalProps
+            additionalProps,
         };
 
-        try{
+        try {
             showSpinner();
-            // ! const result = something;
+            showSpinner();
+            const date = formatDate(additionalContexts.dayLogDate, { format: 'YYYY-MM-DD' });
+            const result = await APIService.nutrition.meals.foods.add({food: payload});
 
-            if(result.success){
-                createAlert({ title: 'Success', text: "Food addition success, click OK to go back", onPress: () => router.back() });
+            if (result.success) {
+                setUser(prev => ({
+                    ...prev,
+                    nutritionLogs: {
+                        ...prev.nutritionLogs,
+                        [date]: {
+                            ...prev.nutritionLogs[date],
+                            meals: prev.nutritionLogs[date].meals.map(m =>
+                                m.id === meal.id
+                                    ? {
+                                        ...m,
+                                        foods: [...m.foods, payload] 
+                                    }
+                                    : m
+                            )
+                        }
+                    }
+                }));
+                
+                createAlert({ title: 'Success', text: "Food added to meal, click OK to go back", onPress: () => router.back() });
             } else {
                 createAlert({ title: 'Failure', text: "Food addition failed!\n" + result.message });
             }
-        }catch(err){
+        } catch (err) {
             console.log(err);
-        }finally{
+        } finally {
             hideSpinner();
         }
     }
-
-
 
     return (
         <AppScroll contentStyle={{ padding: 15 }} extraTop={60} extraBottom={200}>
@@ -112,10 +132,10 @@ export default function FoodProfile() {
             <View style={styles.header}>
                 <View>
                     <AppText style={styles.foodLabel}>{additionalContexts.selectedFood.label}</AppText>
-                    <AppText style={styles.foodType}>{additionalContexts.selectedFood.type !== 'Not specified' ? additionalContexts.selectedFood.type : 'Type unspecified'}</AppText>
+                    <AppText style={styles.foodCategory}>{additionalContexts.selectedFood.category}</AppText>
                     <Divider orientation="horizontal" style={{ marginVertical: 10, opacity: 0.3 }} />
                     <AppText style={styles.creator}>{additionalContexts.selectedFood.creatorName}</AppText>
-                    <AppText style={styles.creator}>{additionalContexts.selectedFood.isPublic ? 'Public' : 'Private'}</AppText>
+                    <AppText style={styles.creator}>{additionalContexts.selectedFood.isUSDA ? 'USDA' : additionalContexts.selectedFood.isPublic ? 'Public' : 'Private'}</AppText>
                 </View>
                 {user.id === additionalContexts.selectedFood.creatorId &&
                     <View style={{ flexDirection: 'row' }}>
@@ -177,7 +197,7 @@ export default function FoodProfile() {
                         placeholder="Enter serving size"
                         style={styles.servingInput}
                         onChangeText={(val) => { if (/^(?![.,])\d*\.?\d*$/.test(val)) { setServingSize(val); } }}
-                        value={String(servingSize)}
+                        value={servingSize?.toString() || ''}
                         keyboardType="numeric"
                     />
                     <AppText style={styles.servingInfo}>{additionalContexts.selectedFood.servingUnit}</AppText>
@@ -243,7 +263,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: colors.main,
     },
-    foodType: {
+    foodCategory: {
         fontSize: scaleFont(16),
         color: colors.mainOpacied,
         marginTop: 2,

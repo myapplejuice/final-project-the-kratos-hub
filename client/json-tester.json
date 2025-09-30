@@ -1,23 +1,107 @@
-{
-    "additionalProps": [
-        {
-            "amount": 30,
-            "id": 0,
-            "label": "Vitamin K",
-            "unit": "mg"
-        }
-    ],
-    "carbs": 45,
-    "creatorName": "Ibrahem Abu Shah",
-    "dominantMacro": "Carbs",
-    "energyKcal": 251,
-    "fat": 0,
-    "id": 1,
-    "isPublic": false,
-    "label": "Addas",
-    "protein": 23,
-    "servingSize": 150,
-    "servingUnit": "grams",
-    "type": "Legume",
-    "userId": "E2EC12D7-7081-47FC-AD97-CC812B048CC4"
-}
+[
+    {
+        "additionalProps": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "carbs": 30,
+        "category": "Legume, Arabic",
+        "creatorId": "01F06320-EFE0-4BF9-A641-8C9250CD5617",
+        "creatorName": "Ibrahem Abu Shah",
+        "dominantMacro": "Carbs",
+        "energyKcal": 220,
+        "fat": 3,
+        "id": 3,
+        "isPublic": true,
+        "isUSDA": false,
+        "label": "Addas Majroush",
+        "mealLogId": 3,
+        "originalCarbs": 30,
+        "originalEnergyKcal": 220,
+        "originalFat": 3,
+        "originalProtein": 20,
+        "originalServingSize": 100,
+        "protein": 20,
+        "servingSize": 100,
+        "servingUnit": "mL",
+        "usdaId": -1
+    },
+    {
+        "additionalProps": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "carbs": 30,
+        "category": "Legume, Arabic",
+        "creatorId": "01F06320-EFE0-4BF9-A641-8C9250CD5617",
+        "creatorName": "Ibrahem Abu Shah",
+        "dominantMacro": "Carbs",
+        "energyKcal": 220,
+        "fat": 3,
+        "id": 4,
+        "isPublic": true,
+        "isUSDA": false,
+        "label": "Addas Majroush",
+        "mealLogId": 3,
+        "originalCarbs": 30,
+        "originalEnergyKcal": 220,
+        "originalFat": 3,
+        "originalProtein": 20,
+        "originalServingSize": 100,
+        "protein": 20,
+        "servingSize": 100,
+        "servingUnit": "mL",
+        "usdaId": -1
+    },
+    {
+        "additionalProps": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "carbs": 45,
+        "category": "Legume, Arabic",
+        "creatorId": "01F06320-EFE0-4BF9-A641-8C9250CD5617",
+        "creatorName": "Ibrahem Abu Shah",
+        "dominantMacro": "Carbs",
+        "energyKcal": 330,
+        "fat": 5,
+        "id": 5,
+        "isPublic": true,
+        "isUSDA": false,
+        "label": "Addas Majroush",
+        "mealLogId": 3,
+        "originalCarbs": 30,
+        "originalEnergyKcal": 330,
+        "originalFat": 3,
+        "originalProtein": 20,
+        "originalServingSize": 100,
+        "protein": 30,
+        "servingSize": 150,
+        "servingUnit": "mL",
+        "usdaId": -1
+    }
+]

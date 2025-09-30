@@ -24,7 +24,7 @@ export default function FoodCreator() {
     const [fabVisible, setFabVisible] = useState(true);
 
     const [label, setLabel] = useState('');
-    const [type, setType] = useState('');
+    const [category, setCategory] = useState('');
     const [servingUnit, setServingUnit] = useState('');
     const [servingSize, setServingSize] = useState(0);
     const [energyKcal, setEnergyKcal] = useState(0);
@@ -132,7 +132,7 @@ export default function FoodCreator() {
     }
 
     async function handleFoodCreation() {
-        const finalType = typeof type === 'string' && type.trim() ? type : 'Not specified';
+        const finalyCategory = typeof category === 'string' && category.trim() ? category : 'Categories unspecified';
         const dominantMacro =
             carbs >= protein && carbs >= fat ? 'Carbs' :
                 protein >= carbs && protein >= fat ? 'Protein' :
@@ -143,7 +143,7 @@ export default function FoodCreator() {
         askUserIfPublic(async (isPublic) => {
             const payload = {
                 label,
-                type: finalType,
+                category: finalyCategory,
                 servingUnit,
                 servingSize,
                 energyKcal,
@@ -154,7 +154,9 @@ export default function FoodCreator() {
                 creatorId,
                 creatorName,
                 isPublic,
-                additionalProps
+                isUSDA: false,
+                USDAId: -1,
+                additionalProps,
             };
 
             try {
@@ -200,7 +202,7 @@ export default function FoodCreator() {
                 enableSlide={false}
             />
             <AppScroll extraBottom={250} onScrollSetStates={setFabVisible} contentStyle={{ padding: 15 }}>
-                {/* Label & Type */}
+                {/* Label & Category */}
                 <AppText style={[styles.sectionTitle, { marginTop: 15 }]}>Food Label</AppText>
                 <AppTextInput
                     placeholder="Enter a food label"
@@ -209,12 +211,12 @@ export default function FoodCreator() {
                     value={label}
                 />
 
-                <AppText style={[styles.sectionTitle, { marginTop: 15 }]}>Food Type (optional)</AppText>
+                <AppText style={[styles.sectionTitle, { marginTop: 15 }]}>Food Category (optional)</AppText>
                 <AppTextInput
-                    placeholder="Enter the food type (e.g. Vegetable, Meat, Dairy...)"
+                    placeholder="Enter categories (e.g. Branded Food, Meat, Dairy...)"
                     style={styles.input}
-                    onChangeText={setType}
-                    value={type}
+                    onChangeText={setCategory}
+                    value={category}
                 />
 
                 <Divider orientation="horizontal" thickness={2} color={colors.divider} style={{ borderRadius: 50, marginVertical: 15 }} />

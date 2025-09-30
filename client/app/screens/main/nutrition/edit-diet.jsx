@@ -132,7 +132,7 @@ export default function EditDiet() {
                         }
 
                         setUser(nutritionLogsUpdatedUser);
-                        createToast({ message: "Diet type successfully updated!" });
+                        createToast({ message: "Diet successfully updated!" });
                     } else {
                         createToast({ message: `Failed to update diet: ${result.message}` });
                     }
@@ -213,7 +213,7 @@ export default function EditDiet() {
                 }
 
                 setUser(nutritionLogsUpdatedUser);
-                createToast({ message: "Diet type successfully updated!" });
+                createToast({ message: "Diet successfully updated!" });
             } else {
                 createToast({ message: `Failed to update diet: ${result.message}` });
             }
