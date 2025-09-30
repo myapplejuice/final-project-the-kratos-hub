@@ -23,6 +23,7 @@ import { router } from 'expo-router';
 import { routes } from '../../../common/settings/constants';
 import { getSQLTime } from '../../../common/utils/date-time';
 import { totalDayConsumption } from '../../../common/utils/metrics-calculator';
+import FadeInOut from '../../../components/effects/fade-in-out';
 
 export default function MealsLog() {
     const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
