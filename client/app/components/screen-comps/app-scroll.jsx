@@ -22,7 +22,8 @@ export default function AppScroll({
     hideTopBarOnScroll = false,
     hideNavBarOnScroll = false,
     onScrollSetStates = [],
-    scrollToTop = false, // <-- new prop
+    scrollToTop = false,
+    avoidKeyboard = true,  
     ...props
 }) {
     const insets = useSafeAreaInsets();
@@ -37,7 +38,6 @@ export default function AppScroll({
 
     const scrollRef = useRef(null);
 
-    // scroll to top when prop is true
     useEffect(() => {
         if (scrollToTop && scrollRef.current) {
             scrollRef.current.scrollToPosition(0, 0, true);
@@ -91,9 +91,9 @@ export default function AppScroll({
             bounces={false}
             overScrollMode="never"
             onLayout={(e) => (scrollViewHeight.current = e.nativeEvent.layout.height)}
-            enableOnAndroid
-            extraScrollHeight={Platform.OS === "ios" ? 20 : 100}
-            keyboardOpeningTime={0}
+            enableOnAndroid={avoidKeyboard}
+             extraScrollHeight={avoidKeyboard ? (Platform.OS === "ios" ? 20 : 100) : 0} 
+               keyboardOpeningTime={avoidKeyboard ? 0 : undefined}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps={keyboardShouldPersistTaps}
             onScroll={handleScroll}

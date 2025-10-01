@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, View, StyleSheet, TouchableOpacity, Keyboard, TouchableWithoutFeedback, } from "react-native";
+import { Animated, View, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { scaleFont } from "../../common/utils/scale-fonts";
 import { colors } from "../../common/settings/styling";
 import AppText from "../screen-comps/app-text";
@@ -16,6 +16,7 @@ export default function Input({
     placeholders = ["Enter value..."],
     initialValues = [],
     extraConfigs = [],
+    largeTextIndices = [],
     onSubmit = (values) => { },
     onCancel = () => { },
 }) {
@@ -75,7 +76,11 @@ export default function Input({
                 </View>
 
                 {/* Input Fields */}
-                <View style={styles.inputsContainer}>
+                <ScrollView
+                    style={styles.inputsContainer}
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                    showsVerticalScrollIndicator={false}
+                >
                     {placeholders.map((phItem, rowIndex) => {
                         if (Array.isArray(phItem)) {
                             return (
@@ -129,14 +134,18 @@ export default function Input({
                                     }}
                                     placeholder={phItem}
                                     placeholderTextColor={colors.mutedText}
-                                    style={styles.input}
+                                    style={[
+                                        styles.input,
+                                        largeTextIndices?.includes(rowIndex) && styles.largeTextInput // <-- add this
+                                    ]}
+                                    multiline={largeTextIndices?.includes(rowIndex)} // <-- enable multiline
+                                    numberOfLines={largeTextIndices?.includes(rowIndex) ? 4 : 1} // <-- optional
                                     {...(extraConfigs[rowIndex] || {})}
                                 />
                             </View>
-
                         );
                     })}
-                </View>
+                </ScrollView>
 
                 {/* Action Buttons */}
                 <View style={styles.buttonRow}>
@@ -194,6 +203,7 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         padding: 0,
         borderRadius: 20,
+        maxHeight: "50%",
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -203,7 +213,7 @@ const styles = StyleSheet.create({
         shadowRadius: 20,
         elevation: 10,
         overflow: 'hidden',
-        marginBottom: 270
+        marginBottom: 350
     },
     header: {
         paddingHorizontal: 18,
@@ -238,7 +248,7 @@ const styles = StyleSheet.create({
         paddingBottom: 15
     },
     inputWrapper: {
-        marginTop: 15, 
+        marginTop: 15,
     },
     input: {
         backgroundColor: 'rgba(255,255,255,0.08)',
@@ -247,7 +257,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.15)',
         borderWidth: 1,
         padding: 15,
-        fontSize: scaleFont(16),
+        fontSize: scaleFont(12),
         fontWeight: '500',
     },
     rowInputContainer: {
@@ -280,7 +290,7 @@ const styles = StyleSheet.create({
         borderRadius: 14,
         minHeight: 52,
         width: '48%',
-        justifyContent: 'center',
+        justifyContent: 'center'
     },
     cancelButton: {
         borderWidth: 1,
@@ -304,4 +314,10 @@ const styles = StyleSheet.create({
     confirmButtonText: {
         color: 'white',
     },
+    largeTextInput: {
+        minHeight: 100,
+        textAlignVertical: 'top', // ensures text starts from the top
+        paddingTop: 15,
+        paddingBottom: 15,
+    }
 });

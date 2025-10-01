@@ -30,12 +30,6 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
         },
         { energyKcal: 0, carbs: 0, protein: 0, fat: 0 }
     );
-    const totalMacros = totals.carbs + totals.protein + totals.fat || 1;
-    const percentages = {
-        carb: Math.round((totals.carbs / totalMacros) * 100),
-        protein: Math.round((totals.protein / totalMacros) * 100),
-        fat: Math.round((totals.fat / totalMacros) * 100),
-    };
 
     const formattedDate = formatDate(date, { format: user.preferences.dateFormat.key });
     
@@ -45,8 +39,8 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
                 <TouchableOpacity onPress={() => { setExpanded(prev => !prev) }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <View>
-                            <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold' }}>Winter Cut</AppText>
-                            <AppText style={{ fontSize: scaleFont(9), color: colors.mutedText, fontWeight: 'bold' }}>Date added: 29/10/2025</AppText>
+                            <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold' }}>{label}</AppText>
+                            <AppText style={{ fontSize: scaleFont(9), color: colors.mutedText, fontWeight: 'bold' }}>{formattedDate}</AppText>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                             <View style={{ flexDirection: 'row' }}>
@@ -81,10 +75,11 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
 
                 <ExpandInOut visible={expanded}>
                     <View style={{ marginVertical: 25 }}>
-                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10), textAlign: description ? 'left' : 'center', lineHeight: 16 }}>
-                            {description || "No description provided."}
+                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10), textAlign: description !== 'No description provided.' ? 'left' : 'center', lineHeight: 16 }}>
+                            {description}
                         </AppText>
                     </View>
+                      
                     <View style={{ padding: 15, alignItems: 'center', backgroundColor: 'rgba(58,58,58,0.49)', borderRadius: 15, marginTop: 0 }}>
                         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                             <AppText style={{ color: nutritionColors.energy1, fontSize: scaleFont(10) }}>

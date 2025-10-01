@@ -36,6 +36,7 @@ export default function Popups({
         text={spinnerParams.text}
         timerDuration={spinnerParams.timerDuration}
         abandonable={spinnerParams.abandonable}
+        abandonableText={spinnerParams.abandonableText}
         onHide={() => {
           setSpinner(false);
           if (spinnerParams.onHide) {
@@ -123,6 +124,7 @@ export default function Popups({
           text={inputParams.text}
           placeholders={inputParams.placeholders || ["Enter value..."]}
           initialValues={inputParams.initialValues || []}
+          largeTextIndices={inputParams.largeTextIndices || []}
           extraConfigs={inputParams.extraConfigs || []} // optional
           onSubmit={(values) => {
             setInput(false);

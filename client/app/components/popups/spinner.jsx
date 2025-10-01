@@ -6,7 +6,7 @@ import AppText from "../screen-comps/app-text";
 import AnimatedButton from "../screen-comps/animated-button";
 import FadeInOut from "../effects/fade-in-out";
 
-export default function Spinner({ text = "Please wait...", timerDuration = 5000, abandonable = false, onHide = () => { } }) {
+export default function Spinner({ text = "Please wait...", timerDuration = 5000, abandonable = false, abandonableText = 'Press "Hide" to continue using the app', onHide = () => { } }) {
     const rotate = useRef(new Animated.Value(0)).current;
     const [button, setButton] = useState(false);
     const [fallbackText, setFallbackText] = useState(false);
@@ -46,14 +46,14 @@ export default function Spinner({ text = "Please wait...", timerDuration = 5000,
                     </FadeInOut>
                     <FadeInOut visible={fallbackText} style={{ position: 'absolute' }}>
                         <AppText style={styles.text}>
-                            {`This is taking a little longer than usual...\n${abandonable ? 'Press "Hide" to continue using the app.' : 'Still working, please wait'}`}
+                            {`This is taking a little longer than usual...\n${abandonable ? abandonableText : 'Still working, please wait'}`}
                         </AppText>
                     </FadeInOut>
                 </View>
             </View>
             <View style={{ flex: 1 }}>
                 <FadeInOut visible={button} >
-                    <AnimatedButton title={"Hide"} onPress={onHide} style={{ marginTop: 5, backgroundColor: colors.main + '90', padding: 10, width: 200 }} />
+                    <AnimatedButton title={"Hide"} onPress={onHide} style={{ marginTop: 5, backgroundColor: colors.main, padding: 10, width: 200, borderRadius: 15 }} />
                 </FadeInOut>
             </View>
         </View>

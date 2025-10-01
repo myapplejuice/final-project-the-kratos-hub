@@ -26,15 +26,62 @@ import { getSQLTime } from '../../../common/utils/date-time';
 import { totalDayConsumption } from '../../../common/utils/metrics-calculator';
 import FadeInOut from '../../../components/effects/fade-in-out';
 import Invert from '../../../components/effects/invert';
-import MealPlan from '../../../components/screen-comps/meal-plan';
 
 export default function MealsPlans() {
     const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
     const { user, setUser, setAdditionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const [scrollToTop, setScrollToTop] = useState(false);
-
     const [fabVisible, setFabVisible] = useState(true);
+
+    async function handlePlanAddition() {
+        createInput({
+            title: "Meal Addition",
+            confirmText: "ADD",
+            text: `Enter a label & description for the plan`,
+            placeholders: [`Meal Plan ${user.nutrition?.plans?.length + 1 || 1}`, `Write any explanation, notes, tips about your meal plan...`],
+            initialValues: [``, ``],
+            largeTextIndices: [1],
+            onSubmit: async (vals) => {
+                let label = vals[0];
+                let description = vals[1];
+                if (!label)
+                    label = `Meal ${user.nutrition?.plans?.length + 1}`;
+
+                if (!description)
+                    description = `No description provided.`;
+
+                showSpinner({ abandonable: true, text: "Adding meal plan...", abandonableText: 'Press "Hide" to continue using the app while you wait' });
+
+                try {
+                    const result = await APIService.nutrition.meals.create({ nutritionLogId: currentDayLog.id, label, time });
+                
+                    if (result.success) {
+                        const meal = result.data.meal;
+                
+                        setOpenMeals(prev => [...prev, meal.id]);
+                        setUser(prev => ({
+                            ...prev,
+                            nutritionLogs: {
+                                ...prev.nutritionLogs,
+                                [pageDateKey]: {
+                                    ...prev.nutritionLogs[pageDateKey],
+                                    meals: [...(prev.nutritionLogs[pageDateKey].meals || []), { ...meal, foods: [] }]
+                                }
+                            }
+                        }));
+                    } else {
+                        createToast({ message: result.message || "Failed to add meal" });
+                    }
+                } catch (err) {
+                    console.error("Failed to add meal:", err);
+                    createToast({ message: "Server error" });
+                } finally {
+                    hideSpinner();
+                }
+            },
+        });
+    }
 
     return (
         <>
@@ -49,25 +96,22 @@ export default function MealsPlans() {
             />
 
             <FloatingActionButton
-                onPress={() => { }}
+                onPress={handlePlanAddition}
                 visible={fabVisible}
                 position={{ bottom: insets.bottom + 50, right: 20 }}
                 icon={Images.plus}
                 iconStyle={{ transform: [{ rotate: '-90deg' }], marginBottom: 2 }}
             />
 
-            <AppScroll extraBottom={150} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
-                <MealPlan/>
-
-
-
-                {/*
+            <AppScroll avoidKeyboard={false} extraBottom={150} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
                 {user.nutrition?.plans?.length > 0 ?
-                    <>
+                    <View>
                         {user.nutrition.plans.map((plan, i) => (
-                            
+                            <Meal
+                                key={i}
+                            />
                         ))}
-                    </>
+                    </View>
                     :
                     <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
                         <Image source={Images.list3Outline} style={{ width: 120, height: 120, tintColor: colors.mutedText + '99' }} />
@@ -78,7 +122,6 @@ export default function MealsPlans() {
                             Tap on plus the "+" to add new meal plan
                         </AppText>
                     </View>}
-                */}
             </AppScroll >
         </>
     );
