@@ -14,6 +14,7 @@ export default function PercentageBar({
   titleTextStyle,
   percentageTextStyle,
   minVisiblePercentage = 12,
+  showTitles = true,
   fadeDuration = 300,
 }) {
   const totalEntered = values.reduce((sum, item) => sum + (item.percentage || 0), 0);
@@ -76,8 +77,9 @@ export default function PercentageBar({
 
   return (
     <View style={[styles.container, containerStyle, { width: barWidth }]}>
+      
       {/* Titles */}
-      {!allZero && (
+      {!allZero && showTitles && (
         <View style={styles.labelsRow}>
           {values.map((item, index) => {
             const widthPercent = (item.percentage / totalEntered) * (100 - emptyPercentage);

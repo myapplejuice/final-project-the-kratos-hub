@@ -28,16 +28,14 @@ export default function FoodProfile() {
     const intent = additionalContexts.foodProfileIntent;
 
     useEffect(() => {
-        console.log(additionalContexts.selectedFood)
-        const factor = servingSize / additionalContexts.selectedFood.servingSize;
-        const energyKcal = Math.round(additionalContexts.selectedFood.energyKcal * factor);
-        const carbs = Math.round(additionalContexts.selectedFood.carbs * factor);
-        const protein = Math.round(additionalContexts.selectedFood.protein * factor);
-        const fat = Math.round(additionalContexts.selectedFood.fat * factor);
+        const factor = servingSize / (additionalContexts.selectedFood.originalServingSize || additionalContexts.selectedFood.servingSize);
+        const energyKcal = Math.round((additionalContexts.selectedFood.originalEnergyKcal || additionalContexts.selectedFood.energyKcal) * factor);
+        const carbs = Math.round((additionalContexts.selectedFood.originalCarbs || additionalContexts.selectedFood.carbs) * factor);
+        const protein = Math.round((additionalContexts.selectedFood.originalProtein || additionalContexts.selectedFood.protein) * factor);
+        const fat = Math.round((additionalContexts.selectedFood.originalFat || additionalContexts.selectedFood.fat) * factor);
         const additionalProps = additionalContexts.selectedFood.additionalProps.map((prop) => ({
             ...prop,
-            originalAmount: prop.amount,
-            amount: Math.round(prop.amount * factor)
+            amount: Math.round(prop.originalAmount * factor)
         }));
 
         setEnergyKcal(energyKcal);
@@ -49,6 +47,10 @@ export default function FoodProfile() {
 
     function handleFood() {
         Keyboard.dismiss();
+        if (servingSize === '') {
+            createAlert({ text: 'Please enter a valid serving size' });
+            return;
+        }
 
         const day = additionalContexts.day;
         const food = additionalContexts.selectedFood;
@@ -173,6 +175,7 @@ export default function FoodProfile() {
             originalProtein: food.protein,
             originalFat: food.fat,
             ...food,
+            ownerId: user.id,
             servingSize: Number(servingSize),
             energyKcal,
             carbs,
@@ -275,26 +278,59 @@ export default function FoodProfile() {
         }
     }
 
+    async function handleFoodAdoption() {
+        const food = additionalContexts.selectedFood;
+        const payload = { ...food, ownerId: user.id };
+
+        try {
+            showSpinner();
+
+            try {
+                showSpinner();
+                const result = await APIService.nutrition.foods.create(payload);
+
+                if (result.success) {
+                    const food = result.data.food;
+                    setUser(prevUser => ({ ...prevUser, foods: [...(prevUser.foods || []), food] }));
+                    return createAlert({ title: 'Success', text: "Food added to your list of My Foods", onPress: () => router.back() });
+                }
+                else
+                    return createAlert({ title: 'Error', text: result.message });
+            } catch (error) {
+                console.log(error);
+            } finally {
+                hideSpinner();
+            }
+        } catch (err) {
+            console.log(err);
+        };
+    }
+
     return (
         <AppScroll contentStyle={{ padding: 15 }} extraTop={60} extraBottom={200}>
             {/* Header */}
             <View style={styles.header}>
-                <View>
+                <View style={{ flexShrink: 1 }}>
                     <AppText style={styles.foodLabel}>{additionalContexts.selectedFood.label}</AppText>
                     <AppText style={styles.foodCategory}>{additionalContexts.selectedFood.category}</AppText>
                     <Divider orientation="horizontal" style={{ marginVertical: 10 }} />
                     <AppText style={styles.creator}>{additionalContexts.selectedFood.isUSDA ? 'United States Department of Agriculture' : additionalContexts.selectedFood.creatorName}</AppText>
-                    <AppText style={[styles.creator, {fontSize: scaleFont(10)}]}>{additionalContexts.selectedFood.isUSDA ? 'Public' : additionalContexts.selectedFood.isPublic ? 'Public' : 'Private'}</AppText>
+                    <AppText style={[styles.creator, { fontSize: scaleFont(10) }]}>{additionalContexts.selectedFood.isUSDA ? 'Public' : additionalContexts.selectedFood.isPublic ? 'Public' : 'Private'}</AppText>
                 </View>
                 <View style={{ flexDirection: 'row' }}>
-                    {(intent === 'update' || user.id === additionalContexts.selectedFood.creatorId) &&
+                    {(intent === 'update' || user.id === additionalContexts.selectedFood.ownerId) &&
                         <TouchableOpacity style={[styles.editBtn, { marginEnd: intent === 'add' ? 7 : 0 }]} onPress={handleFoodDeletion}>
                             <Image source={Images.trash} style={{ width: 22, height: 22, tintColor: colors.accentPink }} />
                         </TouchableOpacity>
                     }
-                    {intent === 'add' && additionalContexts.selectedFood.creatorId === user.id &&
+                    {intent === 'add' && additionalContexts.selectedFood.ownerId === user.id &&
                         <TouchableOpacity style={styles.editBtn} onPress={() => router.push(routes.FOOD_EDITOR)}>
                             <Image source={Images.edit} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                        </TouchableOpacity>
+                    }
+                    {user.id !== additionalContexts.selectedFood.ownerId &&
+                        <TouchableOpacity style={[styles.editBtn, { marginEnd: intent === 'add' ? 7 : 0 }]} onPress={handleFoodAdoption}>
+                            <Image source={Images.plus} style={{ width: 22, height: 22, tintColor: 'white' }} />
                         </TouchableOpacity>
                     }
                 </View>
@@ -302,9 +338,9 @@ export default function FoodProfile() {
 
             {/* Macro Circle */}
             {(() => {
-                const carbs = additionalContexts.selectedFood.carbs || 0;
-                const protein = additionalContexts.selectedFood.protein || 0;
-                const fat = additionalContexts.selectedFood.fat || 0;
+                const carbs = additionalContexts.selectedFood.originalCarbs || additionalContexts.selectedFood.carbs || 0;
+                const protein = additionalContexts.selectedFood.originalProtein || additionalContexts.selectedFood.protein || 0;
+                const fat = additionalContexts.selectedFood.originalFat  || additionalContexts.selectedFood.fat || 0;
                 const totalCalories = carbs * 4 + protein * 4 + fat * 9;
 
                 const carbRatio = (carbs * 4 / totalCalories) * 100 || 0;
@@ -364,29 +400,29 @@ export default function FoodProfile() {
             <View style={styles.macroRow}>
                 <View style={styles.macroItem}>
                     <AppText style={[styles.macroLabel, { color: nutritionColors.energy1 }]}>Energy ({user.preferences.energyUnit.field})</AppText>
-                    <AppText style={styles.macroValue}>{convertEnergy(energyKcal, 'kcal', user.preferences.energyUnit.key)}</AppText>
+                    <AppText style={styles.macroValue}>{convertEnergy(energyKcal || 0, 'kcal', user.preferences.energyUnit.key)}</AppText>
                 </View>
                 <View style={styles.macroItem}>
                     <AppText style={[styles.macroLabel, { color: nutritionColors.carbs1 }]}>Carbs (g)</AppText>
-                    <AppText style={styles.macroValue}>{carbs}</AppText>
+                    <AppText style={styles.macroValue}>{carbs || 0}</AppText>
                 </View>
                 <View style={styles.macroItem}>
                     <AppText style={[styles.macroLabel, { color: nutritionColors.protein1 }]}>Protein (g)</AppText>
-                    <AppText style={styles.macroValue}>{protein}</AppText>
+                    <AppText style={styles.macroValue}>{protein || 0}</AppText>
                 </View>
                 <View style={styles.macroItem}>
                     <AppText style={[styles.macroLabel, { color: nutritionColors.fat1 }]}>Fat (g)</AppText>
-                    <AppText style={styles.macroValue}>{fat}</AppText>
+                    <AppText style={styles.macroValue}>{fat || 0}</AppText>
                 </View>
             </View>
 
             {additionalProps.length > 0 ?
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 15 }}>
                     {additionalProps.map((prop, index) => (
-                        <View key={index} style={styles.additionalPropCard}>
-                            <AppText style={styles.additionalPropLabel}>{prop.label}</AppText>
-                            <AppText style={styles.additionalPropValue}>{prop.amount} {prop.unit}</AppText>
-                        </View>
+                        <TouchableOpacity onPress={() => { createAlert({ title: prop.label, text: prop.amount + ' ' + prop.unit }) }} key={index} style={styles.additionalPropCard}>
+                            <AppText style={styles.additionalPropLabel} numberOfLines={1} ellipsizeMode="tail">{prop.label}</AppText>
+                            <AppText style={styles.additionalPropValue}>{prop.amount || 0} {prop.unit}</AppText>
+                        </TouchableOpacity>
                     ))}
                 </View>
                 :
@@ -497,15 +533,19 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 15,
         marginTop: 15,
-        minWidth: '48%',
+        width: '48%',
     },
     additionalPropLabel: {
         fontSize: scaleFont(14),
         color: colors.mutedText,
+        flexShrink: 1,   // lets it shrink & apply ellipsis
+        flexGrow: 1,     // optional, ensures it takes remaining space
+        marginRight: 8,
     },
     additionalPropValue: {
         fontSize: scaleFont(14),
         fontWeight: '600',
         color: 'white',
+        marginStart: 8
     },
 });

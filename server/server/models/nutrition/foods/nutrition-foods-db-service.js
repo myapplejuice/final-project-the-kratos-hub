@@ -3,18 +3,18 @@ import Database from '../../database/database.js';
 import ObjectMapper from '../../../utils/object-mapper.js';
 
 export default class NutritionFoodsDBService {
-    
+
     static async fetchCommunityFoods(userId) {
         if (!userId) return [];
 
         try {
             const request = Database.getRequest();
-            Database.addInput(request, 'CreatorId', sql.UniqueIdentifier, userId);
+            Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
 
             const query = `
             SELECT *
             FROM dbo.Foods
-            WHERE CreatorId != @CreatorId AND IsPublic = 1
+            WHERE OwnerId != @UserId AND CreatorId != @UserId AND IsPublic = 1
             ORDER BY Id DESC;`;
 
             const result = await request.query(query);
@@ -45,12 +45,12 @@ export default class NutritionFoodsDBService {
 
         try {
             const request = Database.getRequest();
-            Database.addInput(request, 'CreatorId', sql.UniqueIdentifier, userId);
+            Database.addInput(request, 'OwnerId', sql.UniqueIdentifier, userId);
 
             const query = `
             SELECT *
             FROM dbo.Foods
-            WHERE CreatorId = @CreatorId
+            WHERE OwnerId = @OwnerId
             ORDER BY Id DESC;`;
 
             const result = await request.query(query);
@@ -79,17 +79,21 @@ export default class NutritionFoodsDBService {
     static async createFood(userId, payload) {
         if (!userId || !payload) return null;
 
+        console.log(userId, payload);
         const {
             label, category, servingUnit, servingSize,
             energyKcal, carbs, protein, fat,
-            dominantMacro, creatorName, isPublic, additionalProps
+            dominantMacro, USDAId, isUSDA, creatorId, creatorName, isPublic, additionalProps
         } = payload;
 
         try {
             const request = Database.getRequest();
 
-            Database.addInput(request, 'CreatorId', sql.UniqueIdentifier, userId);
+            Database.addInput(request, 'OwnerId', sql.UniqueIdentifier, userId);
+            Database.addInput(request, 'CreatorId', sql.UniqueIdentifier, creatorId);
             Database.addInput(request, 'CreatorName', sql.VarChar(100), creatorName);
+            Database.addInput(request, 'IsUSDA', sql.VarChar(100), isUSDA ? 1 : 0);
+            Database.addInput(request, 'USDAId', sql.VarChar(100), USDAId ?? -1);
             Database.addInput(request, 'IsPublic', sql.Bit, isPublic ? 1 : 0);
 
             Database.addInput(request, 'Label', sql.VarChar(50), label);
@@ -107,11 +111,11 @@ export default class NutritionFoodsDBService {
 
             const query = `
                 INSERT INTO dbo.Foods
-                (CreatorId, CreatorName, IsPublic, Label, Category, ServingUnit, ServingSize,
+                (OwnerId, CreatorId, CreatorName, IsUSDA, USDAId, IsPublic, Label, Category, ServingUnit, ServingSize,
                  EnergyKcal, Carbs, Protein, Fat, DominantMacro, AdditionalProps)
                 OUTPUT INSERTED.*
                 VALUES
-                (@CreatorId, @CreatorName, @IsPublic, @Label, @Category, @ServingUnit, @ServingSize,
+                (@OwnerId, @CreatorId, @CreatorName, @IsUSDA, @USDAId, @IsPublic, @Label, @Category, @ServingUnit, @ServingSize,
                  @EnergyKcal, @Carbs, @Protein, @Fat, @DominantMacro, @AdditionalProps);
             `;
 
@@ -140,7 +144,7 @@ export default class NutritionFoodsDBService {
         if (!payload) return null;
 
         const {
-            id, creatorId, creatorName, label, category, servingUnit, servingSize,
+            id, creatorName, label, category, servingUnit, servingSize,
             energyKcal, carbs, protein, fat,
             dominantMacro, isPublic, additionalProps
         } = payload;
@@ -150,7 +154,6 @@ export default class NutritionFoodsDBService {
 
             Database.addInput(request, 'Id', sql.Int, id);
 
-            Database.addInput(request, 'CreatorId', sql.VarChar(100), creatorId);
             Database.addInput(request, 'CreatorName', sql.VarChar(100), creatorName);
             Database.addInput(request, 'IsPublic', sql.Bit, isPublic ? 1 : 0);
 
@@ -169,8 +172,7 @@ export default class NutritionFoodsDBService {
 
             const query = `
                 UPDATE dbo.Foods
-                SET CreatorName = @CreatorName,
-                    IsPublic = @IsPublic,
+                SET IsPublic = @IsPublic,
                     Label = @Label,
                     Category = @Category,
                     ServingUnit = @ServingUnit,

@@ -10,6 +10,7 @@ export default class NutritionMealsFoodsDBService {
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'MealLogId', sql.Int, food.mealId);
+            Database.addInput(request, 'OwnerId', sql.UniqueIdentifier, food.ownerId || '00000000-0000-0000-0000-000000000000');
             Database.addInput(request, 'CreatorId', sql.UniqueIdentifier, food.creatorId || '00000000-0000-0000-0000-000000000000');
             Database.addInput(request, 'CreatorName', sql.VarChar(100), food.creatorName || 'Unknown');
             Database.addInput(request, 'USDAId', sql.Int, food.USDAId ?? -1);
@@ -18,32 +19,29 @@ export default class NutritionMealsFoodsDBService {
             Database.addInput(request, 'Label', sql.VarChar(50), food.label);
             Database.addInput(request, 'Category', sql.VarChar(50), food.category);
             Database.addInput(request, 'ServingUnit', sql.VarChar(20), food.servingUnit);
-            Database.addInput(request, 'OriginalServingSize', sql.Decimal(7, 2), food.originalServingSize ?? food.servingSize);
+            Database.addInput(request, 'OriginalServingSize', sql.Decimal(7, 2), food.originalServingSize);
             Database.addInput(request, 'ServingSize', sql.Decimal(7, 2), food.servingSize);
-            Database.addInput(request, 'OriginalEnergyKcal', sql.Decimal(7, 2), food.originalEnergyKcal ?? food.energyKcal);
-            Database.addInput(request, 'OriginalCarbs', sql.Decimal(7, 2), food.originalCarbs ?? food.carbs);
-            Database.addInput(request, 'OriginalProtein', sql.Decimal(7, 2), food.originalProtein ?? food.protein);
-            Database.addInput(request, 'OriginalFat', sql.Decimal(7, 2), food.originalFat ?? food.fat);
+            
+            Database.addInput(request, 'OriginalEnergyKcal', sql.Decimal(7, 2), food.originalEnergyKcal);
             Database.addInput(request, 'EnergyKcal', sql.Decimal(7, 2), food.energyKcal);
+            Database.addInput(request, 'OriginalCarbs', sql.Decimal(7, 2), food.originalCarbs);
             Database.addInput(request, 'Carbs', sql.Decimal(7, 2), food.carbs);
+            Database.addInput(request, 'OriginalProtein', sql.Decimal(7, 2), food.originalProtein);
             Database.addInput(request, 'Protein', sql.Decimal(7, 2), food.protein);
+            Database.addInput(request, 'OriginalFat', sql.Decimal(7, 2), food.originalFat);
             Database.addInput(request, 'Fat', sql.Decimal(7, 2), food.fat);
             Database.addInput(request, 'DominantMacro', sql.VarChar(20), food.dominantMacro);
             Database.addInput(request, 'AdditionalProps', sql.NVarChar(sql.MAX), food.additionalProps ? JSON.stringify(food.additionalProps) : null);
 
             const query = `
                 INSERT INTO dbo.MealLogsFoods (
-                    MealLogId, CreatorId, CreatorName, USDAId, IsPublic, IsUSDA, Label, Category,
-                    ServingUnit, OriginalServingSize, ServingSize,
-                    OriginalEnergyKcal, OriginalCarbs, OriginalProtein, OriginalFat,
-                    EnergyKcal, Carbs, Protein, Fat, DominantMacro, AdditionalProps
+                    MealLogId, OwnerId, CreatorId, CreatorName, USDAId, IsPublic, IsUSDA, Label, Category,
+                    ServingUnit, OriginalServingSize, ServingSize,  OriginalEnergyKcal, EnergyKcal, OriginalCarbs, Carbs, OriginalProtein, Protein, OriginalFat, Fat, DominantMacro, AdditionalProps
                 )
                 OUTPUT INSERTED.Id
                 VALUES (
-                    @MealLogId, @CreatorId, @CreatorName, @USDAId, @IsPublic, @IsUSDA, @Label, @Category,
-                    @ServingUnit, @OriginalServingSize, @ServingSize,
-                    @OriginalEnergyKcal, @OriginalCarbs, @OriginalProtein, @OriginalFat,
-                    @EnergyKcal, @Carbs, @Protein, @Fat, @DominantMacro, @AdditionalProps
+                    @MealLogId, @OwnerId, @CreatorId, @CreatorName, @USDAId, @IsPublic, @IsUSDA, @Label, @Category,
+                    @ServingUnit, @OriginalServingSize, @ServingSize, @OriginalEnergyKcal, @EnergyKcal, @OriginalCarbs, @Carbs, @OriginalProtein, @Protein, @OriginalFat, @Fat, @DominantMacro, @AdditionalProps
                 );
             `;
 
@@ -90,11 +88,11 @@ export default class NutritionMealsFoodsDBService {
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, food.id);
             Database.addInput(request, 'MealLogId', sql.Int, food.mealId);
-            Database.addInput(request, 'ServingSize', sql.Decimal(7, 2), food.servingSize);
-            Database.addInput(request, 'EnergyKcal', sql.Decimal(7, 2), food.energyKcal);
-            Database.addInput(request, 'Carbs', sql.Decimal(7, 2), food.carbs);
-            Database.addInput(request, 'Protein', sql.Decimal(7, 2), food.protein);
-            Database.addInput(request, 'Fat', sql.Decimal(7, 2), food.fat);
+            Database.addInput(request, 'ServingSize', sql.Decimal(7, 2), food.servingSize ?? 0);
+            Database.addInput(request, 'EnergyKcal', sql.Decimal(7, 2), food.energyKcal ?? 0);
+            Database.addInput(request, 'Carbs', sql.Decimal(7, 2), food.carbs ?? 0);
+            Database.addInput(request, 'Protein', sql.Decimal(7, 2), food.protein ?? 0);
+            Database.addInput(request, 'Fat', sql.Decimal(7, 2), food.fat ?? 0);
             Database.addInput(request, 'AdditionalProps', sql.NVarChar(sql.MAX), food.additionalProps ? JSON.stringify(food.additionalProps) : null);
 
             const query = `

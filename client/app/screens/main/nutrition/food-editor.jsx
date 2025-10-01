@@ -165,7 +165,8 @@ export default function FoodEditor() {
             carbs >= protein && carbs >= fat ? 'Carbs' :
                 protein >= carbs && protein >= fat ? 'Protein' :
                     'Fat';
-        const creatorId = user.id;
+        const ownerId = additionalContexts.selectedFood.ownerId;
+        const creatorId = additionalContexts.selectedFood.creatorId;
         const creatorName = user.firstname + " " + user.lastname;
         const isUSDA = additionalContexts.selectedFood.isUSDA;
         const USDAId = additionalContexts.selectedFood.USDAId;
@@ -181,6 +182,7 @@ export default function FoodEditor() {
             protein,
             fat,
             dominantMacro,
+            ownerId,
             creatorId,
             creatorName,
             isPublic,

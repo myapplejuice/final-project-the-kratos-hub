@@ -22,10 +22,10 @@ export default function Meal({ label, time, foods = [], onDeletePress = () => { 
 
     const totals = foods.reduce(
         (acc, food) => {
-            acc.energyKcal += food.energyKcal;
-            acc.carbs += food.carbs;
-            acc.protein += food.protein;
-            acc.fat += food.fat;
+            acc.energyKcal += food.energyKcal || 0;
+            acc.carbs += food.carbs || 0;
+            acc.protein += food.protein || 0;
+            acc.fat += food.fat || 0;
             return acc;
         },
         { energyKcal: 0, carbs: 0, protein: 0, fat: 0 }
@@ -94,7 +94,8 @@ export default function Meal({ label, time, foods = [], onDeletePress = () => { 
                         ]}
                         barHeight={3}
                         showPercentage={false}
-                        barContainerStyle={{ borderRadius: 50, marginTop: foods.length > 0 ? 0 : 12 }}
+                        showTitles={false}
+                        barContainerStyle={{ borderRadius: 50, marginTop: 12 }}
                     />
 
                     {foods.length > 0 ? (
@@ -112,13 +113,13 @@ export default function Meal({ label, time, foods = [], onDeletePress = () => { 
                                     </AppText>
                                 </View>
                                 <View style={{ alignItems: 'flex-end' }}>
-                                    <AppText style={{ fontSize: scaleFont(12), color: nutritionColors.energy1 }}>{convertEnergy(food.energyKcal, 'kcal', user.preferences.energyUnit.key)} kcal</AppText>
+                                    <AppText style={{ fontSize: scaleFont(12), color: nutritionColors.energy1 }}>{convertEnergy(food.energyKcal || 0, 'kcal', user.preferences.energyUnit.key)} kcal</AppText>
                                     <View style={{ flexDirection: 'row' }}>
-                                        <AppText style={{ color: nutritionColors.carbs1, fontSize: scaleFont(8) }}>C: {food.carbs}</AppText>
+                                        <AppText style={{ color: nutritionColors.carbs1, fontSize: scaleFont(8) }}>C: {food.carbs || 0}</AppText>
                                         <Divider style={{ marginHorizontal: 5 }} />
-                                        <AppText style={{ color: nutritionColors.protein1, fontSize: scaleFont(8) }}>P: {food.protein}</AppText>
+                                        <AppText style={{ color: nutritionColors.protein1, fontSize: scaleFont(8) }}>P: {food.protein || 0}</AppText>
                                         <Divider style={{ marginHorizontal: 5 }} />
-                                        <AppText style={{ color: nutritionColors.fat1, fontSize: scaleFont(8) }}>F: {food.fat}</AppText>
+                                        <AppText style={{ color: nutritionColors.fat1, fontSize: scaleFont(8) }}>F: {food.fat || 0}</AppText>
                                     </View>
                                 </View>
                             </TouchableOpacity>
@@ -133,24 +134,24 @@ export default function Meal({ label, time, foods = [], onDeletePress = () => { 
                     <View style={{ padding: 15, alignItems: 'center', backgroundColor: 'rgba(58,58,58,0.49)', borderRadius: 15, marginTop: foods.length > 0 ? 7 : 15 }}>
                         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                             <AppText style={{ color: nutritionColors.energy1, fontSize: scaleFont(10) }}>
-                                {convertEnergy(totals.energyKcal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
+                                {convertEnergy(totals.energyKcal || 0, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
                             </AppText>
                             <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>Energy</AppText>
                         </View>
                         <Divider orientation="horizontal" style={{ marginVertical: 8 }} />
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
                             <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                                <AppText style={{ color: nutritionColors.carbs1, fontSize: scaleFont(10) }}>{totals.carbs}g</AppText>
+                                <AppText style={{ color: nutritionColors.carbs1, fontSize: scaleFont(10) }}>{totals.carbs || 0}g</AppText>
                                 <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>Carbs</AppText>
                             </View>
                             <Divider />
                             <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                                <AppText style={{ color: nutritionColors.protein1, fontSize: scaleFont(10) }}>{totals.protein}g</AppText>
+                                <AppText style={{ color: nutritionColors.protein1, fontSize: scaleFont(10) }}>{totals.protein || 0}g</AppText>
                                 <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>Protein</AppText>
                             </View>
                             <Divider />
                             <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                                <AppText style={{ color: nutritionColors.fat1, fontSize: scaleFont(10) }}>{totals.fat}g</AppText>
+                                <AppText style={{ color: nutritionColors.fat1, fontSize: scaleFont(10) }}>{totals.fat || 0}g</AppText>
                                 <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>Fat</AppText>
                             </View>
                         </View>

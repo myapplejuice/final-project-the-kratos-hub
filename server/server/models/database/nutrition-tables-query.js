@@ -48,6 +48,7 @@ export function nutritionTablesQuery() {
                 Id INT IDENTITY(1,1) PRIMARY KEY,
                 MealLogId INT NOT NULL,
                 
+                OwnerId UNIQUEIDENTIFIER NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',
                 CreatorId UNIQUEIDENTIFIER NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',
                 CreatorName VARCHAR(100) NOT NULL DEFAULT 'Unknown',
                 USDAId INT NOT NULL DEFAULT -1,
@@ -82,6 +83,8 @@ export function nutritionTablesQuery() {
         BEGIN
             CREATE TABLE dbo.Foods (
                 Id INT IDENTITY(1,1) PRIMARY KEY,
+                
+                OwnerId UNIQUEIDENTIFIER NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',
                 CreatorId UNIQUEIDENTIFIER NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',
                 CreatorName VARCHAR(100) NOT NULL DEFAULT 'Unknown',
                 USDAId INT NOT NULL DEFAULT -1,
@@ -100,7 +103,7 @@ export function nutritionTablesQuery() {
                 DominantMacro VARCHAR(20) NOT NULL DEFAULT '',
                 AdditionalProps NVARCHAR(MAX) NULL, -- store JSON string
                 
-                CONSTRAINT FK_Foods_Users FOREIGN KEY (CreatorId)
+                CONSTRAINT FK_Foods_Users FOREIGN KEY (OwnerId)
                     REFERENCES dbo.Users(Id)
                     ON DELETE CASCADE
             );

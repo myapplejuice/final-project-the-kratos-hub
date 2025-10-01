@@ -69,8 +69,6 @@ export default class APIService {
 
         const json = await res.json();
 
-        console.log(json)
-
         if (!res.ok) {
             return { success: false, message: json?.message || 'USDA request failed' };
         }

@@ -137,6 +137,7 @@ export default function FoodCreator() {
             carbs >= protein && carbs >= fat ? 'Carbs' :
                 protein >= carbs && protein >= fat ? 'Protein' :
                     'Fat';
+        const ownerId = user.id;
         const creatorId = user.id;
         const creatorName = user.firstname + " " + user.lastname;
 
@@ -151,6 +152,7 @@ export default function FoodCreator() {
                 protein,
                 fat,
                 dominantMacro,
+                ownerId,
                 creatorId,
                 creatorName,
                 isPublic,

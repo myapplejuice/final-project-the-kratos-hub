@@ -20,7 +20,7 @@ import usePopups from "../../../common/hooks/use-popups";
 
 export default function FoodSelection() {
     const { user, setAdditionalContexts } = useContext(UserContext);
-    const { createAlert, showSpinner, hideSpinner } = usePopups();
+    const { createAlert, showSpinner, hideSpinner, createToast } = usePopups();
     const insets = useSafeAreaInsets();
     const [fabVisible, setFabVisible] = useState(true);
 
@@ -63,6 +63,8 @@ export default function FoodSelection() {
     }, [userFoods, communityFoods, selectedList]);
 
     useEffect(() => {
+        if (selectedList === 'Library') return;
+
         const sourceList =
             selectedList === 'My Foods' ? userFoods || [] :
                 selectedList === 'Community' ? communityFoods : [];
@@ -96,13 +98,19 @@ export default function FoodSelection() {
             })
             const result = await APIService.USDARequest(requestBody);
 
+            console.log(result)
             if (!result.success)
                 return createAlert({ message: result.message });
+
+            if (result.data.length === 0){
+             hideSpinner();
+                return createToast({message: 'Food not found'});
+            }
 
             const fetchedFoods = result.data || [];
 
             // Remove duplicates based on fdcId
-            const existingIds = new Set(USDAFoods.map(f => f.usdaId));
+            const existingIds = new Set(USDAFoods.map(f => f.USDAId));
             const newFoods = fetchedFoods.filter(f => !existingIds.has(f.fdcId));
 
             // Parse USDA food into your structure
@@ -117,6 +125,7 @@ export default function FoodSelection() {
                     .map((n, i) => ({
                         id: i,
                         label: n.nutrientName,
+                        originalAmount: n.value,
                         amount: n.value,
                         unit: n.unitName
                     }));
@@ -136,11 +145,17 @@ export default function FoodSelection() {
                     id: `usda-${f.fdcId}`,
                     label: f.description || 'Unknown',
                     category: f.foodCategory || 'USDA Food',
+                    ownerId: '00000000-0000-0000-0000-000000000000',
                     creatorId: '00000000-0000-0000-0000-000000000000',
                     creatorName: 'USDA',
                     isPublic: true,
                     isUSDA: true,
-                    usdaId: f.fdcId,
+                    USDAId: f.fdcId,
+                    originalServingSize: servingSize,
+                    originalEnergyKcal: energyKcal,
+                    originalCarbs: carbs,
+                    originalProtein: protein,
+                    originalFat: fat,
                     energyKcal,
                     carbs,
                     protein,
@@ -219,7 +234,7 @@ export default function FoodSelection() {
                     <AppScroll extraBottom={200} onScrollSetStates={setFabVisible} extraTop={0} topPadding={false}>
                         {foodList.map((food) => (
                             <TouchableOpacity
-                                key={food.isUSDA ? food.usdaId : food.id}
+                                key={food.id}
                                 style={{
                                     padding: 15,
                                     backgroundColor: colors.cardBackground,
