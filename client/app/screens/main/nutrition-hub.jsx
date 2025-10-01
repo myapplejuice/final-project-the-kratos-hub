@@ -58,7 +58,8 @@ export default function NutritionHub() {
                               createToast({ message: `Server error, ${result.message}` });
                          }
                     }
-                    const {energyKcal, carbs, protein, fat} = totalDayConsumption(todayObject);
+                    
+                    const { energyKcal, carbs, protein, fat } = totalDayConsumption(todayObject);
                     todayObject.consumedEnergyKcal = energyKcal;
                     todayObject.consumedCarbGrams = carbs;
                     todayObject.consumedProteinGrams = protein;

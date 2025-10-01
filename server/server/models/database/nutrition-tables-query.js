@@ -19,11 +19,6 @@ export function nutritionTablesQuery() {
                 TargetProteinGrams DECIMAL(7,2) NOT NULL,
                 TargetFatGrams DECIMAL(7,2) NOT NULL,
                 TargetWaterMl DECIMAL(6,1) NOT NULL,
-
-                ConsumedEnergyKcal DECIMAL(7,2) NOT NULL DEFAULT 0,
-                ConsumedCarbGrams DECIMAL(7,2) NOT NULL DEFAULT 0,
-                ConsumedProteinGrams DECIMAL(7,2) NOT NULL DEFAULT 0,
-                ConsumedFatGrams DECIMAL(7,2) NOT NULL DEFAULT 0,
                 ConsumedWaterMl DECIMAL(6,1) NOT NULL DEFAULT 0,
 
                 CONSTRAINT FK_NutritionLogs_User FOREIGN KEY (UserId)
