@@ -2,7 +2,7 @@ import sql from 'mssql/msnodesqlv8.js';
 import Database from '../../database/database.js';
 import ObjectMapper from '../../../utils/object-mapper.js';
 
-export default class NutritionMealFoodsDBService {
+export default class NutritionMealsFoodsDBService {
     // Adds a food to a meal
     static async addFood(food) {
         if (!food) return false;
@@ -32,7 +32,7 @@ export default class NutritionMealFoodsDBService {
             Database.addInput(request, 'AdditionalProps', sql.NVarChar(sql.MAX), food.additionalProps ? JSON.stringify(food.additionalProps) : null);
 
             const query = `
-                INSERT INTO dbo.MealLogFoods (
+                INSERT INTO dbo.MealLogsFoods (
                     MealLogId, CreatorId, CreatorName, USDAId, IsPublic, IsUSDA, Label, Category,
                     ServingUnit, OriginalServingSize, ServingSize,
                     OriginalEnergyKcal, OriginalCarbs, OriginalProtein, OriginalFat,
@@ -69,7 +69,7 @@ export default class NutritionMealFoodsDBService {
             Database.addInput(request, 'Id', sql.Int, foodId);
 
             const query = `
-                DELETE FROM MealLogFoods
+                DELETE FROM MealLogsFoods
                 WHERE MealLogId = @MealLogId AND Id = @Id
             `;
 
@@ -82,41 +82,36 @@ export default class NutritionMealFoodsDBService {
     }
 
     // Updates a food in a meal
-    static async updateFood(mealId, food) {
-        if (!mealId || !food || !food.id) return false;
+    static async updateFood(food) {
+        if (!food || !food.id || !food.mealId) return false;
 
+        console.log(food)
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, food.id);
-            Database.addInput(request, 'MealLogId', sql.Int, mealId);
-            Database.addInput(request, 'Label', sql.VarChar(50), food.label);
-            Database.addInput(request, 'Category', sql.VarChar(50), food.category);
-            Database.addInput(request, 'ServingUnit', sql.VarChar(20), food.servingUnit);
+            Database.addInput(request, 'MealLogId', sql.Int, food.mealId);
             Database.addInput(request, 'ServingSize', sql.Decimal(7, 2), food.servingSize);
             Database.addInput(request, 'EnergyKcal', sql.Decimal(7, 2), food.energyKcal);
             Database.addInput(request, 'Carbs', sql.Decimal(7, 2), food.carbs);
             Database.addInput(request, 'Protein', sql.Decimal(7, 2), food.protein);
             Database.addInput(request, 'Fat', sql.Decimal(7, 2), food.fat);
-            Database.addInput(request, 'DominantMacro', sql.VarChar(20), food.dominantMacro);
             Database.addInput(request, 'AdditionalProps', sql.NVarChar(sql.MAX), food.additionalProps ? JSON.stringify(food.additionalProps) : null);
 
             const query = `
-                UPDATE MealLogFoods
-                SET Label = @Label,
-                    Category = @Category,
-                    ServingUnit = @ServingUnit,
-                    ServingSize = @ServingSize,
+                UPDATE MealLogsFoods
+                SET ServingSize = @ServingSize,
                     EnergyKcal = @EnergyKcal,
                     Carbs = @Carbs,
                     Protein = @Protein,
                     Fat = @Fat,
-                    DominantMacro = @DominantMacro,
                     AdditionalProps = @AdditionalProps
                 WHERE MealLogId = @MealLogId AND Id = @Id
             `;
-
+console.log('comes here ')
             const result = await request.query(query);
-            return result.rowsAffected[0] > 0;
+            if (result.rowsAffected[0] === 0) return false;
+console.log('comes here ')
+            return food.id;
         } catch (err) {
             console.error('updateFood error:', err);
             return false;
@@ -129,7 +124,7 @@ export default class NutritionMealFoodsDBService {
             const request = Database.getRequest();
             Database.addInput(request, 'MealId', sql.Int, mealId);
 
-            const query = `SELECT * FROM MealLogFoods WHERE MealLogId = @MealId`;
+            const query = `SELECT * FROM MealLogsFoods WHERE MealLogId = @MealId`;
             const result = await request.query(query);
 
             return result.recordset.map(food => {

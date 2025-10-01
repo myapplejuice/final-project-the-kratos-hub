@@ -54,22 +54,10 @@ export default function MealsPlans() {
                 showSpinner({ abandonable: true, text: "Adding meal plan...", abandonableText: 'Press "Hide" to continue using the app while you wait' });
 
                 try {
-                    const result = await APIService.nutrition.meals.create({ nutritionLogId: currentDayLog.id, label, time });
+                    //const result = await APIService.nutrition.meals.create({ nutritionLogId: currentDayLog.id, label, time });
                 
                     if (result.success) {
-                        const meal = result.data.meal;
-                
-                        setOpenMeals(prev => [...prev, meal.id]);
-                        setUser(prev => ({
-                            ...prev,
-                            nutritionLogs: {
-                                ...prev.nutritionLogs,
-                                [pageDateKey]: {
-                                    ...prev.nutritionLogs[pageDateKey],
-                                    meals: [...(prev.nutritionLogs[pageDateKey].meals || []), { ...meal, foods: [] }]
-                                }
-                            }
-                        }));
+                       
                     } else {
                         createToast({ message: result.message || "Failed to add meal" });
                     }

@@ -3,8 +3,7 @@ import Database from '../../database/database.js';
 import ObjectMapper from '../../../utils/object-mapper.js';
 
 export default class NutritionFoodsDBService {
-    static async
-
+    
     static async fetchCommunityFoods(userId) {
         if (!userId) return [];
 
@@ -14,7 +13,7 @@ export default class NutritionFoodsDBService {
 
             const query = `
             SELECT *
-            FROM dbo.UserFoods
+            FROM dbo.Foods
             WHERE CreatorId != @CreatorId AND IsPublic = 1
             ORDER BY Id DESC;`;
 
@@ -50,7 +49,7 @@ export default class NutritionFoodsDBService {
 
             const query = `
             SELECT *
-            FROM dbo.UserFoods
+            FROM dbo.Foods
             WHERE CreatorId = @CreatorId
             ORDER BY Id DESC;`;
 
@@ -107,7 +106,7 @@ export default class NutritionFoodsDBService {
             Database.addInput(request, 'AdditionalProps', sql.NVarChar(sql.MAX), JSON.stringify(additionalProps));
 
             const query = `
-                INSERT INTO dbo.UserFoods
+                INSERT INTO dbo.Foods
                 (CreatorId, CreatorName, IsPublic, Label, Category, ServingUnit, ServingSize,
                  EnergyKcal, Carbs, Protein, Fat, DominantMacro, AdditionalProps)
                 OUTPUT INSERTED.*
@@ -169,7 +168,7 @@ export default class NutritionFoodsDBService {
             Database.addInput(request, 'AdditionalProps', sql.NVarChar(sql.MAX), JSON.stringify(additionalProps));
 
             const query = `
-                UPDATE dbo.UserFoods
+                UPDATE dbo.Foods
                 SET CreatorName = @CreatorName,
                     IsPublic = @IsPublic,
                     Label = @Label,
@@ -215,7 +214,7 @@ export default class NutritionFoodsDBService {
             Database.addInput(request, 'Id', sql.Int, foodId);
 
             const query = `
-                DELETE FROM dbo.UserFoods
+                DELETE FROM dbo.Foods
                 WHERE Id = @Id;
             `;
 

@@ -3,7 +3,7 @@ import NutritionDaysController from '../models/nutrition/days/nutrition-days-con
 import NutritionMealsController from '../models/nutrition/meals/nutrition-meals-controller.js';
 import MiddlewaresManager from '../utils/middlewares-manager.js';
 import NutritionFoodsController from '../models/nutrition/foods/nutrition-foods-controller.js';
-import NutritionMealFoodsController from '../models/nutrition/meal-foods/nutrition-meal-foods-controller.js';
+import NutritionMealsFoodsController from '../models/nutrition/meal-foods/nutrition-meals-foods-controller.js';
 
 export default class NutritionRouter {
     static nutritionRouter;
@@ -25,9 +25,9 @@ export default class NutritionRouter {
         this.nutritionRouter.delete("/meals/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealsController.deleteMeal));
         this.nutritionRouter.put("/meals/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealsController.updateMealLabel));
         
-        this.nutritionRouter.post("/meals/food/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealFoodsController.addFood));
-        this.nutritionRouter.delete("/meals/food/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealFoodsController.deleteFood));
-        this.nutritionRouter.put("/meals/food/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealFoodsController.updateFood));
+        this.nutritionRouter.post("/meals/food/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealsFoodsController.addFood));
+        this.nutritionRouter.delete("/meals/food/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealsFoodsController.deleteFood));
+        this.nutritionRouter.put("/meals/food/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealsFoodsController.updateFood));
 
         this.nutritionRouter.get("/foods/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionFoodsController.fetchFoods));
         this.nutritionRouter.post("/foods/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionFoodsController.createFood));

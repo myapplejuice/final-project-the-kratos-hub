@@ -16,7 +16,7 @@ export default class NutritionDaysDBService {
 
             const query = `
                 SELECT *
-                FROM UserNutritionLogs
+                FROM NutritionLogs
                 WHERE UserId = @UserId
                 ORDER BY Date DESC
             `;
@@ -61,7 +61,7 @@ export default class NutritionDaysDBService {
 
             const query = `
                 SELECT *
-                FROM UserNutritionLogs
+                FROM NutritionLogs
                 WHERE UserId = @UserId AND CAST(Date AS DATE) = CAST(@Date AS DATE)
             `;
 
@@ -109,7 +109,7 @@ export default class NutritionDaysDBService {
             }
 
             const updateQuery = `
-            UPDATE UserNutritionLogs
+            UPDATE NutritionLogs
             SET ${setClauses.join(', ')}
             OUTPUT inserted.*
             WHERE UserId = @UserId AND Date >= @Date
@@ -161,7 +161,7 @@ export default class NutritionDaysDBService {
             }
 
             const updateQuery = `
-            UPDATE UserNutritionLogs
+            UPDATE NutritionLogs
             SET ${setClauses.join(', ')}
             OUTPUT inserted.*
             WHERE UserId = @UserId AND CAST(Date AS DATE) = CAST(@Date AS DATE)
@@ -212,7 +212,7 @@ export default class NutritionDaysDBService {
 
                 const checkQuery = `
                 SELECT *
-                FROM UserNutritionLogs
+                FROM NutritionLogs
                 WHERE UserId = @UserId AND CAST(Date AS DATE) = CAST(@Date AS DATE)`;
                 const existing = await request.query(checkQuery);
 
@@ -236,7 +236,7 @@ export default class NutritionDaysDBService {
                     Database.addInput(insertRequest, 'TargetWaterMl', sql.Int, nutrition.waterMl);
 
                     const insertResult = await insertRequest.query(`
-                    INSERT INTO UserNutritionLogs
+                    INSERT INTO NutritionLogs
                     (UserId, Date, Goal, Diet, CarbRate, ProteinRate, FatRate, ProteinRequirement,
                      TargetEnergyKcal, TargetCarbGrams, TargetProteinGrams, TargetFatGrams, TargetWaterMl)
                     OUTPUT INSERTED.*

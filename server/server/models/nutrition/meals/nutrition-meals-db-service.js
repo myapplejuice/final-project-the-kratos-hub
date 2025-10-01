@@ -1,7 +1,7 @@
 import sql from 'mssql/msnodesqlv8.js';
 import Database from '../../database/database.js';
 import ObjectMapper from '../../../utils/object-mapper.js';
-import NutritionMealFoodsDBService from '../meal-foods/nutrition-meal-foods-db-service.js';
+import NutritionMealsFoodsDBService from '../meal-foods/nutrition-meals-foods-db-service.js';
 
 export default class NutritionMealsDBService {
     static normalizeDate(date) {
@@ -16,7 +16,7 @@ export default class NutritionMealsDBService {
             Database.addInput(request, "Time", sql.Time, time);
 
             const query = `
-                INSERT INTO dbo.MealLog (NutritionLogId, Label, Time)
+                INSERT INTO dbo.MealLogs (NutritionLogId, Label, Time)
                 OUTPUT INSERTED.*
                 VALUES (@NutritionLogId, @Label, @Time);
             `;
@@ -44,15 +44,15 @@ export default class NutritionMealsDBService {
             Database.addInput(request, 'Id', sql.Int, mealId);
 
             const query = `
-                DELETE FROM MealLog
+                DELETE FROM MealLogs
                 WHERE Id = @Id
             `;
 
             const result = await request.query(query);
-            return { success: result.rowsAffected[0] > 0 };
+            return result.rowsAffected[0] > 0;
         } catch (err) {
             console.error('deleteMeal error:', err);
-            return { success: false };
+            return false;
         }
     }
 
@@ -65,7 +65,7 @@ export default class NutritionMealsDBService {
             Database.addInput(request, 'Label', sql.VarChar(100), newLabel);
 
             const query = `
-                UPDATE MealLog
+                UPDATE MealLogs
                 SET Label = @Label
                 OUTPUT INSERTED.*
                 WHERE Id = @Id
@@ -79,11 +79,11 @@ export default class NutritionMealsDBService {
                 meal[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
             }
 
-            meal.foods = await NutritionMealFoodsDBService.fetchFoodsByMealId(meal.id);
+            meal.foods = await NutritionMealsFoodsDBService.fetchFoodsByMealId(meal.id);
             return meal;
         } catch (err) {
             console.error('updateMealLabel error:', err);
-            return { success: false, meal: null };
+            return null;
         }
     }
 
@@ -92,7 +92,7 @@ export default class NutritionMealsDBService {
             const request = Database.getRequest();
             Database.addInput(request, 'NutritionLogId', sql.Int, nutritionLogId);
 
-            const query = `SELECT * FROM MealLog WHERE NutritionLogId = @NutritionLogId`;
+            const query = `SELECT * FROM MealLogs WHERE NutritionLogId = @NutritionLogId`;
             const result = await request.query(query);
 
             const meals = await Promise.all(result.recordset.map(async meal => {
@@ -100,7 +100,7 @@ export default class NutritionMealsDBService {
                 for (const key in meal) obj[ObjectMapper.toCamelCase(key)] = meal[key];
 
                 // Fetch foods for this meal
-                obj.foods = await NutritionMealFoodsDBService.fetchFoodsByMealId(obj.id);
+                obj.foods = await NutritionMealsFoodsDBService.fetchFoodsByMealId(obj.id);
                 return obj;
             }));
 

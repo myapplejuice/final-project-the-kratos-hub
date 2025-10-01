@@ -19,15 +19,14 @@ import { formatDate } from "../../../common/utils/date-time";
 
 export default function FoodProfile() {
     const { setUser, user, additionalContexts } = useContext(UserContext);
-    const { createDialog, createAlert, showSpinner, hideSpinner } = usePopups();
+    const { createDialog, createAlert, showSpinner, hideSpinner, createToast } = usePopups();
     const [servingSize, setServingSize] = useState(additionalContexts.selectedFood.servingSize);
     const [energyKcal, setEnergyKcal] = useState(0);
     const [carbs, setCarbs] = useState(0);
     const [protein, setProtein] = useState(0);
     const [fat, setFat] = useState(0);
     const [additionalProps, setAdditionalProps] = useState([]);
-    const [deleteVisible, setDeleteVisible] = useState(user.id === additionalContexts.selectedFood.creatorId || additionalContexts.foodProfileIntent === 'update');
-    const [editVisible, setEditVisible] = useState(user.id === additionalContexts.selectedFood.creatorId && additionalContexts.foodProfileIntent === 'create');
+    const intent = additionalContexts.foodProfileIntent;
 
     useEffect(() => {
         const factor = servingSize / additionalContexts.selectedFood.servingSize;
@@ -48,8 +47,17 @@ export default function FoodProfile() {
         setAdditionalProps(additionalProps);
     }, [servingSize, additionalContexts]);
 
+    function handleFood() {
+        Keyboard.dismiss();
+
+        if (intent === 'create')
+            return handleFoodAddition();
+        else
+            return handleFoodUpdate();
+    }
+
     async function handleFoodDeletion() {
-        const intent = additionalContexts.foodProfileIntent;
+        Keyboard.dismiss();
 
         createDialog({
             title: intent === 'create' ? 'Delete Food' : 'Remove Food',
@@ -108,7 +116,6 @@ export default function FoodProfile() {
     }
 
     async function handleFoodAddition() {
-        Keyboard.dismiss();
         const food = additionalContexts.selectedFood;
         const meal = additionalContexts.selectedMeal;
 
@@ -129,7 +136,6 @@ export default function FoodProfile() {
         };
 
         try {
-            showSpinner();
             showSpinner();
             const date = formatDate(additionalContexts.dayLogDate, { format: 'YYYY-MM-DD' });
             const result = await APIService.nutrition.meals.foods.add({ food: payload });
@@ -166,6 +172,62 @@ export default function FoodProfile() {
         }
     }
 
+    async function handleFoodUpdate() {
+        const food = additionalContexts.selectedFood;
+        const meal = additionalContexts.selectedMeal;
+
+        if (servingSize === food.servingSize) 
+            return createToast({message: 'No changes detected'});
+
+        const payload = {
+            mealId: meal.id,
+            ...food,
+            servingSize: Number(servingSize),
+            energyKcal,
+            carbs,
+            protein,
+            fat,
+            additionalProps,
+        };
+
+        try {
+            showSpinner();
+            const date = formatDate(additionalContexts.dayLogDate, { format: 'YYYY-MM-DD' });
+            const result = await APIService.nutrition.meals.foods.update({ food: payload });
+
+            if (result.success) {
+                setUser(prev => ({
+                    ...prev,
+                    nutritionLogs: {
+                        ...prev.nutritionLogs,
+                        [date]: {
+                            ...prev.nutritionLogs[date],
+                            meals: prev.nutritionLogs[date].meals.map(m =>
+                                m.id === meal.id
+                                    ? {
+                                        ...m,
+                                        foods: m.foods.map(f =>
+                                            f.id === food.id
+                                                ? payload
+                                                : f
+                                        )
+                                    }
+                                    : m
+                            )
+                        }
+                    }
+                }))
+                createAlert({ title: 'Success', text: "Serving size updated, click OK to go back", onPress: () => router.back() });
+            } else {
+                createAlert({ title: 'Failure', text: "Updating serving failed!\n" + result.message });
+            }
+        } catch (err) {
+            console.log(err);
+        } finally {
+            hideSpinner();
+        }
+    }
+
     return (
         <AppScroll contentStyle={{ padding: 15 }} extraTop={60} extraBottom={200}>
             {/* Header */}
@@ -173,18 +235,18 @@ export default function FoodProfile() {
                 <View>
                     <AppText style={styles.foodLabel}>{additionalContexts.selectedFood.label}</AppText>
                     <AppText style={styles.foodCategory}>{additionalContexts.selectedFood.category}</AppText>
-                    <Divider orientation="horizontal" style={{ marginVertical: 10, opacity: 0.3 }} />
+                    <Divider orientation="horizontal" style={{ marginVertical: 10 }} />
                     <AppText style={styles.creator}>{additionalContexts.selectedFood.creatorName}</AppText>
                     <AppText style={styles.creator}>{additionalContexts.selectedFood.isUSDA ? 'USDA' : additionalContexts.selectedFood.isPublic ? 'Public' : 'Private'}</AppText>
                 </View>
                 <View style={{ flexDirection: 'row' }}>
 
-                    {deleteVisible &&
-                        <TouchableOpacity style={[styles.editBtn, { marginEnd: editVisible ? 7 : 0 }]} onPress={handleFoodDeletion}>
+                    {intent === 'update' &&
+                        <TouchableOpacity style={[styles.editBtn, { marginEnd: intent === 'create' ? 7 : 0 }]} onPress={handleFoodDeletion}>
                             <Image source={Images.trash} style={{ width: 22, height: 22, tintColor: colors.accentPink }} />
                         </TouchableOpacity>
                     }
-                    {editVisible &&
+                    {intent === 'create' &&
                         <TouchableOpacity style={styles.editBtn} onPress={() => router.push(routes.FOOD_EDITOR)}>
                             <Image source={Images.edit} style={{ width: 20, height: 20, tintColor: 'white' }} />
                         </TouchableOpacity>
@@ -245,9 +307,9 @@ export default function FoodProfile() {
                     />
                     <AppText style={styles.servingInfo}>{additionalContexts.selectedFood.servingUnit}</AppText>
                 </View>
-                <TouchableOpacity style={styles.addBtn} onPress={handleFoodAddition}>
+                <TouchableOpacity style={styles.addBtn} onPress={handleFood}>
                     <Image source={Images.plus} style={{ width: 18, height: 18, tintColor: 'white', marginRight: 8 }} />
-                    <AppText style={{ color: 'white', fontSize: scaleFont(14) }}>Add</AppText>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(14) }}>{intent === 'create' ? `Add` : `Update Serving`}</AppText>
                 </TouchableOpacity>
             </View>
 
