@@ -1,7 +1,7 @@
 import DeviceStorageService from './device-storage-service'
 
 export default class APIService {
-    static BASE_URL = "http://192.168.33.19:8080/api";
+    static BASE_URL = "http://192.168.33.16:8080/api";
     static USER_ID = null;
 
     static setUserId(id) {

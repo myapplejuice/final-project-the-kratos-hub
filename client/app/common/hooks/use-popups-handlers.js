@@ -18,6 +18,7 @@ export default function usePopupHandlers() {
   const [optionsParams, setOptionsParams] = useState({});
 
   const [spinner, setSpinner] = useState(false);
+  const [spinnerParams, setSpinnerParams] = useState({});
 
   const [toast, setToast] = useState(null);
 
@@ -155,7 +156,16 @@ export default function usePopupHandlers() {
   }, [setBackHandler]);
 
   /* SPINNER */
-  const showSpinner = useCallback(() => {
+  const showSpinner = useCallback((params) => {
+    setSpinnerParams({
+      ...params,
+      onHide: (...args) => {
+        if (typeof params?.onHide === 'function') {
+          params?.onHide(...args);
+        }
+        setSpinner(false);
+      }
+    });
     setSpinner(true);
   }, []);
 
@@ -167,13 +177,14 @@ export default function usePopupHandlers() {
 
   return {
     popupStates: {
+      toast, setToast,
       picker, setPicker, pickerParams,
       dialog, setDialog, dialogParams,
       alert, setAlert, alertParams,
       selector, setSelector, selectorParams,
       input, setInput, inputParams,
-      spinner, toast, setToast,
-      options, optionsParams, setOptions
+      spinner, setSpinner, spinnerParams,
+      options, setOptions, optionsParams
     },
     popupActions: {
       createPicker,

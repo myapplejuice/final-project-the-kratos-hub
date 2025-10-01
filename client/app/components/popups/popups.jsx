@@ -9,7 +9,8 @@ import { StyleSheet, View } from "react-native";
 import Picker from "./picker";
 
 export default function Popups({
-  toast, setToast, spinner,
+  toast, setToast,
+  spinner, setSpinner, spinnerParams,
   dialog, setDialog, dialogParams,
   alert, setAlert, alertParams,
   selector, setSelector, selectorParams,
@@ -31,7 +32,16 @@ export default function Popups({
         />
       )}
 
-      {spinner && <Spinner />}
+      {spinner && <Spinner
+        text={spinnerParams.text}
+        timerDuration={spinnerParams.timerDuration}
+        abandonable={spinnerParams.abandonable}
+        onHide={() => {
+          setSpinner(false);
+          if (spinnerParams.onHide) {
+            spinnerParams.onHide();
+          }
+        }} />}
 
       {dialog && (
         <Dialog
