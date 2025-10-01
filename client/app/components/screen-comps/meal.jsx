@@ -14,8 +14,8 @@ import Invert from '../effects/invert';
 import { formatTime, toDateFromSQLTime } from '../../common/utils/date-time';
 import FadeInOut from '../effects/fade-in-out';
 
-export default function Meal({ label, time, foods = [], num, onDeletePress = () => { }, onRenamePress = () => { }, onAddPress = () => { }, onFoodPress = () => { },
-    onAddPressVisible = true, onRenamePressVisible = true, onFoodPressVisible = true, onDeletePressVisible = true, expandedOnStart = false, onExpand = () => { } }) {
+export default function Meal({ label, time, foods = [], onDeletePress = () => { }, onRenamePress = () => { }, onAddPress = () => { }, onFoodPress = () => { },
+    onAddPressVisible = true, onRenamePressVisible = true, onFoodPressDisabled = false, onDeletePressVisible = true, expandedOnStart = false, onExpand = () => { } }) {
 
     const { user } = useContext(UserContext);
     const [expanded, setExpanded] = useState(expandedOnStart);
@@ -100,7 +100,7 @@ export default function Meal({ label, time, foods = [], num, onDeletePress = () 
                     {foods.length > 0 ? (
                         foods.map((food, index) => (
                             <TouchableOpacity
-                                disabled={!onFoodPressVisible}
+                                disabled={onFoodPressDisabled}
                                 onPress={() => onFoodPress(food)}
                                 key={index}
                                 style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 12 }}
@@ -156,28 +156,30 @@ export default function Meal({ label, time, foods = [], num, onDeletePress = () 
                         </View>
                     </View>
 
-                    <AnimatedButton
-                        title="Add Food"
-                        style={{
-                            padding: 15,
-                            backgroundColor: colors.accentGreen,
-                            borderRadius: 15,
-                            marginTop: 15,
-                        }}
-                        textStyle={{ fontSize: scaleFont(13), fontWeight: 'bold' }}
-                        leftImage={Images.plus}
-                        leftImageStyle={{ tintColor: 'white', width: 18, height: 18 }}
-                        leftImageContainerStyle={{
-                            width: 16,
-                            height: 16,
-                            padding: 5,
-                            borderRadius: 50,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            marginEnd: 8,
-                        }}
-                        onPress={onAddPress}
-                    />
+                    {onAddPressVisible &&
+                        <AnimatedButton
+                            title="Add Food"
+                            style={{
+                                padding: 15,
+                                backgroundColor: colors.accentGreen,
+                                borderRadius: 15,
+                                marginTop: 15,
+                            }}
+                            textStyle={{ fontSize: scaleFont(13), fontWeight: 'bold' }}
+                            leftImage={Images.plus}
+                            leftImageStyle={{ tintColor: 'white', width: 18, height: 18 }}
+                            leftImageContainerStyle={{
+                                width: 16,
+                                height: 16,
+                                padding: 5,
+                                borderRadius: 50,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                marginEnd: 8,
+                            }}
+                            onPress={onAddPress}
+                        />
+                    }
                 </ExpandInOut>
             </View>
         </FadeInOut>

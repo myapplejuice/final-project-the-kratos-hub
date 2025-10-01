@@ -177,7 +177,7 @@ export default function MealsLog() {
             title: "Meal Addition",
             confirmText: "ADD",
             text: `Enter a label for the meal (e.g. Breakfast, Dinner, Pre-Workout...)`,
-            placeholders: [`Meal ${currentDayLog?.meals?.length + 1}`],
+            placeholders: [`Meal ${currentDayLog?.meals?.length + 1 || 1}`],
             initialValues: [``],
             onSubmit: async (vals) => {
                 let label = vals[0];
@@ -329,7 +329,7 @@ export default function MealsLog() {
             }
             <FloatingActionButton
                 onPress={handleMealAddition}
-                visible={fabVisible}
+                visible={fabVisible && !dateComparisons.isPast}
                 position={{ bottom: insets.bottom + 50, right: 20 }}
                 icon={Images.plus}
             />
@@ -415,41 +415,43 @@ export default function MealsLog() {
 
                 {/* Meals Log*/}
                 <View style={{ backgroundColor: colors.background }}>
-                    <View style={[styles.card, { padding: 0, marginTop: 20 }]} >
-                        <View style={{ padding: 15 }}>
-                            <ProgressBar
-                                title="Water"
-                                current={convertFluid(currentDayLog.consumedWaterMl ?? 0, 'ml', user.preferences.fluidUnit.key)}
-                                max={convertFluid(currentDayLog.targetWaterMl ?? user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)}
-                                unit={user.preferences.fluidUnit.field}
-                                color={nutritionColors.water1}
-                                styleType="header"
-                                height={10}
-                                borderRadius={5}
+                    <View style={{ height: 140 }}>
+                        <View style={[styles.card, { padding: 0, marginTop: 20 }]} >
+                            <View style={{ padding: 15 }}>
+                                <ProgressBar
+                                    title="Water"
+                                    current={convertFluid(currentDayLog.consumedWaterMl ?? 0, 'ml', user.preferences.fluidUnit.key)}
+                                    max={convertFluid(currentDayLog.targetWaterMl ?? user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)}
+                                    unit={user.preferences.fluidUnit.field}
+                                    color={nutritionColors.water1}
+                                    styleType="header"
+                                    height={10}
+                                    borderRadius={5}
 
-                            />
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
-                            {/* Minus Button */}
-                            <TouchableOpacity onPress={() => handleWater(-waterAmount)} style={{ backgroundColor: colors.accentPink, borderBottomLeftRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}>
-                                <Image source={Images.minus} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                            </TouchableOpacity>
+                                />
+                            </View>
+                            <FadeInOut visible={!dateComparisons.isPast} removeWhenHidden outDuration={200} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+                                <TouchableOpacity onPress={() => handleWater(-waterAmount)} style={{ backgroundColor: colors.accentPink, borderBottomLeftRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}>
+                                    <Image source={Images.minus} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                                </TouchableOpacity>
 
-                            <TouchableOpacity style={{ paddingHorizontal: 15, alignItems: 'center' }} onPress={handleWaterAmountChange}>
-                                <AppText style={{ fontSize: scaleFont(16), color: nutritionColors.water1 }}>
-                                    {waterAmount} {user.preferences.fluidUnit.field}
-                                </AppText>
-                            </TouchableOpacity>
+                                <TouchableOpacity style={{ paddingHorizontal: 15, alignItems: 'center' }} onPress={handleWaterAmountChange}>
+                                    <AppText style={{ fontSize: scaleFont(16), color: nutritionColors.water1 }}>
+                                        {waterAmount} {user.preferences.fluidUnit.field}
+                                    </AppText>
+                                </TouchableOpacity>
 
-                            <TouchableOpacity onPress={() => handleWater(waterAmount)} style={{ backgroundColor: colors.main, borderBottomRightRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}  >
-                                <Image source={Images.plus} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                            </TouchableOpacity>
+                                <TouchableOpacity onPress={() => handleWater(waterAmount)} style={{ backgroundColor: colors.main, borderBottomRightRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}  >
+                                    <Image source={Images.plus} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                                </TouchableOpacity>
+                            </FadeInOut>
                         </View>
                     </View>
                     {currentDayLog?.meals?.length > 0 ?
                         currentDayLog.meals.map((meal, i) => {
                             return (
                                 <Meal
+                                    key={meal.id}
                                     label={meal.label}
                                     foods={meal.foods}
                                     time={meal.time}
@@ -458,7 +460,10 @@ export default function MealsLog() {
                                     onDeletePress={() => handleMealRemoval(meal.id)}
                                     onAddPress={() => handleFoodAddition(meal)}
                                     onFoodPress={(food) => handleMealFoodPress(meal, food)}
-                                    key={meal.id}
+                                    onFoodPressDisabled={dateComparisons.isPast}
+                                    onAddPressVisible={!dateComparisons.isPast}
+                                    onDeletePressVisible={!dateComparisons.isPast}
+                                    onRenamePressVisible={!dateComparisons.isPast}
                                     expandedOnStart={openMeals.includes(meal.id)}
                                     onExpand={() => { setOpenMeals(prev => prev.includes(meal.id) ? prev.filter(id => id !== meal.id) : [...prev, meal.id]) }}
                                 />
