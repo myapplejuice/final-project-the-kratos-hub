@@ -151,7 +151,7 @@ export default function NutritionHub() {
                     overlayColor="rgba(0, 0, 0, 0.8)"
                     actions={[
                          { icon: Images.statistics2, title: 'Statistical Analysis', onPress: () => console.log("Stats"), closeOnAction: true, delayClosure: true },
-                         { icon: Images.meals, title: 'Meals Log', onPress: () => router.push(routes.MEALS_LOG), closeOnAction: true, delayClosure: true },
+                         { icon: Images.book4, title: 'Meals Log', onPress: () => router.push(routes.MEALS_LOG), closeOnAction: true, delayClosure: true },
                     ]}
                     position={{ bottom: 140, right: 20 }}
                     syncWithNavBar={true}

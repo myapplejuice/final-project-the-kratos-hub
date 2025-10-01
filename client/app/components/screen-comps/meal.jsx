@@ -50,7 +50,7 @@ export default function Meal({ label, time, foods = [], onDeletePress = () => { 
                 >
                     <View>
                         <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold' }}>{label}</AppText>
-                        <AppText style={{ fontSize: scaleFont(9), color: colors.mutedText }}>{formattedTime}</AppText>
+                        <AppText style={{ fontSize: scaleFont(9), color: colors.mutedText, fontWeight: 'bold' }}>{formattedTime}</AppText>
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                         {onRenamePressVisible && onDeletePressVisible && (

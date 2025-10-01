@@ -8,6 +8,7 @@ import AppText from "../../../components/screen-comps/app-text";
 import DateDisplay from "../../../components/screen-comps/date-display";
 import Divider from "../../../components/screen-comps/divider";
 import FloatingActionButton from "../../../components/screen-comps/floating-action-button";
+import FloatingActionMenu from "../../../components/screen-comps/floating-action-menu";
 import Meal from "../../../components/screen-comps/meal";
 import ProgressBar from "../../../components/screen-comps/progress-bar";
 import { Images } from "../../../common/settings/assets";
@@ -327,7 +328,12 @@ export default function MealsLog() {
                     }}
                 />
             }
-            <FloatingActionButton
+            <FloatingActionMenu
+              overlayColor="rgba(0, 0, 0, 0.8)"
+              actions={[
+                         { icon: Images.list3, title: 'Import Plan', onPress: () => router.push(routes.MEAL_PLANS), closeOnAction: true, delayClosure: true },
+                         { icon: Images.meals, title: 'Add Meal', onPress: () => handleMealAddition(), closeOnAction: true },
+                    ]}
                 onPress={handleMealAddition}
                 visible={fabVisible && !dateComparisons.isPast}
                 position={{ bottom: insets.bottom + 50, right: 20 }}

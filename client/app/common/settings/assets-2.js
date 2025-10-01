@@ -73,4 +73,10 @@ export const Images_2 = {
     mealTwoOutline: require('../../../assets/images/meal-2-outline.png'),
     mealThreeOutline: require('../../../assets/images/meal-3-outline.png'),
     arrowUp: require('../../../assets/images/arrow-up.png'),
+    list2: require('../../../assets/images/list-2.png'),
+    mealPlan: require('../../../assets/images/meal-plan.png'),
+    mealOutline: require('../../../assets/images/meal-outline.png'),
+    list2Outline: require('../../../assets/images/list-2-outline.png'),
+    list3: require('../../../assets/images/list-3.png'),
+    list3Outline: require('../../../assets/images/list-3-outline.png'),
 };
