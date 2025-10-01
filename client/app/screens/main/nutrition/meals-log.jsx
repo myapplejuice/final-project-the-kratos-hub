@@ -470,7 +470,7 @@ export default function MealsLog() {
                                     onAddPressVisible={!dateComparisons.isPast}
                                     onDeletePressVisible={!dateComparisons.isPast}
                                     onRenamePressVisible={!dateComparisons.isPast}
-                                    expandedOnStart={openMeals.includes(meal.id)}
+                                    expandedOnStart={openMeals.includes(meal.id) || currentDayLog.meals.length === 1}
                                     onExpand={() => { setOpenMeals(prev => prev.includes(meal.id) ? prev.filter(id => id !== meal.id) : [...prev, meal.id]) }}
                                 />
                             )
