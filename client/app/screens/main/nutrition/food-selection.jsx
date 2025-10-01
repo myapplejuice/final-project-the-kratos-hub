@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useContext, useEffect, useState } from "react";
-import { Image, Platform, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Image, Keyboard, Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppScroll from "../../../components/screen-comps/app-scroll";
 import AppText from "../../../components/screen-comps/app-text";
@@ -18,38 +18,58 @@ import FadeInOut from "../../../components/effects/fade-in-out";
 import APIService from '../../../common/services/api-service';
 
 export default function FoodSelection() {
-    const { user, additionalContexts, setAdditionalContexts } = useContext(UserContext);
-    const meal = additionalContexts.selectedMeal;
+    const { user, setAdditionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const [fabVisible, setFabVisible] = useState(true);
 
     const [selectedList, setSelectedList] = useState('My Foods');
     const [searchQuery, setSearchQuery] = useState('');
+    const [USDAQueryTriggered, setUSDAQueryTriggered] = useState(false);
 
     const [foodList, setFoodList] = useState([]);
+    const [userFoods, setUserFoods] = useState([]);
     const [communityFoods, setCommunityFoods] = useState([]);
 
     useEffect(() => {
-        async function fetchCommunityFoods() {
+        async function prepareFoods() {
             const result = await APIService.nutrition.foods.foods('community');
             const foods = result.data.foods;
             setCommunityFoods(foods);
+
+            const userFoods = user.foods || [];
+            setUserFoods(userFoods);
         }
 
-        fetchCommunityFoods();
+        prepareFoods();
     }, []);
 
     useEffect(() => {
-        const foods = user.foods || [];
-
         if (selectedList === 'My Foods') {
-            setFoodList(foods);
+            setUSDAQueryTriggered(false);
+            setFoodList(userFoods);
         } else if (selectedList === 'Library') {
             setFoodList([]);
         } else if (selectedList === 'Community') {
+            setUSDAQueryTriggered(false);
             setFoodList(communityFoods);
         }
-    }, [user.foods, selectedList, communityFoods]);
+    }, [userFoods, communityFoods, selectedList]);
+
+    useEffect(() => {
+        const sourceList =
+            selectedList === 'My Foods' ? userFoods || [] :
+                selectedList === 'Community' ? communityFoods : [];
+
+        if (searchQuery.trim() === '') {
+            setFoodList(sourceList);
+        } else {
+            const query = searchQuery.toLowerCase();
+            const filtered = sourceList.filter(food =>
+                food.label.toLowerCase().includes(query)
+            );
+            setFoodList(filtered);
+        }
+    }, [searchQuery, selectedList, userFoods, communityFoods]);
 
     function handleFoodSelection(food) {
         setAdditionalContexts(prev => ({ ...prev, selectedFood: food, foodProfileIntent: 'add' }));
@@ -90,7 +110,15 @@ export default function FoodSelection() {
                 <View style={{ flexDirection: 'row', justifyContent: 'flex-start', backgroundColor: colors.inputBackground, alignItems: 'center', borderRadius: 15, marginBottom: 25 }}>
                     <Image source={Images.magnifier} style={{ tintColor: colors.mutedText, width: 20, height: 20, marginHorizontal: 15 }} />
                     <AppTextInput
-                        onChangeText={(value) => { setSearchQuery(value) }}
+                        onChangeText={setSearchQuery}
+                        onSubmitEditing={() => {
+                            Keyboard.dismiss()
+                            if (!searchQuery)
+                                return;
+
+                            if (selectedList === 'Library')
+                                setUSDAQueryTriggered(true)
+                        }}
                         value={searchQuery}
                         placeholder="Search"
                         placeholderTextColor={"rgba(255, 255, 255, 0.5)"}
@@ -99,14 +127,29 @@ export default function FoodSelection() {
 
                 {foodList.length > 0 ? (
                     <AppScroll onScrollSetStates={setFabVisible} extraTop={0} topPadding={false}>
-                        {foodList.map((food, i) => (
-                            <TouchableOpacity key={food.id} style={{ padding: 15, backgroundColor: colors.cardBackground, borderRadius: 15, flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }} onPress={() => handleFoodSelection(food)}>
+                        {foodList.map((food) => (
+                            <TouchableOpacity
+                                key={food.id}
+                                style={{
+                                    padding: 15,
+                                    backgroundColor: colors.cardBackground,
+                                    borderRadius: 15,
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    marginBottom: 5,
+                                }}
+                                onPress={() => handleFoodSelection(food)}
+                            >
                                 <View style={{ justifyContent: 'center', width: '60%' }}>
                                     <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{food.label}</AppText>
-                                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(8), marginTop: 0 }}>{selectedList !== 'My Foods' ? food.creatorName : food.isPublic ? 'Public' : 'Private'}, {food.servingSize} {food.servingUnit}</AppText>
+                                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(8), marginTop: 0 }}>
+                                        {food.category}, {food.servingSize} {food.servingUnit}
+                                    </AppText>
                                 </View>
                                 <View style={{ alignItems: 'flex-end', width: '40%' }}>
-                                    <AppText style={{ color: nutritionColors.energy1, fontSize: scaleFont(12) }}>{convertEnergy(food.energyKcal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}</AppText>
+                                    <AppText style={{ color: nutritionColors.energy1, fontSize: scaleFont(12) }}>
+                                        {convertEnergy(food.energyKcal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
+                                    </AppText>
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 0 }}>
                                         <AppText style={{ color: nutritionColors.carbs1, fontSize: scaleFont(8) }}>C: {food.carbs}</AppText>
                                         <Divider orientation="vertical" thickness={1} color={colors.divider} style={{ marginHorizontal: 5 }} />
@@ -120,35 +163,67 @@ export default function FoodSelection() {
                     </AppScroll>
                 ) : (
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 }}>
-                        <View style={{ justifyContent: 'flex-end', alignItems: 'center', flex: 1 }}>
+                        <View style={{ justifyContent: 'flex-end', alignItems: 'center', height: '30%' }}>
                             <Image source={Images.list} style={{ tintColor: colors.mutedText, width: 100, height: 100, marginBottom: 15 }} />
-                            <AppText style={{ color: colors.mutedText, fontWeight: 'bold', fontSize: scaleFont(18), textAlign: 'center' }}>
-                                Start searching for foods
-                            </AppText>
                         </View>
-                        <View style={{ marginBottom: 200, alignItems: 'center', flex: 1, marginTop:15 }}>
-                            <FadeInOut visible={selectedList !== 'Library'} inDuration={400} outDuration={400} removeWhenHidden={false} collapseWhenHidden>
-                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20, }}>
-                                    Use the search bar above to find meals from My Foods, the Library, or Community contributions.
+                        <View style={{ alignItems: 'center', height: '70%' }}>
+                            {/* MY FOODS */}
+                            <FadeInOut visible={selectedList === 'My Foods' && (userFoods?.length || 0) === 0} inDuration={400} outDuration={400} removeWhenHidden={false} collapseWhenHidden>
+                                <AppText style={{ color: colors.mutedText, fontWeight: 'bold', fontSize: scaleFont(18), textAlign: 'center' }}>
+                                    You have no foods
+                                </AppText>
+                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20, marginTop: 10 }}>
+                                    You can create your own foods by clicking below or use the search bar to find meals from the Library or Community contributions.
                                 </AppText>
                             </FadeInOut>
-                            <FadeInOut visible={selectedList === 'Library'} inDuration={400} outDuration={400} removeWhenHidden={false} collapseWhenHidden>
-                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20 }}>
+                            <FadeInOut visible={selectedList === 'My Foods' && (userFoods?.length || 0) > 0 && foodList.length === 0} inDuration={400} outDuration={400} removeWhenHidden={false} collapseWhenHidden>
+                                <AppText style={{ color: colors.mutedText, fontWeight: 'bold', fontSize: scaleFont(18), textAlign: 'center' }}>
+                                    Food not found
+                                </AppText>
+                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20, marginTop: 10 }}>
+                                    Try searching for another food, or check the Library or Community contributions.
+                                </AppText>
+                            </FadeInOut>
+
+                            {/* LIBRARY */}
+                            <FadeInOut visible={selectedList === 'Library' && foodList.length === 0 && !USDAQueryTriggered} inDuration={400} outDuration={400} removeWhenHidden={false} collapseWhenHidden>
+                                <AppText style={{ color: colors.mutedText, fontWeight: 'bold', fontSize: scaleFont(18), textAlign: 'center' }}>
+                                    Start searching for foods
+                                </AppText>
+                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', marginTop: 10 }}>
                                     All foods in the library provided by:
                                 </AppText>
-                            </FadeInOut>
-                            <FadeInOut visible={selectedList === 'My Foods'} inDuration={400} outDuration={400} removeWhenHidden={false} collapseWhenHidden>
-                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20, marginTop: 15 }}>
-                                    You can also add your own foods to My Foods.
-                                </AppText>
-                            </FadeInOut>
-                            <FadeInOut visible={selectedList === 'Library'} inDuration={400} outDuration={400} removeWhenHidden={false} collapseWhenHidden>
-                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20, marginTop: 8 }}>
+                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', marginTop: 10 }}>
                                     U.S. Department of Agriculture, Agricultural Research Service. FoodData Central, 2025. fdc.nal.usda.gov.
                                 </AppText>
                             </FadeInOut>
-                        </View>
+                            <FadeInOut visible={selectedList === 'Library' && foodList.length === 0 && USDAQueryTriggered} inDuration={400} outDuration={400} removeWhenHidden={false} collapseWhenHidden>
+                                <AppText style={{ color: colors.mutedText, fontWeight: 'bold', fontSize: scaleFont(18), textAlign: 'center' }}>
+                                    Food not found
+                                </AppText>
+                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20, marginTop: 10 }}>
+                                    Try searching for another food or check My Foods or Community.
+                                </AppText>
+                            </FadeInOut>
 
+                            {/* COMMUNITY */}
+                            <FadeInOut visible={selectedList === 'Community' && (foodList.length === 0 && communityFoods.length === 0)} inDuration={400} outDuration={400} removeWhenHidden={false} collapseWhenHidden>
+                                <AppText style={{ color: colors.mutedText, fontWeight: 'bold', fontSize: scaleFont(18), textAlign: 'center' }}>
+                                    No foods currently available
+                                </AppText>
+                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20, marginTop: 10 }}>
+                                    You can contribute by adding your own foods, which would help us, the community, and you!
+                                </AppText>
+                            </FadeInOut>
+                            <FadeInOut visible={selectedList === 'Community' && communityFoods.length > 0 && foodList.length === 0} inDuration={400} outDuration={400} removeWhenHidden={false} collapseWhenHidden>
+                                <AppText style={{ color: colors.mutedText, fontWeight: 'bold', fontSize: scaleFont(18), textAlign: 'center' }}>
+                                    Food not found
+                                </AppText>
+                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20, marginTop: 10 }}>
+                                    Try searching for another food, or check My Foods or the Library.
+                                </AppText>
+                            </FadeInOut>
+                        </View>
                     </View>
                 )}
             </AppView>
