@@ -15,7 +15,6 @@ import APIService from "../../../common/services/api-service";
 import { router } from "expo-router";
 import { routes } from "../../../common/settings/constants";
 import { Keyboard } from "react-native";
-import { formatDate } from "../../../common/utils/date-time";
 
 export default function FoodProfile() {
     const { setUser, user, additionalContexts } = useContext(UserContext);
@@ -29,6 +28,7 @@ export default function FoodProfile() {
     const intent = additionalContexts.foodProfileIntent;
 
     useEffect(() => {
+        console.log(additionalContexts.selectedFood)
         const factor = servingSize / additionalContexts.selectedFood.servingSize;
         const energyKcal = Math.round(additionalContexts.selectedFood.energyKcal * factor);
         const carbs = Math.round(additionalContexts.selectedFood.carbs * factor);
@@ -284,7 +284,7 @@ export default function FoodProfile() {
                     <AppText style={styles.foodCategory}>{additionalContexts.selectedFood.category}</AppText>
                     <Divider orientation="horizontal" style={{ marginVertical: 10 }} />
                     <AppText style={styles.creator}>{additionalContexts.selectedFood.isUSDA ? 'United States Department of Agriculture' : additionalContexts.selectedFood.creatorName}</AppText>
-                    <AppText style={styles.creator}>{additionalContexts.selectedFood.isUSDA ? 'Public' : additionalContexts.selectedFood.isPublic ? 'Public' : 'Private'}</AppText>
+                    <AppText style={[styles.creator, {fontSize: scaleFont(10)}]}>{additionalContexts.selectedFood.isUSDA ? 'Public' : additionalContexts.selectedFood.isPublic ? 'Public' : 'Private'}</AppText>
                 </View>
                 <View style={{ flexDirection: 'row' }}>
                     {(intent === 'update' || user.id === additionalContexts.selectedFood.creatorId) &&

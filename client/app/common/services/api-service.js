@@ -2,6 +2,7 @@ import DeviceStorageService from './device-storage-service'
 
 export default class APIService {
     static BASE_URL = "http://192.168.33.16:8080/api";
+    static USDA_API_KEY = 'sSfzXgd2xefbtWbfEqd0hdjadFSQnUC8tFrRxIbE';
     static USER_ID = null;
 
     static setUserId(id) {
@@ -52,6 +53,29 @@ export default class APIService {
         } finally {
             //clearTimeout(timeoutId);
         }
+    }
+
+    static async USDARequest(body) {
+        if (body === null || !body) return { success: false, message: 'Invalid request' };
+
+        const res = await fetch(
+            `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${APIService.USDA_API_KEY}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body
+            }
+        );
+
+        const json = await res.json();
+
+        console.log(json)
+
+        if (!res.ok) {
+            return { success: false, message: json?.message || 'USDA request failed' };
+        }
+
+        return { success: true, message: json?.message || 'Success!', data: json?.foods || [] };
     }
 
     static user = {

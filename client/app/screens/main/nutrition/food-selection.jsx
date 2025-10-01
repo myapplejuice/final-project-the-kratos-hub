@@ -16,24 +16,29 @@ import { routes } from "../../../common/settings/constants";
 import { colors, nutritionColors } from "../../../common/settings/styling";
 import FadeInOut from "../../../components/effects/fade-in-out";
 import APIService from '../../../common/services/api-service';
+import usePopups from "../../../common/hooks/use-popups";
 
 export default function FoodSelection() {
     const { user, setAdditionalContexts } = useContext(UserContext);
+    const { createAlert, showSpinner, hideSpinner } = usePopups();
     const insets = useSafeAreaInsets();
     const [fabVisible, setFabVisible] = useState(true);
 
     const [selectedList, setSelectedList] = useState('My Foods');
     const [searchQuery, setSearchQuery] = useState('');
     const [USDAQueryTriggered, setUSDAQueryTriggered] = useState(false);
+    const [usdaPage, setUsdaPage] = useState(1);
+    const [usdaPageSize, setUsdaPageSize] = useState(25);
 
     const [foodList, setFoodList] = useState([]);
     const [userFoods, setUserFoods] = useState([]);
+    const [USDAFoods, setUSDAFoods] = useState([]);
     const [communityFoods, setCommunityFoods] = useState([]);
 
     useEffect(() => {
         async function fetchCommunityFoods() {
             const result = await APIService.nutrition.foods.foods('community');
-            const foods = result.data.foods;
+            const foods = result.data.foods || [];
             setCommunityFoods(foods);
         }
 
@@ -50,7 +55,7 @@ export default function FoodSelection() {
             setUSDAQueryTriggered(false);
             setFoodList(userFoods);
         } else if (selectedList === 'Library') {
-            setFoodList([]);
+            setFoodList(USDAFoods);
         } else if (selectedList === 'Community') {
             setUSDAQueryTriggered(false);
             setFoodList(communityFoods);
@@ -76,6 +81,87 @@ export default function FoodSelection() {
     function handleFoodSelection(food) {
         setAdditionalContexts(prev => ({ ...prev, selectedFood: food, foodProfileIntent: 'add' }));
         router.push(routes.FOOD_PROFILE)
+    }
+
+    async function handleUSDASearch() {
+        if (!searchQuery.trim()) return;
+
+        try {
+            showSpinner();
+            const requestBody = JSON.stringify({
+                query: searchQuery,
+                pageNumber: usdaPage,
+                pageSize: usdaPageSize,
+                sortOrder: 'desc'
+            })
+            const result = await APIService.USDARequest(requestBody);
+
+            if (!result.success)
+                return createAlert({ message: result.message });
+
+            const fetchedFoods = result.data || [];
+
+            // Remove duplicates based on fdcId
+            const existingIds = new Set(USDAFoods.map(f => f.usdaId));
+            const newFoods = fetchedFoods.filter(f => !existingIds.has(f.fdcId));
+
+            // Parse USDA food into your structure
+            const parsedFoods = newFoods.map(f => {
+                const nutrients = f.foodNutrients || [];
+
+                // Macronutrient names to exclude from additionalProps
+                const excludedNutrients = ['Energy', 'Protein', 'Total lipid (fat)', 'Carbohydrate, by difference'];
+
+                const additionalProps = nutrients
+                    .filter(n => !excludedNutrients.includes(n.nutrientName))
+                    .map((n, i) => ({
+                        id: i,
+                        label: n.nutrientName,
+                        amount: n.value,
+                        unit: n.unitName
+                    }));
+
+                const energyKcal = nutrients.find(n => n.nutrientName === 'Energy')?.value || 0;
+                const carbs = nutrients.find(n => n.nutrientName === 'Carbohydrate, by difference')?.value || 0;
+                const protein = nutrients.find(n => n.nutrientName === 'Protein')?.value || 0;
+                const fat = nutrients.find(n => n.nutrientName === 'Total lipid (fat)')?.value || 0;
+                const servingSize = f.servingSize || 100;
+                const servingUnit = (f.servingSizeUnit || 'g').toLowerCase();
+
+                let dominantMacro = 'Carbs';
+                if (protein > carbs && protein > fat) dominantMacro = 'Protein';
+                else if (fat > carbs && fat > protein) dominantMacro = 'Fat';
+
+                return {
+                    id: `usda-${f.fdcId}`,
+                    label: f.description || 'Unknown',
+                    category: f.foodCategory || 'USDA Food',
+                    creatorId: '00000000-0000-0000-0000-000000000000',
+                    creatorName: 'USDA',
+                    isPublic: true,
+                    isUSDA: true,
+                    usdaId: f.fdcId,
+                    energyKcal,
+                    carbs,
+                    protein,
+                    fat,
+                    dominantMacro,
+                    servingSize,
+                    servingUnit,
+                    additionalProps
+                };
+            });
+
+            // Update state
+            setUSDAFoods(prev => [...prev, ...parsedFoods]);
+            setFoodList(prev => [...prev, ...parsedFoods]);
+
+            // Increment page
+            setUsdaPage(prev => prev + 1);
+            hideSpinner();
+        } catch (e) {
+            console.error('USDA search failed:', e);
+        }
     }
 
     return (
@@ -113,13 +199,15 @@ export default function FoodSelection() {
                     <Image source={Images.magnifier} style={{ tintColor: colors.mutedText, width: 20, height: 20, marginHorizontal: 15 }} />
                     <AppTextInput
                         onChangeText={setSearchQuery}
-                        onSubmitEditing={() => {
+                        onSubmitEditing={async () => {
                             Keyboard.dismiss()
                             if (!searchQuery)
                                 return;
 
-                            if (selectedList === 'Library')
+                            if (selectedList === 'Library') {
+                                await handleUSDASearch();
                                 setUSDAQueryTriggered(true)
+                            }
                         }}
                         value={searchQuery}
                         placeholder="Search"
@@ -128,10 +216,10 @@ export default function FoodSelection() {
                 </View>
 
                 {foodList.length > 0 ? (
-                    <AppScroll onScrollSetStates={setFabVisible} extraTop={0} topPadding={false}>
+                    <AppScroll extraBottom={200} onScrollSetStates={setFabVisible} extraTop={0} topPadding={false}>
                         {foodList.map((food) => (
                             <TouchableOpacity
-                                key={food.id}
+                                key={food.isUSDA ? food.usdaId : food.id}
                                 style={{
                                     padding: 15,
                                     backgroundColor: colors.cardBackground,
