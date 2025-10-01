@@ -64,7 +64,7 @@ export default function Settings() {
                     setDeleting(false);
 
                     showSpinner();
-                    const result = await APIService.user.destroy(password);
+                    const result = await APIService.user.destroy({ password });
                     hideSpinner();
 
                     if (result.success)
@@ -317,7 +317,7 @@ Device Info (optional, but helpful):
                             <TouchableOpacity key={i} style={[styles.optionRow, { marginBottom: 0 }]} onPress={item.onPress}    >
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <View style={{ backgroundColor: 'rgba(61, 61, 61, 1)', padding: 8, borderRadius: 10 }}>
-                                        <Image source={item.icon} style={[styles.settingIcon,{width: 20, height: 20}]} />
+                                        <Image source={item.icon} style={[styles.settingIcon, { width: 20, height: 20 }]} />
                                     </View>
                                     <AppText style={styles.label}>
                                         {item.label}

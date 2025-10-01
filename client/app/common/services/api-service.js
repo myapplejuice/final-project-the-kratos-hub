@@ -13,14 +13,14 @@ export default class APIService {
         return res.success;
     }
 
-    static async request(endpoint, method, body = null, useToken = true, tokenOverride = null) {
+    static async request(endpoint, method, body = null, useToken = true, tokenOverride = null, timeout = 15000) {
         if (!endpoint || !method) {
             console.error('Invalid request, method or endpoint missing!');
             return { success: false, message: 'Invalid request' };
         }
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        //const controller = new AbortController();
+        //const timeoutId = setTimeout(() => controller.abort(), timeout);
 
         try {
             const headers = { "Content-Type": "application/json" };
@@ -33,7 +33,7 @@ export default class APIService {
                 method,
                 headers,
                 body: body ? JSON.stringify(body) : null,
-                signal: controller.signal
+                //signal: controller.signal
             });
 
             const json = await res.json();
@@ -50,7 +50,7 @@ export default class APIService {
 
             return { success: false, message: `Server error: ${e.message}` };
         } finally {
-            clearTimeout(timeoutId);
+            //clearTimeout(timeoutId);
         }
     }
 
@@ -59,9 +59,9 @@ export default class APIService {
         login: (payload) => APIService.request('/user/login', 'POST', payload, false),
         profile: () => APIService.request('/user/profile', 'GET'),
         update: (payload) => APIService.request(`/user/update/${APIService.USER_ID}`, 'PUT', payload),
-        destroy: (password) => APIService.request(`/user/delete/${APIService.USER_ID}`, 'DELETE', { password }),
-        recoveryMail: (data) => APIService.request('/user/recovery/send-code', 'POST', data, false),
-        updateByRecovery: (data, recoveryToken) => APIService.request('/user/recovery/update-password', 'PUT', data, true, recoveryToken)
+        destroy: (payload) => APIService.request(`/user/delete/${APIService.USER_ID}`, 'DELETE', payload),
+        recoveryMail: (payload) => APIService.request('/user/recovery/send-code', 'POST', payload, false),
+        updateByRecovery: (payload, recoveryToken) => APIService.request('/user/recovery/update-password', 'PUT', payload, true, recoveryToken)
     };
 
     static nutrition = {
