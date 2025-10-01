@@ -31,17 +31,19 @@ export default function FoodSelection() {
     const [communityFoods, setCommunityFoods] = useState([]);
 
     useEffect(() => {
-        async function prepareFoods() {
+        async function fetchCommunityFoods() {
             const result = await APIService.nutrition.foods.foods('community');
             const foods = result.data.foods;
             setCommunityFoods(foods);
-
-            const userFoods = user.foods || [];
-            setUserFoods(userFoods);
         }
 
-        prepareFoods();
+        fetchCommunityFoods();
     }, []);
+
+    useEffect(() => {
+        const userFoods = user.foods || [];
+        setUserFoods(userFoods);
+    }, [user.foods]);
 
     useEffect(() => {
         if (selectedList === 'My Foods') {
@@ -181,7 +183,7 @@ export default function FoodSelection() {
                                     Food not found
                                 </AppText>
                                 <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20, marginTop: 10 }}>
-                                    Try searching for another food, or check the Library or Community contributions.
+                                    Try adding the food by clicking below or check the Library and Community contributions.
                                 </AppText>
                             </FadeInOut>
 
@@ -220,7 +222,7 @@ export default function FoodSelection() {
                                     Food not found
                                 </AppText>
                                 <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), textAlign: 'center', lineHeight: 20, marginTop: 10 }}>
-                                    Try searching for another food, or check My Foods or the Library.
+                                    Try searching for another food or check the Library or add the food in My Foods.
                                 </AppText>
                             </FadeInOut>
                         </View>

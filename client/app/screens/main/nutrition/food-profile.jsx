@@ -119,7 +119,6 @@ export default function FoodProfile() {
                 else
                     result = await APIService.nutrition.meals.foods.delete({ mealId, foodId });
 
-                hideSpinner();
                 if (result.success) {
                     if (intent === 'add') {
                         setUser(prev => ({
@@ -149,6 +148,10 @@ export default function FoodProfile() {
                         });
                     }
 
+                    if (intent === 'add')
+                        createToast({ message: 'Food deleted!' });
+
+                    hideSpinner();
                     router.back();
                 } else {
                     createAlert({ title: 'Failure', text: "Food delete/removal failed!\n" + result.message });
@@ -204,6 +207,7 @@ export default function FoodProfile() {
                     }
                 }));
 
+                createToast({ message: 'Food added!' });
                 router.back();
             } else {
                 createAlert({ title: 'Failure', text: "Food addition failed!\n" + result.message });
@@ -259,6 +263,7 @@ export default function FoodProfile() {
                     }
                 }))
 
+                createToast({ message: 'Serving updated!' });
                 router.back();
             } else {
                 createAlert({ title: 'Failure', text: "Updating serving failed!\n" + result.message });
@@ -278,17 +283,16 @@ export default function FoodProfile() {
                     <AppText style={styles.foodLabel}>{additionalContexts.selectedFood.label}</AppText>
                     <AppText style={styles.foodCategory}>{additionalContexts.selectedFood.category}</AppText>
                     <Divider orientation="horizontal" style={{ marginVertical: 10 }} />
-                    <AppText style={styles.creator}>{additionalContexts.selectedFood.creatorName}</AppText>
-                    <AppText style={styles.creator}>{additionalContexts.selectedFood.isUSDA ? 'USDA' : additionalContexts.selectedFood.isPublic ? 'Public' : 'Private'}</AppText>
+                    <AppText style={styles.creator}>{additionalContexts.selectedFood.isUSDA ? 'United States Department of Agriculture' : additionalContexts.selectedFood.creatorName}</AppText>
+                    <AppText style={styles.creator}>{additionalContexts.selectedFood.isUSDA ? 'Public' : additionalContexts.selectedFood.isPublic ? 'Public' : 'Private'}</AppText>
                 </View>
                 <View style={{ flexDirection: 'row' }}>
-
-                    {intent === 'update' &&
+                    {(intent === 'update' || user.id === additionalContexts.selectedFood.creatorId) &&
                         <TouchableOpacity style={[styles.editBtn, { marginEnd: intent === 'add' ? 7 : 0 }]} onPress={handleFoodDeletion}>
                             <Image source={Images.trash} style={{ width: 22, height: 22, tintColor: colors.accentPink }} />
                         </TouchableOpacity>
                     }
-                    {intent === 'add' &&
+                    {intent === 'add' && additionalContexts.selectedFood.creatorId === user.id &&
                         <TouchableOpacity style={styles.editBtn} onPress={() => router.push(routes.FOOD_EDITOR)}>
                             <Image source={Images.edit} style={{ width: 20, height: 20, tintColor: 'white' }} />
                         </TouchableOpacity>
