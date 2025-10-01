@@ -303,12 +303,12 @@ export default function MealsLog() {
     }
 
     async function handleFoodAddition(meal) {
-        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, dayLogDate: pageDate }));
+        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, day: currentDayLog }));
         router.push(routes.FOOD_SELECTION);
     }
 
     async function handleMealFoodPress(meal, food) {
-        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, selectedFood: food, dayLogDate: pageDate, foodProfileIntent: 'update' }));
+        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, selectedFood: food, day: currentDayLog, foodProfileIntent: 'update' }));
         router.push(routes.FOOD_PROFILE);
     }
 

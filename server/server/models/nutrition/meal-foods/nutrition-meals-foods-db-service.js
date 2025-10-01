@@ -107,10 +107,10 @@ export default class NutritionMealsFoodsDBService {
                     AdditionalProps = @AdditionalProps
                 WHERE MealLogId = @MealLogId AND Id = @Id
             `;
-console.log('comes here ')
+
             const result = await request.query(query);
             if (result.rowsAffected[0] === 0) return false;
-console.log('comes here ')
+
             return food.id;
         } catch (err) {
             console.error('updateFood error:', err);

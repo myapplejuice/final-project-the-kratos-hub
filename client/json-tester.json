@@ -1,0 +1,31 @@
+{
+    "carbRate": 60,
+    "consumedCarbGrams": 0,
+    "consumedEnergyKcal": 1013,
+    "consumedFatGrams": 55,
+    "consumedProteinGrams": 173,
+    "consumedWaterMl": 1000,
+    "date": "2025-10-01",
+    "diet": "lowFat",
+    "fatRate": 15,
+    "goal": "mildWeightLoss",
+    "id": 13,
+    "meals": [
+        {
+            "foods": [Array
+            ],
+            "id": 6,
+            "label": "Meal 1",
+            "nutritionLogId": 13,
+            "time": "1970-01-01T13:21:37.000Z"
+        }
+    ],
+    "proteinRate": 25,
+    "proteinRequirement": 62,
+    "targetCarbGrams": 240,
+    "targetEnergyKcal": 1600,
+    "targetFatGrams": 27,
+    "targetProteinGrams": 100,
+    "targetWaterMl": 2200,
+    "userId": "1E67297B-FF7E-4A59-9229-3BF3C21428D5"
+}

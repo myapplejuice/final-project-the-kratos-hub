@@ -52,7 +52,7 @@ export default function FoodSelection() {
     }, [user.foods, selectedList, communityFoods]);
 
     function handleFoodSelection(food) {
-        setAdditionalContexts(prev => ({ ...prev, selectedFood: food, foodProfileIntent: 'create' }));
+        setAdditionalContexts(prev => ({ ...prev, selectedFood: food, foodProfileIntent: 'add' }));
         router.push(routes.FOOD_PROFILE)
     }
 

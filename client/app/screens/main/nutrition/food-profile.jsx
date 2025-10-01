@@ -50,36 +50,78 @@ export default function FoodProfile() {
     function handleFood() {
         Keyboard.dismiss();
 
-        if (intent === 'create')
-            return handleFoodAddition();
-        else
-            return handleFoodUpdate();
+        const day = additionalContexts.day;
+        const food = additionalContexts.selectedFood;
+        const maxKcal = day.targetEnergyKcal || 0;
+
+        const currentKcal = day.meals
+            ?.map(m => m.foods?.reduce((sum, f) => sum + (f.energyKcal || 0), 0) || 0)
+            .reduce((a, b) => a + b, 0) || 0;
+
+        let projectedKcal;
+
+        if (intent === 'add' || !food) {
+            projectedKcal = currentKcal + energyKcal;
+        } else {
+            projectedKcal = currentKcal - (food.energyKcal || 0) + energyKcal;
+        }
+
+        if (intent === 'update') {
+            if (servingSize === food.servingSize) {
+                createToast({ message: 'No changes detected' })
+                return;
+            }
+        }
+
+        if (projectedKcal > maxKcal) {
+            if (intent === 'add') {
+                createDialog({
+                    title: 'Warning',
+                    text: 'Adding this food would exceed your daily energy limit!\n\nAre you sure you want to continue?',
+                    onConfirm: handleFoodAddition
+                });
+            } else if (servingSize > food.servingSize) {
+                createDialog({
+                    title: 'Warning',
+                    text: currentKcal > maxKcal
+                        ? 'You have already exceeded your daily energy limit! Further increase would only make it worse.\n\nAre you sure you want to continue?'
+                        : 'Increasing serving size of this food would exceed your daily energy limit!\n\nAre you sure you want to continue?',
+                    onConfirm: () => handleFoodUpdate()
+                });
+            } else {
+                handleFoodUpdate();
+            }
+        } else {
+            if (intent === 'add')
+                handleFoodAddition();
+            else
+                handleFoodUpdate();
+        }
     }
 
     async function handleFoodDeletion() {
         Keyboard.dismiss();
 
         createDialog({
-            title: intent === 'create' ? 'Delete Food' : 'Remove Food',
-            text: intent === 'create' ?
+            title: intent === 'add' ? 'Delete Food' : 'Remove Food',
+            text: intent === 'add' ?
                 "Are you sure you want to delete this food entry?" :
                 "Are you sure you want to remove this food from the meal?",
             onConfirm: async () => {
                 showSpinner();
                 const foodId = additionalContexts.selectedFood.id;
                 const mealId = additionalContexts.selectedMeal.id;
-                const date = additionalContexts.dayLogDate || '';
+                const date = additionalContexts.day.date || '';
 
-                console.log(foodId, mealId, date)
                 let result
-                if (intent === 'create')
+                if (intent === 'add')
                     result = await APIService.nutrition.foods.delete({ foodId });
                 else
                     result = await APIService.nutrition.meals.foods.delete({ mealId, foodId });
 
                 hideSpinner();
                 if (result.success) {
-                    if (intent === 'create') {
+                    if (intent === 'add') {
                         setUser(prev => ({
                             ...prev,
                             foods: prev.foods.filter(f => f.id !== foodId)
@@ -87,15 +129,14 @@ export default function FoodProfile() {
                     }
                     else {
                         setUser(prev => {
-                            const formattedDate = formatDate(date, { format: "YYYY-MM-DD" });
-                            const dayLog = prev.nutritionLogs[formattedDate];
+                            const dayLog = prev.nutritionLogs[date];
                             if (!dayLog) return prev;
 
                             return {
                                 ...prev,
                                 nutritionLogs: {
                                     ...prev.nutritionLogs,
-                                    [formattedDate]: {
+                                    [date]: {
                                         ...dayLog,
                                         meals: dayLog.meals.map(m =>
                                             m.id === mealId
@@ -107,7 +148,8 @@ export default function FoodProfile() {
                             };
                         });
                     }
-                    createAlert({ title: 'Success', text: intent === 'create' ? "Food deleted, click OK to go back" : "Food removed, click OK to go back", onPress: () => router.back() });
+
+                    router.back();
                 } else {
                     createAlert({ title: 'Failure', text: "Food delete/removal failed!\n" + result.message });
                 }
@@ -116,6 +158,7 @@ export default function FoodProfile() {
     }
 
     async function handleFoodAddition() {
+        const day = additionalContexts.day;
         const food = additionalContexts.selectedFood;
         const meal = additionalContexts.selectedMeal;
 
@@ -137,7 +180,7 @@ export default function FoodProfile() {
 
         try {
             showSpinner();
-            const date = formatDate(additionalContexts.dayLogDate, { format: 'YYYY-MM-DD' });
+            const date = day.date;
             const result = await APIService.nutrition.meals.foods.add({ food: payload });
 
             if (result.success) {
@@ -161,7 +204,7 @@ export default function FoodProfile() {
                     }
                 }));
 
-                createAlert({ title: 'Success', text: "Food added to meal, click OK to go back", onPress: () => router.back() });
+                router.back();
             } else {
                 createAlert({ title: 'Failure', text: "Food addition failed!\n" + result.message });
             }
@@ -173,11 +216,9 @@ export default function FoodProfile() {
     }
 
     async function handleFoodUpdate() {
+        const day = additionalContexts.day;
         const food = additionalContexts.selectedFood;
         const meal = additionalContexts.selectedMeal;
-
-        if (servingSize === food.servingSize) 
-            return createToast({message: 'No changes detected'});
 
         const payload = {
             mealId: meal.id,
@@ -192,7 +233,7 @@ export default function FoodProfile() {
 
         try {
             showSpinner();
-            const date = formatDate(additionalContexts.dayLogDate, { format: 'YYYY-MM-DD' });
+            const date = day.date;
             const result = await APIService.nutrition.meals.foods.update({ food: payload });
 
             if (result.success) {
@@ -217,7 +258,8 @@ export default function FoodProfile() {
                         }
                     }
                 }))
-                createAlert({ title: 'Success', text: "Serving size updated, click OK to go back", onPress: () => router.back() });
+
+                router.back();
             } else {
                 createAlert({ title: 'Failure', text: "Updating serving failed!\n" + result.message });
             }
@@ -242,11 +284,11 @@ export default function FoodProfile() {
                 <View style={{ flexDirection: 'row' }}>
 
                     {intent === 'update' &&
-                        <TouchableOpacity style={[styles.editBtn, { marginEnd: intent === 'create' ? 7 : 0 }]} onPress={handleFoodDeletion}>
+                        <TouchableOpacity style={[styles.editBtn, { marginEnd: intent === 'add' ? 7 : 0 }]} onPress={handleFoodDeletion}>
                             <Image source={Images.trash} style={{ width: 22, height: 22, tintColor: colors.accentPink }} />
                         </TouchableOpacity>
                     }
-                    {intent === 'create' &&
+                    {intent === 'add' &&
                         <TouchableOpacity style={styles.editBtn} onPress={() => router.push(routes.FOOD_EDITOR)}>
                             <Image source={Images.edit} style={{ width: 20, height: 20, tintColor: 'white' }} />
                         </TouchableOpacity>
@@ -309,7 +351,7 @@ export default function FoodProfile() {
                 </View>
                 <TouchableOpacity style={styles.addBtn} onPress={handleFood}>
                     <Image source={Images.plus} style={{ width: 18, height: 18, tintColor: 'white', marginRight: 8 }} />
-                    <AppText style={{ color: 'white', fontSize: scaleFont(14) }}>{intent === 'create' ? `Add` : `Update Serving`}</AppText>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(14) }}>{intent === 'add' ? `Add` : `Update Serving`}</AppText>
                 </TouchableOpacity>
             </View>
 
