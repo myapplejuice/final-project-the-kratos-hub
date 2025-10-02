@@ -13,7 +13,7 @@ export default class NutritionMealsDBService {
             const request = Database.getRequest();
             Database.addInput(request, "NutritionLogId", sql.Int, nutritionLogId);
             Database.addInput(request, "Label", sql.VarChar(100), label);
-            Database.addInput(request, "Time", sql.Time, time);
+            Database.addInput(request, "Time", sql.DateTime2, new Date(time));
 
             const query = `
                 INSERT INTO dbo.MealLogs (NutritionLogId, Label, Time)

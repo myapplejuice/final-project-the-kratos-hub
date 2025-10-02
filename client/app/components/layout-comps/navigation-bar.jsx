@@ -54,7 +54,7 @@ export default function NavigationBar({ visible }) {
         <Animated.View
             style={[
                 styles.container,
-                { paddingBottom: insets.bottom, paddingTop: 15 },
+                { paddingBottom: insets.bottom + 10, paddingTop: 15 },
                 animatedStyle,
             ]}
         >

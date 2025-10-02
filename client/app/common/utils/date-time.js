@@ -95,20 +95,9 @@ export function formatTime(dateInput, options = {}) {
     }
 }
 
-// When making sql time
-export function getSQLTime() {
-    const now = new Date();
-    const hours = now.getHours().toString().padStart(2, "0");
-    const minutes = now.getMinutes().toString().padStart(2, "0");
-    const seconds = now.getSeconds().toString().padStart(2, "0"); // optional
-    return `${hours}:${minutes}:${seconds}`;
-}
-
-// When getting sql time to create Date() then use FormatTime
-export function toDateFromSQLTime(timeStr) {
-    // timeStr = "14:35:42"
-    const today = new Date().toISOString().split("T")[0]; // "2025-09-29"
-    return new Date(`${today}T${timeStr}`);
+export function fromSqlToLocalTime(utcTimeStr) {
+    const localDate = new Date(utcTimeStr);
+    return localDate.toString();
 }
 
 export function getDayComparisons(compareDate, now = new Date()) {

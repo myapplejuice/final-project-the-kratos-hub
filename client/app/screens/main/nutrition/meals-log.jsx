@@ -185,7 +185,7 @@ export default function MealsLog() {
                 if (!label)
                     label = `Meal ${currentDayLog?.meals?.length + 1}`;
 
-                const time = getSQLTime();
+                const time = new Date();
                 showSpinner();
                 try {
                     // Backend call
