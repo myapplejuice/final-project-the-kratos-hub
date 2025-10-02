@@ -53,7 +53,7 @@ export default function FoodProfile() {
         const carbs = Math.round((intent === 'meal/update' ? selectedFood.originalCarbs : selectedFood.carbs) * factor);
         const protein = Math.round((intent === 'meal/update' ? selectedFood.originalProtein : selectedFood.protein) * factor);
         const fat = Math.round((intent === 'meal/update' ? selectedFood.originalFat : selectedFood.fat) * factor);
-        const additionalProps = selectedFood.additionalProps.map((prop) => ({
+        const additionalProps = (selectedFood.additionalProps || []).map((prop) => ({
             ...prop,
             originalAmount: prop.amount,
             amount: Math.round((intent === 'meal/update' ? prop.originalAmount : prop.amount) * factor)

@@ -48,6 +48,7 @@ export default function FoodSelection() {
     useEffect(() => {
         const userFoods = user.foods || [];
         setUserFoods(userFoods);
+        setFoodList(userFoods);
     }, [user.foods]);
 
     useEffect(() => {
@@ -62,7 +63,7 @@ export default function FoodSelection() {
             setUSDAQueryTriggered(false);
             setFoodList(communityFoods);
         }
-    }, [selectedList]);
+    }, [selectedList, userFoods, USDAFoods, communityFoods]);
 
     useEffect(() => {
         if (selectedList === 'Library') return;
