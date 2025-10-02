@@ -51,6 +51,8 @@ export default function FoodSelection() {
     }, [user.foods]);
 
     useEffect(() => {
+        setSearchQuery('');
+
         if (selectedList === 'My Foods') {
             setUSDAQueryTriggered(false);
             setFoodList(userFoods);
@@ -60,7 +62,7 @@ export default function FoodSelection() {
             setUSDAQueryTriggered(false);
             setFoodList(communityFoods);
         }
-    }, [userFoods, communityFoods, selectedList]);
+    }, [selectedList]);
 
     useEffect(() => {
         if (selectedList === 'Library') return;
@@ -78,7 +80,7 @@ export default function FoodSelection() {
             );
             setFoodList(filtered);
         }
-    }, [searchQuery, selectedList, userFoods, communityFoods]);
+    }, [searchQuery]);
 
     function handleFoodSelection(food) {
         setAdditionalContexts(prev => ({ ...prev, selectedFood: food, foodProfileIntent: 'meal/add' }));
@@ -102,9 +104,9 @@ export default function FoodSelection() {
             if (!result.success)
                 return createAlert({ message: result.message });
 
-            if (result.data.length === 0){
-             hideSpinner();
-                return createToast({message: 'Food not found'});
+            if (result.data.length === 0) {
+                hideSpinner();
+                return createToast({ message: 'Food not found' });
             }
 
             const fetchedFoods = result.data || [];

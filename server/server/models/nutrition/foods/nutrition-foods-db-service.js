@@ -14,7 +14,7 @@ export default class NutritionFoodsDBService {
             const query = `
             SELECT *
             FROM dbo.Foods
-            WHERE OwnerId != @UserId AND CreatorId != @UserId AND IsPublic = 1
+            WHERE OwnerId != @UserId AND CreatorId != @UserId AND IsPublic = 1 AND IsUSDA = 0
             ORDER BY Id DESC;`;
 
             const result = await request.query(query);
@@ -76,37 +76,31 @@ export default class NutritionFoodsDBService {
         }
     }
 
-    static async createFood(userId, payload) {
-        if (!userId || !payload) return null;
-
-        const {
-            label, category, servingUnit, servingSize,
-            energyKcal, carbs, protein, fat,
-            dominantMacro, USDAId, isUSDA, creatorId, creatorName, isPublic, additionalProps
-        } = payload;
+    static async createFood(userId, food) {
+        if (!userId || !food) return null;
 
         try {
             const request = Database.getRequest();
 
             Database.addInput(request, 'OwnerId', sql.UniqueIdentifier, userId);
-            Database.addInput(request, 'CreatorId', sql.UniqueIdentifier, creatorId);
-            Database.addInput(request, 'CreatorName', sql.VarChar(100), creatorName);
-            Database.addInput(request, 'IsUSDA', sql.VarChar(100), isUSDA ? 1 : 0);
-            Database.addInput(request, 'USDAId', sql.VarChar(100), USDAId ?? -1);
-            Database.addInput(request, 'IsPublic', sql.Bit, isPublic ? 1 : 0);
+            Database.addInput(request, 'CreatorId', sql.UniqueIdentifier, food.creatorId);
+            Database.addInput(request, 'CreatorName', sql.VarChar(100), food.creatorName);
+            Database.addInput(request, 'IsUSDA', sql.VarChar(100), food.isUSDA ? 1 : 0);
+            Database.addInput(request, 'USDAId', sql.VarChar(100), food.USDAId ?? -1);
+            Database.addInput(request, 'IsPublic', sql.Bit, food.isPublic ? 1 : 0);
 
-            Database.addInput(request, 'Label', sql.VarChar(50), label);
-            Database.addInput(request, 'Category', sql.VarChar(50), category);
-            Database.addInput(request, 'ServingUnit', sql.VarChar(20), servingUnit);
-            Database.addInput(request, 'ServingSize', sql.Decimal(7, 2), servingSize);
+            Database.addInput(request, 'Label', sql.VarChar(50), food.label);
+            Database.addInput(request, 'Category', sql.VarChar(50), food.category);
+            Database.addInput(request, 'ServingUnit', sql.VarChar(20), food.servingUnit);
+            Database.addInput(request, 'ServingSize', sql.Decimal(7, 2), food.servingSize);
 
-            Database.addInput(request, 'EnergyKcal', sql.Decimal(7, 2), energyKcal);
-            Database.addInput(request, 'Carbs', sql.Decimal(7, 2), carbs);
-            Database.addInput(request, 'Protein', sql.Decimal(7, 2), protein);
-            Database.addInput(request, 'Fat', sql.Decimal(7, 2), fat);
-            Database.addInput(request, 'DominantMacro', sql.VarChar(20), dominantMacro);
+            Database.addInput(request, 'EnergyKcal', sql.Decimal(7, 2), food.energyKcal);
+            Database.addInput(request, 'Carbs', sql.Decimal(7, 2), food.carbs);
+            Database.addInput(request, 'Protein', sql.Decimal(7, 2), food.protein);
+            Database.addInput(request, 'Fat', sql.Decimal(7, 2), food.fat);
+            Database.addInput(request, 'DominantMacro', sql.VarChar(20), food.dominantMacro);
 
-            Database.addInput(request, 'AdditionalProps', sql.NVarChar(sql.MAX), JSON.stringify(additionalProps));
+            Database.addInput(request, 'AdditionalProps', sql.NVarChar(sql.MAX), JSON.stringify(food.additionalProps || []));
 
             const query = `
                 INSERT INTO dbo.Foods
@@ -139,33 +133,27 @@ export default class NutritionFoodsDBService {
         }
     }
 
-    static async updateFood(payload) {
-        if (!payload) return null;
-
-        const {
-            id, label, category, servingUnit, servingSize,
-            energyKcal, carbs, protein, fat,
-            dominantMacro, isPublic, additionalProps
-        } = payload;
+    static async updateFood(food) {
+        if (!food) return null;
 
         try {
             const request = Database.getRequest();
 
-            Database.addInput(request, 'Id', sql.Int, id);
-            Database.addInput(request, 'IsPublic', sql.Bit, isPublic ? 1 : 0);
+            Database.addInput(request, 'Id', sql.Int, food.id);
+            Database.addInput(request, 'IsPublic', sql.Bit, food.isPublic ? 1 : 0);
 
-            Database.addInput(request, 'Label', sql.VarChar(50), label);
-            Database.addInput(request, 'Category', sql.VarChar(50), category);
-            Database.addInput(request, 'ServingUnit', sql.VarChar(20), servingUnit);
-            Database.addInput(request, 'ServingSize', sql.Decimal(7, 2), servingSize);
+            Database.addInput(request, 'Label', sql.VarChar(50), food.label);
+            Database.addInput(request, 'Category', sql.VarChar(50), food.category);
+            Database.addInput(request, 'ServingUnit', sql.VarChar(20), food.servingUnit);
+            Database.addInput(request, 'ServingSize', sql.Decimal(7, 2), food.servingSize);
 
-            Database.addInput(request, 'EnergyKcal', sql.Decimal(7, 2), energyKcal);
-            Database.addInput(request, 'Carbs', sql.Decimal(7, 2), carbs);
-            Database.addInput(request, 'Protein', sql.Decimal(7, 2), protein);
-            Database.addInput(request, 'Fat', sql.Decimal(7, 2), fat);
-            Database.addInput(request, 'DominantMacro', sql.VarChar(20), dominantMacro);
+            Database.addInput(request, 'EnergyKcal', sql.Decimal(7, 2), food.energyKcal);
+            Database.addInput(request, 'Carbs', sql.Decimal(7, 2), food.carbs);
+            Database.addInput(request, 'Protein', sql.Decimal(7, 2), food.protein);
+            Database.addInput(request, 'Fat', sql.Decimal(7, 2), food.fat);
+            Database.addInput(request, 'DominantMacro', sql.VarChar(20), food.dominantMacro);
 
-            Database.addInput(request, 'AdditionalProps', sql.NVarChar(sql.MAX), JSON.stringify(additionalProps));
+            Database.addInput(request, 'AdditionalProps', sql.NVarChar(sql.MAX), JSON.stringify(food.additionalProps || []));
 
             const query = `
                 UPDATE dbo.Foods

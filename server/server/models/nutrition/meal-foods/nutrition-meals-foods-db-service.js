@@ -3,7 +3,6 @@ import Database from '../../database/database.js';
 import ObjectMapper from '../../../utils/object-mapper.js';
 
 export default class NutritionMealsFoodsDBService {
-    // Adds a food to a meal
     static async addFood(food) {
         if (!food) return false;
 
@@ -18,10 +17,10 @@ export default class NutritionMealsFoodsDBService {
             Database.addInput(request, 'IsUSDA', sql.Bit, food.isUSDA ?? 0);
             Database.addInput(request, 'Label', sql.VarChar(50), food.label);
             Database.addInput(request, 'Category', sql.VarChar(50), food.category);
+
             Database.addInput(request, 'ServingUnit', sql.VarChar(20), food.servingUnit);
             Database.addInput(request, 'OriginalServingSize', sql.Decimal(7, 2), food.originalServingSize);
             Database.addInput(request, 'ServingSize', sql.Decimal(7, 2), food.servingSize);
-            
             Database.addInput(request, 'OriginalEnergyKcal', sql.Decimal(7, 2), food.originalEnergyKcal);
             Database.addInput(request, 'EnergyKcal', sql.Decimal(7, 2), food.energyKcal);
             Database.addInput(request, 'OriginalCarbs', sql.Decimal(7, 2), food.originalCarbs);
@@ -31,7 +30,7 @@ export default class NutritionMealsFoodsDBService {
             Database.addInput(request, 'OriginalFat', sql.Decimal(7, 2), food.originalFat);
             Database.addInput(request, 'Fat', sql.Decimal(7, 2), food.fat);
             Database.addInput(request, 'DominantMacro', sql.VarChar(20), food.dominantMacro);
-            Database.addInput(request, 'AdditionalProps', sql.NVarChar(sql.MAX), food.additionalProps ? JSON.stringify(food.additionalProps) : null);
+            Database.addInput(request, 'AdditionalProps', sql.NVarChar(sql.MAX), food.additionalProps ? JSON.stringify(food.additionalProps) : []);
 
             const query = `
                 INSERT INTO dbo.MealLogsFoods (
@@ -83,7 +82,6 @@ export default class NutritionMealsFoodsDBService {
     static async updateFood(food) {
         if (!food || !food.id || !food.mealId) return false;
 
-        console.log(food)
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, food.id);
@@ -93,7 +91,7 @@ export default class NutritionMealsFoodsDBService {
             Database.addInput(request, 'Carbs', sql.Decimal(7, 2), food.carbs ?? 0);
             Database.addInput(request, 'Protein', sql.Decimal(7, 2), food.protein ?? 0);
             Database.addInput(request, 'Fat', sql.Decimal(7, 2), food.fat ?? 0);
-            Database.addInput(request, 'AdditionalProps', sql.NVarChar(sql.MAX), food.additionalProps ? JSON.stringify(food.additionalProps) : null);
+            Database.addInput(request, 'AdditionalProps', sql.NVarChar(sql.MAX), food.additionalProps ? JSON.stringify(food.additionalProps) : []);
 
             const query = `
                 UPDATE MealLogsFoods
