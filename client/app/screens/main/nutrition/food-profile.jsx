@@ -55,7 +55,7 @@ export default function FoodProfile() {
         const fat = Math.round((intent === 'meal/update' ? selectedFood.originalFat : selectedFood.fat) * factor);
         const additionalProps = (selectedFood.additionalProps || []).map((prop) => ({
             ...prop,
-            originalAmount: prop.amount,
+            originalAmount: intent === 'meal/update' ? prop.originalAmount : prop.amount,
             amount: Math.round((intent === 'meal/update' ? prop.originalAmount : prop.amount) * factor)
         }));
 
@@ -118,7 +118,6 @@ export default function FoodProfile() {
             else
                 handleFoodUpdate();
         }
-        showSpinner();
     }
 
     async function handleFoodDeletion() {
@@ -182,6 +181,7 @@ export default function FoodProfile() {
     }
 
     async function handleFoodAddition() {
+        showSpinner();
         const payload = {
             mealId: selectedMeal.id,
             originalServingSize: selectedFood.servingSize,
@@ -236,6 +236,7 @@ export default function FoodProfile() {
     }
 
     async function handleFoodUpdate() {
+        showSpinner();
         const payload = {
             mealId: selectedMeal.id,
             ...selectedFood,

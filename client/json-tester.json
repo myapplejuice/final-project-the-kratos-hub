@@ -1,67 +1,16 @@
-{
-    "USDAId": 2070091,
-    "additionalProps": [
-        {
-            "amount": 1.79,
-            "id": 0,
-            "label": "Total Sugars",
-            "originalAmount": 1.79,
-            "unit": "G"
-        },
-        {
-            "amount": 1.93,
-            "id": 1,
-            "label": "Iron, Fe",
-            "originalAmount": 1.93,
-            "unit": "MG"
-        },
-        {
-            "amount": 1070,
-            "id": 2,
-            "label": "Sodium, Na",
-            "originalAmount": 1070,
-            "unit": "MG"
-        },
-        {
-            "amount": 80,
-            "id": 3,
-            "label": "Cholesterol",
-            "originalAmount": 80,
-            "unit": "MG"
-        },
-        {
-            "amount": 0,
-            "id": 4,
-            "label": "Fatty acids, total trans",
-            "originalAmount": 0,
-            "unit": "G"
-        },
-        {
-            "amount": 5.36,
-            "id": 5,
-            "label": "Fatty acids, total saturated",
-            "originalAmount": 5.36,
-            "unit": "G"
-        }
-    ],
-    "carbs": 1.79,
-    "category": "Pepperoni, Salami & Cold Cuts",
-    "creatorId": "00000000-0000-0000-0000-000000000000",
-    "creatorName": "USDA",
-    "dominantMacro": "Protein",
-    "energyKcal": 179,
-    "fat": 12.5,
-    "id": "usda-2070091",
-    "isPublic": true,
-    "isUSDA": true,
-    "label": "BEEF",
-    "originalCarbs": 1.79,
-    "originalEnergyKcal": 179,
-    "originalFat": 12.5,
-    "originalProtein": 16.1,
-    "originalServingSize": 56,
-    "ownerId": "00000000-0000-0000-0000-000000000000",
-    "protein": 16.1,
-    "servingSize": 56,
-    "servingUnit": "g"
-}
+[
+    {
+        "id": 0,
+        "label": "Vitamin K",
+        "amount": 0,
+        "unit": "mg",
+        "originalAmount": 10600
+    },
+    {
+        "id": 2,
+        "label": "Iron",
+        "amount": 0,
+        "unit": "mg",
+        "originalAmount": 50000
+    }
+]
