@@ -25,6 +25,7 @@ import { routes } from '../../../common/settings/constants';
 import { getSQLTime } from '../../../common/utils/date-time';
 import { totalDayConsumption } from '../../../common/utils/metrics-calculator';
 import FadeInOut from '../../../components/effects/fade-in-out';
+import SlideInOut from '../../../components/effects/slide-in-out';
 
 export default function MealsLog() {
     const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
@@ -329,11 +330,11 @@ export default function MealsLog() {
                 />
             }
             <FloatingActionMenu
-              overlayColor="rgba(0, 0, 0, 0.8)"
-              actions={[
-                         { icon: Images.list3, title: 'Import Plan', onPress: () => router.push(routes.MEAL_PLANS), closeOnAction: true, delayClosure: true },
-                         { icon: Images.meals, title: 'Add Meal', onPress: () => handleMealAddition(), closeOnAction: true },
-                    ]}
+                overlayColor="rgba(0, 0, 0, 0.8)"
+                actions={[
+                    { icon: Images.list3, title: 'Import Plan', onPress: () => router.push(routes.MEAL_PLANS), closeOnAction: true, delayClosure: true },
+                    { icon: Images.meals, title: 'Add Meal', onPress: () => handleMealAddition(), closeOnAction: true },
+                ]}
                 onPress={handleMealAddition}
                 visible={fabVisible && !dateComparisons.isPast}
                 position={{ bottom: insets.bottom + 50, right: 20 }}
@@ -358,21 +359,21 @@ export default function MealsLog() {
                             <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white', transform: [{ scaleX: -1 }] }} />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setDatePickerOpen(true)} style={{ height: 30, width: '50%', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
-                            {(dateComparisons.isToday || dateComparisons.isYesterday || dateComparisons.isTomorrow) &&
-                                (
-                                    <AppText style={{ color: 'white', fontSize: scaleFont(dateComparisons.isToday || dateComparisons.isYesterday || dateComparisons.isTomorrow ? 16 : 14), fontWeight: 'bold' }}>
-                                        {dateComparisons.isToday ? 'Today' : dateComparisons.isYesterday ? 'Yesterday' : 'Tomorrow'}
-                                    </AppText>
-                                )}
-                            {(!dateComparisons.isToday && !dateComparisons.isYesterday && !dateComparisons.isTomorrow) &&
-                                <DateDisplay
-                                    styles={{ textAlign: 'center', marginBottom: 0, marginTop: 0 }} dateStyle={{ color: 'white', fontSize: scaleFont(16) }}
-                                    dayStyle={{ color: 'white' }}
-                                    centered={true}
-                                    uppercaseDate={false}
-                                    uppercaseDay={false}
-                                    date={pageDate}
-                                    showDay={!dateComparisons.isToday && !dateComparisons.isYesterday && !dateComparisons.isTomorrow} />}
+                            <AppText style={{ color: 'white', fontSize: scaleFont(14), fontWeight: 'bold' }}>
+                                {dateComparisons.isToday ? 'Today' : dateComparisons.isYesterday ? 'Yesterday' : 'Tomorrow'}
+                            </AppText>
+                            <SlideInOut removeWhenHidden distance={3} visible={!dateComparisons.isToday && !dateComparisons.isYesterday && !dateComparisons.isTomorrow}>
+                                <FadeInOut removeWhenHidden visible={!dateComparisons.isToday && !dateComparisons.isYesterday && !dateComparisons.isTomorrow}>
+                                    <DateDisplay
+                                        styles={{ textAlign: 'center', marginBottom: 0, marginTop: 0 }} dateStyle={{ color: 'white', fontSize: scaleFont(16) }}
+                                        dayStyle={{ color: 'white' }}
+                                        centered={true}
+                                        uppercaseDate={false}
+                                        uppercaseDay={false}
+                                        date={pageDate}
+                                        showDay={false} />
+                                </FadeInOut>
+                            </SlideInOut>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => handleDate(1, 'next')} style={{ justifyContent: 'center', width: '25%', alignItems: 'center' }}>
                             <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white' }} />
@@ -421,7 +422,7 @@ export default function MealsLog() {
 
                 {/* Meals Log*/}
                 <View style={{ backgroundColor: colors.background }}>
-                    <View style={{ height: 140 }}>
+                    <View style={!dateComparisons.isPast && { height: 140 }}>
                         <View style={[styles.card, { padding: 0, marginTop: 20 }]} >
                             <View style={{ padding: 15 }}>
                                 <ProgressBar

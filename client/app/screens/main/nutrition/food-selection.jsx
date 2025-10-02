@@ -28,7 +28,6 @@ export default function FoodSelection() {
     const [searchQuery, setSearchQuery] = useState('');
     const [USDAQueryTriggered, setUSDAQueryTriggered] = useState(false);
     const [usdaPage, setUsdaPage] = useState(1);
-    const [usdaPageSize, setUsdaPageSize] = useState(25);
 
     const [foodList, setFoodList] = useState([]);
     const [userFoods, setUserFoods] = useState([]);
@@ -97,7 +96,8 @@ export default function FoodSelection() {
             const requestBody = JSON.stringify({
                 query: searchQuery,
                 pageNumber: usdaPage,
-                pageSize: usdaPageSize,
+                pageSize: 9,
+                dataType: ['Foundation', 'Branded'],
                 sortOrder: 'desc'
             })
             const result = await APIService.USDARequest(requestBody);
@@ -115,9 +115,9 @@ export default function FoodSelection() {
             // Remove duplicates based on fdcId
             const existingIds = new Set(USDAFoods.map(f => f.USDAId));
             const newFoods = fetchedFoods.filter(f => !existingIds.has(f.fdcId));
+            const cleanedFoods = newFoods.filter(f => f.foodNutrients.some(n => n.nutrientName === 'Energy' && n.value >= 5));
 
-            // Parse USDA food into your structure
-            const parsedFoods = newFoods.map(f => {
+            const parsedFoods = cleanedFoods.map(f => {
                 const nutrients = f.foodNutrients || [];
 
                 // Macronutrient names to exclude from additionalProps
@@ -146,7 +146,7 @@ export default function FoodSelection() {
 
                 return {
                     id: `usda-${f.fdcId}`,
-                    label: f.description || 'Unknown',
+                    label: normalizeLabel( f.description) || 'Unknown',
                     category: f.foodCategory || 'USDA Food',
                     ownerId: '00000000-0000-0000-0000-000000000000',
                     creatorId: '00000000-0000-0000-0000-000000000000',
@@ -181,6 +181,17 @@ export default function FoodSelection() {
             console.error('USDA search failed:', e);
         }
     }
+
+    function normalizeLabel(category) {
+        if (!category) return "Unknown";
+
+        return category
+            .toLowerCase()
+            .split(" ")
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ");
+    }
+
 
     return (
         <>
