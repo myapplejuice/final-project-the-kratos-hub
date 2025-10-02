@@ -25,17 +25,38 @@ export default function FoodProfile() {
     const [protein, setProtein] = useState(0);
     const [fat, setFat] = useState(0);
     const [additionalProps, setAdditionalProps] = useState([]);
-    const intent = additionalContexts.foodProfileIntent;
+    const [intent, setIntent] = useState('');
+    const [day, setDay] = useState({});
+    const [selectedFood, setSelectedFood] = useState({});
+    const [selectedMeal, setSelectedMeal] = useState({});
 
     useEffect(() => {
-        const factor = servingSize / (additionalContexts.selectedFood.originalServingSize || additionalContexts.selectedFood.servingSize);
-        const energyKcal = Math.round((additionalContexts.selectedFood.originalEnergyKcal || additionalContexts.selectedFood.energyKcal) * factor);
-        const carbs = Math.round((additionalContexts.selectedFood.originalCarbs || additionalContexts.selectedFood.carbs) * factor);
-        const protein = Math.round((additionalContexts.selectedFood.originalProtein || additionalContexts.selectedFood.protein) * factor);
-        const fat = Math.round((additionalContexts.selectedFood.originalFat || additionalContexts.selectedFood.fat) * factor);
-        const additionalProps = additionalContexts.selectedFood.additionalProps.map((prop) => ({
+        const intent = additionalContexts.foodProfileIntent;
+        const day = additionalContexts.day;
+        const food = additionalContexts.selectedFood;
+        const meal = additionalContexts.selectedMeal;
+
+        setIntent(intent);
+        setDay(day);
+        setSelectedFood(food);
+        setSelectedMeal(meal);
+    }, [additionalContexts.foodProfileIntent, additionalContexts.selectedFood, additionalContexts.selectedMeal]);
+
+    useEffect(() => {
+        let factor;
+        if (!servingSize)
+            factor = 0;
+        else
+            factor = servingSize / (intent === 'meal/update' ? selectedFood.originalServingSize : selectedFood.servingSize);
+
+        const energyKcal = Math.round((intent === 'meal/update' ? selectedFood.originalEnergyKcal : selectedFood.energyKcal) * factor);
+        const carbs = Math.round((intent === 'meal/update' ? selectedFood.originalCarbs : selectedFood.carbs) * factor);
+        const protein = Math.round((intent === 'meal/update' ? selectedFood.originalProtein : selectedFood.protein) * factor);
+        const fat = Math.round((intent === 'meal/update' ? selectedFood.originalFat : selectedFood.fat) * factor);
+        const additionalProps = selectedFood.additionalProps.map((prop) => ({
             ...prop,
-            amount: Math.round(prop.originalAmount * factor)
+            originalAmount: prop.amount,
+            amount: Math.round((intent === 'meal/update' ? prop.originalAmount : prop.amount) * factor)
         }));
 
         setEnergyKcal(energyKcal);
@@ -43,46 +64,44 @@ export default function FoodProfile() {
         setProtein(protein);
         setFat(fat);
         setAdditionalProps(additionalProps);
-    }, [servingSize, additionalContexts]);
+    }, [servingSize, selectedFood, intent]);
 
     function handleFood() {
         Keyboard.dismiss();
+
         if (servingSize === '') {
             createAlert({ text: 'Please enter a valid serving size' });
             return;
         }
 
-        const day = additionalContexts.day;
-        const food = additionalContexts.selectedFood;
         const maxKcal = day.targetEnergyKcal || 0;
-
         const currentKcal = day.meals
             ?.map(m => m.foods?.reduce((sum, f) => sum + (f.energyKcal || 0), 0) || 0)
             .reduce((a, b) => a + b, 0) || 0;
 
         let projectedKcal;
 
-        if (intent === 'add' || !food) {
+        if (intent === 'meal/add' || !selectedFood) {
             projectedKcal = currentKcal + energyKcal;
         } else {
-            projectedKcal = currentKcal - (food.energyKcal || 0) + energyKcal;
+            projectedKcal = currentKcal - (selectedFood.energyKcal || 0) + energyKcal;
         }
 
-        if (intent === 'update') {
-            if (servingSize === food.servingSize) {
+        if (intent === 'meal/update') {
+            if (servingSize === selectedFood.servingSize) {
                 createToast({ message: 'No changes detected' })
                 return;
             }
         }
 
         if (projectedKcal > maxKcal) {
-            if (intent === 'add') {
+            if (intent === 'meal/add') {
                 createDialog({
                     title: 'Warning',
                     text: 'Adding this food would exceed your daily energy limit!\n\nAre you sure you want to continue?',
                     onConfirm: handleFoodAddition
                 });
-            } else if (servingSize > food.servingSize) {
+            } else if (servingSize > selectedFood.servingSize) {
                 createDialog({
                     title: 'Warning',
                     text: currentKcal > maxKcal
@@ -94,87 +113,83 @@ export default function FoodProfile() {
                 handleFoodUpdate();
             }
         } else {
-            if (intent === 'add')
+            if (intent === 'meal/add')
                 handleFoodAddition();
             else
                 handleFoodUpdate();
         }
+        showSpinner();
     }
 
     async function handleFoodDeletion() {
         Keyboard.dismiss();
 
         createDialog({
-            title: intent === 'add' ? 'Delete Food' : 'Remove Food',
-            text: intent === 'add' ?
+            title: intent === 'meal/add' ? 'Delete Food' : 'Remove Food',
+            text: intent === 'meal/add' ?
                 "Are you sure you want to delete this food entry?" :
                 "Are you sure you want to remove this food from the meal?",
             onConfirm: async () => {
                 showSpinner();
-                const foodId = additionalContexts.selectedFood.id;
-                const mealId = additionalContexts.selectedMeal.id;
-                const date = additionalContexts.day.date || '';
+                try {
+                    let result
+                    result = intent === 'meal/add' ?
+                        await APIService.nutrition.foods.delete({ foodId: selectedFood.id })
+                        :
+                        await APIService.nutrition.meals.foods.delete({ mealId: selectedMeal.id, foodId: selectedFood.id });
 
-                let result
-                if (intent === 'add')
-                    result = await APIService.nutrition.foods.delete({ foodId });
-                else
-                    result = await APIService.nutrition.meals.foods.delete({ mealId, foodId });
-
-                if (result.success) {
-                    if (intent === 'add') {
-                        setUser(prev => ({
-                            ...prev,
-                            foods: prev.foods.filter(f => f.id !== foodId)
-                        }));
-                    }
-                    else {
-                        setUser(prev => {
-                            const dayLog = prev.nutritionLogs[date];
-                            if (!dayLog) return prev;
-
-                            return {
+                    if (result.success) {
+                        if (intent === 'meal/add') {
+                            setUser(prev => ({
                                 ...prev,
-                                nutritionLogs: {
-                                    ...prev.nutritionLogs,
-                                    [date]: {
-                                        ...dayLog,
-                                        meals: dayLog.meals.map(m =>
-                                            m.id === mealId
-                                                ? { ...m, foods: m.foods.filter(f => f.id !== foodId) }
-                                                : m
-                                        )
+                                foods: prev.foods.filter(f => f.id !== selectedFood.id)
+                            }));
+                        }
+                        else {
+                            setUser(prev => {
+                                const dayLog = prev.nutritionLogs[day.date];
+                                if (!dayLog) return prev;
+
+                                return {
+                                    ...prev,
+                                    nutritionLogs: {
+                                        ...prev.nutritionLogs,
+                                        [day.date]: {
+                                            ...dayLog,
+                                            meals: dayLog.meals.map(m =>
+                                                m.id === selectedMeal.id
+                                                    ? { ...m, foods: m.foods.filter(f => f.id !== selectedFood.id) }
+                                                    : m
+                                            )
+                                        }
                                     }
-                                }
-                            };
-                        });
+                                };
+                            });
+                        }
+
+                        createToast({ message: intent === 'meal/add' ? 'Food deleted' : 'Food removed' });
+                        router.back();
+                    } else {
+                        createAlert({ title: 'Failure', text: "Food delete/removal failed!\n" + result.message });
                     }
-
-                    if (intent === 'add')
-                        createToast({ message: 'Food deleted!' });
-
+                } catch (e) {
+                    createAlert({ title: 'Failure', text: "Food delete/removal failed!\n" + e.message });
+                } finally {
                     hideSpinner();
-                    router.back();
-                } else {
-                    createAlert({ title: 'Failure', text: "Food delete/removal failed!\n" + result.message });
                 }
             }
         })
     }
 
     async function handleFoodAddition() {
-        const day = additionalContexts.day;
-        const food = additionalContexts.selectedFood;
-        const meal = additionalContexts.selectedMeal;
-
         const payload = {
-            mealId: meal.id,
-            originalServingSize: food.servingSize,
-            originalEnergyKcal: food.energyKcal,
-            originalCarbs: food.carbs,
-            originalProtein: food.protein,
-            originalFat: food.fat,
-            ...food,
+            mealId: selectedMeal.id,
+            originalServingSize: selectedFood.servingSize,
+            originalEnergyKcal: selectedFood.energyKcal,
+            originalCarbs: selectedFood.carbs,
+            originalProtein: selectedFood.protein,
+            originalFat: selectedFood.fat,
+            ...selectedFood,
             ownerId: user.id,
             servingSize: Number(servingSize),
             energyKcal,
@@ -185,8 +200,6 @@ export default function FoodProfile() {
         };
 
         try {
-            showSpinner();
-            const date = day.date;
             const result = await APIService.nutrition.meals.foods.add({ food: payload });
 
             if (result.success) {
@@ -196,10 +209,10 @@ export default function FoodProfile() {
                     ...prev,
                     nutritionLogs: {
                         ...prev.nutritionLogs,
-                        [date]: {
-                            ...prev.nutritionLogs[date],
-                            meals: prev.nutritionLogs[date].meals.map(m =>
-                                m.id === meal.id
+                        [day.date]: {
+                            ...prev.nutritionLogs[day.date],
+                            meals: prev.nutritionLogs[day.date].meals.map(m =>
+                                m.id === selectedMeal.id
                                     ? {
                                         ...m,
                                         foods: [...m.foods, payload]
@@ -210,26 +223,22 @@ export default function FoodProfile() {
                     }
                 }));
 
-                createToast({ message: 'Food added!' });
+                createToast({ message: 'Food added' });
                 router.back();
             } else {
                 createAlert({ title: 'Failure', text: "Food addition failed!\n" + result.message });
             }
         } catch (err) {
-            console.log(err);
+            createAlert({ title: 'Failure', text: "Food addition failed!\n" + err });
         } finally {
             hideSpinner();
         }
     }
 
     async function handleFoodUpdate() {
-        const day = additionalContexts.day;
-        const food = additionalContexts.selectedFood;
-        const meal = additionalContexts.selectedMeal;
-
         const payload = {
-            mealId: meal.id,
-            ...food,
+            mealId: selectedMeal.id,
+            ...selectedFood,
             servingSize: Number(servingSize),
             energyKcal,
             carbs,
@@ -239,8 +248,6 @@ export default function FoodProfile() {
         };
 
         try {
-            showSpinner();
-            const date = day.date;
             const result = await APIService.nutrition.meals.foods.update({ food: payload });
 
             if (result.success) {
@@ -248,14 +255,14 @@ export default function FoodProfile() {
                     ...prev,
                     nutritionLogs: {
                         ...prev.nutritionLogs,
-                        [date]: {
-                            ...prev.nutritionLogs[date],
-                            meals: prev.nutritionLogs[date].meals.map(m =>
-                                m.id === meal.id
+                        [day.date]: {
+                            ...prev.nutritionLogs[day.date],
+                            meals: prev.nutritionLogs[day.date].meals.map(m =>
+                                m.id === selectedMeal.id
                                     ? {
                                         ...m,
                                         foods: m.foods.map(f =>
-                                            f.id === food.id
+                                            f.id === selectedFood.id
                                                 ? payload
                                                 : f
                                         )
@@ -266,44 +273,46 @@ export default function FoodProfile() {
                     }
                 }))
 
-                createToast({ message: 'Serving updated!' });
+                createToast({ message: 'Serving updated' });
                 router.back();
             } else {
                 createAlert({ title: 'Failure', text: "Updating serving failed!\n" + result.message });
             }
         } catch (err) {
-            console.log(err);
+            createAlert({ title: 'Failure', text: "Updating serving failed!\n" + err });
         } finally {
             hideSpinner();
         }
     }
 
     async function handleFoodAdoption() {
-        const food = additionalContexts.selectedFood;
-        const payload = { ...food, ownerId: user.id };
+        Keyboard.dismiss();
 
-        try {
-            showSpinner();
-
-            try {
+        createDialog({
+            title: "Save Food",
+            message: "Are you sure you want to add this food to your list of My Foods?",
+            onConfirm: async () => {
                 showSpinner();
-                const result = await APIService.nutrition.foods.create(payload);
+                try {
+                    const payload = { ...selectedFood, isPublic: false, ownerId: user.id };
+                    const result = await APIService.nutrition.foods.create(payload);
 
-                if (result.success) {
-                    const food = result.data.food;
-                    setUser(prevUser => ({ ...prevUser, foods: [...(prevUser.foods || []), food] }));
-                    return createAlert({ title: 'Success', text: "Food added to your list of My Foods", onPress: () => router.back() });
+                    if (result.success) {
+                        setUser(prevUser => ({ ...prevUser, foods: [...(prevUser.foods || []), result.data.food] }));
+
+                        createToast({ message: "Food added" });
+                        router.back();
+                    }
+                    else {
+                        createAlert({ title: 'Failure', text: "Food addition failed!\n" + result.message });
+                    }
+                } catch (error) {
+                    createAlert({ title: 'Failure', text: "Food addition failed!\n" + error });
+                } finally {
+                    hideSpinner();
                 }
-                else
-                    return createAlert({ title: 'Error', text: result.message });
-            } catch (error) {
-                console.log(error);
-            } finally {
-                hideSpinner();
             }
-        } catch (err) {
-            console.log(err);
-        };
+        });
     }
 
     return (
@@ -311,25 +320,25 @@ export default function FoodProfile() {
             {/* Header */}
             <View style={styles.header}>
                 <View style={{ flexShrink: 1 }}>
-                    <AppText style={styles.foodLabel}>{additionalContexts.selectedFood.label}</AppText>
-                    <AppText style={styles.foodCategory}>{additionalContexts.selectedFood.category}</AppText>
+                    <AppText style={styles.foodLabel}>{selectedFood.label}</AppText>
+                    <AppText style={styles.foodCategory}>{selectedFood.category}</AppText>
                     <Divider orientation="horizontal" style={{ marginVertical: 10 }} />
-                    <AppText style={styles.creator}>{additionalContexts.selectedFood.isUSDA ? 'United States Department of Agriculture' : additionalContexts.selectedFood.creatorName}</AppText>
-                    <AppText style={[styles.creator, { fontSize: scaleFont(10) }]}>{additionalContexts.selectedFood.isUSDA ? 'Public' : additionalContexts.selectedFood.isPublic ? 'Public' : 'Private'}</AppText>
+                    <AppText style={styles.creator}>{selectedFood.isUSDA ? 'United States Department of Agriculture' : selectedFood.creatorName}</AppText>
+                    <AppText style={[styles.creator, { fontSize: scaleFont(10) }]}>{selectedFood.isUSDA ? 'Public' : selectedFood.isPublic ? 'Public' : 'Private'}</AppText>
                 </View>
                 <View style={{ flexDirection: 'row' }}>
-                    {(intent === 'update' || user.id === additionalContexts.selectedFood.ownerId) &&
-                        <TouchableOpacity style={[styles.editBtn, { marginEnd: intent === 'add' ? 7 : 0 }]} onPress={handleFoodDeletion}>
+                    {(intent === 'meal/update' || user.id === selectedFood.ownerId) &&
+                        <TouchableOpacity style={[styles.editBtn, { marginEnd: intent === 'meal/add' ? 7 : 0 }]} onPress={handleFoodDeletion}>
                             <Image source={Images.trash} style={{ width: 22, height: 22, tintColor: colors.accentPink }} />
                         </TouchableOpacity>
                     }
-                    {intent === 'add' && additionalContexts.selectedFood.ownerId === user.id &&
+                    {intent === 'meal/add' && selectedFood.ownerId === user.id &&
                         <TouchableOpacity style={styles.editBtn} onPress={() => router.push(routes.FOOD_EDITOR)}>
                             <Image source={Images.edit} style={{ width: 20, height: 20, tintColor: 'white' }} />
                         </TouchableOpacity>
                     }
-                    {user.id !== additionalContexts.selectedFood.ownerId &&
-                        <TouchableOpacity style={[styles.editBtn, { marginEnd: intent === 'add' ? 7 : 0 }]} onPress={handleFoodAdoption}>
+                    {user.id !== selectedFood.ownerId &&
+                        <TouchableOpacity style={[styles.editBtn, { marginEnd: intent === 'meal/add' ? 7 : 0 }]} onPress={handleFoodAdoption}>
                             <Image source={Images.plus} style={{ width: 22, height: 22, tintColor: 'white' }} />
                         </TouchableOpacity>
                     }
@@ -338,9 +347,9 @@ export default function FoodProfile() {
 
             {/* Macro Circle */}
             {(() => {
-                const carbs = additionalContexts.selectedFood.originalCarbs || additionalContexts.selectedFood.carbs || 0;
-                const protein = additionalContexts.selectedFood.originalProtein || additionalContexts.selectedFood.protein || 0;
-                const fat = additionalContexts.selectedFood.originalFat  || additionalContexts.selectedFood.fat || 0;
+                const carbs = selectedFood.originalCarbs || selectedFood.carbs || 0;
+                const protein = selectedFood.originalProtein || selectedFood.protein || 0;
+                const fat = selectedFood.originalFat || selectedFood.fat || 0;
                 const totalCalories = carbs * 4 + protein * 4 + fat * 9;
 
                 const carbRatio = (carbs * 4 / totalCalories) * 100 || 0;
@@ -387,11 +396,11 @@ export default function FoodProfile() {
                         value={servingSize?.toString() || ''}
                         keyboardType="numeric"
                     />
-                    <AppText style={styles.servingInfo}>{additionalContexts.selectedFood.servingUnit}</AppText>
+                    <AppText style={styles.servingInfo}>{selectedFood.servingUnit}</AppText>
                 </View>
                 <TouchableOpacity style={styles.addBtn} onPress={handleFood}>
                     <Image source={Images.plus} style={{ width: 18, height: 18, tintColor: 'white', marginRight: 8 }} />
-                    <AppText style={{ color: 'white', fontSize: scaleFont(14) }}>{intent === 'add' ? `Add` : `Update Serving`}</AppText>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(14) }}>{intent === 'meal/add' ? `Add` : `Update Serving`}</AppText>
                 </TouchableOpacity>
             </View>
 

@@ -57,10 +57,10 @@ export function nutritionTablesQuery() {
 
                 Label VARCHAR(50) NOT NULL,
                 Category VARCHAR(50) NOT NULL,
+
                 ServingUnit VARCHAR(20) NOT NULL,
                 OriginalServingSize DECIMAL(7,2) NOT NULL,
                 ServingSize DECIMAL(7,2) NOT NULL,
-                
                 OriginalEnergyKcal DECIMAL(7,2) NOT NULL DEFAULT 0,
                 OriginalCarbs DECIMAL(7,2) NOT NULL DEFAULT 0,
                 OriginalProtein DECIMAL(7,2) NOT NULL DEFAULT 0,
@@ -93,9 +93,9 @@ export function nutritionTablesQuery() {
 
                 Label VARCHAR(50) NOT NULL,
                 Category VARCHAR(50) NOT NULL,
+                
                 ServingUnit VARCHAR(20) NOT NULL,
                 ServingSize DECIMAL(7,2) NOT NULL,
-                
                 EnergyKcal DECIMAL(7,2) NOT NULL DEFAULT 0,
                 Carbs DECIMAL(7,2) NOT NULL DEFAULT 0,
                 Protein DECIMAL(7,2) NOT NULL DEFAULT 0,

@@ -308,7 +308,7 @@ export default function MealsLog() {
     }
 
     async function handleMealFoodPress(meal, food) {
-        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, selectedFood: food, day: currentDayLog, foodProfileIntent: 'update' }));
+        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, selectedFood: food, day: currentDayLog, foodProfileIntent: 'meal/update' }));
         router.push(routes.FOOD_PROFILE);
     }
 

@@ -61,8 +61,7 @@ export default function FoodEditor() {
 
         setIsChange(basicChanged || propsChanged);
         setFabVisible(basicChanged || propsChanged ? true : false);
-    }, [label, category, servingUnit, servingSize, energyKcal,
-        carbs, protein, fat, isPublic, additionalProps, additionalContexts.selectedFood]);
+    }, [label, category, servingUnit, servingSize, energyKcal, carbs, protein, fat, isPublic, additionalProps, additionalContexts.selectedFood]);
 
     useEffect(() => {
         const cRate = (carbs * 4 / energyKcal * 100) || 0;
@@ -70,7 +69,6 @@ export default function FoodEditor() {
         const fRate = (fat * 9 / energyKcal * 100) || 0;
         const sum = Math.round(cRate + pRate + fRate);
 
-        console.log(sum)
         setCarbRate(cRate);
         setProteinRate(pRate);
         setFatRate(fRate);
@@ -115,8 +113,7 @@ export default function FoodEditor() {
         });
     }
 
-    function validateMacrosEntries() {
-        console.log(energyKcal, carbs, protein, fat)
+    function validateEntries() {
         if (!label) {
             return createToast({ message: "Please fill in food label" });
         }
@@ -140,13 +137,13 @@ export default function FoodEditor() {
         if (macrosRateOffset > 0.2) {
             createDialog({
                 title: 'Warning',
-                text: "There is a mismatch between calories and macros. Continue?",
+                text: "There is a mismatch between calories and macros!\n\nContinue?",
                 onConfirm: handleFoodEdit
             });
         } else if (macrosRateOffset > 0.1) {
             createDialog({
                 title: 'Warning',
-                text: "There is a slight mismatch between calories and macros. Continue?",
+                text: "There is a slight mismatch between calories and macros!\n\nContinue?",
                 onConfirm: handleFoodEdit
             });
 
@@ -160,21 +157,16 @@ export default function FoodEditor() {
     }
 
     async function handleFoodEdit() {
-        const finalyCategory = typeof category === 'string' && category.trim() ? category : 'Not specified';
+        const finalCategory = typeof category === 'string' && category.trim() ? category : 'Categories unspecified';
         const dominantMacro =
             carbs >= protein && carbs >= fat ? 'Carbs' :
                 protein >= carbs && protein >= fat ? 'Protein' :
                     'Fat';
-        const ownerId = additionalContexts.selectedFood.ownerId;
-        const creatorId = additionalContexts.selectedFood.creatorId;
-        const creatorName = user.firstname + " " + user.lastname;
-        const isUSDA = additionalContexts.selectedFood.isUSDA;
-        const USDAId = additionalContexts.selectedFood.USDAId;
 
         const payload = {
-            id: additionalContexts.selectedFood.id,
+            ...additionalContexts.selectedFood,
             label,
-            category: finalyCategory,
+            category: finalCategory,
             servingUnit,
             servingSize,
             energyKcal,
@@ -182,12 +174,7 @@ export default function FoodEditor() {
             protein,
             fat,
             dominantMacro,
-            ownerId,
-            creatorId,
-            creatorName,
             isPublic,
-            isUSDA,
-            USDAId,
             additionalProps
         };
 
@@ -197,17 +184,20 @@ export default function FoodEditor() {
 
             if (result.success) {
                 const food = result.data.food;
+
                 setUser(prev => ({
                     ...prev,
                     foods: prev.foods.map(f => f.id === food.id ? food : f)
                 }));
                 setAdditionalContexts(prev => ({ ...prev, selectedFood: food }));
-                return createAlert({ title: 'Success', text: "Successfully edited food", onPress: () => router.back() });
+                createToast({ message: "Successfully edited food" });
+                router.back();
             }
-            else
-                return createAlert({ title: 'Error', text: result.message });
+            else {
+                createAlert({ title: 'Failure', text: "Food edit failed!\n" + result.message });
+            }
         } catch (error) {
-            console.log(error);
+            createAlert({ title: 'Failure', text: "Food edit failed!\n" + error });
         } finally {
             hideSpinner();
         }
@@ -223,25 +213,29 @@ export default function FoodEditor() {
                 style={{ width: '100%', height: 50, backgroundColor: colors.accentGreen }}
                 position={{ bottom: insets.bottom + 20, right: 20, left: 20 }}
                 visible={fabVisible && isChange}
-                onPress={validateMacrosEntries}
+                onPress={validateEntries}
             />
             <AppScroll extraBottom={250} onScrollSetStates={setFabVisible} contentStyle={{ padding: 15 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 15 }}>
-                    <AppText style={[styles.sectionTitle, { marginTop: 15 }]}>Share to Community</AppText>
-                    <TouchableOpacity style={{ height: 40, backgroundColor: colors.cardBackground, width: 120, borderRadius: 12, flexDirection: 'row', alignItems: 'center' }} onPress={() => setIsPublic(!isPublic)}>
-                        <View style={{ height: '100%', justifyContent: 'center', backgroundColor: isPublic ? colors.main : colors.cardBackground, borderTopLeftRadius: 8, borderBottomLeftRadius: 8, flex: 1, }}>
-                            <AppText style={{ fontWeight: 'bold', color: isPublic ? 'white' : colors.main, textAlign: 'center' }}>Public</AppText>
+                {additionalContexts.selectedFood.ownerId === additionalContexts.selectedFood.creatorId &&
+                    <>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 15, marginBottom: 15, }}>
+                            <AppText style={[styles.sectionTitle, { marginTop: 15 }]}>Share to Community</AppText>
+                            <TouchableOpacity style={{ height: 40, backgroundColor: colors.cardBackground, width: 120, borderRadius: 12, flexDirection: 'row', alignItems: 'center' }} onPress={() => setIsPublic(!isPublic)}>
+                                <View style={{ height: '100%', justifyContent: 'center', backgroundColor: isPublic ? colors.main : colors.cardBackground, borderTopLeftRadius: 8, borderBottomLeftRadius: 8, flex: 1, }}>
+                                    <AppText style={{ fontWeight: 'bold', color: isPublic ? 'white' : colors.main, textAlign: 'center' }}>Public</AppText>
+                                </View>
+                                <View style={{ height: '100%', justifyContent: 'center', backgroundColor: !isPublic ? colors.main : colors.cardBackground, borderTopRightRadius: 8, borderBottomRightRadius: 8, flex: 1, }}>
+                                    <AppText style={{ fontWeight: 'bold', color: !isPublic ? 'white' : colors.main, textAlign: 'center' }}>Private</AppText>
+                                </View>
+                            </TouchableOpacity>
                         </View>
-                        <View style={{ height: '100%', justifyContent: 'center', backgroundColor: !isPublic ? colors.main : colors.cardBackground, borderTopRightRadius: 8, borderBottomRightRadius: 8, flex: 1, }}>
-                            <AppText style={{ fontWeight: 'bold', color: !isPublic ? 'white' : colors.main, textAlign: 'center' }}>Private</AppText>
-                        </View>
-                    </TouchableOpacity>
-                </View>
 
-                <Divider orientation="horizontal" thickness={2} color={colors.divider} style={{ borderRadius: 50, marginVertical: 15 }} />
+                        <Divider orientation="horizontal" thickness={2} color={colors.divider} style={{ borderRadius: 50 }} />
+                    </>
+                }
 
                 {/* Label & Category */}
-                <AppText style={[styles.sectionTitle]}>Food Label</AppText>
+                <AppText style={[styles.sectionTitle, { marginTop: 15 }]}>Food Label</AppText>
                 <AppTextInput
                     placeholder="Enter a food label"
                     style={styles.input}

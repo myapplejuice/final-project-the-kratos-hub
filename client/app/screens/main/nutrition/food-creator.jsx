@@ -132,7 +132,7 @@ export default function FoodCreator() {
     }
 
     async function handleFoodCreation() {
-        const finalyCategory = typeof category === 'string' && category.trim() ? category : 'Categories unspecified';
+        const finalCategory = typeof category === 'string' && category.trim() ? category : 'Categories unspecified';
         const dominantMacro =
             carbs >= protein && carbs >= fat ? 'Carbs' :
                 protein >= carbs && protein >= fat ? 'Protein' :
@@ -144,7 +144,7 @@ export default function FoodCreator() {
         askUserIfPublic(async (isPublic) => {
             const payload = {
                 label,
-                category: finalyCategory,
+                category: finalCategory,
                 servingUnit,
                 servingSize,
                 energyKcal,
@@ -162,18 +162,21 @@ export default function FoodCreator() {
             };
 
             try {
-            showSpinner();
+                showSpinner();
                 const result = await APIService.nutrition.foods.create(payload);
 
                 if (result.success) {
-                const food = result.data.food;
+                    const food = result.data.food;
                     setUser(prevUser => ({ ...prevUser, foods: [...(prevUser.foods || []), food] }));
-                    return createAlert({ title: 'Success', text: "Successfully created food", onPress: () => router.back() });
+
+                    createToast({ message: "Food created" });
+                    router.back();
                 }
-                else
-                    return createAlert({ title: 'Error', text: result.message });
+                else{
+                    createAlert({ title: 'Failure', text: result.message });
+                }
             } catch (error) {
-                console.log(error);
+                    createAlert({ title: 'Failure', text: "Food creation failed!\n" + error});
             } finally {
                 hideSpinner();
             }
