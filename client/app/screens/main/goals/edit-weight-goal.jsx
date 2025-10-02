@@ -42,7 +42,7 @@ export default function EditWeightGoal() {
         }, 30000);
 
         return () => clearInterval(intervalId);
-    }, []);
+    }, [user]);
 
     async function handleGoalUpdate(newGoalKey) {
         try {

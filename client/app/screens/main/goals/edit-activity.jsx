@@ -44,7 +44,7 @@ export default function EditActivity() {
         }, 30000);
 
         return () => clearInterval(intervalId);
-    }, []);
+    }, [user]);
 
     async function handleActivityUpdate(newActivityKey) {
         try {
