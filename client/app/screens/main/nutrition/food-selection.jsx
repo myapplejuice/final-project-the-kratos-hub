@@ -39,7 +39,7 @@ export default function FoodSelection() {
         async function fetchCommunityFoods() {
             const result = await APIService.nutrition.foods.foods('community');
             const foods = result.data.foods || [];
-            console.log(foods)
+
             setCommunityFoods(foods);
         }
 
