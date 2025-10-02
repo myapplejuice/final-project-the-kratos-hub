@@ -92,7 +92,6 @@ export default function FoodCreator() {
     }
 
     function validateMacrosEntries() {
-        console.log(energyKcal, carbs, protein, fat)
         if (!label) {
             return createToast({ message: "Please fill in food label" });
         }

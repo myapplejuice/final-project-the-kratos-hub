@@ -235,7 +235,6 @@ export default function EditDiet() {
             if (user.preferences.energyUnit.key === "kj")
                 setEnergyKcal = convertEnergy(Number(energyIntake), "kj", "kcal");
 
-            console.log(setEnergyKcal)
             if (setEnergyKcal === user.nutrition.setEnergyKcal) {
                 createToast({ message: "No changes made!" });
                 return;

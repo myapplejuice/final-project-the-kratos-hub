@@ -291,7 +291,7 @@ export default function FoodProfile() {
 
         createDialog({
             title: "Save Food",
-            message: "Are you sure you want to add this food to your list of My Foods?",
+            text: "Are you sure you want to add this food to your list of My Foods?",
             onConfirm: async () => {
                 showSpinner();
                 try {
@@ -328,21 +328,27 @@ export default function FoodProfile() {
                     <AppText style={[styles.creator, { fontSize: scaleFont(10) }]}>{selectedFood.isUSDA ? 'Public' : selectedFood.isPublic ? 'Public' : 'Private'}</AppText>
                 </View>
                 <View style={{ flexDirection: 'row' }}>
-                    {(intent === 'meal/update' || user.id === selectedFood.ownerId) &&
-                        <TouchableOpacity style={[styles.editBtn, { marginEnd: intent === 'meal/add' ? 7 : 0 }]} onPress={handleFoodDeletion}>
-                            <Image source={Images.trash} style={{ width: 22, height: 22, tintColor: colors.accentPink }} />
-                        </TouchableOpacity>
-                    }
-                    {intent === 'meal/add' && selectedFood.ownerId === user.id &&
-                        <TouchableOpacity style={styles.editBtn} onPress={() => router.push(routes.FOOD_EDITOR)}>
-                            <Image source={Images.edit} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                        </TouchableOpacity>
-                    }
-                    {user.id !== selectedFood.ownerId &&
-                        <TouchableOpacity style={[styles.editBtn, { marginEnd: intent === 'meal/add' ? 7 : 0 }]} onPress={handleFoodAdoption}>
-                            <Image source={Images.plus} style={{ width: 22, height: 22, tintColor: 'white' }} />
-                        </TouchableOpacity>
-                    }
+                    {(() => {
+                        const icons = [
+                            (intent === 'meal/update' || user.id === selectedFood.ownerId) && { onPress: handleFoodDeletion, source: Images.trash, tint: colors.accentPink },
+                            (intent === 'meal/add' && selectedFood.ownerId === user.id) && { onPress: () => router.push(routes.FOOD_EDITOR), source: Images.edit, tint: 'white' },
+                            (user.id !== selectedFood.ownerId) && { onPress: handleFoodAdoption, source: Images.plus, tint: 'white' },
+                        ].filter(Boolean);
+
+                        return (
+                            <View style={{ flexDirection: 'row' }}>
+                                {icons.map((icon, index) => (
+                                    <TouchableOpacity
+                                        key={index}
+                                        style={[styles.editBtn, { marginEnd: index < icons.length - 1 ? 7 : 0 }]}
+                                        onPress={icon.onPress}
+                                    >
+                                        <Image source={icon.source} style={{ width: 22, height: 22, tintColor: icon.tint }} />
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        )
+                    })()}
                 </View>
             </View>
 

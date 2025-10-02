@@ -118,21 +118,24 @@ export default function FoodEditor() {
             return createToast({ message: "Please fill in food label" });
         }
 
-        if (!servingSize || servingSize <= 0) {
+        if (servingSize === '' || servingSize === null || servingSize === undefined || isNaN(servingSize)) {
             return createToast({ message: "Please fill in serving size" });
         }
 
-        if (!energyKcal || energyKcal <= 0) {
+        if (energyKcal === '' || energyKcal === null || energyKcal === undefined || isNaN(energyKcal)) {
             return createToast({ message: "Please fill in energy" });
         }
 
-        if (!carbs && !protein && !fat) {
-            return createToast({ message: "Please fill in macros" });
+        if ((carbs === '' || carbs === null || carbs === undefined || isNaN(carbs)) ||
+            (protein === '' || protein === null || protein === undefined || isNaN(protein)) ||
+            (fat === '' || fat === null || fat === undefined || isNaN(fat))) {
+            return createToast({ message: "Please fill in all macros" });
         }
 
-        if (additionalProps.some(p => !p.label || !p.amount || !p.unit)) {
-            return createToast({ message: "Please fill in all additional properties" });
+        if (additionalProps.some(p => !p.label?.trim() || !p.unit?.trim() || p.amount === '' || isNaN(Number(p.amount)))) {
+            return createToast({ message: "Please fill in all additional properties correctly" });
         }
+
 
         if (macrosRateOffset > 0.2) {
             createDialog({

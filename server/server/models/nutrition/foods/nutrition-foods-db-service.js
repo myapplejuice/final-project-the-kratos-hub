@@ -115,18 +115,18 @@ export default class NutritionFoodsDBService {
             const result = await request.query(query);
             if (!result.recordset[0]) return null;
 
-            const food = {};
+            const newFood = {};
             for (const key in result.recordset[0]) {
-                food[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
+                newFood[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
             }
 
-            if (food.additionalProps) {
+            if (newFood.additionalProps) {
                 try {
-                    food.additionalProps = JSON.parse(food.additionalProps);
+                    newFood.additionalProps = JSON.parse(newFood.additionalProps);
                 } catch { }
             }
 
-            return food;
+            return newFood;
         } catch (err) {
             console.error('createFood error:', err);
             return null;
@@ -175,18 +175,18 @@ export default class NutritionFoodsDBService {
             const result = await request.query(query);
             if (!result.recordset[0]) return null;
 
-            const food = {};
+            const updatedFood = {};
             for (const key in result.recordset[0]) {
-                food[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
+                updatedFood[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
             }
 
-            if (food.additionalProps) {
+            if (updatedFood.additionalProps) {
                 try {
-                    food.additionalProps = JSON.parse(food.additionalProps);
+                    updatedFood.additionalProps = JSON.parse(updatedFood.additionalProps);
                 } catch { }
             }
 
-            return food;
+            return updatedFood;
         } catch (err) {
             console.error('updateFood error:', err);
             return null;

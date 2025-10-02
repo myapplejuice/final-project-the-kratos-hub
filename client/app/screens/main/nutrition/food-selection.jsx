@@ -39,6 +39,7 @@ export default function FoodSelection() {
         async function fetchCommunityFoods() {
             const result = await APIService.nutrition.foods.foods('community');
             const foods = result.data.foods || [];
+            console.log(foods)
             setCommunityFoods(foods);
         }
 
@@ -101,7 +102,6 @@ export default function FoodSelection() {
             })
             const result = await APIService.USDARequest(requestBody);
 
-            console.log(result)
             if (!result.success)
                 return createAlert({ message: result.message });
 

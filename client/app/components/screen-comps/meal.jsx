@@ -104,15 +104,15 @@ export default function Meal({ label, time, foods = [], onDeletePress = () => { 
                                 disabled={onFoodPressDisabled}
                                 onPress={() => onFoodPress(food)}
                                 key={index}
-                                style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 12 }}
+                                style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginVertical: 12 }}
                             >
-                                <View>
+                                <View style={{flexShrink: 1}}>
                                     <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{food.label}</AppText>
                                     <AppText style={{ color: colors.mutedText, fontSize: scaleFont(8) }}>
                                         {food.category}, {food.servingSize} {food.unit || 'g'}
                                     </AppText>
                                 </View>
-                                <View style={{ alignItems: 'flex-end' }}>
+                                <View style={{ alignItems: 'flex-end'}}>
                                     <AppText style={{ fontSize: scaleFont(12), color: nutritionColors.energy1 }}>{convertEnergy(food.energyKcal || 0, 'kcal', user.preferences.energyUnit.key)} kcal</AppText>
                                     <View style={{ flexDirection: 'row' }}>
                                         <AppText style={{ color: nutritionColors.carbs1, fontSize: scaleFont(8) }}>C: {food.carbs || 0}</AppText>
