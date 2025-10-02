@@ -79,7 +79,6 @@ export default class NutritionFoodsDBService {
     static async createFood(userId, payload) {
         if (!userId || !payload) return null;
 
-        console.log(userId, payload);
         const {
             label, category, servingUnit, servingSize,
             energyKcal, carbs, protein, fat,
@@ -144,7 +143,7 @@ export default class NutritionFoodsDBService {
         if (!payload) return null;
 
         const {
-            id, creatorName, label, category, servingUnit, servingSize,
+            id, label, category, servingUnit, servingSize,
             energyKcal, carbs, protein, fat,
             dominantMacro, isPublic, additionalProps
         } = payload;
@@ -153,8 +152,6 @@ export default class NutritionFoodsDBService {
             const request = Database.getRequest();
 
             Database.addInput(request, 'Id', sql.Int, id);
-
-            Database.addInput(request, 'CreatorName', sql.VarChar(100), creatorName);
             Database.addInput(request, 'IsPublic', sql.Bit, isPublic ? 1 : 0);
 
             Database.addInput(request, 'Label', sql.VarChar(50), label);

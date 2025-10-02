@@ -3,7 +3,6 @@ import NutritionMealsFoodsDBService from "./nutrition-meals-foods-db-service.js"
 export default class NutritionMealsFoodsController {
     static async addFood(req, res) {
         const { food } = req.body;
-        console.log(food)
         if (!food) return res.status(400).json({ success: false, error: "food is required" });
 
         const result = await NutritionMealsFoodsDBService.addFood(food);

@@ -9,8 +9,8 @@ export default class NutritionFoodsController {
         if (scope === 'user') {
             return NutritionFoodsController.allFoods(req, res);
         }
-        return res.status(400).json({ success: false, error: "Invalid type. Use 'user' or 'community'." });
-
+        
+        return res.status(400).json({ success: false, error: "Invalid type. Use 'user' or 'community'" });
     }
 
     static async allCommunityFoods(req, res) {

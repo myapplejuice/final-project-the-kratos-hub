@@ -71,6 +71,12 @@ export default class ObjectMapper {
             OriginalFat: 'originalFat',
             DominantMacro: 'dominantMacro',
             Time: 'time',
+            Date: 'date',
+            OwnerId: 'ownerId',
+            CreatorName: 'creatorName',
+            IsPublic: 'isPublic',
+            ServingUnit: 'servingUnit',
+            ServingSize: 'servingSize',
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -136,7 +142,7 @@ export default class ObjectMapper {
             creatorId: 'CreatorId',
             additionalProps: 'AdditionalProps',
             usdaId: 'USDAId',
-            isUSDA: 'IsUSDAFood',
+            isUSDA: 'IsUSDA',
             originalServingUnit: 'OriginalServingUnit',
             originalEnergyKcal: 'OriginalEnergyKcal',
             originalServingSize: 'OriginalServingSize',
@@ -145,6 +151,12 @@ export default class ObjectMapper {
             originalFat: 'OriginalFat',
             dominantMacro: 'DominantMacro',
             time: 'Time',
+            date: 'Date',
+            ownerId: 'OwnerId',
+            creatorName: 'CreatorName',
+            isPublic: 'IsPublic',
+            servingUnit: 'ServingUnit',
+            servingSize: 'ServingSize',
         };
         return map[key] || key;
     }
