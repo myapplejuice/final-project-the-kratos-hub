@@ -195,7 +195,7 @@ export default function FoodSelection() {
                 onPress={() => router.push(routes.FOOD_CREATOR)}
             />
             <AppView style={styles.container}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 15, }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 15 }}>
                     {[
                         { title: 'My Foods', onPress: () => setSelectedList('My Foods') },
                         { title: 'Library', onPress: () => setSelectedList('Library') },
@@ -203,7 +203,7 @@ export default function FoodSelection() {
                     ].map((item, i) => (
                         <TouchableOpacity
                             key={i}
-                            style={[{ borderWidth: 1, borderColor: colors.main, paddingVertical: 10, paddingHorizontal: 15, borderRadius: 50, width: 105, alignItems: 'center' }, selectedList === item.title && { backgroundColor: colors.main }]}
+                            style={[{ borderWidth: 1, borderColor: colors.main, paddingVertical: 10, paddingHorizontal: 15, borderRadius: 50, width: 115, alignItems: 'center' }, selectedList === item.title && { backgroundColor: colors.main }]}
                             onPress={item.onPress}
                         >
                             <AppText style={{ color: selectedList === item.title ? 'white' : colors.main, fontWeight: 'bold' }}>{item.title}</AppText>

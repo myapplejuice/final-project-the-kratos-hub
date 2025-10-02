@@ -1,4 +1,4 @@
-import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Image, StyleSheet, TouchableOpacity, Platform } from "react-native";
 import { router, usePathname } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
@@ -7,6 +7,7 @@ import React from "react";
 import { colors } from "../../common/settings/styling";
 import { Images } from "../../common/settings/assets";
 import { routes } from "../../common/settings/constants";
+import { BlurView } from "expo-blur";
 
 export default function NavigationBar({ visible }) {
     const insets = useSafeAreaInsets();
@@ -17,9 +18,9 @@ export default function NavigationBar({ visible }) {
 
     React.useEffect(() => {
         translateY.value = withSpring(visible ? 0 : 150, {
-            damping: 50,   // higher damping = less bounce
-            stiffness: 150, // adjust speed
-            mass: 1,       // optional, default 1
+            damping: 50,
+            stiffness: 150,
+            mass: 1,
         });
     }, [visible]);
 
@@ -50,13 +51,40 @@ export default function NavigationBar({ visible }) {
     }
 
     return (
-        <Animated.View style={[styles.container, { bottom: insets.bottom + 15 }, animatedStyle]}>
-            <LinearGradient
-                colors={["rgba(0,0,0,0.8)", "rgba(0,0,0,0.8)"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}
-                style={StyleSheet.absoluteFill}
-            />
+        <Animated.View
+            style={[
+                styles.container,
+                { paddingBottom: insets.bottom, paddingTop: 15 },
+                animatedStyle,
+            ]}
+        >
+            {Platform.OS === "ios" ?
+                <BlurView
+                    intensity={20}
+                    tint="dark"
+                    style={StyleSheet.absoluteFill}
+                >
+                    <LinearGradient
+                        colors={["rgba(0,0,0,0.0)", "rgba(0,0,0,0.0)"]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 0, y: 1 }}
+                        style={StyleSheet.absoluteFill}
+                    />
+                </BlurView>
+                :
+                <LinearGradient
+                    colors={[
+                        "rgba(0,0,0,0)",
+                        "rgba(0,0,0,0.5)",
+                        "rgba(0,0,0,0.8)",
+                        "rgba(0,0,0,1)",
+                        "rgba(0,0,0,1)"
+                    ]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 0, y: 1 }}
+                    style={StyleSheet.absoluteFill}
+                />
+            }
 
             {navItems.map((item) => {
                 const isActive = screen === item.route;
@@ -83,18 +111,14 @@ export default function NavigationBar({ visible }) {
 const styles = StyleSheet.create({
     container: {
         position: "absolute",
-        left: 15,
-        right: 15,
         backgroundColor: "transparent",
         zIndex: 9999,
         flexDirection: "row",
         justifyContent: "center",
-        borderRadius: 70,
         alignItems: "center",
         overflow: "hidden",
-        height: 60,
-        borderWidth: 1,
-        borderColor: colors.main + "30"
+        bottom: 0,
+        borderColor: colors.main + "30",
     },
     buttonWrapper: {
         flex: 1,
