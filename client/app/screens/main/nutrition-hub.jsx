@@ -156,10 +156,10 @@ export default function NutritionHub() {
 
                     <AppText style={[styles.sectionTitle, { marginHorizontal: 25, fontSize: scaleFont(15), marginBottom: 0, marginTop: 25 }]}>Make sure to always log your meals!</AppText>
 
-                    <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 0, backgroundColor: colors.main + '20' }]}>
+                    <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 0 }]}>
                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <View style={{ flexDirection: 'row', alignItems: 'center', margin: 15 }}>
-                                   <View>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', margin: 10 }}>
+                                   <View  style={{backgroundColor: colors.main + '20', borderRadius: 10, padding: 10}}>
                                         <Image
                                              source={Images.book5}
                                              style={{ width: 40, height: 40, tintColor: colors.main }}
@@ -182,16 +182,16 @@ export default function NutritionHub() {
                          </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 0, backgroundColor: colors.accentBlue + '20' }]}>
+                    <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 0 }]}>
                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <View style={{ flexDirection: 'row', alignItems: 'center', margin: 15, flexShrink: 1 }}>
-                                   <View>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', margin: 10, flexShrink: 1 }}>
+                                   <View style={{backgroundColor: colors.accentBlue + '20', borderRadius: 10, padding: 10}}>
                                         <Image
                                              source={Images.plan2}
                                              style={{ width: 40, height: 40, tintColor: colors.accentBlue }}
                                         />
                                    </View>
-                                   <View style={{ justifyContent: 'flex-start', marginStart: 15, marginEnd: 50 }}>
+                                   <View style={{ justifyContent: 'flex-start', marginStart: 15, marginEnd: 70 }}>
                                         <View>
                                              <AppText style={{ color: colors.accentBlue, fontSize: scaleFont(18), fontWeight: 'bold' }}>
                                                   Nutrition Plans
@@ -208,16 +208,16 @@ export default function NutritionHub() {
                          </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 0, backgroundColor: colors.accentGreen + "20" }]}>
+                    <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 0 }]}>
                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <View style={{ flexDirection: 'row', alignItems: 'center', margin: 15, flexShrink: 1 }}>
-                                   <View>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', margin: 10, flexShrink: 1 }}>
+                                   <View  style={{backgroundColor: colors.accentGreen + '20', borderRadius: 10, padding: 10}}>
                                         <Image
                                              source={Images.foodsOne}
                                              style={{ width: 40, height: 40, tintColor: colors.accentGreen }}
                                         />
                                    </View>
-                                   <View style={{ justifyContent: 'flex-start', marginStart: 15, marginEnd: 50 }}>
+                                   <View style={{ justifyContent: 'flex-start', marginStart: 15, marginEnd: 70 }}>
                                         <View>
                                              <AppText style={{ color: colors.accentGreen, fontSize: scaleFont(18), fontWeight: 'bold' }}>
                                                   My Foods
