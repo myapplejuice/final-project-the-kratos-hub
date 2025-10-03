@@ -17,10 +17,13 @@ export default function ProgressBar({
   titleStyle,
   valueStyle,
   showText = true, // control text presence
+  showWarningText = false, // control warning text visibility
+  warningText = "Limit Exceeded",
+  warningTextStyle,
+  warningTextColor = "red",
 }) {
   const percent = Math.min((current / max) * 100, 100);
 
-  // Animated bar width
   const barWidth = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -31,23 +34,47 @@ export default function ProgressBar({
     }).start();
   }, [percent]);
 
+  const isExceeded = current > max;
+
   return (
     <View style={{ width }}>
-      {/* Header Text */}
+      {/* Header Style */}
       {styleType === "header" && showText && (
         <View style={styles.row}>
-          <AppText style={[styles.title, titleStyle]}>{title}</AppText>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <AppText style={[styles.title, titleStyle]}>{title}</AppText>
+            {showWarningText && isExceeded && (
+              <AppText
+                style={[
+                  { marginLeft: 5, color: warningTextColor, fontSize: scaleFont(10) },
+                  warningTextStyle,
+                ]}
+              >
+                {warningText}
+              </AppText>
+            )}
+          </View>
           <AppText style={[styles.value, { color }, valueStyle]}>
             {valueText ?? `${current} / ${max} ${unit}`}
           </AppText>
         </View>
       )}
 
-      {/* Inline Title */}
+      {/* Inline Style */}
       {styleType === "inline" && showText && (
-        <AppText style={[styles.title, { textAlign: "center", marginBottom: 5 }, titleStyle]}>
-          {title}
-        </AppText>
+        <View style={{ alignItems: "center", marginBottom: 5 }}>
+          <AppText style={[styles.title, titleStyle]}>{title}</AppText>
+          {showWarningText && isExceeded && (
+            <AppText
+              style={[
+                { color: warningTextColor, fontSize: scaleFont(10), marginTop: 2 },
+                warningTextStyle,
+              ]}
+            >
+              {warningText}
+            </AppText>
+          )}
+        </View>
       )}
 
       {/* Progress Bar */}

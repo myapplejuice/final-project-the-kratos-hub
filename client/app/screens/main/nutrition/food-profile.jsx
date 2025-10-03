@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Image, Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import AppScroll from "../../../components/screen-comps/app-scroll";
 import AppText from "../../../components/screen-comps/app-text";
@@ -17,7 +17,7 @@ import { routes } from "../../../common/settings/constants";
 import { Keyboard } from "react-native";
 
 export default function FoodProfile() {
-    const { setUser, user, additionalContexts } = useContext(UserContext);
+    const { setUser, user, setAdditionalContexts, additionalContexts } = useContext(UserContext);
     const { createDialog, createAlert, showSpinner, hideSpinner, createToast } = usePopups();
     const [servingSize, setServingSize] = useState(additionalContexts.selectedFood.servingSize);
     const [energyKcal, setEnergyKcal] = useState(0);
@@ -29,6 +29,7 @@ export default function FoodProfile() {
     const [day, setDay] = useState({});
     const [selectedFood, setSelectedFood] = useState({});
     const [selectedMeal, setSelectedMeal] = useState({});
+    const didMountRef = useRef(false);
 
     useEffect(() => {
         const intent = additionalContexts.foodProfileIntent;
@@ -40,7 +41,18 @@ export default function FoodProfile() {
         setDay(day);
         setSelectedFood(food);
         setSelectedMeal(meal);
-    }, [additionalContexts.foodProfileIntent, additionalContexts.selectedFood, additionalContexts.selectedMeal]);
+    }, [additionalContexts.day, additionalContexts.foodProfileIntent, additionalContexts.selectedFood, additionalContexts.selectedMeal]);
+
+    useEffect(() => {
+        if (!didMountRef.current) {
+            didMountRef.current = true;
+            return;
+        }
+        
+        const day = user.nutritionLogs[additionalContexts.day.date];
+        setAdditionalContexts(prev => ({ ...prev, day }));
+        setDay(day);
+    }, [user.nutritionLogs]);
 
     useEffect(() => {
         let factor;
@@ -98,14 +110,16 @@ export default function FoodProfile() {
             if (intent === 'meal/add') {
                 createDialog({
                     title: 'Warning',
-                    text: 'Adding this food would exceed your daily energy limit!\n\nAre you sure you want to continue?',
+                    text: currentKcal > maxKcal
+                        ? 'You have already exceeded your daily energy limit! Adding this food would only make it worse.\n\nAre you sure you want to continue?'
+                        : 'Adding this food would exceed your daily energy limit!\n\nAre you sure you want to continue?',
                     onConfirm: handleFoodAddition
                 });
             } else if (servingSize > selectedFood.servingSize) {
                 createDialog({
                     title: 'Warning',
                     text: currentKcal > maxKcal
-                        ? 'You have already exceeded your daily energy limit! Further increase would only make it worse.\n\nAre you sure you want to continue?'
+                        ? 'You have already exceeded your daily energy limit! Increasing serving size of this food would only make it worse.\n\nAre you sure you want to continue?'
                         : 'Increasing serving size of this food would exceed your daily energy limit!\n\nAre you sure you want to continue?',
                     onConfirm: () => handleFoodUpdate()
                 });

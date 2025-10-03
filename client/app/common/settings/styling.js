@@ -73,9 +73,9 @@ export const nutritionColors = {
   protein2: "#4ADE80",
   protein3: "#86EFAC",
 
-  energy1: "#F59E0B",
+  energy1: "#FCD34D",
   energy2: "#FBBF24",
-  energy3: "#FCD34D",
+  energy3: "#F59E0B",
 
   water1: "#3B82F6",
   water2: "#60A5FA",

@@ -388,10 +388,13 @@ export default function MealsLog() {
                             current={convertEnergy(currentDayLog?.consumedEnergyKcal ?? 0, 'kcal', user.preferences.energyUnit.key)}
                             max={convertEnergy(currentDayLog?.targetEnergyKcal ?? user.nutrition.setEnergyKcal, 'kcal', user.preferences.energyUnit.key)}
                             unit={user.preferences.energyUnit.field}
-                            color={nutritionColors.energy1}
+                            color={currentDayLog?.consumedEnergyKcal > currentDayLog?.targetEnergyKcal ? 'red' : nutritionColors.energy1}
                             styleType="header"
                             height={10}
                             borderRadius={5}
+                            showWarningText={true}
+                            warningText="- Target Exceeded"
+                            
                         />
                     </View>
 
