@@ -394,7 +394,7 @@ export default function MealsLog() {
                             borderRadius={5}
                             showWarningText={true}
                             warningText="- Target Exceeded"
-                            
+
                         />
                     </View>
 
@@ -425,7 +425,7 @@ export default function MealsLog() {
 
                 {/* Meals Log*/}
                 <View style={{ backgroundColor: colors.background }}>
-                    <View style={!dateComparisons.isPast && { height: 140 }}>
+                    <View>
                         <View style={[styles.card, { padding: 0, marginTop: 20 }]} >
                             <View style={{ padding: 15 }}>
                                 <ProgressBar
@@ -440,23 +440,26 @@ export default function MealsLog() {
 
                                 />
                             </View>
-                            <FadeInOut visible={!dateComparisons.isPast} removeWhenHidden outDuration={200} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
-                                <TouchableOpacity onPress={() => handleWater(-waterAmount)} style={{ backgroundColor: colors.accentPink, borderBottomLeftRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}>
-                                    <Image source={Images.minus} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                                </TouchableOpacity>
+                            {!dateComparisons.isPast && (
+                                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+                                    <TouchableOpacity onPress={() => handleWater(-waterAmount)} style={{ backgroundColor: colors.accentPink, borderBottomLeftRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}>
+                                        <Image source={Images.minus} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                                    </TouchableOpacity>
 
-                                <TouchableOpacity style={{ paddingHorizontal: 15, alignItems: 'center' }} onPress={handleWaterAmountChange}>
-                                    <AppText style={{ fontSize: scaleFont(16), color: nutritionColors.water1 }}>
-                                        {waterAmount} {user.preferences.fluidUnit.field}
-                                    </AppText>
-                                </TouchableOpacity>
+                                    <TouchableOpacity style={{ paddingHorizontal: 15, alignItems: 'center' }} onPress={handleWaterAmountChange}>
+                                        <AppText style={{ fontSize: scaleFont(16), color: nutritionColors.water1 }}>
+                                            {waterAmount} {user.preferences.fluidUnit.field}
+                                        </AppText>
+                                    </TouchableOpacity>
 
-                                <TouchableOpacity onPress={() => handleWater(waterAmount)} style={{ backgroundColor: colors.main, borderBottomRightRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}  >
-                                    <Image source={Images.plus} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                                </TouchableOpacity>
-                            </FadeInOut>
+                                    <TouchableOpacity onPress={() => handleWater(waterAmount)} style={{ backgroundColor: colors.main, borderBottomRightRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}  >
+                                        <Image source={Images.plus} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                                    </TouchableOpacity>
+                                </View>
+                            )}
                         </View>
                     </View>
+
                     {currentDayLog?.meals?.length > 0 ?
                         currentDayLog.meals.map((meal, i) => {
                             return (
