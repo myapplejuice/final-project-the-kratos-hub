@@ -11,7 +11,7 @@ import { formatTime } from "../../common/utils/date-time";
 import { scaleFont } from "../../common/utils/scale-fonts";
 import { routes, } from "../../common/settings/constants";
 import { colors } from "../../common/settings/styling";
-import { homeBottomTabsText, homeGreetingText, homeIntroText, homeStatsTabsText } from "../../common/utils/text-generator";
+import { homeGreetingText, homeIntroText } from "../../common/utils/text-generator";
 import Divider from "../../components/screen-comps/divider";
 import AppScroll from "../../components/screen-comps/app-scroll";
 import FadeInOut from "../../components/effects/fade-in-out";
@@ -20,27 +20,15 @@ export default function Homepage() {
     const { user } = useContext(UserContext);
     const [currentTime, setCurrentTime] = useState();
     const [introText, setIntroText] = useState('');
-    const [statsIntroText, setStatsIntroText] = useState('');
     const [greeting, setGreeting] = useState('');
-    const [greetingEmoji, setGreetingEmoji] = useState("");
-    const [greetingEmojiBackground, setGreetingEmojiBackground] = useState('');
-    const [goalsTapMessage, setGoalsTapMesasage] = useState("");
-    const [loggersTapsMessage, setLoggersTapsMessage] = useState("");
 
     useEffect(() => {
         const updateHomeTexts = () => {
             const [text, emoji, color] = homeGreetingText();
-            const { goalMessage, loggerMessage } = homeBottomTabsText();
             const introText = homeIntroText();
-            const statsIntroText = homeStatsTabsText();
 
             setGreeting(text);
-            setGreetingEmoji(emoji);
-            setGreetingEmojiBackground(color);
             setIntroText(introText);
-            setGoalsTapMesasage(goalMessage);
-            setLoggersTapsMessage(loggerMessage);
-            setStatsIntroText(statsIntroText);
         };
 
         updateHomeTexts();
@@ -117,8 +105,8 @@ export default function Homepage() {
         <AppScroll paddingColor={colors.background} topPadding={false} extraBottom={100} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>
             <View style={{ paddingHorizontal: 20, paddingTop: 100, paddingBottom: 30, margin: 0, backgroundColor: colors.main, borderBottomEndRadius: 30, borderBottomStartRadius: 30, overflow: 'hidden' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignContent: 'center' }}>
-                    <DateDisplay styles={{ textAlign: 'center', marginBottom: 0, marginTop: 0 }} dateStyle={{ color: 'white' }} dayStyle={{ color: 'white' }} />
-                    <View style={{ flexDirection: 'row', backgroundColor: '#ffffff48', padding: 10, borderRadius: 20, height: 40, alignItems: 'center', justifyContent: 'center', alignContent: 'center' }}>
+                    <DateDisplay styles={{ textAlign: 'center' }} dateStyle={{ color: 'white' }} dayStyle={{ color: 'white' }} />
+                    <View style={{ flexDirection: 'row', backgroundColor: '#ffffff48', padding: 12, borderRadius: 15, alignItems: 'center', justifyContent: 'center', alignContent: 'center' }}>
                         <AppText style={{ color: 'white', fontWeight: 'bold', textAlign: 'center', fontSize: scaleFont(17) }}>{currentTime}</AppText>
                     </View>
                 </View>
@@ -177,7 +165,7 @@ export default function Homepage() {
 
                 <TouchableOpacity onPress={() => router.push(routes.GOALS)} style={{ backgroundColor: colors.cardBackground, padding: 15, borderRadius: 20, marginTop: 15, marginHorizontal: 15 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={{ backgroundColor: colors.lightMutedText, padding: 12, borderRadius: 30 }}>
+                        <View style={{ backgroundColor: colors.lightMutedText, padding: 12, borderRadius: 15 }}>
                             <Image source={Images.noGoals} style={[userStatsCard.statImage, { tintColor: 'white', width: 35, height: 35 }]} />
                         </View>
                         <View style={{ marginStart: 15 }}>
@@ -192,12 +180,12 @@ export default function Homepage() {
                 </TouchableOpacity>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15, marginHorizontal: 15 }}>
-                    <TouchableOpacity onPress={() => router.push(routes.NUTRITION_HUB)} style={{ padding: 15, backgroundColor: colors.accentGreen, borderRadius: 20, alignItems: 'center', width: '48%' }}>
+                    <TouchableOpacity onPress={() => router.push(routes.NUTRITION_HUB)} style={{ padding: 15, backgroundColor: colors.accentGreen, borderRadius: 20, height: 180, justifyContent: 'center', alignItems: 'center', width: '48%' }}>
                         <Image source={Images.nutrition} style={[userStatsCard.statImage, { width: 50, height: 50, tintColor: 'white' }]} />
                         <AppText style={{ fontSize: scaleFont(18), color: 'white', fontWeight: 'bold', marginTop: 10 }}>Nutrition</AppText>
                         <AppText style={{ fontSize: scaleFont(12), color: 'white', marginTop: 5 }}>Track meals & progress</AppText>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => router.push(routes.TRAINING_HUB)} style={{ padding: 15, backgroundColor: colors.accentBlue, borderRadius: 20, alignItems: 'center', width: '48%' }}>
+                    <TouchableOpacity onPress={() => router.push(routes.TRAINING_HUB)} style={{ padding: 15, backgroundColor: colors.accentBlue, borderRadius: 20, height: 180, justifyContent: 'center', alignItems: 'center', width: '48%' }}>
                         <Image source={Images.nutrition} style={[userStatsCard.statImage, { width: 50, height: 50, tintColor: 'white' }]} />
                         <AppText style={{ fontSize: scaleFont(18), color: 'white', fontWeight: 'bold', marginTop: 10 }}>Training</AppText>
                         <AppText style={{ fontSize: scaleFont(12), color: 'white', marginTop: 5 }}>Log your workouts</AppText>
