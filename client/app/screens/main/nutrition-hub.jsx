@@ -4,13 +4,10 @@ import { router } from "expo-router";
 import { routes, } from "../../common/settings/constants";
 import { colors, nutritionColors } from "../../common/settings/styling";
 import AppText from "../../components/screen-comps/app-text";
-import { Platform } from "react-native";
-import { dietOptions } from "../../common/utils/global-options";
 import { scaleFont } from "../../common/utils/scale-fonts";
 import { UserContext } from "../../common/contexts/user-context";
 import { Image } from "expo-image";
 import { Images } from "../../common/settings/assets";
-import { goalsDietaryFeedbackTips } from "../../common/utils/text-generator";
 import { convertEnergy, convertFluid } from "../../common/utils/unit-converter";
 import { formatDate } from "../../common/utils/date-time";
 import usePopups from "../../common/hooks/use-popups";
@@ -149,7 +146,7 @@ export default function NutritionHub() {
                     <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 0 }]}>
                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                               <View style={{ flexDirection: 'row', alignItems: 'center', margin: 10 }}>
-                                   <View style={{ backgroundColor: colors.main + '20', borderRadius: 10, padding: 10 }}>
+                                   <View style={{ backgroundColor: colors.main + '20', borderRadius: 15, padding: 10 }}>
                                         <Image
                                              source={Images.book5}
                                              style={{ width: 40, height: 40, tintColor: colors.main }}
@@ -175,7 +172,7 @@ export default function NutritionHub() {
                     <TouchableOpacity onPress={() => router.push(routes.MEAL_PLANS)} style={[styles.card, { padding: 0 }]}>
                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                               <View style={{ flexDirection: 'row', alignItems: 'center', margin: 10, flexShrink: 1 }}>
-                                   <View style={{ backgroundColor: colors.accentBlue + '20', borderRadius: 10, padding: 10 }}>
+                                   <View style={{ backgroundColor: colors.accentBlue + '20', borderRadius: 15, padding: 10 }}>
                                         <Image
                                              source={Images.plan2}
                                              style={{ width: 40, height: 40, tintColor: colors.accentBlue }}
@@ -201,7 +198,7 @@ export default function NutritionHub() {
                     <TouchableOpacity onPress={() => router.push(routes.FOODS)} style={[styles.card, { padding: 0 }]}>
                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                               <View style={{ flexDirection: 'row', alignItems: 'center', margin: 10, flexShrink: 1 }}>
-                                   <View style={{ backgroundColor: colors.accentGreen + '20', borderRadius: 10, padding: 10 }}>
+                                   <View style={{ backgroundColor: colors.accentGreen + '20', borderRadius: 15, padding: 10 }}>
                                         <Image
                                              source={Images.foodsOne}
                                              style={{ width: 40, height: 40, tintColor: colors.accentGreen }}
@@ -236,7 +233,7 @@ const styles = StyleSheet.create({
      card: {
           backgroundColor: colors.cardBackground,
           padding: 15,
-          borderRadius: 15,
+          borderRadius: 20,
           marginTop: 15,
           marginHorizontal: 15,
      },
@@ -299,7 +296,7 @@ const styles = StyleSheet.create({
      button: {
           marginTop: 18,
           height: 50,
-          borderRadius: 15,
+          borderRadius: 20,
           backgroundColor: 'linear-gradient(90deg, rgba(0,140,255,1) 0%, rgba(0,200,255,1) 100%)',
           justifyContent: 'center',
           alignItems: 'center',

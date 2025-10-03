@@ -419,8 +419,8 @@ const styles = StyleSheet.create({
 
     card: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 15,
-        padding: 15,
+        borderRadius: 20,
+        padding: 20,
         marginHorizontal: 15,
     },
     optionRow: {
@@ -472,10 +472,10 @@ const styles = StyleSheet.create({
         marginTop: 20,
         paddingVertical: 10,
         paddingHorizontal: 25,
-        borderRadius: 8,
+        borderRadius: 15,
         backgroundColor: colors.main,
     },
-    cancelText: { color: 'white', fontSize: scaleFont(15), fontWeight: '600' },
+    cancelText: { color: 'white', fontSize: scaleFont(15) },
 
     buttonsContainer: {
         marginHorizontal: 15,

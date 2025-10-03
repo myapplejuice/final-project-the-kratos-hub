@@ -1,9 +1,8 @@
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Animated, StyleSheet, TouchableOpacity, View } from "react-native";
 import DateDisplay from "../../components/screen-comps/date-display";
-import AnimatedButton from "../../components/screen-comps/animated-button";
 import AppText from "../../components/screen-comps/app-text";
 import { Images } from '../../common/settings/assets';
 import { UserContext } from "../../common/contexts/user-context";
@@ -13,9 +12,9 @@ import { scaleFont } from "../../common/utils/scale-fonts";
 import { routes, } from "../../common/settings/constants";
 import { colors } from "../../common/settings/styling";
 import { homeBottomTabsText, homeGreetingText, homeIntroText, homeStatsTabsText } from "../../common/utils/text-generator";
-import { LinearGradient } from "expo-linear-gradient";
 import Divider from "../../components/screen-comps/divider";
 import AppScroll from "../../components/screen-comps/app-scroll";
+import FadeInOut from "../../components/effects/fade-in-out";
 
 export default function Homepage() {
     const { user } = useContext(UserContext);
@@ -27,15 +26,8 @@ export default function Homepage() {
     const [greetingEmojiBackground, setGreetingEmojiBackground] = useState('');
     const [goalsTapMessage, setGoalsTapMesasage] = useState("");
     const [loggersTapsMessage, setLoggersTapsMessage] = useState("");
-    const fadeAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
-        Animated.timing(fadeAnim, {
-            toValue: 1,
-            duration: 1350,
-            useNativeDriver: true,
-        }).start();
-
         const updateHomeTexts = () => {
             const [text, emoji, color] = homeGreetingText();
             const { goalMessage, loggerMessage } = homeBottomTabsText();
@@ -72,7 +64,7 @@ export default function Homepage() {
         return () => clearInterval(interval);
     }, [user.preferences]);
 
-    const tabs = [
+    const BMRTab = [
         {
             label: "Basal Metabolic Rate",
             value: convertEnergy(user.metrics.bmr, 'kcal', user.preferences.energyUnit.key) + " " + user.preferences.energyUnit.field,
@@ -81,6 +73,9 @@ export default function Homepage() {
             bgColor: colors.statImageBackground,
             iconColor: colors.white
         },
+    ];
+
+    const tabsGroupOne = [
         {
             label: "Body Mass Index",
             value: user.metrics.bmi,
@@ -96,7 +91,10 @@ export default function Homepage() {
             route: routes.BODY_FAT,
             bgColor: '#E74C3C33',
             iconColor: '#E74C3C'
-        },
+        }
+    ];
+
+    const tabsGroupTwo = [
         {
             label: "Lean Body Mass",
             value: convertWeight(user.metrics.leanBodyMass, 'kg', user.preferences.weightUnit.key) + ` ${user.preferences.weightUnit.field}`,
@@ -106,7 +104,7 @@ export default function Homepage() {
             iconColor: '#4DB6AC'
         },
         {
-            label: "Total Daily Energy Expenditure",
+            label: "Energy Expenditure",
             value: convertEnergy(user.metrics.tdee, 'kcal', user.preferences.energyUnit.key) + " " + user.preferences.energyUnit.field,
             icon: Images.tdee,
             route: routes.TOTAL_DAILY_ENERGY_EXPENDITURE,
@@ -116,118 +114,116 @@ export default function Homepage() {
     ];
 
     return (
-        <AppScroll backgroundColor={colors.main} paddingColor={colors.background} extraBottom={100} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>
-            <LinearGradient
-                colors={[
-                    colors.main + "FF",
-                    colors.main,
-                    colors.main + "CC",
-                    colors.main + "88",
-                    colors.main + "44",
-                    colors.background,
-                    "transparent"
-                ]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}
-                style={{ paddingHorizontal: 20, margin: 0, backgroundColor: colors.background }}
-            >
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignContent: 'center', marginBottom: 10 }}>
+        <AppScroll paddingColor={colors.background} topPadding={false} extraBottom={100} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>
+            <View style={{ paddingHorizontal: 20, paddingTop: 100, paddingBottom: 30, margin: 0, backgroundColor: colors.main, borderBottomEndRadius: 30, borderBottomStartRadius: 30, overflow: 'hidden' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignContent: 'center' }}>
                     <DateDisplay styles={{ textAlign: 'center', marginBottom: 0, marginTop: 0 }} dateStyle={{ color: 'white' }} dayStyle={{ color: 'white' }} />
-                    <View style={{ backgroundColor: '#ffffff48', padding: 10, borderRadius: 15, height: 40, alignItems: 'center', justifyContent: 'center', alignContent: 'center' }}>
-                        <AppText style={{ color: 'white', fontWeight: 'bold', textAlign: 'center', fontSize: scaleFont(16) }}>{currentTime}</AppText>
+                    <View style={{ flexDirection: 'row', backgroundColor: '#ffffff48', padding: 10, borderRadius: 20, height: 40, alignItems: 'center', justifyContent: 'center', alignContent: 'center' }}>
+                        <AppText style={{ color: 'white', fontWeight: 'bold', textAlign: 'center', fontSize: scaleFont(17) }}>{currentTime}</AppText>
                     </View>
                 </View>
 
-                <Animated.View style={{ opacity: fadeAnim }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <AppText style={{ fontSize: scaleFont(40), backgroundColor: greetingEmojiBackground, padding: 5, borderRadius: 15 }}>
-                            {greetingEmoji}
-                        </AppText>
-                        <AppText numberOfLines={2} style={[styles.introText, { fontSize: scaleFont(25), fontWeight: '700', marginLeft: 15, flexShrink: 1 }]}>
-                            {greeting}, {user.firstname}!
-                        </AppText>
-                    </View>
+                <Divider orientation="horizontal" thickness={2} color="rgba(255, 255, 255, 0.25)" style={{ marginVertical: 20 }} />
 
-                    <AppText style={[styles.introText, { fontSize: scaleFont(16), marginTop: 5 }]}>
+                <FadeInOut visible={true}>
+                    <AppText numberOfLines={2} style={[styles.introText, { fontSize: scaleFont(25), fontWeight: '700', flexShrink: 1 }]}>
+                        {greeting}, {user.firstname}!
+                    </AppText>
+                    <AppText style={[styles.introText, { fontSize: scaleFont(16), marginTop: 5, color: 'rgba(255, 255, 255, 0.75)' }]}>
                         {introText}
                     </AppText>
+                </FadeInOut>
+            </View>
 
-                </Animated.View>
-            </LinearGradient>
-            <View style={{ backgroundColor: colors.background }}>
-                <TouchableOpacity
-                    onPress={() => router.push(routes.PROFILE)}
-                    style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        backgroundColor: colors.cardBackground,
-                        paddingHorizontal: 15,
-                        marginHorizontal: 15,
-                        paddingVertical: 10,
-                        borderRadius: 15,
-                        marginTop: 30
-                    }}
-                >
-                    <Image source={Images.profileOutline} style={{ width: 24, height: 24, marginRight: 8, tintColor: 'white' }} />
-                    <AppText style={{ color: 'white', fontSize: scaleFont(11), flexShrink: 1 }}>
-                        Tap here or your profile picture above to view your profile
+            <View style={{ backgroundColor: colors.background, marginTop: 20 }}>
+                <View style={{ marginBottom: 15 }}>
+                    <AppText style={{ marginTop: 15, color: 'white', paddingHorizontal: 25, fontSize: scaleFont(20), fontWeight: 'bold' }}>
+                        Today's Overview
                     </AppText>
-                </TouchableOpacity>
-                <AppText style={{ marginTop: 15, color: 'white', paddingHorizontal: 25 }}>
-                    {statsIntroText}
-                </AppText>
-                <View style={userStatsCard.statsContainer}>
-                    {tabs.map((item, index) => (
-                        <View key={index}>
-                            <TouchableOpacity onPress={() => router.push(item.route)} style={[userStatsCard.statItem, index !== 4 && { marginBottom: 15 }, index !== 0 && { marginTop: 15 }]}>
-                                <View style={userStatsCard.statItemLeft}>
-                                    <View style={[userStatsCard.statImageContainer, item.label !== 'Basal Metabolic Rate' && { backgroundColor: item.bgColor }]}>
-                                        <Image source={item.icon} style={[userStatsCard.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }]} />
-                                    </View>
-                                    <View style={userStatsCard.titleContainer}>
-                                        <AppText style={userStatsCard.statLabel}>{item.label}</AppText>
-                                        <AppText style={userStatsCard.statValue}>{item.value}</AppText>
-                                    </View>
-                                </View>
-                                <Image source={Images.backArrow} style={userStatsCard.statArrow} />
-                            </TouchableOpacity>
-                            {index !== 4 && <Divider orientation="horizontal" color={colors.divider} thickness={1} style={{ borderRadius: 40 }} />}
-                        </View>
+                </View>
+                <View style={{ backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15, marginBottom: 15 }}>
+                    {BMRTab.map((item, index) => (
+                        <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 30, height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+                            <Image source={item.icon} style={[userStatsCard.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
+                            <View style={{ alignItems: 'center' }}>
+                                <AppText style={{ fontSize: scaleFont(15), fontWeight: 'bold', color: 'white', textAlign: 'center', marginTop: 15 }}>{item.value}</AppText>
+                                <AppText style={{ fontSize: scaleFont(12), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>{item.label}</AppText>
+                            </View>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+                <View style={{ flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15, marginBottom: 15 }}>
+                    {tabsGroupOne.map((item, index) => (
+                        <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 20, width: '48%', height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+                            <Image source={item.icon} style={[userStatsCard.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
+                            <View style={{ justifyContent: 'flex-start' }}>
+                                <AppText style={{ fontSize: scaleFont(15), fontWeight: 'bold', color: 'white', textAlign: 'center', marginTop: 15 }}>{item.value}</AppText>
+                                <AppText style={{ fontSize: scaleFont(12), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>{item.label}</AppText>
+                            </View>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+                <View style={{ flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15, marginBottom: 15 }}>
+                    {tabsGroupTwo.map((item, index) => (
+                        <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 20, width: '48%', height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+                            <Image source={item.icon} style={[userStatsCard.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
+                            <View style={{ justifyContent: 'flex-start' }}>
+                                <AppText style={{ fontSize: scaleFont(15), fontWeight: 'bold', color: 'white', textAlign: 'center', marginTop: 15 }}>{item.value}</AppText>
+                                <AppText style={{ fontSize: scaleFont(12), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>{item.label}</AppText>
+                            </View>
+                        </TouchableOpacity>
                     ))}
                 </View>
 
-                <AppText style={{ marginBottom: 15, color: 'white', paddingHorizontal: 25 }}>{goalsTapMessage}</AppText>
-                <View style={[userStatsCard.statsContainer, { marginTop: 0 }]}>
-                    <TouchableOpacity onPress={() => router.push(routes.GOALS)} style={{ width: '100%' }}>
-
-                        <View style={[userStatsCard.statItem]}>
-                            <View style={userStatsCard.statItemLeft}>
-                                <View style={[userStatsCard.statImageContainer, { backgroundColor: 'rgba(61, 61, 61, 1)' }]}>
-                                    <Image source={Images.noGoals} style={[userStatsCard.statImage, { tintColor: 'white', width: 25, height: 25 }]} />
-                                </View>
-                                <AppText style={[userStatsCard.statValue, { fontSize: scaleFont(15) }]}>
-                                    Manage Your Goals & Metrics
-                                </AppText>
-                            </View>
+                <TouchableOpacity onPress={() => router.push(routes.GOALS)} style={{ backgroundColor: colors.cardBackground, padding: 15, borderRadius: 20, marginTop: 15, marginHorizontal: 15 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ backgroundColor: colors.lightMutedText, padding: 12, borderRadius: 30 }}>
+                            <Image source={Images.noGoals} style={[userStatsCard.statImage, { tintColor: 'white', width: 35, height: 35 }]} />
                         </View>
+                        <View style={{ marginStart: 15 }}>
+                            <AppText style={{ fontSize: scaleFont(18), color: 'white', fontWeight: 'bold' }}>
+                                Manage Goals & Metrics
+                            </AppText>
+                            <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11), flexShrink: 1 }}>
+                                Set your goals and track your progress
+                            </AppText>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15, marginHorizontal: 15 }}>
+                    <TouchableOpacity onPress={() => router.push(routes.NUTRITION_HUB)} style={{ padding: 15, backgroundColor: colors.accentGreen, borderRadius: 20, alignItems: 'center', width: '48%' }}>
+                        <Image source={Images.nutrition} style={[userStatsCard.statImage, { width: 50, height: 50, tintColor: 'white' }]} />
+                        <AppText style={{ fontSize: scaleFont(18), color: 'white', fontWeight: 'bold', marginTop: 10 }}>Nutrition</AppText>
+                        <AppText style={{ fontSize: scaleFont(12), color: 'white', marginTop: 5 }}>Track meals & progress</AppText>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => router.push(routes.TRAINING_HUB)} style={{ padding: 15, backgroundColor: colors.accentBlue, borderRadius: 20, alignItems: 'center', width: '48%' }}>
+                        <Image source={Images.nutrition} style={[userStatsCard.statImage, { width: 50, height: 50, tintColor: 'white' }]} />
+                        <AppText style={{ fontSize: scaleFont(18), color: 'white', fontWeight: 'bold', marginTop: 10 }}>Training</AppText>
+                        <AppText style={{ fontSize: scaleFont(12), color: 'white', marginTop: 5 }}>Log your workouts</AppText>
                     </TouchableOpacity>
                 </View>
 
-                <AppText style={{ marginBottom: 15, color: 'white', paddingHorizontal: 25 }}>{loggersTapsMessage}</AppText>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 15 }}>
-                    <AnimatedButton
-                        title={"Nutrition"}
-                        onPress={() => router.push(routes.NUTRITION_HUB)}
-                        style={{ width: '48%', justifyContent: 'center', alignContent: 'center', alignItems: 'center', padding: 15, backgroundColor: colors.accentGreen, borderRadius: 15 }}
-                        textStyle={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12) }}
-                    />
-                    <AnimatedButton
-                        title={"Training"}
-                        onPress={() => router.push(routes.TRAINING_HUB)}
-                        style={{ width: '48%', justifyContent: 'center', alignContent: 'center', alignItems: 'center', padding: 15, backgroundColor: colors.accentBlue, borderRadius: 15 }}
-                        textStyle={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12) }}
-                    />
-                </View>
+                <TouchableOpacity
+                    onPress={() => router.push(routes.PROFILE)}
+                    style={{
+                        backgroundColor: colors.cardBackground,
+                        marginHorizontal: 15,
+                        marginTop: 15,
+                        padding: 20,
+                        borderRadius: 20,
+                    }}
+                >
+                    <View style={{ flexDirection: 'row' }}>
+                        <Image source={Images.profileOutline} style={{ width: 24, height: 24, marginRight: 8, tintColor: 'white' }} />
+                        <AppText style={{ color: 'white', fontSize: scaleFont(18), flexShrink: 1, fontWeight: 'bold' }}>
+                            View Your Profile
+                        </AppText>
+                    </View>
+                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11), flexShrink: 1, marginTop: 5 }}>
+                        Tap here to modify your profile and app settings
+                    </AppText>
+                </TouchableOpacity>
             </View>
         </AppScroll>
     );
@@ -299,12 +295,11 @@ const styles = StyleSheet.create({
 });
 
 const userStatsCard = StyleSheet.create({
-    statsContainer: { margin: 15, backgroundColor: colors.cardBackground, borderRadius: 15, padding: 15 },
+    statsContainer: { margin: 15, backgroundColor: colors.cardBackground, borderRadius: 20, padding: 15 },
     statItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     statItemLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
-    statImageContainer: { backgroundColor: colors.statImageBackground, padding: 8, borderRadius: 15, justifyContent: 'center', alignItems: 'center', marginRight: 8 },
+    statImageContainer: { backgroundColor: colors.statImageBackground, padding: 8, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginRight: 8 },
     statImage: { width: 35, height: 35, resizeMode: 'contain' },
     statLabel: { fontSize: scaleFont(13), color: colors.mutedText },
-    statValue: { fontSize: scaleFont(13), fontWeight: '700', color: colors.white, marginTop: 2 },
     statArrow: { width: 20, height: 20, transform: [{ scaleX: -1 }], resizeMode: 'contain' }
 });

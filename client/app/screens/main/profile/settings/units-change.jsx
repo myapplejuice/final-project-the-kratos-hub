@@ -16,7 +16,7 @@ export default function UnitsChange() {
         return (
             <View key={label}>
                 <TouchableOpacity
-                    style={[styles.optionRow]}
+                    style={[styles.optionRow, isLast && {paddingBottom: 0}]}
                     onPress={async () => {
                         const userPreferences = { ...user.preferences, [key]: option };
                         setUser({ ...user, preferences: userPreferences });
@@ -80,9 +80,8 @@ export default function UnitsChange() {
 const styles = StyleSheet.create({
     card: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 16,
-        paddingHorizontal: 14,
-        paddingTop: 14,
+        borderRadius: 20,
+        padding: 20
     },
     optionRow: {
         flexDirection: 'row',

@@ -5,6 +5,7 @@ import AppText from "../../../../components/screen-comps/app-text";
 import { scaleFont } from "../../../../common/utils/scale-fonts";
 import { colors } from "../../../../common/settings/styling";
 import AppScroll from "../../../../components/screen-comps/app-scroll";
+import Divider from "../../../../components/screen-comps/divider";
 
 export default function PrivacyPolicy() {
 
@@ -18,12 +19,16 @@ export default function PrivacyPolicy() {
                     also collect basic device and usage data to improve the app.
                 </AppText>
 
+<Divider orientation="horizontal" style={{ marginVertical: 15 }} />
+
                 <AppText style={styles.subtitle}>2. How We Use Information</AppText>
                 <AppText style={styles.paragraph}>
                     Your data is used to provide core app functionality, improve
                     recommendations, and enable communication features. We never sell
                     your personal information to third parties.
                 </AppText>
+
+<Divider orientation="horizontal" style={{ marginVertical: 15 }} />
 
                 <AppText style={styles.subtitle}>3. Data Sharing</AppText>
                 <AppText style={styles.paragraph}>
@@ -32,12 +37,16 @@ export default function PrivacyPolicy() {
                     health and chat data remain confidential.
                 </AppText>
 
+<Divider orientation="horizontal" style={{ marginVertical: 15 }} />
+
                 <AppText style={styles.subtitle}>4. Security</AppText>
                 <AppText style={styles.paragraph}>
                     We implement reasonable security measures to protect your data.
                     However, no system is 100% secure. Use the app at your own risk and
                     avoid sharing sensitive personal details in public chats.
                 </AppText>
+
+<Divider orientation="horizontal" style={{ marginVertical: 15 }} />
 
                 <AppText style={styles.subtitle}>5. Contact</AppText>
                 <AppText style={[styles.paragraph, { marginBottom: 0 }]}>
@@ -59,8 +68,8 @@ export default function PrivacyPolicy() {
 const styles = StyleSheet.create({
     card: {
         backgroundColor: colors.cardBackground || "#222",
-        padding: 15,
-        borderRadius: 12,
+        padding: 20,
+        borderRadius: 20,
         margin: 15,
     },
     subtitle: {
@@ -72,14 +81,13 @@ const styles = StyleSheet.create({
     paragraph: {
         fontSize: scaleFont(12),
         color: colors.detailText,
-        lineHeight: 18,
-        marginBottom: 15
+        lineHeight: 18
     },
     backButton: {
         margin: 15,
         backgroundColor: 'rgb(0, 140, 255)',
         height: 50,
-        borderRadius: 15
+        borderRadius: 20
     },
     backButtonText: {
         fontSize: scaleFont(12)

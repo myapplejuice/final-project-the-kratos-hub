@@ -92,8 +92,8 @@ export default function About() {
 const styles = StyleSheet.create({
     card: {
         backgroundColor: colors.cardBackground || "#222",
-        padding: 15,
-        borderRadius: 12,
+        padding: 20,
+        borderRadius: 20,
         marginTop: 15,
         marginHorizontal:15,
     },
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 15,
         backgroundColor: 'rgb(0, 140, 255)',
         height: 50,
-        borderRadius: 15
+        borderRadius: 20
     },
     backButtonText: {
         fontSize: scaleFont(12)
