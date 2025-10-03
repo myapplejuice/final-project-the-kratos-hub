@@ -216,6 +216,12 @@ export default function FoodSelection() {
         const nextPage = communityPage + 1;
         const nextItems = loadMoreItems(visibleCommunityFoods, communityFoods, nextPage, pageSize);
 
+        const prevLength = visibleCommunityFoods.length;
+        const nextLength = nextItems.length;
+        if (prevLength === nextLength) {
+            return createToast({ message: 'No more results from community foods' });
+        }
+
         setVisibleCommunityFoods(nextItems);
         setFoodList(nextItems);
         setCommunityPage(nextPage);
@@ -335,19 +341,19 @@ export default function FoodSelection() {
                             ))}
                         </View>
                         {selectedList !== 'My Foods' && (
-                                <AnimatedButton
-                                    style={{ marginTop: 25, backgroundColor: colors.background, padding: 15, borderRadius: 15, borderWidth: 1, borderColor: colors.mutedText, width: '40%', justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}
-                                    leftImage={Images.plus}
-                                    leftImageStyle={{ tintColor: colors.mutedText, width: 20, height: 20, marginEnd: 10 }}
-                                    textStyle={{ color: colors.mutedText }}
-                                    title="Load More"
-                                    onPress={() => {
-                                        if (selectedList === 'Library')
-                                            handleUSDASearch(lastUSDAQuery, 'loadmore');
-                                        else if (selectedList === 'Community')
-                                            handleLoadMoreCommunity();
-                                    }}
-                                />
+                            <AnimatedButton
+                                style={{ marginTop: 25, backgroundColor: colors.background, padding: 15, borderRadius: 15, borderWidth: 1, borderColor: colors.mutedText, width: '40%', justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}
+                                leftImage={Images.plus}
+                                leftImageStyle={{ tintColor: colors.mutedText, width: 20, height: 20, marginEnd: 10 }}
+                                textStyle={{ color: colors.mutedText }}
+                                title="Load More"
+                                onPress={() => {
+                                    if (selectedList === 'Library')
+                                        handleUSDASearch(lastUSDAQuery, 'loadmore');
+                                    else if (selectedList === 'Community')
+                                        handleLoadMoreCommunity();
+                                }}
+                            />
                         )}
                     </AppScroll>
                 ) : (
