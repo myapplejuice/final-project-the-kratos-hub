@@ -1,16 +1,82 @@
 [
     {
-        "id": 0,
-        "label": "Vitamin K",
-        "amount": 0,
-        "unit": "mg",
-        "originalAmount": 10600
+        "additionalProps": [
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "carbs": 0,
+        "category": "Poultry",
+        "creatorId": "24F9AE47-129B-4EDC-9994-682B93E173C3",
+        "creatorName": "Ibrahem Abu Shah",
+        "dominantMacro": "Protein",
+        "energyKcal": 165,
+        "fat": 4.1,
+        "id": 15,
+        "isPublic": false,
+        "isUSDA": false,
+        "label": "Chicken",
+        "ownerId": "57E0CAF4-4C9A-4E67-A07F-B2D8D69ABBF5",
+        "protein": 32,
+        "servingSize": 100,
+        "servingUnit": "g",
+        "usdaId": -1
     },
     {
-        "id": 2,
-        "label": "Iron",
-        "amount": 0,
-        "unit": "mg",
-        "originalAmount": 50000
+        "additionalProps": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "carbs": 0,
+        "category": "Other Meats",
+        "creatorId": "00000000-0000-0000-0000-000000000000",
+        "creatorName": "USDA",
+        "dominantMacro": "Protein",
+        "energyKcal": 204,
+        "fat": 11.5,
+        "id": 14,
+        "isPublic": false,
+        "isUSDA": true,
+        "label": "BEEF",
+        "ownerId": "57E0CAF4-4C9A-4E67-A07F-B2D8D69ABBF5",
+        "protein": 16.8,
+        "servingSize": 113,
+        "servingUnit": "g",
+        "usdaId": 2466144
     }
 ]

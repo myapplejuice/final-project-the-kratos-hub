@@ -17,6 +17,7 @@ import { colors, nutritionColors } from "../../../common/settings/styling";
 import FadeInOut from "../../../components/effects/fade-in-out";
 import APIService from '../../../common/services/api-service';
 import usePopups from "../../../common/hooks/use-popups";
+import AnimatedButton from "../../../components/screen-comps/animated-button";
 
 export default function FoodSelection() {
     const { user, setAdditionalContexts } = useContext(UserContext);
@@ -27,12 +28,20 @@ export default function FoodSelection() {
     const [selectedList, setSelectedList] = useState('My Foods');
     const [searchQuery, setSearchQuery] = useState('');
     const [USDAQueryTriggered, setUSDAQueryTriggered] = useState(false);
-    const [usdaPage, setUsdaPage] = useState(1);
+    const [lastUSDAQuery, setLastUSDAQuery] = useState('');
 
     const [foodList, setFoodList] = useState([]);
     const [userFoods, setUserFoods] = useState([]);
+
     const [USDAFoods, setUSDAFoods] = useState([]);
+    const [usdaPage, setUsdaPage] = useState(1);
+
     const [communityFoods, setCommunityFoods] = useState([]);
+    const [communityPage, setCommunityPage] = useState(1);
+    const [visibleCommunityFoods, setVisibleCommunityFoods] = useState([]);
+
+    const pageSize = 10;
+
 
     useEffect(() => {
         async function fetchCommunityFoods() {
@@ -52,8 +61,6 @@ export default function FoodSelection() {
     }, [user.foods]);
 
     useEffect(() => {
-        setSearchQuery('');
-
         if (selectedList === 'My Foods') {
             setUSDAQueryTriggered(false);
             setFoodList(userFoods);
@@ -61,9 +68,13 @@ export default function FoodSelection() {
             setFoodList(USDAFoods);
         } else if (selectedList === 'Community') {
             setUSDAQueryTriggered(false);
-            setFoodList(communityFoods);
+            setFoodList(visibleCommunityFoods);
         }
     }, [selectedList, userFoods, USDAFoods, communityFoods]);
+
+    useEffect(()=>{
+        setSearchQuery('')
+    },[selectedList]);
 
     useEffect(() => {
         if (selectedList === 'Library') return;
@@ -83,20 +94,25 @@ export default function FoodSelection() {
         }
     }, [searchQuery]);
 
+    useEffect(() => {
+        if (communityFoods.length > 0) {
+            setCommunityPage(1);
+            setVisibleCommunityFoods(communityFoods.slice(0, pageSize));
+        }
+    }, [communityFoods]);
+
     function handleFoodSelection(food) {
         setAdditionalContexts(prev => ({ ...prev, selectedFood: food, foodProfileIntent: 'meal/add' }));
         router.push(routes.FOOD_PROFILE)
     }
 
-    async function handleUSDASearch() {
-        if (!searchQuery.trim()) return;
-
+    async function handleUSDASearch(searchQuery, source) {
         try {
             showSpinner();
             const requestBody = JSON.stringify({
                 query: searchQuery,
                 pageNumber: usdaPage,
-                pageSize: 9,
+                pageSize: pageSize,
                 dataType: ['Foundation', 'Branded'],
                 sortOrder: 'desc'
             })
@@ -107,7 +123,7 @@ export default function FoodSelection() {
 
             if (result.data.length === 0) {
                 hideSpinner();
-                return createToast({ message: 'Food not found' });
+                return createToast({ message: source==='searchbar' ? 'Food not found': 'No more results of this food' });
             }
 
             const fetchedFoods = result.data || [];
@@ -146,7 +162,7 @@ export default function FoodSelection() {
 
                 return {
                     id: `usda-${f.fdcId}`,
-                    label: normalizeLabel( f.description) || 'Unknown',
+                    label: normalizeLabel(f.description) || 'Unknown',
                     category: f.foodCategory || 'USDA Food',
                     ownerId: '00000000-0000-0000-0000-000000000000',
                     creatorId: '00000000-0000-0000-0000-000000000000',
@@ -192,6 +208,22 @@ export default function FoodSelection() {
             .join(" ");
     }
 
+    function handleLoadMoreCommunity() {
+        const nextPage = communityPage + 1;
+        const nextItems = loadMoreItems(visibleCommunityFoods, communityFoods, nextPage, pageSize);
+
+        setVisibleCommunityFoods(nextItems);
+        setFoodList(nextItems);
+        setCommunityPage(nextPage);
+    }
+
+    function loadMoreItems(currentList, fullList, page, pageSize) {
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const nextSlice = fullList.slice(startIndex, endIndex);
+
+        return [...currentList, ...nextSlice];
+    }
 
     return (
         <>
@@ -230,11 +262,17 @@ export default function FoodSelection() {
                         onChangeText={setSearchQuery}
                         onSubmitEditing={async () => {
                             Keyboard.dismiss()
-                            if (!searchQuery)
+                            if (!searchQuery.trim())
                                 return;
 
                             if (selectedList === 'Library') {
-                                await handleUSDASearch();
+                                if (searchQuery === lastUSDAQuery) return;
+                                setLastUSDAQuery(searchQuery);
+                                setUSDAFoods([]);
+                                setFoodList([]);
+
+                                setUsdaPage(1);
+                                await handleUSDASearch(searchQuery, 'searchbar');
                                 setUSDAQueryTriggered(true)
                             }
                         }}
@@ -246,39 +284,56 @@ export default function FoodSelection() {
 
                 {foodList.length > 0 ? (
                     <AppScroll extraBottom={200} onScrollSetStates={setFabVisible} extraTop={0} topPadding={false}>
-                        {foodList.map((food) => (
-                            <TouchableOpacity
-                                key={food.id}
-                                style={{
-                                    padding: 15,
-                                    backgroundColor: colors.cardBackground,
-                                    borderRadius: 15,
-                                    flexDirection: 'row',
-                                    justifyContent: 'space-between',
-                                    marginBottom: 5,
-                                }}
-                                onPress={() => handleFoodSelection(food)}
-                            >
-                                <View style={{ justifyContent: 'center', width: '60%' }}>
-                                    <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{food.label}</AppText>
-                                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(8), marginTop: 0 }}>
-                                        {food.category}, {food.servingSize} {food.servingUnit}
-                                    </AppText>
-                                </View>
-                                <View style={{ alignItems: 'flex-end', width: '40%' }}>
-                                    <AppText style={{ color: nutritionColors.energy1, fontSize: scaleFont(12) }}>
-                                        {convertEnergy(food.energyKcal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
-                                    </AppText>
-                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 0 }}>
-                                        <AppText style={{ color: nutritionColors.carbs1, fontSize: scaleFont(8) }}>C: {food.carbs}</AppText>
-                                        <Divider orientation="vertical" thickness={1} color={colors.divider} style={{ marginHorizontal: 5 }} />
-                                        <AppText style={{ color: nutritionColors.protein1, fontSize: scaleFont(8) }}>P: {food.protein}</AppText>
-                                        <Divider orientation="vertical" thickness={1} color={colors.divider} style={{ marginHorizontal: 5 }} />
-                                        <AppText style={{ color: nutritionColors.fat1, fontSize: scaleFont(8) }}>F: {food.fat}</AppText>
+                        <View>
+                            {foodList.map((food) => (
+                                <TouchableOpacity
+                                    key={food.id}
+                                    style={{
+                                        padding: 15,
+                                        backgroundColor: colors.cardBackground,
+                                        borderRadius: 15,
+                                        flexDirection: 'row',
+                                        justifyContent: 'space-between',
+                                        marginBottom: 5,
+                                    }}
+                                    onPress={() => handleFoodSelection(food)}
+                                >
+                                    <View style={{ justifyContent: 'center', width: '60%' }}>
+                                        <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{food.label}</AppText>
+                                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(8), marginTop: 0 }}>
+                                            {food.category}, {food.servingSize} {food.servingUnit}
+                                        </AppText>
                                     </View>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
+                                    <View style={{ alignItems: 'flex-end', width: '40%' }}>
+                                        <AppText style={{ color: nutritionColors.energy1, fontSize: scaleFont(12) }}>
+                                            {convertEnergy(food.energyKcal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
+                                        </AppText>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 0 }}>
+                                            <AppText style={{ color: nutritionColors.carbs1, fontSize: scaleFont(8) }}>C: {food.carbs}</AppText>
+                                            <Divider orientation="vertical" thickness={1} color={colors.divider} style={{ marginHorizontal: 5 }} />
+                                            <AppText style={{ color: nutritionColors.protein1, fontSize: scaleFont(8) }}>P: {food.protein}</AppText>
+                                            <Divider orientation="vertical" thickness={1} color={colors.divider} style={{ marginHorizontal: 5 }} />
+                                            <AppText style={{ color: nutritionColors.fat1, fontSize: scaleFont(8) }}>F: {food.fat}</AppText>
+                                        </View>
+                                    </View>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                        <FadeInOut visible={selectedList !== 'My Foods'}>
+                            <AnimatedButton
+                                style={{ marginTop: 25, backgroundColor: colors.background, padding: 15, borderRadius: 15, borderWidth: 1, borderColor: colors.mutedText, width: '40%', justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}
+                                leftImage={Images.plus}
+                                leftImageStyle={{ tintColor: colors.mutedText, width: 20, height: 20, marginEnd: 10 }}
+                                textStyle={{ color: colors.mutedText }}
+                                title="Load More"
+                                onPress={() => {
+                                    if (selectedList === 'Library')
+                                        handleUSDASearch(lastUSDAQuery, 'loadmore');
+                                    else if (selectedList === 'Community')
+                                        handleLoadMoreCommunity();
+                                }}
+                            />
+                        </FadeInOut>
                     </AppScroll>
                 ) : (
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 }}>
