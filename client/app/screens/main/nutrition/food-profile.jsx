@@ -48,7 +48,7 @@ export default function FoodProfile() {
             didMountRef.current = true;
             return;
         }
-        
+
         const day = user.nutritionLogs[additionalContexts.day.date];
         setAdditionalContexts(prev => ({ ...prev, day }));
         setDay(day);
@@ -138,21 +138,21 @@ export default function FoodProfile() {
         Keyboard.dismiss();
 
         createDialog({
-            title: intent === 'meal/add' ? 'Delete Food' : 'Remove Food',
-            text: intent === 'meal/add' ?
+            title: (intent === 'meal/add' || intent === 'myfoods') ? 'Delete Food' : 'Remove Food',
+            text: (intent === 'meal/add' || intent === 'myfoods') ?
                 "Are you sure you want to delete this food entry?" :
                 "Are you sure you want to remove this food from the meal?",
             onConfirm: async () => {
                 showSpinner();
                 try {
                     let result
-                    result = intent === 'meal/add' ?
+                    result = (intent === 'meal/add' || intent === 'myfoods') ?
                         await APIService.nutrition.foods.delete({ foodId: selectedFood.id })
                         :
                         await APIService.nutrition.meals.foods.delete({ mealId: selectedMeal.id, foodId: selectedFood.id });
 
                     if (result.success) {
-                        if (intent === 'meal/add') {
+                        if (intent === 'meal/add' || intent === 'myfoods') {
                             setUser(prev => ({
                                 ...prev,
                                 foods: prev.foods.filter(f => f.id !== selectedFood.id)
@@ -180,7 +180,7 @@ export default function FoodProfile() {
                             });
                         }
 
-                        createToast({ message: intent === 'meal/add' ? 'Food deleted' : 'Food removed' });
+                        createToast({ message: (intent === 'meal/add' || intent === 'myfoods') ? 'Food deleted' : 'Food removed' });
                         router.back();
                     } else {
                         createAlert({ title: 'Failure', text: "Food delete/removal failed!\n" + result.message });
@@ -345,7 +345,7 @@ export default function FoodProfile() {
                     {(() => {
                         const icons = [
                             (intent === 'meal/update' || user.id === selectedFood.ownerId) && { onPress: handleFoodDeletion, source: Images.trash, tint: nutritionColors.carbs1 },
-                            (intent === 'meal/add' && selectedFood.ownerId === user.id) && { onPress: () => router.push(routes.FOOD_EDITOR), source: Images.edit, tint: 'white' },
+                            ((intent === 'meal/add' || intent === 'myfoods') && selectedFood.ownerId === user.id) && { onPress: () => router.push(routes.FOOD_EDITOR), source: Images.edit, tint: 'white' },
                             (user.id !== selectedFood.ownerId) && { onPress: handleFoodAdoption, source: Images.plus, tint: 'white' },
                         ].filter(Boolean);
 

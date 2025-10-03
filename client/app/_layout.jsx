@@ -122,16 +122,17 @@ function Layout() {
                                             {/* GOALS CHILDREN */}
                                             <Stack.Screen name="screens/main/goals/edit-activity" />
                                             <Stack.Screen name="screens/main/goals/edit-weight-goal" />
+                                            <Stack.Screen name="screens/main/goals/edit-diet" />
 
 
                                             {/* NUTRITION CHILDREN */}
-                                            <Stack.Screen name="screens/main/nutrition/edit-diet" />
                                             <Stack.Screen name="screens/main/nutrition/meals-log" />
                                             <Stack.Screen name="screens/main/nutrition/meal-plans" />
                                             <Stack.Screen name="screens/main/nutrition/food-creator" />
                                             <Stack.Screen name="screens/main/nutrition/food-editor" />
                                             <Stack.Screen name="screens/main/nutrition/food-selection" />
                                             <Stack.Screen name="screens/main/nutrition/food-profile" />
+                                            <Stack.Screen name="screens/main/nutrition/foods" />
 
                                         </Stack>
                                     </View>

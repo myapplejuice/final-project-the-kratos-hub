@@ -22,19 +22,9 @@ import DateDisplay from "../../components/screen-comps/date-display";
 import AppScroll from "../../components/screen-comps/app-scroll";
 
 export default function NutritionHub() {
-     const { createInput, showSpinner, hideSpinner, createToast } = usePopups();
+     const { showSpinner, hideSpinner, createToast } = usePopups();
      const { user, setUser } = useContext(UserContext);
      const [log, setLog] = useState({})
-     const [diet, setDiet] = useState({});
-     const [dietTips, setDietTips] = useState([]);
-
-     useEffect(() => {
-          const diet = dietOptions.find(item => item.key === user.nutrition.diet);
-          const dietTips = goalsDietaryFeedbackTips(user, 3);
-
-          setDiet(diet);
-          setDietTips(dietTips);
-     }, [user.nutrition]);
 
      useEffect(() => {
           async function prepareDayLog() {
@@ -159,7 +149,7 @@ export default function NutritionHub() {
                     <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 0 }]}>
                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                               <View style={{ flexDirection: 'row', alignItems: 'center', margin: 10 }}>
-                                   <View  style={{backgroundColor: colors.main + '20', borderRadius: 10, padding: 10}}>
+                                   <View style={{ backgroundColor: colors.main + '20', borderRadius: 10, padding: 10 }}>
                                         <Image
                                              source={Images.book5}
                                              style={{ width: 40, height: 40, tintColor: colors.main }}
@@ -182,10 +172,10 @@ export default function NutritionHub() {
                          </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 0 }]}>
+                    <TouchableOpacity onPress={() => router.push(routes.MEAL_PLANS)} style={[styles.card, { padding: 0 }]}>
                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                               <View style={{ flexDirection: 'row', alignItems: 'center', margin: 10, flexShrink: 1 }}>
-                                   <View style={{backgroundColor: colors.accentBlue + '20', borderRadius: 10, padding: 10}}>
+                                   <View style={{ backgroundColor: colors.accentBlue + '20', borderRadius: 10, padding: 10 }}>
                                         <Image
                                              source={Images.plan2}
                                              style={{ width: 40, height: 40, tintColor: colors.accentBlue }}
@@ -208,10 +198,10 @@ export default function NutritionHub() {
                          </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 0 }]}>
+                    <TouchableOpacity onPress={() => router.push(routes.FOODS)} style={[styles.card, { padding: 0 }]}>
                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                               <View style={{ flexDirection: 'row', alignItems: 'center', margin: 10, flexShrink: 1 }}>
-                                   <View  style={{backgroundColor: colors.accentGreen + '20', borderRadius: 10, padding: 10}}>
+                                   <View style={{ backgroundColor: colors.accentGreen + '20', borderRadius: 10, padding: 10 }}>
                                         <Image
                                              source={Images.foodsOne}
                                              style={{ width: 40, height: 40, tintColor: colors.accentGreen }}

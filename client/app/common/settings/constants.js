@@ -33,15 +33,16 @@ export const routes = {
     /* GOALS CHILDREN */
     EDIT_ACTIVITY: '/screens/main/goals/edit-activity',
     EDIT_WEIGHT_GOAL: '/screens/main/goals/edit-weight-goal',
+    EDIT_DIET: '/screens/main/goals/edit-diet',
 
     /* NUTRITION CHILDREN */
-    EDIT_DIET: '/screens/main/nutrition/edit-diet',
     MEALS_LOG: '/screens/main/nutrition/meals-log',
     MEAL_PLANS: '/screens/main/nutrition/meal-plans',
     FOOD_CREATOR: '/screens/main/nutrition/food-creator',
     FOOD_EDITOR: '/screens/main/nutrition/food-editor',
     FOOD_SELECTION: '/screens/main/nutrition/food-selection',
     FOOD_PROFILE: '/screens/main/nutrition/food-profile',
+    FOODS: '/screens/main/nutrition/foods',
 
 }
 
