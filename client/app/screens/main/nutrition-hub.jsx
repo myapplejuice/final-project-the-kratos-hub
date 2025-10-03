@@ -14,7 +14,7 @@ import { goalsDietaryFeedbackTips } from "../../common/utils/text-generator";
 import { convertEnergy, convertFluid } from "../../common/utils/unit-converter";
 import { formatDate } from "../../common/utils/date-time";
 import usePopups from "../../common/hooks/use-popups";
-import { recalculateUserInformation, recommendedWaterIntake, totalDayConsumption } from "../../common/utils/metrics-calculator";
+import { totalDayConsumption } from "../../common/utils/metrics-calculator";
 import APIService from "../../common/services/api-service";
 import FloatingActionMenu from "../../components/screen-comps/floating-action-menu";
 import ProgressBar from "../../components/screen-comps/progress-bar";
@@ -58,7 +58,7 @@ export default function NutritionHub() {
                               createToast({ message: `Server error, ${result.message}` });
                          }
                     }
-                    
+
                     const { energyKcal, carbs, protein, fat } = totalDayConsumption(todayObject);
                     todayObject.consumedEnergyKcal = energyKcal;
                     todayObject.consumedCarbGrams = carbs;
@@ -76,77 +76,8 @@ export default function NutritionHub() {
           prepareDayLog();
      }, [user.nutritionLogs]);
 
-     async function handleWaterChange() {
-          const waterMlRecommendation = recommendedWaterIntake(user.metrics.weightKg);
-          const water = convertFluid(waterMlRecommendation, 'ml', user.preferences.fluidUnit.key);
-          const recommendation = `Recommended daily water intake (${water} ${user.preferences.fluidUnit.field})`;
-
-          createInput({
-               title: "Water Intake",
-               text: `${recommendation}`,
-               confirmText: "SAVE",
-               placeholders: [user.preferences.fluidUnit.field],
-               initialValues: [convertFluid(user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)],
-               extraConfigs: [{ keyboardType: "numeric" }],
-               onSubmit: async (values) => {
-                    try {
-                         const [waterVal] = values;
-
-                         if (waterVal == null || isNaN(waterVal) || waterVal <= 0) {
-                              createToast({ message: "Enter a valid number of water intake!" });
-                              return;
-                         }
-
-                         let waterMl = Number(waterVal);
-
-                         if (user.preferences.fluidUnit.key === 'floz')
-                              waterMl = convertFluid(Number(waterVal), 'floz', 'ml');
-                         else if (user.preferences.fluidUnit.key === 'cups')
-                              waterMl = convertFluid(Number(waterVal), 'cups', 'ml');
-
-                         if (waterMl === user.nutrition.waterMl) return;
-
-                         const updatedUser = recalculateUserInformation({
-                              ...user,
-                              nutrition: {
-                                   ...user.nutrition,
-                                   waterMl: Number(waterMl),
-                              },
-                         });
-
-                         const nutritionPayload = { ...updatedUser.nutrition };
-
-                         showSpinner();
-                         const result = await APIService.user.update({ nutrition: nutritionPayload });
-
-                         if (result.success) {
-                              const date = formatDate(new Date(), { format: 'YYYY-MM-DD' });
-                              const nutritionLogsResult = await APIService.nutrition.days.updateDay(date, { targetWaterMl: waterMl });
-                              const nutritionLogsUpdatedUser = {
-                                   ...updatedUser,
-                                   nutritionLogs: {
-                                        ...user.nutritionLogs,
-                                        ...nutritionLogsResult.data.updatedDays
-                                   }
-                              }
-
-                              setUser(nutritionLogsUpdatedUser);
-                              createToast({ message: "Water intake successfully updated!" });
-                         } else {
-                              createToast({ message: `Failed to update water intake: ${result.message}` });
-                         }
-                    } catch (err) {
-                         console.log(err.message);
-                         createToast({ message: "Failed to update water intake!" });
-                    } finally {
-                         hideSpinner();
-                    }
-               },
-          });
-     }
-
      return (
-          <View>
+          <>
                <FloatingActionMenu
                     overlayColor="rgba(0, 0, 0, 0.8)"
                     actions={[
@@ -156,8 +87,8 @@ export default function NutritionHub() {
                     position={{ bottom: 140, right: 20 }}
                     syncWithNavBar={true}
                />
-               <AppScroll extraBottom={150} backgroundColor={colors.cardBackground} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>
-                    <View style={{ margin: 0, padding: 15, borderRadius: 0, backgroundColor: colors.cardBackground }}>
+               <AppScroll extraBottom={150} extraTop={0} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>
+                    <View style={{ margin: 0, paddingHorizontal: 15, paddingTop: 60, paddingBottom: 15, borderRadius: 0, backgroundColor: colors.cardBackground }}>
                          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
                               <AppText style={{ fontSize: scaleFont(15), color: colors.white, fontWeight: 'bold' }}>
                                    Daily Nutrition Targets
@@ -223,69 +154,88 @@ export default function NutritionHub() {
                          </AppText>
                     </View>
 
-                    <View style={{ backgroundColor: colors.background }}>
-                         <AppText style={[styles.sectionTitle, { marginHorizontal: 25, fontSize: scaleFont(15), marginBottom: 0, marginTop: 25 }]}>Make sure to always log your meals!</AppText>
-                         <TouchableOpacity
-                              onPress={() => router.push(routes.MEALS_LOG)}
-                              style={[styles.card, { borderRadius: 15, padding: 10 }]}
-                         >
-                              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                   <Image
-                                        source={Images.book5}
-                                        style={{ width: 25, height: 25, tintColor: 'white' }}
-                                   />
-                                   <View style={{ flex: 1, marginLeft: 12 }}>
-                                        <AppText style={{ color: 'white', fontSize: scaleFont(14), }}>
-                                             Tap to go to your meals logger
-                                        </AppText>
+                    <AppText style={[styles.sectionTitle, { marginHorizontal: 25, fontSize: scaleFont(15), marginBottom: 0, marginTop: 25 }]}>Make sure to always log your meals!</AppText>
+
+                    <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 0 }]}>
+                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', margin: 15 }}>
+                                   <View>
+                                        <Image
+                                             source={Images.book5}
+                                             style={{ width: 40, height: 40, tintColor: 'white' }}
+                                        />
                                    </View>
-
-                                   <Image source={Images.arrow} style={styles.arrow} />
-                              </View>
-                         </TouchableOpacity>
-
-                         <TouchableOpacity
-                              onPress={handleWaterChange}
-                              style={[styles.row, { backgroundColor: nutritionColors.water1 + '20', padding: 12, borderRadius: 15, marginHorizontal: 15 }]}
-                         >
-                              <View style={[styles.iconWrapper, { padding: 10 }]}>
-                                   <Image source={Images.water} style={[styles.icon, { tintColor: nutritionColors.water1 }]} />
-                              </View>
-                              <View style={[styles.textWrapper, { padding: 0 }]}>
-                                   <AppText style={[styles.label, { color: nutritionColors.water1 }]}>Water</AppText>
-                                   <AppText style={styles.subText}>Make sure you're having enough water! Tap here to adjust water intake</AppText>
-                              </View>
-                              <Image source={Images.arrow} style={[styles.arrow]} />
-                         </TouchableOpacity>
-
-                         <View style={[styles.card, { marginTop: 15 }]}>
-                              <AppText style={styles.sectionTitle}>Current Diet</AppText>
-                              {dietTips.map((tip, i) => (
-                                   <View key={i}>
-                                        <View style={styles.feedbackRow}>
-                                             <AppText style={styles.feedbackBullet}>• </AppText>
-                                             <AppText style={styles.feedbackText}>{tip}</AppText>
+                                   <View style={{ justifyContent: 'flex-start', marginStart: 15 }}>
+                                        <View>
+                                             <AppText style={{ color: 'white', fontSize: scaleFont(18), fontWeight: 'bold' }}>
+                                                  Meals Logger
+                                             </AppText>
+                                             <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
+                                                  Tap to go to your meals logger
+                                             </AppText>
                                         </View>
                                    </View>
-                              ))}
-
-                              <TouchableOpacity
-                                   onPress={() => router.push(routes.EDIT_DIET)}
-                                   style={[styles.row, { backgroundColor: diet.color + '20', padding: 10, borderRadius: 15, borderColor: diet.color }]}
-                              >
-                                   <View style={[styles.iconWrapper]}>
-                                        <Image source={diet.image} style={[styles.icon, { tintColor: diet.color }]} />
-                                   </View>
-                                   <View style={styles.textWrapper}>
-                                        <AppText style={[styles.label, { color: diet.color }]}>{diet.label}</AppText>
-                                        <AppText style={styles.subText}>New diet plan and macros? Tap here to switch up your diet!</AppText>
-                                   </View>
+                              </View>
+                              <View style={{ alignItems: 'flex-end', marginEnd: 10 }}>
                                    <Image source={Images.arrow} style={styles.arrow} />
-                              </TouchableOpacity>
+                              </View>
                          </View>
-                    </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 0 }]}>
+                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', margin: 15, flexShrink: 1 }}>
+                                   <View>
+                                        <Image
+                                             source={Images.plan2}
+                                             style={{ width: 40, height: 40, tintColor: 'white' }}
+                                        />
+                                   </View>
+                                   <View style={{ justifyContent: 'flex-start', marginStart: 15, marginEnd: 50 }}>
+                                        <View>
+                                             <AppText style={{ color: 'white', fontSize: scaleFont(18), fontWeight: 'bold' }}>
+                                                  Nutrition Plans
+                                             </AppText>
+                                             <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
+                                                  Build and prepare your own meals which you can import to your logger
+                                             </AppText>
+                                        </View>
+                                   </View>
+                              </View>
+                              <View style={{ alignItems: 'flex-end', marginEnd: 10 }}>
+                                   <Image source={Images.arrow} style={styles.arrow} />
+                              </View>
+                         </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 0, backgroundColor: nutritionColors.diet1 + "20" }]}>
+                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', margin: 15, flexShrink: 1 }}>
+                                   <View>
+                                        <Image
+                                             source={Images.foodsOne}
+                                             style={{ width: 40, height: 40, tintColor: 'white' }}
+                                        />
+                                   </View>
+                                   <View style={{ justifyContent: 'flex-start', marginStart: 15, marginEnd: 50 }}>
+                                        <View>
+                                             <AppText style={{ color: 'white', fontSize: scaleFont(18), fontWeight: 'bold' }}>
+                                                  My Foods
+                                             </AppText>
+                                             <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
+                                                  Tap to explore your food list and other community and library foods
+                                             </AppText>
+                                        </View>
+                                   </View>
+                              </View>
+                              <View style={{ alignItems: 'flex-end', marginEnd: 10 }}>
+                                   <Image source={Images.arrow} style={styles.arrow} />
+                              </View>
+                         </View>
+
+                    </TouchableOpacity>
                </AppScroll >
-          </View>
+          </>
      );
 }
 
@@ -299,10 +249,6 @@ const styles = StyleSheet.create({
           borderRadius: 15,
           marginTop: 15,
           marginHorizontal: 15,
-          ...Platform.select({
-               ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.4, shadowRadius: 5 },
-               android: { elevation: 5 },
-          }),
      },
      sectionTitle: {
           fontSize: scaleFont(19),
@@ -358,8 +304,6 @@ const styles = StyleSheet.create({
           width: 20,
           height: 20,
           tintColor: 'white',
-          marginLeft: 6,
-          alignSelf: 'center',
      },
      divider: { width: 1, backgroundColor: "rgba(102,102,102,0.2)", alignSelf: "center", height: "60%" },
      button: {

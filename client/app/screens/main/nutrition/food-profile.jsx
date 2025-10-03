@@ -344,7 +344,7 @@ export default function FoodProfile() {
                 <View style={{ flexDirection: 'row' }}>
                     {(() => {
                         const icons = [
-                            (intent === 'meal/update' || user.id === selectedFood.ownerId) && { onPress: handleFoodDeletion, source: Images.trash, tint: colors.accentPink },
+                            (intent === 'meal/update' || user.id === selectedFood.ownerId) && { onPress: handleFoodDeletion, source: Images.trash, tint: nutritionColors.carbs1 },
                             (intent === 'meal/add' && selectedFood.ownerId === user.id) && { onPress: () => router.push(routes.FOOD_EDITOR), source: Images.edit, tint: 'white' },
                             (user.id !== selectedFood.ownerId) && { onPress: handleFoodAdoption, source: Images.plus, tint: 'white' },
                         ].filter(Boolean);

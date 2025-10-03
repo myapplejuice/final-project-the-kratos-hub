@@ -500,10 +500,6 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 15,
         marginTop: 15,
-        marginHorizontal: 15,
-        ...Platform.select({
-            ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.4, shadowRadius: 5 },
-            android: { elevation: 5 },
-        }),
+        marginHorizontal: 15
     },
 });

@@ -170,11 +170,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.cardBackground,
         padding: 15,
         borderRadius: 15,
-        margin: 15,
-        ...Platform.select({
-            ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.4, shadowRadius: 5 },
-            android: { elevation: 5 },
-        }),
+        margin: 15
     },
     introText: {
         color: 'white',

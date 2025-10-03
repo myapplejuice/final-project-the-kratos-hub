@@ -5,17 +5,18 @@ import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../../components/screen-comps/app-text";
 import { Images } from '../../common/settings/assets';
 import { UserContext } from "../../common/contexts/user-context";
-import { activityOptions, goalOptions } from "../../common/utils/global-options";
+import { activityOptions, dietOptions, goalOptions } from "../../common/utils/global-options";
 import { scaleFont } from "../../common/utils/scale-fonts";
 import { routes } from "../../common/settings/constants";
-import { colors } from "../../common/settings/styling";
-import { goalsActivityFeedbackText, goalsWeightGoalFeedbackText } from "../../common/utils/text-generator";
+import { colors, nutritionColors } from "../../common/settings/styling";
+import { goalsActivityFeedbackText, goalsDietaryFeedbackTips, goalsWeightGoalFeedbackText } from "../../common/utils/text-generator";
 import usePopups from "../../common/hooks/use-popups";
 import APIService from "../../common/services/api-service";
-import { recalculateUserInformation } from "../../common/utils/metrics-calculator";
+import { recalculateUserInformation, recommendedWaterIntake } from "../../common/utils/metrics-calculator";
 import Divider from "../../components/screen-comps/divider";
 import AppScroll from "../../components/screen-comps/app-scroll";
-import { convertHeight, convertWeight } from "../../common/utils/unit-converter";
+import { convertFluid, convertHeight, convertWeight } from "../../common/utils/unit-converter";
+import { formatDate } from "../../common/utils/date-time";
 
 export default function Goals() {
     const { user, setUser } = useContext(UserContext);
@@ -25,11 +26,13 @@ export default function Goals() {
     const [weightGoalFeedbacks, setWeightGoalFeedbacks] = useState([]);
     const [activity, setActivity] = useState({});
     const [goal, setGoal] = useState({});
+    const [diet, setDiet] = useState({});
+    const [dietTips, setDietTips] = useState([]);
 
     useEffect(() => {
         function updateFeedbacks() {
-            const activityFeedbacks = goalsActivityFeedbackText(user, 3);
-            const weightGoalFeedBacks = goalsWeightGoalFeedbackText(user, 3);
+            const activityFeedbacks = goalsActivityFeedbackText(user, 1);
+            const weightGoalFeedBacks = goalsWeightGoalFeedbackText(user, 1);
 
             setActivityFeedbacks(activityFeedbacks);
             setWeightGoalFeedbacks(weightGoalFeedBacks);
@@ -37,6 +40,11 @@ export default function Goals() {
 
         const activity = activityOptions.find(item => item.key === user.metrics.activityLevel);
         const goal = goalOptions.find(item => item.key === user.nutrition.goal);
+        const diet = dietOptions.find(item => item.key === user.nutrition.diet);
+        const dietTips = goalsDietaryFeedbackTips(user, 1);
+
+        setDiet(diet);
+        setDietTips(dietTips);
         setActivity(activity);
         setGoal(goal);
 
@@ -136,7 +144,7 @@ export default function Goals() {
                     ? user.metrics.weightLb
                     : user.metrics.weightKg,
             ],
-            extraConfigs: [{keyboardType: "numeric"}],
+            extraConfigs: [{ keyboardType: "numeric" }],
             onSubmit: async (values) => {
                 try {
                     let payload = {};
@@ -289,6 +297,76 @@ export default function Goals() {
         })
     }
 
+
+    async function handleWaterChange() {
+        const waterMlRecommendation = recommendedWaterIntake(user.metrics.weightKg);
+        const water = convertFluid(waterMlRecommendation, 'ml', user.preferences.fluidUnit.key);
+        const recommendation = `Recommended daily water intake (${water} ${user.preferences.fluidUnit.field})`;
+
+        createInput({
+            title: "Water Intake",
+            text: `${recommendation}`,
+            confirmText: "SAVE",
+            placeholders: [user.preferences.fluidUnit.field],
+            initialValues: [convertFluid(user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)],
+            extraConfigs: [{ keyboardType: "numeric" }],
+            onSubmit: async (values) => {
+                try {
+                    const [waterVal] = values;
+
+                    if (waterVal == null || isNaN(waterVal) || waterVal <= 0) {
+                        createToast({ message: "Enter a valid number of water intake!" });
+                        return;
+                    }
+
+                    let waterMl = Number(waterVal);
+
+                    if (user.preferences.fluidUnit.key === 'floz')
+                        waterMl = convertFluid(Number(waterVal), 'floz', 'ml');
+                    else if (user.preferences.fluidUnit.key === 'cups')
+                        waterMl = convertFluid(Number(waterVal), 'cups', 'ml');
+
+                    if (waterMl === user.nutrition.waterMl) return;
+
+                    const updatedUser = recalculateUserInformation({
+                        ...user,
+                        nutrition: {
+                            ...user.nutrition,
+                            waterMl: Number(waterMl),
+                        },
+                    });
+
+                    const nutritionPayload = { ...updatedUser.nutrition };
+
+                    showSpinner();
+                    const result = await APIService.user.update({ nutrition: nutritionPayload });
+
+                    if (result.success) {
+                        const date = formatDate(new Date(), { format: 'YYYY-MM-DD' });
+                        const nutritionLogsResult = await APIService.nutrition.days.updateDay(date, { targetWaterMl: waterMl });
+                        const nutritionLogsUpdatedUser = {
+                            ...updatedUser,
+                            nutritionLogs: {
+                                ...user.nutritionLogs,
+                                ...nutritionLogsResult.data.updatedDays
+                            }
+                        }
+
+                        setUser(nutritionLogsUpdatedUser);
+                        createToast({ message: "Water intake successfully updated!" });
+                    } else {
+                        createToast({ message: `Failed to update water intake: ${result.message}` });
+                    }
+                } catch (err) {
+                    console.log(err.message);
+                    createToast({ message: "Failed to update water intake!" });
+                } finally {
+                    hideSpinner();
+                }
+            },
+        });
+    }
+
     return (
         <AppScroll backgroundColor={colors.cardBackground} hideNavBarOnScroll={true} hideTopBarOnScroll={true} extraBottom={100}>
             <View style={[styles.card, { margin: 0, borderRadius: 0 }]}>
@@ -364,7 +442,7 @@ export default function Goals() {
             </View>
 
             <View style={{ backgroundColor: colors.background }}>
-                <View style={[styles.card, { padding: 10, marginTop: 25, }]}>
+                <View style={[styles.card, { padding: 10 }]}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Image
                             source={Images.magnifier}
@@ -471,7 +549,7 @@ export default function Goals() {
 
                         <View style={styles.activityTextWrapper}>
                             <AppText style={[styles.activityLabel, { color: activity.color }]}>{activity.label}</AppText>
-                            <AppText style={styles.activitySubText}>Been more active recently? Tap to update activity levels!</AppText>
+                            <AppText style={styles.activitySubText}>Been more active recently? Tap to update activity levels</AppText>
                         </View>
 
                         <Image source={Images.arrow} style={[styles.activityArrow]} />
@@ -499,10 +577,50 @@ export default function Goals() {
                             <AppText style={[styles.activityLabel, { color: goal.color }]}>
                                 {goal.label}
                             </AppText>
-                            <AppText style={styles.activitySubText}>New weight goals? Tap to update your weight goal!</AppText>
+                            <AppText style={styles.activitySubText}>New weight goals? Tap to update your weight goal</AppText>
                         </View>
 
                         <Image source={Images.arrow} style={[styles.activityArrow, {}]} />
+                    </TouchableOpacity>
+
+                    <Divider orientation="horizontal" style={{ backgroundColor: "rgba(102,102,102,0.2)", marginVertical: 15 }} thickness={2} />
+
+                    <AppText style={styles.sectionTitle}>Current Diet</AppText>
+                    {dietTips.map((tip, i) => (
+                        <View key={i}>
+                            <View style={styles.feedbackRow}>
+                                <AppText style={styles.feedbackBullet}>• </AppText>
+                                <AppText style={styles.feedbackText}>{tip}</AppText>
+                            </View>
+                        </View>
+                    ))}
+
+                    <TouchableOpacity
+                        onPress={() => router.push(routes.EDIT_DIET)}
+                        style={[styles.activityRow, { backgroundColor: diet.color + '20', borderRadius: 15, borderColor: diet.color }]}
+                    >
+                        <View style={[styles.activityIconWrapper]}>
+                            <Image source={diet.image} style={[styles.activityIcon, { tintColor: diet.color }]} />
+                        </View>
+                        <View style={styles.activityTextWrapper}>
+                            <AppText style={[styles.activityLabel, { color: diet.color }]}>{diet.label}</AppText>
+                            <AppText style={styles.activitySubText}>New diet plan and macros? Tap here to switch up your diet</AppText>
+                        </View>
+                        <Image source={Images.arrow} style={styles.activityArrow} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={handleWaterChange}
+                        style={[styles.activityRow, { backgroundColor: nutritionColors.water1 + '20', borderRadius: 15 }]}
+                    >
+                        <View style={[styles.activityIconWrapper]}>
+                            <Image source={Images.water} style={[styles.activityIcon, { tintColor: nutritionColors.water1 }]} />
+                        </View>
+                        <View style={[styles.activityTextWrapper]}>
+                            <AppText style={[styles.activityLabel, { color: nutritionColors.water1 }]}>Water</AppText>
+                            <AppText style={[styles.activitySubText]}>Make sure you're having enough water! Tap here to adjust water intake</AppText>
+                        </View>
+                        <Image source={Images.arrow} style={[styles.activityArrow]} />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -516,10 +634,6 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 15,
         margin: 15,
-        ...Platform.select({
-            ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.4, shadowRadius: 5 },
-            android: { elevation: 5 },
-        }),
     },
 
     metricRow: { flexDirection: "row", justifyContent: "space-evenly" },
@@ -606,4 +720,5 @@ const styles = StyleSheet.create({
         marginLeft: 6,
         alignSelf: 'center',
     },
+
 });

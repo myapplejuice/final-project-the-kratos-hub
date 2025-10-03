@@ -379,11 +379,6 @@ const styles = StyleSheet.create({
         padding: 15,
         margin: 15,
         borderRadius: 20,
-        shadowColor: "#000",
-        shadowOpacity: 0.15,
-        shadowOffset: { width: 0, height: 4 },
-        shadowRadius: 8,
-        elevation: 6,
     },
     imageWrapper: {
         borderRadius: 50,
