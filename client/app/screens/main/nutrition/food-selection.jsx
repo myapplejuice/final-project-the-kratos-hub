@@ -113,34 +113,69 @@ export default function FoodSelection() {
     async function handleUSDASearch(searchQuery, source) {
         try {
             showSpinner();
-            const requestBody = JSON.stringify({
+            let requestBody = {
                 query: searchQuery,
                 pageNumber: usdaPage,
                 pageSize: pageSize,
                 dataType: ['Foundation', 'Branded'],
                 sortOrder: 'desc'
-            })
-            const result = await APIService.USDARequest(requestBody);
+            }
+            let result = await APIService.USDARequest(JSON.stringify(requestBody));
 
             if (!result.success)
                 return createAlert({ message: result.message });
 
             if (result.data.length === 0) {
-                hideSpinner();
-                return createToast({ message: source === 'searchbar' ? 'Food not found' : 'No more results of this food' });
+                // try lowercased
+                requestBody.query = searchQuery.toLowerCase();
+                result = await APIService.USDARequest(JSON.stringify(requestBody));
+
+                // try uppercased
+                if (result.data.length === 0) {
+                    requestBody.query = searchQuery.toUpperCase();
+                    result = await APIService.USDARequest(JSON.stringify(requestBody));
+                }
+
+                if (result.data.length === 0)
+                    return createToast({ message: source === 'searchbar' ? 'Food not found' : 'No more results of this food' });
             }
 
-            const fetchedFoods = result.data || [];
+            let fetchedFoods = result.data || [];
 
-            // Remove duplicates based on fdcId
+            // remove duplicates based on USDAId
             const existingIds = new Set(USDAFoods.map(f => f.USDAId));
-            const newFoods = fetchedFoods.filter(f => !existingIds.has(f.fdcId));
-            const cleanedFoods = newFoods.filter(f => f.foodNutrients.some(n => n.nutrientName === 'Energy' && n.value >= 5));
+            let newFoods = fetchedFoods.filter(f => !existingIds.has(f.fdcId));
 
-            const parsedFoods = cleanedFoods.map(f => {
+            // remove duplicates with same description + category
+            const seenFoods = new Set();
+            newFoods = newFoods.filter(f => {
+                const key = `${f.description.toLowerCase()}|${(f.foodCategory || '').toLowerCase()}`;
+                if (seenFoods.has(key)) return false;
+                seenFoods.add(key);
+                return true;
+            });
+
+            const queryLower = searchQuery.toLowerCase();
+
+            const prioritizedFoods = newFoods.sort((a, b) => {
+                // 1. foundation first
+                if (a.dataType === 'Foundation' && b.dataType !== 'Foundation') return -1;
+                if (a.dataType !== 'Foundation' && b.dataType === 'Foundation') return 1;
+
+                // 2. exact description match first
+                const aExact = a.description.toLowerCase() === queryLower ? -1 : 0;
+                const bExact = b.description.toLowerCase() === queryLower ? -1 : 0;
+                if (aExact !== bExact) return aExact - bExact;
+
+                // 3. more nutrients = more complete food
+                return (b.foodNutrients?.length || 0) - (a.foodNutrients?.length || 0);
+            });
+
+            // remove foods with almost no energy
+            newFoods = prioritizedFoods.filter(f => f.foodNutrients.some(n => n.nutrientName === 'Energy' && n.value >= 5));
+
+            const parsedFoods = newFoods.map(f => {
                 const nutrients = f.foodNutrients || [];
-
-                // Macronutrient names to exclude from additionalProps
                 const excludedNutrients = ['Energy', 'Protein', 'Total lipid (fat)', 'Carbohydrate, by difference'];
 
                 const additionalProps = nutrients
@@ -164,9 +199,12 @@ export default function FoodSelection() {
                 if (protein > carbs && protein > fat) dominantMacro = 'Protein';
                 else if (fat > carbs && fat > protein) dominantMacro = 'Fat';
 
+                const label = normalizeLabel(f.description) || 'Unknown';
+                const fullLabel = f.dataType === 'Branded' && f.brandOwner ? `${label} (${f.brandOwner})` : label;
+
                 return {
                     id: `usda-${f.fdcId}`,
-                    label: normalizeLabel(f.description) || 'Unknown',
+                    label: fullLabel || 'Unknown',
                     category: f.foodCategory || 'USDA Food',
                     ownerId: '00000000-0000-0000-0000-000000000000',
                     creatorId: '00000000-0000-0000-0000-000000000000',
@@ -190,15 +228,20 @@ export default function FoodSelection() {
                 };
             });
 
+            if (parsedFoods.length === 0)
+                return createToast({ message: source === 'searchbar' ? 'Food not found' : 'No more results of this food' });
+
             // Update state
             setUSDAFoods(prev => [...prev, ...parsedFoods]);
             setFoodList(prev => [...prev, ...parsedFoods]);
 
             // Increment page
             setUsdaPage(prev => prev + 1);
-            hideSpinner();
         } catch (e) {
             console.error('USDA search failed:', e);
+            createToast({ message: 'Something went wrong while searching USDA foods' });
+        } finally {
+            hideSpinner();
         }
     }
 
