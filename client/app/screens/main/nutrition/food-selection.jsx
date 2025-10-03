@@ -24,6 +24,7 @@ export default function FoodSelection() {
     const { createAlert, showSpinner, hideSpinner, createToast } = usePopups();
     const insets = useSafeAreaInsets();
     const [fabVisible, setFabVisible] = useState(true);
+    const [scrollToTop, setScrollToTop] = useState(false);
 
     const [selectedList, setSelectedList] = useState('My Foods');
     const [searchQuery, setSearchQuery] = useState('');
@@ -61,6 +62,9 @@ export default function FoodSelection() {
     }, [user.foods]);
 
     useEffect(() => {
+        setScrollToTop(true);
+        setFabVisible(true);
+
         if (selectedList === 'My Foods') {
             setUSDAQueryTriggered(false);
             setFoodList(userFoods);
@@ -72,9 +76,9 @@ export default function FoodSelection() {
         }
     }, [selectedList, userFoods, USDAFoods, communityFoods]);
 
-    useEffect(()=>{
+    useEffect(() => {
         setSearchQuery('')
-    },[selectedList]);
+    }, [selectedList]);
 
     useEffect(() => {
         if (selectedList === 'Library') return;
@@ -123,7 +127,7 @@ export default function FoodSelection() {
 
             if (result.data.length === 0) {
                 hideSpinner();
-                return createToast({ message: source==='searchbar' ? 'Food not found': 'No more results of this food' });
+                return createToast({ message: source === 'searchbar' ? 'Food not found' : 'No more results of this food' });
             }
 
             const fetchedFoods = result.data || [];
@@ -237,6 +241,17 @@ export default function FoodSelection() {
                 visible={fabVisible && selectedList === 'My Foods'}
                 onPress={() => router.push(routes.FOOD_CREATOR)}
             />
+
+            <FloatingActionButton
+                onPress={() => setScrollToTop(true)}
+                visible={!fabVisible}
+                position={{ bottom: insets.bottom + (selectedList === 'My Foods' ? 100 : 50), left: 20 }}
+                icon={Images.arrow}
+                iconStyle={{ transform: [{ rotate: '-90deg' }], marginBottom: 2 }}
+                iconSize={20}
+                size={40}
+            />
+
             <AppView style={styles.container}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 15 }}>
                     {[
@@ -283,7 +298,7 @@ export default function FoodSelection() {
                 </View>
 
                 {foodList.length > 0 ? (
-                    <AppScroll extraBottom={200} onScrollSetStates={setFabVisible} extraTop={0} topPadding={false}>
+                    <AppScroll scrollToTop={scrollToTop} extraBottom={200} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} extraTop={0} topPadding={false}>
                         <View>
                             {foodList.map((food) => (
                                 <TouchableOpacity
@@ -319,21 +334,21 @@ export default function FoodSelection() {
                                 </TouchableOpacity>
                             ))}
                         </View>
-                        <FadeInOut visible={selectedList !== 'My Foods'}>
-                            <AnimatedButton
-                                style={{ marginTop: 25, backgroundColor: colors.background, padding: 15, borderRadius: 15, borderWidth: 1, borderColor: colors.mutedText, width: '40%', justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}
-                                leftImage={Images.plus}
-                                leftImageStyle={{ tintColor: colors.mutedText, width: 20, height: 20, marginEnd: 10 }}
-                                textStyle={{ color: colors.mutedText }}
-                                title="Load More"
-                                onPress={() => {
-                                    if (selectedList === 'Library')
-                                        handleUSDASearch(lastUSDAQuery, 'loadmore');
-                                    else if (selectedList === 'Community')
-                                        handleLoadMoreCommunity();
-                                }}
-                            />
-                        </FadeInOut>
+                        {selectedList !== 'My Foods' && (
+                                <AnimatedButton
+                                    style={{ marginTop: 25, backgroundColor: colors.background, padding: 15, borderRadius: 15, borderWidth: 1, borderColor: colors.mutedText, width: '40%', justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}
+                                    leftImage={Images.plus}
+                                    leftImageStyle={{ tintColor: colors.mutedText, width: 20, height: 20, marginEnd: 10 }}
+                                    textStyle={{ color: colors.mutedText }}
+                                    title="Load More"
+                                    onPress={() => {
+                                        if (selectedList === 'Library')
+                                            handleUSDASearch(lastUSDAQuery, 'loadmore');
+                                        else if (selectedList === 'Community')
+                                            handleLoadMoreCommunity();
+                                    }}
+                                />
+                        )}
                     </AppScroll>
                 ) : (
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 }}>
