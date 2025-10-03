@@ -393,7 +393,7 @@ export default function MealsLog() {
                             height={10}
                             borderRadius={5}
                             showWarningText={true}
-                            warningText="- Target Exceeded"
+                            warningText="(Excess Energy Consumed)"
 
                         />
                     </View>
@@ -426,7 +426,7 @@ export default function MealsLog() {
                 {/* Meals Log*/}
                 <View style={{ backgroundColor: colors.background }}>
                     <View>
-                        <View style={[styles.card, { padding: 0, marginTop: 20 }]} >
+                        <View style={[styles.card, { padding: 0 }]} >
                             <View style={{ padding: 15 }}>
                                 <ProgressBar
                                     title="Water"
