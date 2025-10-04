@@ -80,36 +80,33 @@ export default function ImageCapture({ onConfirm, onCancel }) {
         }
     }
 
-    // --- Centralized back handler ---
     function adjustBackHandler(protocol) {
         if (protocol === 0) {
-            setBackHandler(() => false); // default behavior
+            setBackHandler(() => false);
         } else if (protocol === 1) {
             setBackHandler(() => {
-                if (cameraPreviewActive) onCancelPhoto();
+                if (cameraPreviewActive) {
+                    createDialog({ title: "Cancel", text: "Cancel photo capture or retake?", onConfirm: onRetakePhoto, onAbort: onCancelPhoto, confirmText: 'Retake', abortText: 'Cancel' });
+                    return true;
+                }
                 else if (cameraActive) {
                     setCameraActive(false);
                     adjustBackHandler(0);
+                    return true;
                 }
-                return true;
+                return false;
             });
         }
     }
 
-    // --- Back button listener for hardware ---
     useEffect(() => {
-        const backAction = () => {
-            if (cameraPreviewActive || cameraActive) {
-                onCancelPhoto();
-                return true;
-            }
-            return false;
-        };
-        const subscription = BackHandler.addEventListener("hardwareBackPress", backAction);
-        return () => subscription.remove();
+        if (cameraActive || cameraPreviewActive) {
+            adjustBackHandler(1);
+        } else {
+            adjustBackHandler(0);
+        }
     }, [cameraActive, cameraPreviewActive]);
 
-    // --- External triggers ---
     useEffect(() => {
         if (cameraActive) requestCameraAccess();
         if (libraryActive) requestMediaAccess();
