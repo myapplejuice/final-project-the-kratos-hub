@@ -105,174 +105,119 @@ export default function Homepage() {
         }
     ];
 
-    async function handleBarcode(barcode) {
-        const upc = barcode.data; 
-
-        const requestBody = {
-            query: upc,
-            pageNumber: 1,
-            pageSize: 1,
-            sortOrder: "desc"
-        };
-
-        const result = await APIService.USDARequest(JSON.stringify(requestBody));
-
-        if (result.success && result.data.length > 0) {
-            const food = result.data[0];
-            console.log("Food info from USDA:", food);
-
-            const info = {
-                name: food.description,
-                category: food.foodCategory,
-                brand: food.brandOwner,
-                calories: food.foodNutrients?.find(n => n.nutrientName === "Energy")?.value,
-                protein: food.foodNutrients?.find(n => n.nutrientName === "Protein")?.value,
-                fat: food.foodNutrients?.find(n => n.nutrientName === "Total lipid (fat)")?.value,
-                carbs: food.foodNutrients?.find(n => n.nutrientName === "Carbohydrate, by difference")?.value
-            };
-
-            console.log("Extracted info:", info);
-        } else {
-            console.log("No food found for UPC:", upc);
-        }
-    }
-
     return (
-        <>
-            <BarcodeScanner onScan={(barcode) => handleBarcode(barcode)} />
-            <AppScroll paddingColor={colors.background} topPadding={false} extraBottom={100} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>
-                <View style={{ paddingHorizontal: 20, paddingTop: 100, paddingBottom: 30, margin: 0, backgroundColor: colors.main, borderBottomEndRadius: 30, borderBottomStartRadius: 30, overflow: 'hidden' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignContent: 'center' }}>
-                        <DateDisplay styles={{ textAlign: 'center' }} dateStyle={{ color: 'white' }} dayStyle={{ color: 'white' }} />
-                        <View style={{ flexDirection: 'row', backgroundColor: '#ffffff48', padding: 12, borderRadius: 15, alignItems: 'center', justifyContent: 'center', alignContent: 'center' }}>
-                            <AppText style={{ color: 'white', fontWeight: 'bold', textAlign: 'center', fontSize: scaleFont(17) }}>{currentTime}</AppText>
-                        </View>
+        <AppScroll paddingColor={colors.background} topPadding={false} extraBottom={100} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>
+            <View style={{ paddingHorizontal: 20, paddingTop: 100, paddingBottom: 30, margin: 0, backgroundColor: colors.main, borderBottomEndRadius: 30, borderBottomStartRadius: 30, overflow: 'hidden' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignContent: 'center' }}>
+                    <DateDisplay styles={{ textAlign: 'center' }} dateStyle={{ color: 'white' }} dayStyle={{ color: 'white' }} />
+                    <View style={{ flexDirection: 'row', backgroundColor: '#ffffff48', padding: 12, borderRadius: 15, alignItems: 'center', justifyContent: 'center', alignContent: 'center' }}>
+                        <AppText style={{ color: 'white', fontWeight: 'bold', textAlign: 'center', fontSize: scaleFont(17) }}>{currentTime}</AppText>
                     </View>
-
-                    <Divider orientation="horizontal" thickness={2} color="rgba(255, 255, 255, 0.25)" style={{ marginVertical: 20 }} />
-
-                    <FadeInOut visible={true}>
-                        <AppText numberOfLines={2} style={[styles.introText, { fontSize: scaleFont(25), fontWeight: '700', flexShrink: 1 }]}>
-                            {greeting}, {user.firstname}!
-                        </AppText>
-                        <AppText style={[styles.introText, { fontSize: scaleFont(16), marginTop: 5, color: 'rgba(255, 255, 255, 0.75)' }]}>
-                            {introText}
-                        </AppText>
-                    </FadeInOut>
                 </View>
 
-                <View style={{ backgroundColor: colors.background, marginTop: 20 }}>
-                    <View style={{ marginBottom: 15 }}>
-                        <AppText style={{ marginTop: 15, color: 'white', paddingHorizontal: 25, fontSize: scaleFont(20), fontWeight: 'bold' }}>
-                            Today's Overview
-                        </AppText>
-                    </View>
-                    <View style={{ backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15, marginBottom: 15 }}>
-                        {BMRTab.map((item, index) => (
-                            <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 30, height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
-                                <Image source={item.icon} style={[userStatsCard.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
-                                <View style={{ alignItems: 'center' }}>
-                                    <AppText style={{ fontSize: scaleFont(15), fontWeight: 'bold', color: 'white', textAlign: 'center', marginTop: 15 }}>{item.value}</AppText>
-                                    <AppText style={{ fontSize: scaleFont(12), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>{item.label}</AppText>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                    <View style={{ flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15, marginBottom: 15 }}>
-                        {tabsGroupOne.map((item, index) => (
-                            <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 20, width: '48%', height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
-                                <Image source={item.icon} style={[userStatsCard.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
-                                <View style={{ justifyContent: 'flex-start' }}>
-                                    <AppText style={{ fontSize: scaleFont(15), fontWeight: 'bold', color: 'white', textAlign: 'center', marginTop: 15 }}>{item.value}</AppText>
-                                    <AppText style={{ fontSize: scaleFont(12), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>{item.label}</AppText>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                    <View style={{ flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15 }}>
-                        {tabsGroupTwo.map((item, index) => (
-                            <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 20, width: '48%', height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
-                                <Image source={item.icon} style={[userStatsCard.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
-                                <View style={{ justifyContent: 'flex-start' }}>
-                                    <AppText style={{ fontSize: scaleFont(15), fontWeight: 'bold', color: 'white', textAlign: 'center', marginTop: 15 }}>{item.value}</AppText>
-                                    <AppText style={{ fontSize: scaleFont(12), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>{item.label}</AppText>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
+                <Divider orientation="horizontal" thickness={2} color="rgba(255, 255, 255, 0.25)" style={{ marginVertical: 20 }} />
 
-                    <TouchableOpacity onPress={() => router.push(routes.GOALS)} style={{ backgroundColor: colors.cardBackground, padding: 15, borderRadius: 20, marginTop: 15, marginHorizontal: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <View style={{ backgroundColor: colors.lightMutedText, padding: 12, borderRadius: 15 }}>
-                                <Image source={Images.noGoals} style={[userStatsCard.statImage, { tintColor: 'white', width: 35, height: 35 }]} />
+                <FadeInOut visible={true}>
+                    <AppText numberOfLines={2} style={[styles.introText, { fontSize: scaleFont(25), fontWeight: '700', flexShrink: 1 }]}>
+                        {greeting}, {user.firstname}!
+                    </AppText>
+                    <AppText style={[styles.introText, { fontSize: scaleFont(16), marginTop: 5, color: 'rgba(255, 255, 255, 0.75)' }]}>
+                        {introText}
+                    </AppText>
+                </FadeInOut>
+            </View>
+
+            <View style={{ backgroundColor: colors.background, marginTop: 20 }}>
+                <View style={{ marginBottom: 15 }}>
+                    <AppText style={{ marginTop: 15, color: 'white', paddingHorizontal: 25, fontSize: scaleFont(20), fontWeight: 'bold' }}>
+                        Today's Overview
+                    </AppText>
+                </View>
+                <View style={{ backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15, marginBottom: 15 }}>
+                    {BMRTab.map((item, index) => (
+                        <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 30, height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+                            <Image source={item.icon} style={[userStatsCard.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
+                            <View style={{ alignItems: 'center' }}>
+                                <AppText style={{ fontSize: scaleFont(15), fontWeight: 'bold', color: 'white', textAlign: 'center', marginTop: 15 }}>{item.value}</AppText>
+                                <AppText style={{ fontSize: scaleFont(12), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>{item.label}</AppText>
                             </View>
-                            <View style={{ marginStart: 15 }}>
-                                <AppText style={{ fontSize: scaleFont(18), color: 'white', fontWeight: 'bold' }}>
-                                    Manage Goals & Metrics
-                                </AppText>
-                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11), flexShrink: 1 }}>
-                                    Set your goals and track your progress
-                                </AppText>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+                <View style={{ flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15, marginBottom: 15 }}>
+                    {tabsGroupOne.map((item, index) => (
+                        <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 20, width: '48%', height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+                            <Image source={item.icon} style={[userStatsCard.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
+                            <View style={{ justifyContent: 'flex-start' }}>
+                                <AppText style={{ fontSize: scaleFont(15), fontWeight: 'bold', color: 'white', textAlign: 'center', marginTop: 15 }}>{item.value}</AppText>
+                                <AppText style={{ fontSize: scaleFont(12), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>{item.label}</AppText>
                             </View>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+                <View style={{ flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15 }}>
+                    {tabsGroupTwo.map((item, index) => (
+                        <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 20, width: '48%', height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+                            <Image source={item.icon} style={[userStatsCard.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
+                            <View style={{ justifyContent: 'flex-start' }}>
+                                <AppText style={{ fontSize: scaleFont(15), fontWeight: 'bold', color: 'white', textAlign: 'center', marginTop: 15 }}>{item.value}</AppText>
+                                <AppText style={{ fontSize: scaleFont(12), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>{item.label}</AppText>
+                            </View>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+
+                <TouchableOpacity onPress={() => router.push(routes.GOALS)} style={{ backgroundColor: colors.cardBackground, padding: 15, borderRadius: 20, marginTop: 15, marginHorizontal: 15 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ backgroundColor: colors.lightMutedText, padding: 12, borderRadius: 15 }}>
+                            <Image source={Images.noGoals} style={[userStatsCard.statImage, { tintColor: 'white', width: 35, height: 35 }]} />
                         </View>
-                    </TouchableOpacity>
-
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15, marginHorizontal: 15 }}>
-                        <TouchableOpacity onPress={() => router.push(routes.NUTRITION_HUB)} style={{ padding: 15, backgroundColor: colors.accentGreen, borderRadius: 20, height: 180, justifyContent: 'center', alignItems: 'center', width: '48%' }}>
-                            <Image source={Images.nutrition} style={[userStatsCard.statImage, { width: 50, height: 50, tintColor: 'white' }]} />
-                            <AppText style={{ fontSize: scaleFont(18), color: 'white', fontWeight: 'bold', marginTop: 10 }}>Nutrition</AppText>
-                            <AppText style={{ fontSize: scaleFont(12), color: 'white', marginTop: 5 }}>Track meals & progress</AppText>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => router.push(routes.TRAINING_HUB)} style={{ padding: 15, backgroundColor: colors.accentBlue, borderRadius: 20, height: 180, justifyContent: 'center', alignItems: 'center', width: '48%' }}>
-                            <Image source={Images.nutrition} style={[userStatsCard.statImage, { width: 50, height: 50, tintColor: 'white' }]} />
-                            <AppText style={{ fontSize: scaleFont(18), color: 'white', fontWeight: 'bold', marginTop: 10 }}>Training</AppText>
-                            <AppText style={{ fontSize: scaleFont(12), color: 'white', marginTop: 5 }}>Log your workouts</AppText>
-                        </TouchableOpacity>
-                    </View>
-
-                    <TouchableOpacity
-                        onPress={() => router.push(routes.PROFILE)}
-                        style={{
-                            backgroundColor: colors.cardBackground,
-                            marginHorizontal: 15,
-                            marginTop: 15,
-                            padding: 20,
-                            borderRadius: 20,
-                        }}
-                    >
-                        <View style={{ flexDirection: 'row' }}>
-                            <Image source={Images.profileOutline} style={{ width: 24, height: 24, marginRight: 8, tintColor: 'white' }} />
-                            <AppText style={{ color: 'white', fontSize: scaleFont(18), flexShrink: 1, fontWeight: 'bold' }}>
-                                View Your Profile
+                        <View style={{ marginStart: 15 }}>
+                            <AppText style={{ fontSize: scaleFont(18), color: 'white', fontWeight: 'bold' }}>
+                                Manage Goals & Metrics
+                            </AppText>
+                            <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11), flexShrink: 1 }}>
+                                Set your goals and track your progress
                             </AppText>
                         </View>
-                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11), flexShrink: 1, marginTop: 5 }}>
-                            Tap here to modify your profile and app settings
-                        </AppText>
+                    </View>
+                </TouchableOpacity>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15, marginHorizontal: 15 }}>
+                    <TouchableOpacity onPress={() => router.push(routes.NUTRITION_HUB)} style={{ padding: 15, backgroundColor: colors.accentGreen, borderRadius: 20, height: 180, justifyContent: 'center', alignItems: 'center', width: '48%' }}>
+                        <Image source={Images.nutrition} style={[userStatsCard.statImage, { width: 50, height: 50, tintColor: 'white' }]} />
+                        <AppText style={{ fontSize: scaleFont(18), color: 'white', fontWeight: 'bold', marginTop: 10 }}>Nutrition</AppText>
+                        <AppText style={{ fontSize: scaleFont(12), color: 'white', marginTop: 5 }}>Track meals & progress</AppText>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => setCameraActive(true)}
-                        style={{
-                            backgroundColor: colors.cardBackground,
-                            marginHorizontal: 15,
-                            marginTop: 15,
-                            padding: 20,
-                            borderRadius: 20,
-                        }}
-                    >
-                        <View style={{ flexDirection: 'row' }}>
-                            <Image source={Images.profileOutline} style={{ width: 24, height: 24, marginRight: 8, tintColor: 'white' }} />
-                            <AppText style={{ color: 'white', fontSize: scaleFont(18), flexShrink: 1, fontWeight: 'bold' }}>
-                                View Your Profile
-                            </AppText>
-                        </View>
-                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11), flexShrink: 1, marginTop: 5 }}>
-                            Tap here to modify your profile and app settings
-                        </AppText>
+                    <TouchableOpacity onPress={() => router.push(routes.TRAINING_HUB)} style={{ padding: 15, backgroundColor: colors.accentBlue, borderRadius: 20, height: 180, justifyContent: 'center', alignItems: 'center', width: '48%' }}>
+                        <Image source={Images.nutrition} style={[userStatsCard.statImage, { width: 50, height: 50, tintColor: 'white' }]} />
+                        <AppText style={{ fontSize: scaleFont(18), color: 'white', fontWeight: 'bold', marginTop: 10 }}>Training</AppText>
+                        <AppText style={{ fontSize: scaleFont(12), color: 'white', marginTop: 5 }}>Log your workouts</AppText>
                     </TouchableOpacity>
                 </View>
-            </AppScroll>
-        </>
+
+                <TouchableOpacity
+                    onPress={() => router.push(routes.PROFILE)}
+                    style={{
+                        backgroundColor: colors.cardBackground,
+                        marginHorizontal: 15,
+                        marginTop: 15,
+                        padding: 20,
+                        borderRadius: 20,
+                    }}
+                >
+                    <View style={{ flexDirection: 'row' }}>
+                        <Image source={Images.profileOutline} style={{ width: 24, height: 24, marginRight: 8, tintColor: 'white' }} />
+                        <AppText style={{ color: 'white', fontSize: scaleFont(18), flexShrink: 1, fontWeight: 'bold' }}>
+                            View Your Profile
+                        </AppText>
+                    </View>
+                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11), flexShrink: 1, marginTop: 5 }}>
+                        Tap here to modify your profile and app settings
+                    </AppText>
+                </TouchableOpacity>
+            </View>
+        </AppScroll>
     );
 }
 

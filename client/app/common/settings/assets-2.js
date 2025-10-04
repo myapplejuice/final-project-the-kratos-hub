@@ -87,4 +87,8 @@ export const Images_2 = {
     plan1: require('../../../assets/images/plan-1.png'),
     plan2: require('../../../assets/images/plan-2.png'),
     plan3: require('../../../assets/images/plan-3.png'),
+    barcode1: require('../../../assets/images/barcode-1.png'),
+    barcode2: require('../../../assets/images/barcode-2.png'),
+    barcode3: require('../../../assets/images/barcode-3.png'),
+    barcode4: require('../../../assets/images/barcode-4.png'),
 };

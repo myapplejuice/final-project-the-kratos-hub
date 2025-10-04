@@ -18,9 +18,12 @@ import FadeInOut from "../../../components/effects/fade-in-out";
 import APIService from '../../../common/services/api-service';
 import usePopups from "../../../common/hooks/use-popups";
 import AnimatedButton from "../../../components/screen-comps/animated-button";
+import BarcodeScanner from '../../../components/screen-comps/barcode-scanner';
+import { CameraContext } from '../../../common/contexts/camera-context';
 
 export default function FoodSelection() {
     const { user, setAdditionalContexts } = useContext(UserContext);
+    const { setCameraActive } = useContext(CameraContext);
     const { createAlert, showSpinner, hideSpinner, createToast } = usePopups();
     const insets = useSafeAreaInsets();
     const [fabVisible, setFabVisible] = useState(true);
@@ -278,8 +281,83 @@ export default function FoodSelection() {
         return [...currentList, ...nextSlice];
     }
 
+    async function handleBarcode(barcode) {
+        showSpinner();
+        const upc = barcode.data;
+
+        const requestBody = {
+            query: upc,
+            pageNumber: 1,
+            pageSize: 1,
+            dataType: ["Branded", "Foundation", "Survey (FNDDS)"],
+            sortOrder: "desc"
+        };
+
+        const result = await APIService.USDARequest(JSON.stringify(requestBody));
+        hideSpinner();
+
+        if (!result.success) {
+            return createAlert({ title: 'Barcode Scan', text: 'Internal server error, please try again later' })
+        }
+
+        if (result.data.length > 0) {
+            const food = result.data[0];
+
+            const label = normalizeLabel(food.description) || 'Unknown';
+            const fullLabel = food.dataType === 'Branded' && food.brandOwner ? `${label} (${food.brandOwner})` : label;
+
+            const nutrients = food.foodNutrients || [];
+            const excludedNutrients = ['Energy', 'Protein', 'Total lipid (fat)', 'Carbohydrate, by difference'];
+
+            const additionalProps = nutrients
+                .filter(n => !excludedNutrients.includes(n.nutrientName))
+                .map((n, i) => ({
+                    id: i,
+                    label: n.nutrientName,
+                    amount: n.value,
+                    unit: n.unitName
+                }));
+
+            const energyKcal = nutrients.find(n => n.nutrientName === 'Energy')?.value || 0;
+            const carbs = nutrients.find(n => n.nutrientName === 'Carbohydrate, by difference')?.value || 0;
+            const protein = nutrients.find(n => n.nutrientName === 'Protein')?.value || 0;
+            const fat = nutrients.find(n => n.nutrientName === 'Total lipid (fat)')?.value || 0;
+            const servingSize = food.servingSize || 100;
+            const servingUnit = (food.servingSizeUnit || 'g').toLowerCase();
+
+            let dominantMacro = 'Carbs';
+            if (protein > carbs && protein > fat) dominantMacro = 'Protein';
+            else if (fat > carbs && fat > protein) dominantMacro = 'Fat';
+
+            const info = {
+                id: `usda-${food.fdcId}`,
+                label: fullLabel || 'Unknown',
+                category: food.foodCategory || 'USDA Food',
+                ownerId: '00000000-0000-0000-0000-000000000000',
+                creatorId: '00000000-0000-0000-0000-000000000000',
+                creatorName: 'USDA',
+                isPublic: true,
+                isUSDA: true,
+                USDAId: food.fdcId,
+                energyKcal,
+                carbs,
+                protein,
+                fat,
+                dominantMacro,
+                servingSize,
+                servingUnit,
+                additionalProps,
+            };
+
+            console.log("Extracted info:", info);
+        } else {
+            createAlert({ title: 'Barcode Scan', text: 'Barcode did not match a food' })
+        }
+    }
+
     return (
         <>
+            <BarcodeScanner onScan={(barcode) => handleBarcode(barcode)} />
             <FloatingActionButton
                 icon={Images.plus}
                 label={"Create New Food"}
@@ -320,30 +398,35 @@ export default function FoodSelection() {
 
                 <Divider orientation="horizontal" thickness={2} color={colors.divider} style={{ borderRadius: 50, marginBottom: 15 }} />
 
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-start', backgroundColor: colors.inputBackground, alignItems: 'center', borderRadius: 15, marginBottom: 25 }}>
-                    <Image source={Images.magnifier} style={{ tintColor: colors.mutedText, width: 20, height: 20, marginHorizontal: 15 }} />
-                    <AppTextInput
-                        onChangeText={setSearchQuery}
-                        onSubmitEditing={async () => {
-                            Keyboard.dismiss()
-                            if (!searchQuery.trim())
-                                return;
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.inputBackground, alignItems: 'center', borderRadius: 15, marginBottom: 25, height: 50 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', width: '80%' }}>
+                        <Image source={Images.magnifier} style={{ tintColor: colors.mutedText, width: 20, height: 20, marginHorizontal: 15 }} />
+                        <AppTextInput
+                            onChangeText={setSearchQuery}
+                            onSubmitEditing={async () => {
+                                Keyboard.dismiss()
+                                if (!searchQuery.trim())
+                                    return;
 
-                            if (selectedList === 'Library') {
-                                if (searchQuery === lastUSDAQuery) return;
-                                setLastUSDAQuery(searchQuery);
-                                setUSDAFoods([]);
-                                setFoodList([]);
+                                if (selectedList === 'Library') {
+                                    if (searchQuery === lastUSDAQuery) return;
+                                    setLastUSDAQuery(searchQuery);
+                                    setUSDAFoods([]);
+                                    setFoodList([]);
 
-                                setUsdaPage(1);
-                                await handleUSDASearch(searchQuery, 'searchbar');
-                                setUSDAQueryTriggered(true)
-                            }
-                        }}
-                        value={searchQuery}
-                        placeholder="Search"
-                        placeholderTextColor={"rgba(255, 255, 255, 0.5)"}
-                        style={styles.inputStripped} />
+                                    setUsdaPage(1);
+                                    await handleUSDASearch(searchQuery, 'searchbar');
+                                    setUSDAQueryTriggered(true)
+                                }
+                            }}
+                            value={searchQuery}
+                            placeholder="Search"
+                            placeholderTextColor={"rgba(255, 255, 255, 0.5)"}
+                            style={styles.inputStripped} />
+                    </View>
+                    <TouchableOpacity onPress={() => setCameraActive(true)} style={{ width: '15%', justifyContent: 'center', alignItems: "center", height: '100%', borderRadius: 15 }}>
+                        <Image source={Images.barcode1} style={{ tintColor: colors.mutedText, width: 20, height: 20 }} />
+                    </TouchableOpacity>
                 </View>
 
                 {foodList.length > 0 ? (
