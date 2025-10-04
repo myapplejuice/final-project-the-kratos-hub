@@ -66,9 +66,9 @@ export default function EditProfile() {
 
                 if (result.success) {
                     setUser(prev => ({ ...prev, ...payload }));
-                    createToast({ message: 'Fullname successfully changed!' });
+                    createToast({ message: 'Fullname changed' });
                 } else {
-                    createToast({ message: result.message || "Update failure!" });
+                    createToast({ message: "Update failure " + result.message });
                 }
             },
         });
@@ -108,9 +108,9 @@ export default function EditProfile() {
 
                 if (result.success) {
                     setUser(prev => ({ ...prev, ...payload }));
-                    createToast({ message: "Email successfully changed!" });
+                    createToast({ message: "Email changed" });
                 } else {
-                    createToast({ message: result.message || "Update failure!" });
+                    createToast({ message: "Update failure " + result.message });
                 }
             },
         });
@@ -156,9 +156,9 @@ export default function EditProfile() {
 
                 if (result.success) {
                     setUser(prev => ({ ...prev, ...payload }));
-                    createToast({ message: "Phone number successfully changed!" });
+                    createToast({ message: "Phone number changed" });
                 } else {
-                    createToast({ message: result.message || "Update failure!" });
+                    createToast({ message: "Update failure " + result.message });
                 }
             },
         });

@@ -180,7 +180,7 @@ export default function FoodProfile() {
                             });
                         }
 
-                        createToast({ message: (intent === 'meal/add' || intent === 'myfoods') ? 'Food deleted' : 'Food removed' });
+                        createToast({ message: (intent === 'meal/add' || intent === 'myfoods') ? 'Food entry deleted' : 'Food removed' });
                         router.back();
                     } else {
                         createAlert({ title: 'Failure', text: "Food delete/removal failed!\n" + result.message });

@@ -46,7 +46,7 @@ export default function Profile() {
 
             if (result.success) {
                 setUser(prev => ({ ...prev, image: { uri: `data:image/jpeg;base64,${imageBase64}` } }));
-                createToast({ message: "Your profile picture successfully updated!" });
+                createToast({ message: "Profile picture updated" });
                 return true;
             }
             else {
@@ -104,7 +104,7 @@ export default function Profile() {
                 hideSpinner();
 
                 if (result.success) {
-                    createToast({ message: "Password successfully changed!" });
+                    createToast({ message: "Password changed" });
                 } else {
                     createToast({ message: result.message });
                 }

@@ -193,7 +193,7 @@ export default function FoodEditor() {
                     foods: prev.foods.map(f => f.id === food.id ? food : f)
                 }));
                 setAdditionalContexts(prev => ({ ...prev, selectedFood: food }));
-                createToast({ message: "Successfully edited food" });
+                createToast({ message: "Food edited" });
                 router.back();
             }
             else {

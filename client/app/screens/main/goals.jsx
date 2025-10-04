@@ -18,6 +18,7 @@ import AppScroll from "../../components/screen-comps/app-scroll";
 import { convertFluid, convertHeight, convertWeight } from "../../common/utils/unit-converter";
 import { formatDate } from "../../common/utils/date-time";
 
+
 export default function Goals() {
     const { user, setUser } = useContext(UserContext);
     const { createPicker, createInput, createOptions, createToast, hideSpinner, showSpinner } = usePopups();
@@ -116,13 +117,13 @@ export default function Goals() {
 
                     if (result.success) {
                         setUser(updatedUser);
-                        createToast({ message: "Height successfully updated!" });
+                        createToast({ message: "Height updated" });
                     } else {
                         createToast({ message: `Failed to update height: ${result.message}` });
                     }
                 } catch (err) {
                     console.log(err.message);
-                    createToast({ message: "Failed to update height!" });
+                    createToast({ message: "Failed to update height! " + err.message });
                 } finally {
                     hideSpinner();
                 }
@@ -192,13 +193,13 @@ export default function Goals() {
 
                     if (result.success) {
                         setUser(updatedUser);
-                        createToast({ message: "Weight successfully updated!" });
+                        createToast({ message: "Weight updated" });
                     } else {
                         createToast({ message: `Failed to update weight: ${result.message}` });
                     }
                 } catch (err) {
                     console.log(err.message);
-                    createToast({ message: "Failed to update weight!" });
+                    createToast({ message: "Failed to update weight!" + err.message });
                 } finally {
                     hideSpinner();
                 }
@@ -232,7 +233,7 @@ export default function Goals() {
 
                     if (result.success) {
                         setUser(updatedUser);
-                        createToast({ message: "Gender successfully updated!" });
+                        createToast({ message: "Gender updated" });
                     } else {
                         createToast({
                             message: `Failed to update gender: ${result.message}`,
@@ -240,7 +241,7 @@ export default function Goals() {
                     }
                 } catch (err) {
                     console.log(err.message);
-                    createToast({ message: "Failed to update gender!" });
+                    createToast({ message: "Failed to update gender!" + err.message  });
                 }
                 finally {
                     hideSpinner();
@@ -282,13 +283,13 @@ export default function Goals() {
 
                     if (result.success) {
                         setUser(updatedUser);
-                        createToast({ message: "Age successfully updated!" });
+                        createToast({ message: "Age updated" });
                     } else {
                         createToast({ message: `Failed to update age: ${result.message}` });
                     }
                 } catch (err) {
                     console.log(err.message);
-                    createToast({ message: "Failed to update age!" });
+                    createToast({ message: "Failed to update age!" + err.message });
                 }
                 finally {
                     hideSpinner();
@@ -353,13 +354,13 @@ export default function Goals() {
                         }
 
                         setUser(nutritionLogsUpdatedUser);
-                        createToast({ message: "Water intake successfully updated!" });
+                        createToast({ message: "Water intake updated" });
                     } else {
                         createToast({ message: `Failed to update water intake: ${result.message}` });
                     }
                 } catch (err) {
                     console.log(err.message);
-                    createToast({ message: "Failed to update water intake!" });
+                    createToast({ message: "Failed to update water intake!" + err.message });
                 } finally {
                     hideSpinner();
                 }
