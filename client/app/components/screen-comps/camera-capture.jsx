@@ -38,141 +38,11 @@ export default function CameraCapture({ onCapture, initialFacing = "back" }) {
         onCapture({ uri: photo.uri });
     }
 
-    const styles = StyleSheet.create({
-        container: {
-            ...StyleSheet.absoluteFillObject,
-            zIndex: 9999,
-            backgroundColor: '#000',
-        },
-        camera: {
-            flex: 1,
-        },
-        topGradient: {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 120,
-            zIndex: 1,
-        },
-        bottomGradient: {
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            paddingTop: 40,
-            paddingBottom: insets.bottom + 20,
-            zIndex: 1,
-        },
-        controlsContainer: {
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingHorizontal: 40,
-            marginBottom: 30,
-        },
-        leftControls: {
-            alignItems: 'flex-start',
-        },
-        rightControls: {
-            alignItems: 'flex-end',
-        },
-        centerControls: {
-            alignItems: 'center',
-        },
-        controlButton: {
-            width: 60,
-            height: 60,
-            borderRadius: 30,
-            justifyContent: 'center',
-            alignItems: 'center',
-            position: 'relative',
-        },
-        buttonInner: {
-            width: 50,
-            height: 50,
-            borderRadius: 25,
-            backgroundColor: 'rgba(255,255,255,0.15)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 2,
-        },
-        buttonShadow: {
-            position: 'absolute',
-            width: 60,
-            height: 60,
-            borderRadius: 30,
-            backgroundColor: 'rgba(0,0,0,0.3)',
-            zIndex: 1,
-        },
-        controlIcon: {
-            width: 24,
-            height: 24,
-            tintColor: 'white',
-        },
-        flashActive: {
-            tintColor: '#FFD700',
-        },
-        captureButton: {
-            width: 80,
-            height: 80,
-            borderRadius: 40,
-            justifyContent: 'center',
-            alignItems: 'center',
-            position: 'relative',
-        },
-        captureButtonOuter: {
-            width: 70,
-            height: 70,
-            borderRadius: 35,
-            backgroundColor: 'rgba(255,255,255,0.2)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 2,
-        },
-        captureButtonInner: {
-            width: 60,
-            height: 60,
-            borderRadius: 30,
-            backgroundColor: 'rgba(255,255,255,0.3)',
-            justifyContent: 'center',
-            alignItems: 'center',
-        },
-        captureButtonCore: {
-            width: 50,
-            height: 50,
-            borderRadius: 25,
-            backgroundColor: 'white',
-        },
-        captureRing: {
-            position: 'absolute',
-            width: 84,
-            height: 84,
-            borderRadius: 42,
-            borderWidth: 2,
-            borderColor: 'rgba(255,255,255,0.5)',
-            zIndex: 1,
-        },
-        instructionContainer: {
-            alignItems: 'center',
-            paddingHorizontal: 20
-        },
-        instructionText: {
-            color: 'white',
-            fontSize: 14,
-            fontWeight: '500',
-            textAlign: 'center',
-            textShadowColor: 'rgba(0,0,0,0.8)',
-            textShadowOffset: { width: 1, height: 1 },
-            textShadowRadius: 6,
-        },
-    });
-
     return (
         <View style={styles.container}>
             <CameraView style={styles.camera} facing={facing} enableTorch={flash} ref={ref => setCamera(ref)}>
 
-                <View style={styles.bottomGradient} >
+                <View style={[styles.bottomGradient, { paddingBottom: insets.bottom + 30 }]}>
                     <View style={styles.controlsContainer}>
 
                         <View style={styles.leftControls}>
@@ -222,3 +92,132 @@ export default function CameraCapture({ onCapture, initialFacing = "back" }) {
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        ...StyleSheet.absoluteFillObject,
+        zIndex: 9999,
+        backgroundColor: '#000',
+    },
+    camera: {
+        flex: 1,
+    },
+    topGradient: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 120,
+        zIndex: 1,
+    },
+    bottomGradient: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        paddingTop: 40,
+        zIndex: 1,
+    },
+    controlsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 40,
+        marginBottom: 30,
+    },
+    leftControls: {
+        alignItems: 'flex-start',
+    },
+    rightControls: {
+        alignItems: 'flex-end',
+    },
+    centerControls: {
+        alignItems: 'center',
+    },
+    controlButton: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+    },
+    buttonInner: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: 'rgba(255,255,255,0.15)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 2,
+    },
+    buttonShadow: {
+        position: 'absolute',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        zIndex: 1,
+    },
+    controlIcon: {
+        width: 24,
+        height: 24,
+        tintColor: 'white',
+    },
+    flashActive: {
+        tintColor: '#FFD700',
+    },
+    captureButton: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+    },
+    captureButtonOuter: {
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 2,
+    },
+    captureButtonInner: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: 'rgba(255,255,255,0.3)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    captureButtonCore: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: 'white',
+    },
+    captureRing: {
+        position: 'absolute',
+        width: 84,
+        height: 84,
+        borderRadius: 42,
+        borderWidth: 2,
+        borderColor: 'rgba(255,255,255,0.5)',
+        zIndex: 1,
+    },
+    instructionContainer: {
+        alignItems: 'center',
+        paddingHorizontal: 20
+    },
+    instructionText: {
+        color: 'white',
+        fontSize: 14,
+        fontWeight: '500',
+        textAlign: 'center',
+        textShadowColor: 'rgba(0,0,0,0.8)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 6,
+    },
+});

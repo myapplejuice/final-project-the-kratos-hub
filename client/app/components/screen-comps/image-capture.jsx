@@ -86,7 +86,7 @@ export default function ImageCapture({ onConfirm, onCancel }) {
         } else if (protocol === 1) {
             setBackHandler(() => {
                 if (cameraPreviewActive) {
-                    createDialog({ title: "Cancel", text: "Cancel photo capture or retake?", onConfirm: onRetakePhoto, onAbort: onCancelPhoto, confirmText: 'Retake', abortText: 'Cancel' });
+                    createDialog({ title: "Photo Capture", text: "Cancel photo capture or retake?", onConfirm: onRetakePhoto, onAbort: onCancelPhoto, confirmText: 'RETAKE', abortText: 'CANCEL' });
                     return true;
                 }
                 else if (cameraActive) {
