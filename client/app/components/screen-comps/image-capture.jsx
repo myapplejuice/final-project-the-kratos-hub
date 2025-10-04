@@ -14,7 +14,7 @@ export default function ImageCapture({ onConfirm, onCancel }) {
     const { setBackHandler } = useBackHandlerContext();
     const { cameraActive, setCameraActive, cameraPreviewActive, setCameraPreviewActive } = useContext(CameraContext);
     const { libraryActive, setLibraryActive } = useContext(LibraryContext);
-    const { showSpinner, hideSpinner } = usePopups();
+    const { showSpinner, hideSpinner, createDialog } = usePopups();
     const [previewImage, setPreviewImage] = useState(null);
 
     const { requestCameraAccess } = useCameraPermissionRequest({
@@ -41,6 +41,13 @@ export default function ImageCapture({ onConfirm, onCancel }) {
         setCameraPreviewActive(false);
         adjustBackHandler(0);
         onCancel?.();
+    }
+
+    function onRetakePhoto() {
+        setCameraActive(true);
+        setCameraPreviewActive(false);
+        adjustBackHandler(1);
+        setPreviewImage(null);
     }
 
     async function onCameraConfirm() {
@@ -115,7 +122,7 @@ export default function ImageCapture({ onConfirm, onCancel }) {
                 <ImagePreview
                     imageUri={previewImage}
                     onConfirm={onCameraConfirm}
-                    onCancel={onCancelPhoto}
+                    onCancel={() => createDialog({ title: "Cancel", text: "Cancel photo capture or retake?", onConfirm: onRetakePhoto, onAbort: onCancelPhoto, confirmText: 'Retake', abortText: 'Cancel' })}
                 />
             )}
         </>
