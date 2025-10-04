@@ -75,7 +75,7 @@ export default function NutritionHub() {
                     syncWithNavBar={true}
                />
                <AppScroll extraBottom={150} extraTop={0} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>
-                    <View style={{ margin: 0, paddingHorizontal: 15, paddingTop: 60, paddingBottom: 15, borderRadius: 0, backgroundColor: colors.cardBackground }}>
+                    <View style={{ margin: 0, paddingHorizontal: 20, paddingTop: 60, paddingBottom: 20, borderBottomEndRadius: 30, borderBottomStartRadius: 30, backgroundColor: colors.cardBackground }}>
                          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
                               <AppText style={{ fontSize: scaleFont(15), color: colors.white, fontWeight: 'bold' }}>
                                    Daily Nutrition Targets

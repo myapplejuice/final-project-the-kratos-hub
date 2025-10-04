@@ -311,76 +311,7 @@ export default function EditDiet() {
             hideSpinner();
         }
     }
-
-    async function handleWaterChange() {
-        const waterMlRecommendation = recommendedWaterIntake(user.metrics.weightKg);
-        const water = convertFluid(waterMlRecommendation, 'ml', user.preferences.fluidUnit.key);
-        const recommendation = `Recommended daily water intake (${water} ${user.preferences.fluidUnit.field})`;
-
-        createInput({
-            title: "Water Intake",
-            text: `${recommendation}`,
-            confirmText: "Save",
-            placeholders: [user.preferences.fluidUnit.field],
-            initialValues: [convertFluid(user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)],
-            extraConfigs: [{ keyboardType: "numeric" }],
-            onSubmit: async (values) => {
-                try {
-                    const [waterVal] = values;
-
-                    if (waterVal == null || isNaN(waterVal) || waterVal <= 0) {
-                        createToast({ message: "Enter a valid number of water intake!" });
-                        return;
-                    }
-
-                    let waterMl = Number(waterVal);
-
-                    if (user.preferences.fluidUnit.key === 'floz')
-                        waterMl = convertFluid(Number(waterVal), 'floz', 'ml');
-                    else if (user.preferences.fluidUnit.key === 'cups')
-                        waterMl = convertFluid(Number(waterVal), 'cups', 'ml');
-
-                    if (waterMl === user.nutrition.waterMl) return;
-
-                    const updatedUser = recalculateUserInformation({
-                        ...user,
-                        nutrition: {
-                            ...user.nutrition,
-                            waterMl: Number(waterMl),
-                        },
-                    });
-
-                    const nutritionPayload = { ...updatedUser.nutrition };
-
-                    showSpinner();
-                    const result = await APIService.user.update({ nutrition: nutritionPayload });
-
-                    if (result.success) {
-                        const date = formatDate(new Date(), { format: 'YYYY-MM-DD' });
-                        const nutritionLogsResult = await APIService.nutrition.days.updateDay(date, { targetWaterMl: waterMl });
-                        const nutritionLogsUpdatedUser = {
-                            ...updatedUser,
-                            nutritionLogs: {
-                                ...user.nutritionLogs,
-                                ...nutritionLogsResult.data.updatedDays
-                            }
-                        }
-
-                        setUser(nutritionLogsUpdatedUser);
-                        createToast({ message: "Water intake updated" });
-                    } else {
-                        createToast({ message: `Failed to update water intake: ${result.message}` });
-                    }
-                } catch (err) {
-                    console.log(err.message);
-                    createToast({ message: "Failed to update water intake!" + err.message });
-                } finally {
-                    hideSpinner();
-                }
-            },
-        });
-    }
-
+    
     return (
         <AppScroll extraBottom={150}>
             {/* Current Diet Header */}
@@ -582,27 +513,6 @@ export default function EditDiet() {
                     />
                 </View>
             </View>
-
-            <TouchableOpacity
-                onPress={handleWaterChange}
-                style={[styles.actionCard, { marginTop: 15, marginHorizontal: 15 }]}    >
-                <View style={styles.actionContent}>
-                    <View style={[styles.waterIcon, { backgroundColor: nutritionColors.water1 + '20' }]}>
-                        <Image source={Images.water} style={[styles.waterIconImage, { tintColor: nutritionColors.water1 }]} />
-                    </View>
-                    <View style={styles.actionText}>
-                        <AppText style={[styles.actionTitle, { color: nutritionColors.water1 }]}>
-                            Water Intake
-                        </AppText>
-                        <AppText style={styles.actionSubtitle}>
-                            Adjust daily consumption
-                        </AppText>
-                    </View>
-                    <View style={[styles.actionArrow]}>
-                        <Image source={Images.arrow} style={[styles.arrowIcon, { tintColor: 'white' }]} />
-                    </View>
-                </View>
-            </TouchableOpacity>
         </AppScroll>
     );
 }
