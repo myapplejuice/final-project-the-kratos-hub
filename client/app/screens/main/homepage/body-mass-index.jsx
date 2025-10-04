@@ -120,8 +120,8 @@ const styles = StyleSheet.create({
     },
     card: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 15,
-        padding: 18,
+        borderRadius: 20,
+        padding: 20,
         marginTop: 15,
         marginHorizontal: 15,
     },

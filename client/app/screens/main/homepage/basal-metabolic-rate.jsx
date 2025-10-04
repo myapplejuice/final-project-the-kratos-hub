@@ -17,9 +17,9 @@ export default function BasalMetabolicRate() {
         },
         card: {
             backgroundColor: colors.cardBackground,
-            padding: 18,
+            padding: 20,
             marginTop: 15,
-            borderRadius: 15,
+            borderRadius: 20,
             marginHorizontal: 15,
         },
         bmrValue: {
