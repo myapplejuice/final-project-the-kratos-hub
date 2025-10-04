@@ -14,12 +14,13 @@ import AppText from "../../../components/screen-comps/app-text";
 import APIService from "../../../common/services/api-service";
 import AppScroll from "../../../components/screen-comps/app-scroll";
 import { convertEnergy } from "../../../common/utils/unit-converter";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function EditActivity() {
     const { createToast, hideSpinner, showSpinner } = usePopups();
     const { user, setUser } = useContext(UserContext);
-    const [activity, setActivity] = useState("");
-    const [tip, setTip] = useState("");
+    const [activity, setActivity] = useState({color: colors.accentBlue});
+    const [tip, setTip] = useState('');
 
     useEffect(() => {
         const activityKey = user.metrics.activityLevel;
@@ -78,198 +79,309 @@ export default function EditActivity() {
 
     return (
         <AppScroll extraTop={60} extraBottom={100}>
-            <View style={[styles.card, { marginTop: 0, padding: 15 }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                    <Image
-                        source={activity.image}
-                        style={{ width: 45, height: 45, marginRight: 12, tintColor: activity.color }}
-                    />
-                    <AppText style={{ color: activity.color, fontWeight: '700', fontSize: scaleFont(20) }}>
-                        {activity.label}
-                    </AppText>
-                </View>
-
-                <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-                    <View style={styles.statBox}>
-                        <Image source={Images.bmr} style={[styles.statIcon]} />
-                        <AppText style={styles.statLabel}>BMR</AppText>
-                        <AppText style={styles.statValue}>
-                            {convertEnergy(user.metrics.bmr, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
-                        </AppText>
+            {/* Current Activity Header */}
+            <View style={[styles.currentActivityCard, { borderLeftColor: activity.color, marginTop: 0 }]}>
+                <LinearGradient
+                    colors={[activity.color + '20', activity.color + '08']}
+                    style={styles.currentActivityGradient}
+                >
+                    <View style={styles.currentActivityHeader}>
+                        <View style={[styles.activityIconContainer, { backgroundColor: activity.color + '40' }]}>
+                            <Image
+                                source={activity.image}
+                                style={[styles.currentActivityIcon]}
+                            />
+                        </View>
+                        <View style={styles.currentActivityText}>
+                            <AppText style={styles.currentActivityLabel}>Current Activity Level</AppText>
+                            <AppText style={[styles.currentActivityTitle, { color: activity.color }]}>
+                                {activity.label}
+                            </AppText>
+                        </View>
                     </View>
 
-                    <View style={styles.statBox}>
-                        <Image source={Images.kcalBurn} style={styles.statIcon} />
-                        <AppText style={styles.statLabel}>TDEE</AppText>
-                        <AppText style={styles.statValue}>
-                            {convertEnergy(user.metrics.tdee, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
-                        </AppText>
+                    {/* Stats Grid */}
+                    <View style={styles.statsGrid}>
+                        <View style={styles.statItem}>
+                            <View style={[styles.statIconContainer, { backgroundColor: '#e7b93933' }]}>
+                                <Image source={Images.kcalBurn} style={[styles.statIcon]} />
+                            </View>
+                            <AppText style={styles.statLabel}>BMR</AppText>
+                            <AppText style={styles.statValue}>
+                                {convertEnergy(user.metrics.bmr, 'kcal', user.preferences.energyUnit.key)}
+                            </AppText>
+                            <AppText style={styles.statUnit}>{user.preferences.energyUnit.field}</AppText>
+                        </View>
+
+                        <View style={styles.statItem}>
+                            <View style={[styles.statIconContainer, { backgroundColor: '#f5990423' }]}>
+                                <Image source={Images.tdee} style={[styles.statIcon, { tintColor: '#F39C12' }]} />
+                            </View>
+                            <AppText style={styles.statLabel}>TDEE</AppText>
+                            <AppText style={styles.statValue}>
+                                {convertEnergy(user.metrics.tdee, 'kcal', user.preferences.energyUnit.key)}
+                            </AppText>
+                            <AppText style={styles.statUnit}>{user.preferences.energyUnit.field}</AppText>
+                        </View>
+
+                        <View style={styles.statItem}>
+                            <View style={[styles.statIconContainer, { backgroundColor: '#9B59B620' }]}>
+                                <Image source={Images.bmi} style={[styles.statIcon, { tintColor: '#9B59B6' }]} />
+                            </View>
+                            <AppText style={styles.statLabel}>BMI</AppText>
+                            <AppText style={styles.statValue}>{user.metrics.bmi}</AppText>
+                            <AppText style={styles.statUnit}>Score</AppText>
+                        </View>
+
+                        <View style={styles.statItem}>
+                            <View style={[styles.statIconContainer, { backgroundColor: '#3498DB20' }]}>
+                                <Image source={Images.muscleFibers} style={[styles.statIcon, { tintColor: '#3498DB' }]} />
+                            </View>
+                            <AppText style={styles.statLabel}>Lean BMI</AppText>
+                            <AppText style={styles.statValue}>
+                                {BMIByLeanMass(user.metrics.weightKg, user.metrics.heightCm, user.metrics.leanBodyMass)}
+                            </AppText>
+                            <AppText style={styles.statUnit}>Score</AppText>
+                        </View>
                     </View>
 
-                    <View style={styles.statBox}>
-                        <Image source={Images.bmi} style={[styles.statIcon, { tintColor: '#9B59B6' }]} />
-                        <AppText style={styles.statLabel}>BMI</AppText>
-                        <AppText style={styles.statValue}>{user.metrics.bmi}</AppText>
+                    {/* Tip Box */}
+                    <View style={[styles.tipBox, ]}>
+                        <View style={[styles.tipIconContainer,]}>
+                            <Image source={Images.energyOutline} style={[styles.tipIcon, { tintColor: 'white' }]} />
+                        </View>
+                        <View style={styles.tipContent}>
+                            <AppText style={styles.tipTitle}>Pro Tip</AppText>
+                            <AppText style={styles.tipText}>{tip}</AppText>
+                        </View>
                     </View>
-
-                    <View style={styles.statBox}>
-                        <Image source={Images.muscleFibers} style={[styles.statIcon, { tintColor: '#3498DB' }]} />
-                        <AppText style={styles.statLabel}>Lean BMI</AppText>
-                        <AppText style={styles.statValue}>{BMIByLeanMass(user.metrics.weightKg, user.metrics.heightCm, user.metrics.leanBodyMass)}</AppText>
-                    </View>
-                </View>
-
-                <View style={[styles.tipBox, { backgroundColor: activity.color + "33" }]}>
-                    <Image source={Images.energyOutline} style={styles.tipIcon} />
-                    <AppText style={styles.tipText}>{tip}</AppText>
-                </View>
+                </LinearGradient>
             </View>
 
-
-
-            {activityOptions.map((item, i) => (
-                <TouchableOpacity
-                    key={i}
-                    style={{
-                        padding: 15,
-                        backgroundColor: user.metrics.activityLevel === item.key ? item.color + "20" : styles.card.backgroundColor,
-                        borderColor: user.metrics.activityLevel === item.key ? item.color : adjustColor(styles.card.backgroundColor, 100, "lighten"),
-                        flexDirection: 'row',
-                        borderRadius: 12, marginHorizontal: 15, marginBottom: 15,
-                        justifyContent: 'space-between', alignItems: 'center'
-                    }}
-                    onPress={() => handleActivityUpdate(item.key)}
-                >
-                    <View style={{ flexDirection: 'row' }}>
-                        <View style={{ backgroundColor: item.color + '40', borderRadius: 12, padding: 10, justifyContent: 'center' }}>
-                            <Image source={item.image} style={{ tintColor: item.color, width: 35, height: 35, margin: 0, padding: 0 }} />
+            {/* Activity Options */}
+            <View style={styles.optionsContainer}>
+                <AppText style={styles.optionsTitle}>Choose Your Activity Level</AppText>
+                <AppText style={styles.optionsSubtitle}>Select the option that best matches your daily routine</AppText>
+                
+                {activityOptions.map((item, i) => (
+                    <TouchableOpacity
+                        key={i}
+                        style={[
+                            styles.activityOption,
+                            {
+                                backgroundColor: user.metrics.activityLevel === item.key ? item.color + '20' : colors.cardBackground,
+                                borderColor: user.metrics.activityLevel === item.key ? item.color : 'rgba(255,255,255,0.1)',
+                                borderWidth: user.metrics.activityLevel === item.key ? 2 : 1,
+                            }
+                        ]}
+                        onPress={() => handleActivityUpdate(item.key)}
+                    >
+                        <View style={styles.optionContent}>
+                            <View style={[styles.optionIconContainer, { backgroundColor: item.color + '30' }]}>
+                                <Image source={item.image} style={[styles.optionIcon, { tintColor: item.color }]} />
+                            </View>
+                            <View style={styles.optionText}>
+                                <AppText style={[styles.optionLabel, { color: item.color }]}>
+                                    {item.label}
+                                </AppText>
+                                <AppText style={styles.optionDescription}>
+                                    {item.description}
+                                </AppText>
+                            </View>
                         </View>
-                        <View style={{ marginLeft: 10, justifyContent: 'center' }}>
-                            <AppText style={{ color: item.color, fontSize: scaleFont(18), fontWeight: 'bold' }}>{item.label}</AppText>
-                            <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12), marginTop: 5 }}>{item.description}</AppText>
-                        </View>
-                    </View>
-                    {user.metrics.activityLevel === item.key && (
-                        <Image source={Images.done} style={{ width: 25, height: 25, tintColor: item.color }} />
-                    )}
-                </TouchableOpacity>
-            ))}
+                        
+                        {user.metrics.activityLevel === item.key && (
+                            <View style={[styles.selectedBadge, { backgroundColor: item.color }]}>
+                                <Image source={Images.done} style={styles.selectedIcon} />
+                            </View>
+                        )}
+                    </TouchableOpacity>
+                ))}
+            </View>
         </AppScroll>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    currentActivityCard: {
+        margin: 15,
+        marginBottom: 20,
+        borderRadius: 20,
+        overflow: 'hidden',
+        borderLeftWidth: 4,
+    },
+    currentActivityGradient: {
+        padding: 20,
+    },
+    currentActivityHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    activityIconContainer: {
+        width: 60,
+        height: 60,
+        borderRadius: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 15,
+    },
+    currentActivityIcon: {
+        width: 30,
+        height: 30,
+        tintColor: 'white',
+    },
+    currentActivityText: {
         flex: 1,
-        backgroundColor: colors.background,
     },
-    scrollContent: {
-        backgroundColor: colors.background,
+    currentActivityLabel: {
+        color: colors.mutedText,
+        fontSize: scaleFont(12),
+        marginBottom: 4,
+        fontWeight: '600',
     },
-    card: {
-        backgroundColor: colors.cardBackground,
-        padding: 15,
-        borderRadius: 15,
-        margin: 15
-    },
-    introText: {
-        color: 'white',
-        fontSize: scaleFont(14),
-        lineHeight: 24,
-    },
-    sectionTitle: {
-        fontSize: scaleFont(16),
+    currentActivityTitle: {
+        fontSize: scaleFont(22),
         fontWeight: '700',
-        color: 'white',
-        marginBottom: 12,
     },
-    feedbackRow: {
+    statsGrid: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginBottom: 6,
-        width: '100%',
+        justifyContent: 'space-between',
+        marginBottom: 20,
     },
-    feedbackBullet: {
-        color: 'white',
-        fontSize: scaleFont(14),
-        marginRight: 6,
-    },
-    feedbackText: {
-        color: 'white',
-        fontSize: scaleFont(14),
-        lineHeight: 20,
+    statItem: {
+        alignItems: 'center',
         flex: 1,
     },
-    activityRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 15,
-    },
-    activityIconWrapper: {
-        padding: 12,
-        borderRadius: 12,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    activityIcon: {
+    statIconContainer: {
         width: 40,
         height: 40,
-    },
-    activityTextWrapper: {
-        flex: 1,
-        marginLeft: 12,
-    },
-    activityLabel: {
-        fontWeight: '700',
-        fontSize: scaleFont(22),
-    },
-    activitySubText: {
-        fontSize: scaleFont(12),
-        color: colors.mutedText,
-        marginTop: 2,
-    },
-    activityArrow: {
-        width: 20,
-        height: 20,
-        tintColor: 'white',
-        marginLeft: 6,
-        alignSelf: 'center',
-    },
-    statBox: {
-        flex: 1,
-        paddingVertical: 10,
+        borderRadius: 12,
+        justifyContent: 'center',
         alignItems: 'center',
+        marginBottom: 8,
     },
     statIcon: {
-        width: 28,
-        height: 28,
-        marginBottom: 6,
+        width: 20,
+        height: 20,
     },
     statLabel: {
-        fontSize: scaleFont(12),
+        fontSize: scaleFont(10),
         color: colors.mutedText,
-        marginBottom: 2,
+        marginBottom: 4,
+        fontWeight: '600',
     },
     statValue: {
         fontSize: scaleFont(14),
         color: 'white',
-        fontWeight: '600',
-    }, tipBox: {
+        fontWeight: '700',
+        marginBottom: 2,
+    },
+    statUnit: {
+        fontSize: scaleFont(9),
+        color: colors.mutedText,
+    },
+    tipBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 15,
-        borderRadius: 15, // always applied
-        overflow: 'hidden', // ensures rounding works on Android
+        padding: 12,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    tipIconContainer: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
     },
     tipIcon: {
-        width: 28,
-        height: 28,
-        marginRight: 10,
-        tintColor: 'white',
+        width: 30,
+        height: 30,
+    },
+    tipContent: {
+        flex: 1,
+    },
+    tipTitle: {
+        color: 'white',
+        fontSize: scaleFont(12),
+        fontWeight: '700',
+        marginBottom: 4,
     },
     tipText: {
         color: 'white',
+        fontSize: scaleFont(12),
+        lineHeight: 18,
+        opacity: 0.9,
+    },
+    optionsContainer: {
+        marginHorizontal: 15,
+        marginBottom: 20,
+    },
+    optionsTitle: {
+        fontSize: scaleFont(18),
+        fontWeight: '700',
+        color: 'white',
+        marginBottom: 4,
+        marginHorizontal: 15,
+    },
+    optionsSubtitle: {
+        fontSize: scaleFont(12),
+        color: colors.mutedText,
+        marginBottom: 20,
+        marginHorizontal: 15,
+    },
+    activityOption: {
+        borderRadius: 20,
+        padding: 16,
+        marginBottom: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    optionContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
         flex: 1,
     },
-
+    optionIconContainer: {
+        width: 50,
+        height: 50,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    optionIcon: {
+        width: 24,
+        height: 24,
+    },
+    optionText: {
+        flex: 1,
+    },
+    optionLabel: {
+        fontSize: scaleFont(16),
+        fontWeight: '700',
+        marginBottom: 4,
+    },
+    optionDescription: {
+        fontSize: scaleFont(12),
+        color: colors.mutedText,
+        lineHeight: 16,
+    },
+    selectedBadge: {
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 8,
+    },
+    selectedIcon: {
+        width: 16,
+        height: 16,
+        tintColor: 'white',
+    },
 });

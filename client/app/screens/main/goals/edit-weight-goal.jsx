@@ -10,16 +10,17 @@ import { Images } from "../../../common/settings/assets";
 import APIService from "../../../common/services/api-service";
 import usePopups from "../../../common/hooks/use-popups";
 import { recalculateUserInformation } from "../../../common/utils/metrics-calculator";
-import { convertWeight} from "../../../common/utils/unit-converter";
+import { convertWeight } from "../../../common/utils/unit-converter";
 import { formatDate } from "../../../common/utils/date-time";
 import { goalsWeightGoalTip } from "../../../common/utils/text-generator";
 import AppText from "../../../components/screen-comps/app-text";
 import AppScroll from "../../../components/screen-comps/app-scroll";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function EditWeightGoal() {
     const { createToast, hideSpinner, showSpinner } = usePopups();
     const { user, setUser } = useContext(UserContext);
-    const [goal, setGoal] = useState("");
+    const [goal, setGoal] = useState({color: colors.accentGreen});
     const [tip, setTip] = useState("");
 
     useEffect(() => {
@@ -87,190 +88,293 @@ export default function EditWeightGoal() {
 
     return (
         <AppScroll extraTop={60} extraBottom={100}>
-            <View style={[styles.card, { marginTop: 0, padding: 15 }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                    <Image
-                        source={goal.image}
-                        style={{ width: 45, height: 45, marginRight: 12, tintColor: goal.color }}
-                    />
-                    <AppText style={{ color: goal.color, fontWeight: '700', fontSize: scaleFont(20) }}>
-                        {goal.label}
-                    </AppText>
-                </View>
-
-                <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-                    <View style={styles.statBox}>
-                        <Image source={Images.tape} style={[styles.statIcon, { tintColor: "#FFCD61" }]} />
-                        <AppText style={styles.statLabel}>Weight</AppText>
-                        <AppText style={styles.statValue}>
-                            {convertWeight(user.metrics.weightKg, 'kg', user.preferences.weightUnit.field)} {user.preferences.weightUnit.field}
-                        </AppText>
+            {/* Current Goal Header */}
+            <View style={[styles.currentGoalCard, { borderLeftColor: goal?.color || colors.accentBlue, marginTop: 0 }]}>
+                <LinearGradient colors={[goal.color + '20', goal.color + '08']} style={[styles.currentGoalContent, { backgroundColor: (goal?.color || colors.accentBlue) + '15' }]}>
+                    <View style={styles.currentGoalHeader}>
+                        <View style={[styles.goalIconContainer, { backgroundColor: (goal?.color || colors.accentBlue) + '40' }]}>
+                            <Image
+                                source={goal?.image || Images.target}
+                                style={[styles.currentGoalIcon, { tintColor: 'white' }]}
+                            />
+                        </View>
+                        <View style={styles.currentGoalText}>
+                            <AppText style={styles.currentGoalLabel}>Current Weight Goal</AppText>
+                            <AppText style={[styles.currentGoalTitle, { color: goal?.color || colors.accentBlue }]}>
+                                {goal?.label || "Loading..."}
+                            </AppText>
+                        </View>
                     </View>
 
-                    <View style={styles.statBox}>
-                        <Image source={Images.muscleFibers} style={[styles.statIcon, { tintColor: '#6FCF97' }]} />
-                        <AppText style={styles.statLabel}>Lean Mass</AppText>
-                        <AppText style={styles.statValue}>
-                            {convertWeight(user.metrics.leanBodyMass, 'kg', user.preferences.weightUnit.field)} {user.preferences.weightUnit.field}
-                        </AppText>
+                    {/* Stats Grid */}
+                    <View style={styles.statsGrid}>
+                        <View style={styles.statItem}>
+                            <View style={[styles.statIconContainer, { backgroundColor: '#FFCD6120' }]}>
+                                <Image source={Images.tape} style={[styles.statIcon, { tintColor: '#FFCD61' }]} />
+                            </View>
+                            <AppText style={styles.statLabel}>Weight</AppText>
+                            <AppText style={styles.statValue}>
+                                {convertWeight(user.metrics.weightKg, 'kg', user.preferences.weightUnit.field)}
+                            </AppText>
+                            <AppText style={styles.statUnit}>{user.preferences.weightUnit.field}</AppText>
+                        </View>
+
+                        <View style={styles.statItem}>
+                            <View style={[styles.statIconContainer, { backgroundColor: '#6FCF9720' }]}>
+                                <Image source={Images.muscleFibers} style={[styles.statIcon, { tintColor: '#6FCF97' }]} />
+                            </View>
+                            <AppText style={styles.statLabel}>Lean Mass</AppText>
+                            <AppText style={styles.statValue}>
+                                {convertWeight(user.metrics.leanBodyMass, 'kg', user.preferences.weightUnit.field)}
+                            </AppText>
+                            <AppText style={styles.statUnit}>{user.preferences.weightUnit.field}</AppText>
+                        </View>
+
+                        <View style={styles.statItem}>
+                            <View style={[styles.statIconContainer, { backgroundColor: '#E74C3C20' }]}>
+                                <Image source={Images.heartRate} style={[styles.statIcon, { tintColor: '#E74C3C' }]} />
+                            </View>
+                            <AppText style={styles.statLabel}>Body Fat</AppText>
+                            <AppText style={styles.statValue}>{user.metrics.bodyFat}%</AppText>
+                            <AppText style={styles.statUnit}>Percentage</AppText>
+                        </View>
                     </View>
 
-                    <View style={[styles.statBox]}>
-                        <Image source={Images.heartRate} style={[styles.statIcon, { tintColor: '#E74C3C' }]} />
-                        <AppText style={styles.statLabel}>Body Fat</AppText>
-                        <AppText style={styles.statValue}>{user.metrics.bodyFat}%</AppText>
+                    {/* Tip Box */}
+                    <View style={[styles.tipBox, { borderColor: 'rgba(255,255,255,0.1)' }]}>
+                        <View style={[styles.tipIconContainer,]}>
+                            <Image source={Images.energyOutline} style={[styles.tipIcon, { tintColor: 'white' }]} />
+                        </View>
+                        <View style={styles.tipContent}>
+                            <AppText style={styles.tipTitle}>Pro Tip</AppText>
+                            <AppText style={styles.tipText}>{tip}</AppText>
+                        </View>
                     </View>
-                </View>
-
-                <View style={[styles.tipBox, { backgroundColor: goal.color + "33" }]}>
-                    <Image source={Images.energyOutline} style={styles.tipIcon} />
-                    <AppText style={styles.tipText}>{tip}</AppText>
-                </View>
+                </LinearGradient>
             </View>
 
-            {goalOptions.map((item, i) => (
-                <TouchableOpacity
-                    key={i}
-                    style={{
-                        padding: 10,
-                        backgroundColor: user.nutrition.goal === item.key ? item.color + "20" : styles.card.backgroundColor,
-                        borderColor: user.nutrition.goal === item.key ? item.color : adjustColor(styles.card.backgroundColor, 100, "lighten"),
-                        flexDirection: 'row',
-                        borderRadius: 12, marginHorizontal: 15, marginBottom: 15,
-                        justifyContent: 'space-between', alignItems: 'center'
-                    }}
-                    onPress={() => handleGoalUpdate(item.key)}
-                >
-                    <View style={{ flexDirection: 'row' }}>
-                        <View style={{ backgroundColor: item.color + '40', borderRadius: 12, padding: 10, justifyContent: 'center' }}>
-                            <Image source={item.image} style={{ tintColor: item.color, width: 35, height: 35, margin: 0, padding: 0 }} />
+            {/* Goal Options */}
+            <View style={styles.optionsContainer}>
+                <AppText style={styles.optionsTitle}>Choose Your Weight Goal</AppText>
+                <AppText style={styles.optionsSubtitle}>Select the goal that matches your fitness objectives</AppText>
+
+                {goalOptions.map((item, i) => (
+                    <TouchableOpacity
+                        key={i}
+                        style={[
+                            styles.goalOption,
+                            {
+                                backgroundColor: user.nutrition.goal === item.key ? item.color + '20' : colors.cardBackground,
+                                borderColor: user.nutrition.goal === item.key ? item.color : 'rgba(255,255,255,0.1)',
+                                borderWidth: user.nutrition.goal === item.key ? 2 : 1,
+                            }
+                        ]}
+                        onPress={() => handleGoalUpdate(item.key)}
+                    >
+                        <View style={styles.optionContent}>
+                            <View style={[styles.optionIconContainer, { backgroundColor: item.color + '30' }]}>
+                                <Image source={item.image} style={[styles.optionIcon, { tintColor: item.color }]} />
+                            </View>
+                            <View style={styles.optionText}>
+                                <AppText style={[styles.optionLabel, { color: item.color }]}>
+                                    {item.label}
+                                </AppText>
+                                <AppText style={styles.optionDescription}>
+                                    {item.description}
+                                </AppText>
+                            </View>
                         </View>
-                        <View style={{ marginLeft: 10, justifyContent: 'center' }}>
-                            <AppText style={{ color: item.color, fontSize: scaleFont(18), fontWeight: 'bold' }}>{item.label}</AppText>
-                            <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12), marginTop: 5, flexShrink: 1 }}>{item.description}</AppText>
-                        </View>
-                    </View>
-                    {user.nutrition.goal === item.key && (
-                        <Image source={Images.done} style={{ width: 25, height: 25, tintColor: item.color }} />
-                    )}
-                </TouchableOpacity>
-            ))}
+
+                        {user.nutrition.goal === item.key && (
+                            <View style={[styles.selectedBadge, { backgroundColor: item.color }]}>
+                                <Image source={Images.done} style={styles.selectedIcon} />
+                            </View>
+                        )}
+                    </TouchableOpacity>
+                ))}
+            </View>
         </AppScroll>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    currentGoalCard: {
+        margin: 15,
+        marginBottom: 20,
+        borderRadius: 20,
+        overflow: 'hidden',
+        borderLeftWidth: 4,
+    },
+    currentGoalContent: {
+        padding: 20,
+    },
+    currentGoalHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    goalIconContainer: {
+        width: 60,
+        height: 60,
+        borderRadius: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 15,
+    },
+    currentGoalIcon: {
+        width: 30,
+        height: 30,
+    },
+    currentGoalText: {
         flex: 1,
-        backgroundColor: colors.background,
     },
-    scrollContent: {
-        backgroundColor: colors.background,
+    currentGoalLabel: {
+        color: colors.mutedText,
+        fontSize: scaleFont(12),
+        marginBottom: 4,
+        fontWeight: '600',
     },
-    card: {
-        backgroundColor: colors.cardBackground,
-        padding: 15,
-        borderRadius: 15,
-        margin: 15
-    },
-    introText: {
-        color: 'white',
-        fontSize: scaleFont(14),
-        lineHeight: 24,
-    },
-    sectionTitle: {
-        fontSize: scaleFont(16),
+    currentGoalTitle: {
+        fontSize: scaleFont(22),
         fontWeight: '700',
-        color: 'white',
-        marginBottom: 12,
     },
-    feedbackRow: {
+    statsGrid: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginBottom: 6,
-        width: '100%',
+        justifyContent: 'space-between',
+        marginBottom: 20,
     },
-    feedbackBullet: {
-        color: 'white',
-        fontSize: scaleFont(14),
-        marginRight: 6,
-    },
-    feedbackText: {
-        color: 'white',
-        fontSize: scaleFont(14),
-        lineHeight: 20,
+    statItem: {
+        alignItems: 'center',
         flex: 1,
     },
-    goalRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 15,
-    },
-    goalIconWrapper: {
-        padding: 12,
-        borderRadius: 12,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    goalIcon: {
+    statIconContainer: {
         width: 40,
         height: 40,
-    },
-    goalTextWrapper: {
-        flex: 1,
-        marginLeft: 12,
-    },
-    goalLabel: {
-        fontWeight: '700',
-        fontSize: scaleFont(22),
-    },
-    goalSubText: {
-        fontSize: scaleFont(12),
-        color: colors.mutedText,
-        marginTop: 2,
-    },
-    goalArrow: {
-        width: 20,
-        height: 20,
-        tintColor: 'white',
-        marginLeft: 6,
-        alignSelf: 'center',
-    },
-    statBox: {
-        flex: 1,
-        paddingVertical: 10,
-        paddingHorizontal: 5,
+        borderRadius: 12,
+        justifyContent: 'center',
         alignItems: 'center',
+        marginBottom: 8,
     },
     statIcon: {
-        width: 28,
-        height: 28,
-        marginBottom: 6,
+        width: 20,
+        height: 20,
     },
     statLabel: {
-        fontSize: scaleFont(12),
+        fontSize: scaleFont(10),
         color: colors.mutedText,
-        marginBottom: 2,
+        marginBottom: 4,
+        fontWeight: '600',
     },
     statValue: {
         fontSize: scaleFont(14),
         color: 'white',
-        fontWeight: '600',
-    }, tipBox: {
+        fontWeight: '700',
+        marginBottom: 2,
+    },
+    statUnit: {
+        fontSize: scaleFont(9),
+        color: colors.mutedText,
+    },
+    tipBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 15,
-        borderRadius: 15, // always applied
-        overflow: 'hidden', // ensures rounding works on Android
+        padding: 12,
+        borderRadius: 20,
+        borderWidth: 1,
+    },
+    tipIconContainer: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
     },
     tipIcon: {
-        width: 28,
-        height: 28,
-        marginRight: 10,
-        tintColor: 'white',
+        width: 30,
+        height: 30,
+    },
+    tipContent: {
+        flex: 1,
+    },
+    tipTitle: {
+        color: 'white',
+        fontSize: scaleFont(12),
+        fontWeight: '700',
+        marginBottom: 4,
     },
     tipText: {
         color: 'white',
+        fontSize: scaleFont(12),
+        lineHeight: 18,
+        opacity: 0.9,
+    },
+    optionsContainer: {
+        marginHorizontal: 15,
+        marginBottom: 20,
+    },
+    optionsTitle: {
+        fontSize: scaleFont(18),
+        fontWeight: '700',
+        color: 'white',
+        marginBottom: 4,
+        marginHorizontal: 15,
+    },
+    optionsSubtitle: {
+        fontSize: scaleFont(12),
+        color: colors.mutedText,
+        marginBottom: 20,
+        marginHorizontal: 15,
+    },
+    goalOption: {
+        borderRadius: 20,
+        padding: 16,
+        marginBottom: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    optionContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
         flex: 1,
+    },
+    optionIconContainer: {
+        width: 50,
+        height: 50,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    optionIcon: {
+        width: 24,
+        height: 24,
+    },
+    optionText: {
+        flex: 1,
+    },
+    optionLabel: {
+        fontSize: scaleFont(16),
+        fontWeight: '700',
+        marginBottom: 4,
+    },
+    optionDescription: {
+        fontSize: scaleFont(12),
+        color: colors.mutedText,
+        lineHeight: 16,
+    },
+    selectedBadge: {
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 8,
+    },
+    selectedIcon: {
+        width: 16,
+        height: 16,
+        tintColor: 'white',
     },
 });

@@ -241,7 +241,7 @@ export default function Goals() {
                     }
                 } catch (err) {
                     console.log(err.message);
-                    createToast({ message: "Failed to update gender!" + err.message  });
+                    createToast({ message: "Failed to update gender!" + err.message });
                 }
                 finally {
                     hideSpinner();
@@ -369,8 +369,8 @@ export default function Goals() {
     }
 
     return (
-        <AppScroll hideNavBarOnScroll={true} hideTopBarOnScroll={true} extraBottom={100}>
-            <View style={[styles.card, { margin: 15 }]}>
+        <AppScroll hideNavBarOnScroll={true} hideTopBarOnScroll={true} extraBottom={100} topPadding={false}>
+            <View style={[styles.card, { margin: 0, borderTopEndRadius: 0, borderTopStartRadius: 0, paddingTop: 90, marginBottom: 15, borderRadius: 30  }]}>
                 <View style={styles.metricRow}>
                     <TouchableOpacity onPress={handleHeightChange} style={styles.metricItem}>
                         <View style={{ padding: 15, backgroundColor: "#d8001d44", borderRadius: 50 }}>
@@ -432,7 +432,7 @@ export default function Goals() {
                     </TouchableOpacity>
                 </View>
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 15, backgroundColor: colors.backgroundTop, borderRadius: 20, marginTop: 15 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 15, backgroundColor: colors.backgroundTop, borderRadius: 25, marginTop: 15 }}>
                     <View style={[styles.rowInfo, { width: '40%' }]}>
                         <AppText style={styles.rowInfoValue}>
                             {activityOptions.find(opt => opt.key === user.metrics.activityLevel)?.label || "Unknown Activity Level"}
@@ -465,143 +465,168 @@ export default function Goals() {
                 </View>
             </View>
 
-            <AppText style={[styles.sectionTitle, { marginHorizontal: 25, marginTop: 15 }]}>
+            <AppText style={[styles.sectionTitle, { marginHorizontal: 25, marginTop: 15, marginBottom: 10 }]}>
                 Quick Updates
             </AppText>
 
             <View style={[styles.card, { marginTop: 0 }]}>
-                <AppText style={styles.sectionTitle}>Activity Level & Lifestyle</AppText>
-                {activityFeedbacks.map((line, i) => (
-                    <View key={i} style={[styles.feedbackRow, { marginStart: 15 }]}>
-                        <AppText style={[styles.feedbackBullet, { color: colors.mutedText }]}>• </AppText>
-                        <AppText style={[styles.feedbackText, { color: colors.mutedText }]}>{line}</AppText>
+                {/* Activity Level Section */}
+                <View style={styles.sectionHeader}>
+                    <View style={[styles.sectionIcon, { backgroundColor: activity.color + '20' }]}>
+                        <Image source={activity.image} style={[styles.sectionHeaderIcon, { tintColor: activity.color }]} />
                     </View>
-                ))}
+                    <View style={styles.sectionHeaderText}>
+                        <AppText style={styles.sectionTitle}>Activity Level & Lifestyle</AppText>
+                        <AppText style={styles.sectionSubtitle}>Optimize your daily movement</AppText>
+                    </View>
+                </View>
+
+                <View style={styles.feedbackContainer}>
+                    {activityFeedbacks.map((line, i) => (
+                        <View key={i} style={styles.feedbackItem}>
+                            <View style={[styles.feedbackDot, { backgroundColor: activity.color }]} />
+                            <AppText style={styles.feedbackText}>{line}</AppText>
+                        </View>
+                    ))}
+                </View>
 
                 <TouchableOpacity
                     onPress={() => router.push(routes.EDIT_ACTIVITY)}
                     style={[
-                        styles.activityRow,
-                        {
-                            backgroundColor: colors.backgroundTop,
-                            borderWidth: 1,
-                            padding: 15,
-                            borderRadius: 20,
-                            borderColor: activity.color,
-                        },
+                        styles.actionCard,
+                        { borderLeftColor: activity.color }
                     ]}
                 >
-                    <View style={[styles.activityIconWrapper, { backgroundColor: activity.color + '20', borderRadius: 15, overflow: 'hidden' }]}>
-                        <Image source={activity.image} style={[styles.activityIcon, { tintColor: activity.color }]} />
+                    <View style={styles.actionContent}>
+                        <View style={styles.actionText}>
+                            <AppText style={[styles.actionTitle, { color: activity.color }]}>
+                                {activity.label}
+                            </AppText>
+                            <AppText style={styles.actionSubtitle}>
+                                Update your activity level
+                            </AppText>
+                        </View>
+                        <View style={[styles.actionArrow]}>
+                            <Image source={Images.arrow} style={[styles.arrowIcon, { tintColor: 'white' }]} />
+                        </View>
                     </View>
-                    <View style={[styles.activityTextWrapper, { marginStart: 15 }]}>
-                        <AppText style={[styles.activityLabel, { color: activity.color, fontSize: scaleFont(15) }]}>
-                            {activity.label}
-                        </AppText>
-                        <AppText style={[styles.activitySubText, { fontSize: scaleFont(10) }]}>
-                            Been more active recently? Tap to update activity levels
-                        </AppText>
-                    </View>
-                    <Image source={Images.arrow} style={[styles.activityArrow, { tintColor: colors.mutedText }]} />
                 </TouchableOpacity>
 
-                <Divider orientation="horizontal" style={{ backgroundColor: "rgba(102,102,102,0.2)", marginVertical: 20 }} thickness={2} />
+                <View style={styles.sectionDivider} />
 
-                <AppText style={styles.sectionTitle}>Weight Goal</AppText>
-                {weightGoalFeedbacks.map((line, i) => (
-                    <View key={i} style={[styles.feedbackRow, { marginStart: 15 }]}>
-                        <AppText style={[styles.feedbackBullet, { color: colors.mutedText }]}>• </AppText>
-                        <AppText style={[styles.feedbackText, { color: colors.mutedText }]}>{line}</AppText>
+                {/* Weight Goal Section */}
+                <View style={styles.sectionHeader}>
+                    <View style={[styles.sectionIcon, { backgroundColor: goal.color + '20' }]}>
+                        <Image source={goal.image} style={[styles.sectionHeaderIcon, { tintColor: goal.color }]} />
                     </View>
-                ))}
+                    <View style={styles.sectionHeaderText}>
+                        <AppText style={styles.sectionTitle}>Weight Goal</AppText>
+                        <AppText style={styles.sectionSubtitle}>Track your progress</AppText>
+                    </View>
+                </View>
+
+                <View style={styles.feedbackContainer}>
+                    {weightGoalFeedbacks.map((line, i) => (
+                        <View key={i} style={styles.feedbackItem}>
+                            <View style={[styles.feedbackDot, { backgroundColor: goal.color }]} />
+                            <AppText style={styles.feedbackText}>{line}</AppText>
+                        </View>
+                    ))}
+                </View>
 
                 <TouchableOpacity
                     onPress={() => router.push(routes.EDIT_WEIGHT_GOAL)}
                     style={[
-                        styles.activityRow,
-                        {
-                            backgroundColor: colors.backgroundTop,
-                            borderWidth: 1,
-                            padding: 15,
-                            borderRadius: 20,
-                            borderColor: goal.color,
-                        },
+                        styles.actionCard,
+                        { borderLeftColor: goal.color }
                     ]}
                 >
-                    <View style={[styles.activityIconWrapper, { backgroundColor: goal.color + '20', borderRadius: 15, overflow: 'hidden' }]}>
-                        <Image source={goal.image} style={[styles.activityIcon, { tintColor: goal.color }]} />
+                    <View style={styles.actionContent}>
+                        <View style={styles.actionText}>
+                            <AppText style={[styles.actionTitle, { color: goal.color }]}>
+                                {goal.label}
+                            </AppText>
+                            <AppText style={styles.actionSubtitle}>
+                                Adjust your weight target
+                            </AppText>
+                        </View>
+                        <View style={[styles.actionArrow]}>
+                            <Image source={Images.arrow} style={[styles.arrowIcon, { tintColor: 'white' }]} />
+                        </View>
                     </View>
-                    <View style={[styles.activityTextWrapper, { marginStart: 15 }]}>
-                        <AppText style={[styles.activityLabel, { color: goal.color, fontSize: scaleFont(15) }]}>
-                            {goal.label}
-                        </AppText>
-                        <AppText style={[styles.activitySubText, { fontSize: scaleFont(10) }]}>
-                            New weight goals? Tap to update your weight goal
-                        </AppText>
-                    </View>
-                    <Image source={Images.arrow} style={[styles.activityArrow, { tintColor: colors.mutedText }]} />
                 </TouchableOpacity>
 
-                <Divider orientation="horizontal" style={{ backgroundColor: "rgba(102,102,102,0.2)", marginVertical: 20 }} thickness={2} />
+                <View style={styles.sectionDivider} />
 
-                <AppText style={styles.sectionTitle}>Current Diet</AppText>
-                {dietTips.map((tip, i) => (
-                    <View key={i} style={[styles.feedbackRow, { marginStart: 15 }]}>
-                        <AppText style={[styles.feedbackBullet, { color: colors.mutedText }]}>• </AppText>
-                        <AppText style={[styles.feedbackText, { color: colors.mutedText }]}>{tip}</AppText>
+                {/* Diet Section */}
+                <View style={styles.sectionHeader}>
+                    <View style={[styles.sectionIcon, { backgroundColor: diet.color + '20' }]}>
+                        <Image source={diet.image} style={[styles.sectionHeaderIcon, { tintColor: diet.color }]} />
                     </View>
-                ))}
+                    <View style={styles.sectionHeaderText}>
+                        <AppText style={styles.sectionTitle}>Current Diet</AppText>
+                        <AppText style={styles.sectionSubtitle}>Nutrition & meal planning</AppText>
+                    </View>
+                </View>
+
+                <View style={styles.feedbackContainer}>
+                    {dietTips.map((tip, i) => (
+                        <View key={i} style={styles.feedbackItem}>
+                            <View style={[styles.feedbackDot, { backgroundColor: diet.color }]} />
+                            <AppText style={styles.feedbackText}>{tip}</AppText>
+                        </View>
+                    ))}
+                </View>
 
                 <TouchableOpacity
                     onPress={() => router.push(routes.EDIT_DIET)}
                     style={[
-                        styles.activityRow,
-                        {
-                            backgroundColor: colors.backgroundTop,
-                            borderWidth: 1,
-                            padding: 15,
-                            borderRadius: 20,
-                            borderColor: diet.color,
-                        },
+                        styles.actionCard,
+                        { borderLeftColor: diet.color }
                     ]}
                 >
-                    <View style={[styles.activityIconWrapper, { backgroundColor: diet.color + '20', borderRadius: 15, overflow: 'hidden' }]}>
-                        <Image source={diet.image} style={[styles.activityIcon, { tintColor: diet.color }]} />
+                    <View style={styles.actionContent}>
+                        <View style={styles.actionText}>
+                            <AppText style={[styles.actionTitle, { color: diet.color }]}>
+                                {diet.label}
+                            </AppText>
+                            <AppText style={styles.actionSubtitle}>
+                                Change diet plan
+                            </AppText>
+                        </View>
+                        <View style={[styles.actionArrow,]}>
+                            <Image source={Images.arrow} style={[styles.arrowIcon, { tintColor: 'white' }]} />
+                        </View>
                     </View>
-                    <View style={[styles.activityTextWrapper, { marginStart: 15 }]}>
-                        <AppText style={[styles.activityLabel, { color: diet.color, fontSize: scaleFont(15) }]}>{diet.label}</AppText>
-                        <AppText style={[styles.activitySubText, { fontSize: scaleFont(10) }]}>
-                            New diet plan and macros? Tap here to switch up your diet
-                        </AppText>
-                    </View>
-                    <Image source={Images.arrow} style={[styles.activityArrow, { tintColor: colors.mutedText }]} />
                 </TouchableOpacity>
 
+                {/* Water Section */}
                 <TouchableOpacity
                     onPress={handleWaterChange}
                     style={[
-                        styles.activityRow,
+                        styles.actionCard,
                         {
-                            backgroundColor: colors.backgroundTop,
-                            borderWidth: 1,
-                            padding: 15,
-                            borderRadius: 20,
-                            borderColor: nutritionColors.water1,
-                        },
+                            borderLeftColor: nutritionColors.water1,
+                            marginTop: 20
+                        }
                     ]}
                 >
-                    <View style={[styles.activityIconWrapper, { backgroundColor: nutritionColors.water1 + '20', borderRadius: 15, overflow: 'hidden' }]}>
-                        <Image source={Images.water} style={[styles.activityIcon, { tintColor: nutritionColors.water1 }]} />
+                    <View style={styles.actionContent}>
+                        <View style={[styles.waterIcon, { backgroundColor: nutritionColors.water1 + '20' }]}>
+                            <Image source={Images.water} style={[styles.waterIconImage, { tintColor: nutritionColors.water1 }]} />
+                        </View>
+                        <View style={styles.actionText}>
+                            <AppText style={[styles.actionTitle, { color: nutritionColors.water1 }]}>
+                                Water Intake
+                            </AppText>
+                            <AppText style={styles.actionSubtitle}>
+                                Adjust daily consumption
+                            </AppText>
+                        </View>
+                        <View style={[styles.actionArrow]}>
+                            <Image source={Images.arrow} style={[styles.arrowIcon, { tintColor: 'white' }]} />
+                        </View>
                     </View>
-                    <View style={[styles.activityTextWrapper, { marginStart: 15 }]}>
-                        <AppText style={[styles.activityLabel, { color: nutritionColors.water1, fontSize: scaleFont(15) }]}>
-                            Water
-                        </AppText>
-                        <AppText style={[styles.activitySubText, { fontSize: scaleFont(10) }]}>
-                            Make sure you're having enough water! Tap here to adjust water intake
-                        </AppText>
-                    </View>
-                    <Image source={Images.arrow} style={[styles.activityArrow, { tintColor: colors.mutedText }]} />
                 </TouchableOpacity>
             </View>
         </AppScroll>
@@ -677,8 +702,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     activityIcon: {
-        width: 40,
-        height: 40,
+        width: 25,
+        height: 25,
     },
     activityTextWrapper: {
         flex: 1,
@@ -699,6 +724,112 @@ const styles = StyleSheet.create({
         tintColor: 'white',
         marginLeft: 6,
         alignSelf: 'center',
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    sectionIcon: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+        overflow:'hidden'
+    },
+    sectionHeaderIcon: {
+        width: 20,
+        height: 20,
+    },
+    sectionHeaderText: {
+        flex: 1,
+    },
+    sectionTitle: {
+        fontSize: scaleFont(18),
+        fontWeight: '700',
+        color: 'white',
+        marginBottom: 2,
+    },
+    sectionSubtitle: {
+        fontSize: scaleFont(12),
+        color: colors.mutedText,
+    },
+    feedbackContainer: {
+        marginBottom: 20,
+    },
+    feedbackItem: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: 8,
+        marginHorizontal: 10
+    },
+    feedbackDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        marginTop: 8,
+        marginRight: 12,
+    },
+    feedbackText: {
+        color: colors.mutedText,
+        fontSize: scaleFont(12),
+        lineHeight: 18,
+        flex: 1,
+    },
+    actionCard: {
+        backgroundColor: colors.backgroundTop,
+        borderLeftWidth: 4,
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 8,
+    },
+    actionContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    actionText: {
+        flex: 1,
+    },
+    actionTitle: {
+        fontSize: scaleFont(16),
+        fontWeight: '700',
+        marginBottom: 4,
+    },
+    actionSubtitle: {
+        fontSize: scaleFont(11),
+        color: colors.mutedText,
+    },
+    waterIcon: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    waterIconImage: {
+        width: 18,
+        height: 18,
+    },
+    actionArrow: {
+        width: 32,
+        height: 32,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    arrowIcon: {
+        width: 14,
+        height: 14,
+    },
+    sectionDivider: {
+        height: 1,
+        backgroundColor: 'rgba(102,102,102,0.3)',
+        marginVertical: 24,
+        marginHorizontal: -10,
     },
 
 });

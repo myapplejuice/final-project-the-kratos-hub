@@ -9,7 +9,7 @@ import { Image } from "expo-image";
 import { Images } from "../../../common/settings/assets";
 import usePopups from "../../../common/hooks/use-popups";
 import { macrosFromCalories, recalculateUserInformation } from "../../../common/utils/metrics-calculator";
-import { convertEnergy} from "../../../common/utils/unit-converter";
+import { convertEnergy } from "../../../common/utils/unit-converter";
 import { formatDate } from "../../../common/utils/date-time";
 import AppText from "../../../components/screen-comps/app-text";
 import PercentageBar from "../../../components/screen-comps/percentage-bar";
@@ -19,7 +19,7 @@ import APIService from "../../../common/services/api-service";
 import AppScroll from "../../../components/screen-comps/app-scroll";
 
 export default function EditDiet() {
-    const { createOptions, createToast, hideSpinner, showSpinner } = usePopups();
+    const { createOptions, createToast, hideSpinner, showSpinner, createDialog } = usePopups();
     const { user, setUser } = useContext(UserContext);
 
     const [diet, setDiet] = useState({});
@@ -228,23 +228,37 @@ export default function EditDiet() {
 
     async function handleEnergyIntake() {
         Keyboard.dismiss();
+        let setEnergyKcal = energyIntake;
+
+        if (user.preferences.energyUnit.key === "kj")
+            setEnergyKcal = convertEnergy(Number(energyIntake), "kj", "kcal");
+
+        if (setEnergyKcal === user.nutrition.setEnergyKcal) {
+            createToast({ message: "No changes made!" });
+            return;
+        }
+
+        if (setEnergyKcal <= 0) {
+            createToast({ message: "Energy intake can't be 0 or below!" });
+            return;
+        }
+
+        const factor = Math.abs(setEnergyKcal - user.nutrition.recommendedEnergyKcal);
+
+        if (factor > 500) {
+            if (setEnergyKcal > user.nutrition.recommendedEnergyKcal) {
+                return createDialog({ title: "Warning", text: "This energy intake is too high for your TDEE!\n\nAre you sure you want to continue?", onConfirm: () => confirmEnergyIntake(setEnergyKcal) });
+            } else {
+                return createDialog({  title: "Warning",text: "This energy intake is too low for your TDEE!\n\nAre you sure you want to continue?", onConfirm: () => confirmEnergyIntake(setEnergyKcal) });
+            }
+        }else {
+            confirmEnergyIntake(setEnergyKcal);
+        }
+    }
+
+    async function confirmEnergyIntake(setEnergyKcal) {
+        showSpinner();
         try {
-            showSpinner();
-            let setEnergyKcal = energyIntake;
-
-            if (user.preferences.energyUnit.key === "kj")
-                setEnergyKcal = convertEnergy(Number(energyIntake), "kj", "kcal");
-
-            if (setEnergyKcal === user.nutrition.setEnergyKcal) {
-                createToast({ message: "No changes made!" });
-                return;
-            }
-
-            if (setEnergyKcal <= 0) {
-                createToast({ message: "Energy intake can't be 0 or below!" });
-                return;
-            }
-
             const newMacros = macrosFromCalories(setEnergyKcal, dietKey, currentCarbRate, currentProteinRate, currentFatRate);
             const carbGrams = newMacros.carbs;
             const proteinGrams = newMacros.protein;
@@ -300,258 +314,493 @@ export default function EditDiet() {
 
     return (
         <AppScroll extraBottom={150}>
+            {/* Current Diet Header */}
             <TouchableOpacity
                 onPress={handleDietOptions}
-                style={[styles.card, { backgroundColor: diet.color + '20' }]}
+                style={[styles.currentDietCard, { borderLeftColor: diet.color }]}
             >
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Image
-                        source={diet.image}
-                        style={{
-                            width: 45,
-                            height: 45,
-                            marginRight: 15,
-                            tintColor: diet.color,
-                        }}
-                    />
-                    <View style={{ flex: 1 }}>
-                        <AppText
-                            style={[
-                                styles.headerText,
-                                { color: diet.color, fontSize: scaleFont(20) },
-                            ]}
-                        >
+                <View style={styles.currentDietContent}>
+                    <View style={[styles.dietIconContainer, { backgroundColor: diet.color + '30', overflow: 'hidden' }]}>
+                        <Image
+                            source={diet.image}
+                            style={[styles.dietIcon, { tintColor: diet.color }]}
+                        />
+                    </View>
+                    <View style={styles.dietText}>
+                        <AppText style={styles.currentDietLabel}>Current Diet Plan</AppText>
+                        <AppText style={[styles.currentDietTitle, { color: diet.color }]}>
                             {diet.label}
                         </AppText>
-                        <AppText style={styles.subText}>{diet.description}</AppText>
+                        <AppText style={styles.currentDietDescription}>{diet.description}</AppText>
                     </View>
-                    <Image
-                        source={Images.arrow}
-                        style={{ width: 20, height: 20, tintColor: 'white' }}
-                    />
+                    <View style={[styles.arrowContainer]}>
+                        <Image
+                            source={Images.arrow}
+                            style={[styles.arrowIcon, { tintColor: 'white' }]}
+                        />
+                    </View>
                 </View>
             </TouchableOpacity>
 
-            <View style={[styles.card, { padding: 10, marginTop: 15, }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Image
-                        source={Images.magnifier}
-                        style={{ width: 22, height: 22, tintColor: 'white' }}
-                    />
-                    <View style={{ flex: 1, marginLeft: 12 }}>
-                        <AppText style={{ color: 'white', fontSize: scaleFont(12), }}>
-                            Energy intake drives your weight goals.  Pick a diet that fits your health and lifestyle.
+            {/* Info Card */}
+            <View style={styles.infoCard}>
+                <View style={styles.infoContent}>
+                    <View style={[styles.infoIcon]}>
+                        <Image
+                            source={Images.magnifier}
+                            style={[styles.infoIconImage, { tintColor: 'white' }]}
+                        />
+                    </View>
+                    <View style={styles.infoText}>
+                        <AppText style={styles.infoTitle}>Energy & Nutrition</AppText>
+                        <AppText style={styles.infoDescription}>
+                            Energy intake drives your weight goals. Pick a diet that fits your health and lifestyle.
                         </AppText>
                     </View>
                 </View>
             </View>
 
-            <View style={[styles.card]}>
-                <AppText style={styles.sectionTitle}>Macronutrient Breakdown</AppText>
+            {/* Macronutrient Section */}
+            <View style={styles.macroCard}>
+                <View style={styles.sectionHeader}>
+                    <AppText style={styles.sectionTitle}>Macronutrient Breakdown</AppText>
+                    <AppText style={styles.sectionSubtitle}>Daily distribution</AppText>
+                </View>
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 12 }}>
-                    <View style={styles.macroBox}>
-                        <Image source={Images.carbs1} style={[styles.macroIcon, { tintColor: nutritionColors.carbs1 }]} />
+                <View style={styles.macrosGrid}>
+                    <View style={styles.macroItem}>
+                        <View style={[styles.macroIconContainer, { backgroundColor: nutritionColors.carbs1 + '20' }]}>
+                            <Image source={Images.carbs1} style={[styles.macroIcon, { tintColor: nutritionColors.carbs1 }]} />
+                        </View>
                         <AppText style={styles.macroLabel}>Carbs</AppText>
                         <AppText style={styles.macroValue}>{currentCarbGrams}g</AppText>
+                        <AppText style={styles.macroPercentage}>{currentCarbRate}%</AppText>
                     </View>
-                    <View style={styles.macroBox}>
-                        <Image source={Images.protein5} style={[styles.macroIcon, { tintColor: nutritionColors.protein1 }]} />
+
+                    <View style={styles.macroItem}>
+                        <View style={[styles.macroIconContainer, { backgroundColor: nutritionColors.protein1 + '20' }]}>
+                            <Image source={Images.protein5} style={[styles.macroIcon, { tintColor: nutritionColors.protein1 }]} />
+                        </View>
                         <AppText style={styles.macroLabel}>Protein</AppText>
                         <AppText style={styles.macroValue}>{currentProteinGrams}g</AppText>
+                        <AppText style={styles.macroPercentage}>{currentProteinRate}%</AppText>
                         <AppText style={styles.requirementText}>
                             Req: {user.nutrition.proteinRequirement}g
                         </AppText>
                     </View>
-                    <View style={styles.macroBox}>
-                        <Image source={Images.butter} style={[styles.macroIcon, { tintColor: nutritionColors.fat1 }]} />
+
+                    <View style={styles.macroItem}>
+                        <View style={[styles.macroIconContainer, { backgroundColor: nutritionColors.fat1 + '20' }]}>
+                            <Image source={Images.butter} style={[styles.macroIcon, { tintColor: nutritionColors.fat1 }]} />
+                        </View>
                         <AppText style={styles.macroLabel}>Fat</AppText>
                         <AppText style={styles.macroValue}>{currentFatGrams}g</AppText>
+                        <AppText style={styles.macroPercentage}>{currentFatRate}%</AppText>
                     </View>
                 </View>
 
-                <PercentageBar
-                    values={[
-                        { percentage: Number(currentCarbRate), color: nutritionColors.carbs1 },
-                        { percentage: Number(currentProteinRate), color: nutritionColors.protein1 },
-                        { percentage: Number(currentFatRate), color: nutritionColors.fat1 },
-                    ]}
-                    barHeight={10}
-                    showPercentage={true}
-                    minVisiblePercentage={3}
-                />
-
-                <AppText style={[styles.subText, { textAlign: 'center', marginTop: 10, fontSize: scaleFont(9) }]}>
-                    Macronutrient Distribution (% of Total Energy)
-                </AppText>
-
+                <View style={styles.percentageSection}>
+                    <PercentageBar
+                        values={[
+                            { percentage: Number(currentCarbRate), color: nutritionColors.carbs1 },
+                            { percentage: Number(currentProteinRate), color: nutritionColors.protein1 },
+                            { percentage: Number(currentFatRate), color: nutritionColors.fat1 },
+                        ]}
+                        barHeight={12}
+                        showPercentage={true}
+                        minVisiblePercentage={3}
+                    />
+                    <AppText style={styles.percentageLabel}>
+                        Macronutrient Distribution (% of Total Energy)
+                    </AppText>
+                </View>
 
                 {dietKey === 'custom' && (
-                    <View style={{ marginTop: 15 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <AppTextInput
-                                value={String(currentCarbRate)}
-                                onChangeText={setCurrentCarbRate}
-                                style={[styles.inputNew]}
-                                placeholder="% Carbs"
-                                keyboardType="numeric"
-                            />
-                            <AppTextInput
-                                value={String(currentProteinRate)}
-                                onChangeText={setCurrentProteinRate}
-                                style={[styles.inputNew, { marginHorizontal: 15 }]}
-                                placeholder="% Protein"
-                                keyboardType="numeric"
-                            />
-                            <AppTextInput
-                                value={String(currentFatRate)}
-                                onChangeText={setCurrentFatRate}
-                                style={[styles.inputNew]}
-                                placeholder="% Fat"
-                                keyboardType="numeric"
-                            />
+                    <View style={styles.customMacroSection}>
+                        <AppText style={styles.customTitle}>Customize Macros</AppText>
+                        <View style={styles.macroInputs}>
+                            <View style={styles.macroInputGroup}>
+                                <AppText style={[styles.macroInputLabel, { color: nutritionColors.carbs1 }]}>Carbs</AppText>
+                                <AppTextInput
+                                    value={String(currentCarbRate)}
+                                    onChangeText={setCurrentCarbRate}
+                                    style={[styles.macroInput, { borderColor: nutritionColors.carbs1 + '40' }]}
+                                    placeholder="%"
+                                    keyboardType="numeric"
+                                />
+                            </View>
+                            <View style={styles.macroInputGroup}>
+                                <AppText style={[styles.macroInputLabel, { color: nutritionColors.protein1 }]}>Protein</AppText>
+                                <AppTextInput
+                                    value={String(currentProteinRate)}
+                                    onChangeText={setCurrentProteinRate}
+                                    style={[styles.macroInput, { borderColor: nutritionColors.protein1 + '40' }]}
+                                    placeholder="%"
+                                    keyboardType="numeric"
+                                />
+                            </View>
+                            <View style={styles.macroInputGroup}>
+                                <AppText style={[styles.macroInputLabel, { color: nutritionColors.fat1 }]}>Fat</AppText>
+                                <AppTextInput
+                                    value={String(currentFatRate)}
+                                    onChangeText={setCurrentFatRate}
+                                    style={[styles.macroInput, { borderColor: nutritionColors.fat1 + '40' }]}
+                                    placeholder="%"
+                                    keyboardType="numeric"
+                                />
+                            </View>
                         </View>
                         <AnimatedButton
                             onPress={handleCustomDiet}
-                            style={styles.button}
-                            textStyle={styles.buttonText}
+                            style={[styles.actionButton, { backgroundColor: diet.color }]}
+                            textStyle={styles.actionButtonText}
                             title="Confirm Macro Changes"
                         />
                     </View>
                 )}
             </View>
 
-            <View style={[styles.card]}>
-                <View style={{ marginBottom: 8 }}>
+            {/* Energy Intake Section */}
+            <View style={styles.energyCard}>
+                <View style={styles.sectionHeader}>
                     <AppText style={styles.sectionTitle}>Daily Energy Intake</AppText>
+                    <AppText style={styles.sectionSubtitle}>Manage your calorie goals</AppText>
                 </View>
 
-                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 12 }}>
-                    <AppText style={styles.subText}>Weight Goal:</AppText>
-                    <AppText style={[styles.highlightValue, { color: goalOptions.find(option => option.key === user.nutrition.goal).color }]}>
-                        {goalOptions.find(option => option.key === user.nutrition.goal).label}
-                    </AppText>
+                <View style={styles.goalBadge}>
+                    <AppText style={styles.goalLabel}>Weight Goal:</AppText>
+                    <View style={[styles.goalValue, { backgroundColor: goalOptions.find(option => option.key === user.nutrition.goal).color + '20' }]}>
+                        <AppText style={[styles.goalValueText, { color: goalOptions.find(option => option.key === user.nutrition.goal).color }]}>
+                            {goalOptions.find(option => option.key === user.nutrition.goal).label}
+                        </AppText>
+                    </View>
                 </View>
 
-                <View style={{ backgroundColor: adjustColor(colors.cardBackground, '30'), marginBottom: 15, padding: 15, borderRadius: 15 }}>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 2 }}>
-                        <AppText style={styles.subText}>Current:</AppText>
-                        <AppText style={styles.highlightValue}>
+                <View style={styles.energyStats}>
+                    <View style={styles.energyStat}>
+                        <AppText style={styles.energyStatLabel}>Current Intake</AppText>
+                        <AppText style={styles.energyStatValue}>
                             {convertEnergy(user.nutrition.setEnergyKcal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
                         </AppText>
                     </View>
-
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 2 }}>
-                        <AppText style={styles.subText}>TDEE:</AppText>
-                        <AppText style={styles.highlightValue}>
+                    <View style={styles.energyStat}>
+                        <AppText style={styles.energyStatLabel}>Your TDEE</AppText>
+                        <AppText style={styles.energyStatValue}>
                             {convertEnergy(user.metrics.tdee, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
                         </AppText>
                     </View>
-
-                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                        <AppText style={styles.subText}>Recommended:</AppText>
-                        <AppText style={[styles.highlightValue, { color: colors.main }]}>
+                    <View style={styles.energyStat}>
+                        <AppText style={styles.energyStatLabel}>Recommended</AppText>
+                        <AppText style={[styles.energyStatValue, { color: colors.main }]}>
                             {convertEnergy(user.nutrition.recommendedEnergyKcal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
                         </AppText>
                     </View>
                 </View>
 
-                <AppTextInput
-                    value={String(energyIntake)}
-                    onChangeText={setEnergyIntake}
-                    style={[styles.inputNew, { width: "100%", marginBottom: 0 }]}
-                    placeholder={`Enter energy in ${user.preferences.energyUnit.field}`}
-                    keyboardType="numeric"
-                />
-
-                <AnimatedButton
-                    onPress={handleEnergyIntake}
-                    style={styles.button}
-                    textStyle={styles.buttonText}
-                    title="Update Energy Intake"
-                />
+                <View style={styles.energyInputSection}>
+                    <AppText style={styles.energyInputLabel}>Adjust Daily Energy Intake</AppText>
+                    <AppTextInput
+                        value={String(energyIntake)}
+                        onChangeText={setEnergyIntake}
+                        style={styles.energyInput}
+                        placeholder={`Enter energy in ${user.preferences.energyUnit.field}`}
+                        keyboardType="numeric"
+                    />
+                    <AnimatedButton
+                        onPress={handleEnergyIntake}
+                        style={[styles.actionButton, { backgroundColor: colors.main }]}
+                        textStyle={styles.actionButtonText}
+                        title="Update Energy Intake"
+                    />
+                </View>
             </View>
         </AppScroll>
     );
-
 }
 const styles = StyleSheet.create({
-    card: {
+    currentDietCard: {
+        marginHorizontal: 15,
+        marginTop: 15,
+        borderRadius: 20,
+        borderLeftWidth: 4,
+        overflow: 'hidden',
+    },
+    currentDietContent: {
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        padding: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    dietIconContainer: {
+        width: 60,
+        height: 60,
+        borderRadius: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 15,
+    },
+    dietIcon: {
+        width: 30,
+        height: 30,
+    },
+    dietText: {
+        flex: 1,
+    },
+    currentDietLabel: {
+        fontSize: scaleFont(12),
+        color: colors.mutedText,
+        fontWeight: '600',
+        marginBottom: 2,
+    },
+    currentDietTitle: {
+        fontSize: scaleFont(20),
+        fontWeight: '700',
+        marginBottom: 4,
+    },
+    currentDietDescription: {
+        fontSize: scaleFont(12),
+        color: colors.mutedText,
+        lineHeight: 16,
+    },
+    arrowContainer: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    arrowIcon: {
+        width: 16,
+        height: 16,
+    },
+    infoCard: {
+        marginHorizontal: 15,
+        marginTop: 15,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.03)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    infoContent: {
+        padding: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    infoIcon: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    infoIconImage: {
+        width: 25,
+        height: 25,
+    },
+    infoText: {
+        flex: 1,
+    },
+    infoTitle: {
+        fontSize: scaleFont(14),
+        fontWeight: '700',
+        color: 'white',
+        marginBottom: 4,
+    },
+    infoDescription: {
+        fontSize: scaleFont(12),
+        color: colors.mutedText,
+        lineHeight: 16,
+    },
+    macroCard: {
         backgroundColor: 'rgba(255,255,255,0.05)',
         marginHorizontal: 15,
         marginTop: 15,
-        padding: 15,
-        borderRadius: 15,
+        paddingTop: 20,
+        paddingHorizontal: 20,
+        borderRadius: 20,
     },
-    headerText: {
+    energyCard: {
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        marginHorizontal: 15,
+        marginTop: 20,
+        padding: 20,
+        borderRadius: 20,
+    },
+    sectionHeader: {
+        marginBottom: 20,
+    },
+    sectionTitle: {
         fontSize: scaleFont(18),
         fontWeight: '700',
         color: 'white',
+        marginBottom: 4,
     },
-    subText: {
-        fontSize: scaleFont(11),
+    sectionSubtitle: {
+        fontSize: scaleFont(12),
         color: colors.mutedText,
     },
-    sectionTitle: {
-        fontSize: scaleFont(16),
-        fontWeight: '700',
-        color: 'white',
-        marginBottom: 12,
+    macrosGrid: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 20,
     },
-    macroBox: {
+    macroItem: {
         alignItems: 'center',
+        flex: 1,
+    },
+    macroIconContainer: {
+        width: 50,
+        height: 50,
+        borderRadius: 14,
         justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 8,
     },
     macroIcon: {
-        width: 30,
-        height: 30,
-        marginBottom: 4,
+        width: 24,
+        height: 24,
     },
     macroLabel: {
         fontSize: scaleFont(12),
         color: colors.mutedText,
+        marginBottom: 4,
+        fontWeight: '600',
     },
     macroValue: {
-        fontSize: scaleFont(14),
+        fontSize: scaleFont(16),
         fontWeight: '700',
         color: 'white',
+        marginBottom: 2,
     },
-    inputNew: {
-        flex: 1,
-        height: 48,
-        paddingHorizontal: 12,
-        borderRadius: 15,
-        backgroundColor: colors.inputBackground,
-        color: 'white',
-        borderWidth: 1,
-        borderColor: colors.inputBorderColor,
+    macroPercentage: {
+        fontSize: scaleFont(11),
+        color: colors.mutedText,
     },
-    button: {
-        marginTop: 18,
-        height: 50,
-        borderRadius: 15,
-        backgroundColor: colors.main,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    buttonText: {
-        color: 'white',
-        fontWeight: '700',
-        fontSize: scaleFont(14),
-    }, requirementText: {
+    requirementText: {
         fontSize: scaleFont(10),
         color: colors.mutedText,
         marginTop: 2,
     },
-    sectionHighlight: {
-        fontSize: scaleFont(13),
-        fontWeight: '600',
-        color: nutritionColors.protein1,
+    percentageSection: {
+        marginBottom: 20,
+    },
+    percentageLabel: {
+        fontSize: scaleFont(10),
+        color: colors.mutedText,
         textAlign: 'center',
-        marginBottom: 10,
-    }, highlightValue: {
+        marginTop: 15,
+    },
+    customMacroSection: {
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255,255,255,0.1)',
+        paddingTop: 20,
+    },
+    customTitle: {
+        fontSize: scaleFont(14),
+        fontWeight: '600',
+        color: 'white',
+        marginBottom: 12,
+        textAlign: 'center',
+    },
+    macroInputs: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 15,
+    },
+    macroInputGroup: {
+        alignItems: 'center',
+        flex: 1,
+    },
+    macroInputLabel: {
+        fontSize: scaleFont(11),
+        fontWeight: '600',
+        marginBottom: 6,
+    },
+    macroInput: {
+        height: 44,
+        width: '80%',
+        paddingHorizontal: 12,
+        borderRadius: 12,
+        backgroundColor: colors.inputBackground,
+        color: 'white',
+        borderWidth: 1,
+        textAlign: 'center',
+        fontSize: scaleFont(14),
+    },
+    goalBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 20,
+        padding: 12,
+        backgroundColor: 'rgba(255,255,255,0.03)',
+        borderRadius: 16,
+    },
+    goalLabel: {
+        fontSize: scaleFont(14),
+        color: colors.mutedText,
+        fontWeight: '600',
+    },
+    goalValue: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 8,
+    },
+    goalValueText: {
+        fontSize: scaleFont(12),
+        fontWeight: '700',
+    },
+    energyStats: {
+        backgroundColor: 'rgba(255,255,255,0.03)',
+        borderRadius: 20,
+        padding: 20,
+        marginBottom: 20,
+    },
+    energyStat: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    energyStatLabel: {
         fontSize: scaleFont(13),
-        fontWeight: "700",
-        color: "white",
+        color: colors.mutedText,
+    },
+    energyStatValue: {
+        fontSize: scaleFont(14),
+        fontWeight: '700',
+        color: 'white',
+    },
+    energyInputSection: {
+        marginTop: 10,
+    },
+    energyInputLabel: {
+        fontSize: scaleFont(13),
+        color: colors.mutedText,
+        marginBottom: 8,
+        fontWeight: '600',
+    },
+    energyInput: {
+        height: 50,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+        backgroundColor: colors.inputBackground,
+        color: 'white',
+        borderWidth: 1,
+        borderColor: colors.inputBorderColor,
+        fontSize: scaleFont(14),
+        marginBottom: 15,
+    },
+    actionButton: {
+        height: 50,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    actionButtonText: {
+        color: 'white',
+        fontWeight: '700',
+        fontSize: scaleFont(14),
     },
 });
