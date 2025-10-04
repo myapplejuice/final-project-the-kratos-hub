@@ -18,7 +18,7 @@ export default function EditProfile() {
     async function handleFullname() {
         createInput({
             title: "Change Fullname",
-            confirmText: "SUBMIT",
+            confirmText: "Submit",
             text: "Enter your new fullname",
             initialValues: [user.firstname, user.lastname],
             placeholders: ["Firstname", "Lastname"],
@@ -77,7 +77,7 @@ export default function EditProfile() {
     async function handleEmail() {
         createInput({
             title: "Change Email",
-            confirmText: "SUBMIT",
+            confirmText: "Submit",
             text: "Enter your new email",
             initialValues: [user.email],
             placeholders: ["Email"],
@@ -119,7 +119,7 @@ export default function EditProfile() {
     async function handlePhone() {
         createInput({
             title: "Change Phone",
-            confirmText: "SUBMIT",
+            confirmText: "Submit",
             text: "Enter your new phone number",
             initialValues: [user.phone],
             placeholders: ["Phone"],

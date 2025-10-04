@@ -398,7 +398,7 @@ export default function FoodSelection() {
 
                 <Divider orientation="horizontal" thickness={2} color={colors.divider} style={{ borderRadius: 50, marginBottom: 15 }} />
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.inputBackground, alignItems: 'center', borderRadius: 15, marginBottom: 25, height: 50 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.inputBackground, alignItems: 'center', borderRadius: 15, marginBottom: 15, height: 50 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', width: '80%' }}>
                         <Image source={Images.magnifier} style={{ tintColor: colors.mutedText, width: 20, height: 20, marginHorizontal: 15 }} />
                         <AppTextInput
@@ -430,58 +430,62 @@ export default function FoodSelection() {
                 </View>
 
                 {foodList.length > 0 ? (
-                    <AppScroll scrollToTop={scrollToTop} extraBottom={200} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} extraTop={0} topPadding={false}>
-                        <View>
-                            {foodList.map((food) => (
-                                <TouchableOpacity
-                                    key={food.id}
-                                    style={{
-                                        padding: 15,
-                                        backgroundColor: colors.cardBackground,
-                                        borderRadius: 15,
-                                        flexDirection: 'row',
-                                        justifyContent: 'space-between',
-                                        marginBottom: 5,
-                                    }}
-                                    onPress={() => handleFoodSelection(food)}
-                                >
-                                    <View style={{ justifyContent: 'center', width: '60%' }}>
-                                        <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{food.label}</AppText>
-                                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(8), marginTop: 0 }}>
-                                            {food.category}, {food.servingSize} {food.servingUnit}
-                                        </AppText>
-                                    </View>
-                                    <View style={{ alignItems: 'flex-end', width: '40%' }}>
-                                        <AppText style={{ color: nutritionColors.energy1, fontSize: scaleFont(12) }}>
-                                            {convertEnergy(food.energyKcal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
-                                        </AppText>
-                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 0 }}>
-                                            <AppText style={{ color: nutritionColors.carbs1, fontSize: scaleFont(8) }}>C: {food.carbs}</AppText>
-                                            <Divider orientation="vertical" thickness={1} color={colors.divider} style={{ marginHorizontal: 5 }} />
-                                            <AppText style={{ color: nutritionColors.protein1, fontSize: scaleFont(8) }}>P: {food.protein}</AppText>
-                                            <Divider orientation="vertical" thickness={1} color={colors.divider} style={{ marginHorizontal: 5 }} />
-                                            <AppText style={{ color: nutritionColors.fat1, fontSize: scaleFont(8) }}>F: {food.fat}</AppText>
+                    <>
+                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12), marginHorizontal: 15, marginBottom: 10 }}>Foods Count: {foodList.length}</AppText>
+                        <AppScroll scrollToTop={scrollToTop} extraBottom={200} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} extraTop={0} topPadding={false}>
+                            <>
+                                {foodList.map((food) => (
+                                    <TouchableOpacity
+                                        key={food.id}
+                                        style={{
+                                            padding: 15,
+                                            backgroundColor: colors.cardBackground,
+                                            borderRadius: 15,
+                                            flexDirection: 'row',
+                                            justifyContent: 'space-between',
+                                            marginBottom: 5,
+                                        }}
+                                        onPress={() => handleFoodSelection(food)}
+                                    >
+                                        <View style={{ justifyContent: 'center', width: '60%' }}>
+                                            <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{food.label}</AppText>
+                                            <AppText style={{ color: colors.mutedText, fontSize: scaleFont(8), marginTop: 0 }}>
+                                                {food.category}, {food.servingSize} {food.servingUnit}
+                                            </AppText>
                                         </View>
-                                    </View>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                        {selectedList !== 'My Foods' && (
-                            <AnimatedButton
-                                style={{ marginTop: 25, backgroundColor: colors.background, padding: 15, borderRadius: 15, borderWidth: 1, borderColor: colors.mutedText, width: '40%', justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}
-                                leftImage={Images.plus}
-                                leftImageStyle={{ tintColor: colors.mutedText, width: 20, height: 20, marginEnd: 10 }}
-                                textStyle={{ color: colors.mutedText }}
-                                title="Load More"
-                                onPress={() => {
-                                    if (selectedList === 'Library')
-                                        handleUSDASearch(lastUSDAQuery, 'loadmore');
-                                    else if (selectedList === 'Community')
-                                        handleLoadMoreCommunity();
-                                }}
-                            />
-                        )}
-                    </AppScroll>
+                                        <View style={{ alignItems: 'flex-end', width: '40%' }}>
+                                            <AppText style={{ color: nutritionColors.energy1, fontSize: scaleFont(12) }}>
+                                                {convertEnergy(food.energyKcal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
+                                            </AppText>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 0 }}>
+                                                <AppText style={{ color: nutritionColors.carbs1, fontSize: scaleFont(8) }}>C: {food.carbs}</AppText>
+                                                <Divider orientation="vertical" thickness={1} color={colors.divider} style={{ marginHorizontal: 5 }} />
+                                                <AppText style={{ color: nutritionColors.protein1, fontSize: scaleFont(8) }}>P: {food.protein}</AppText>
+                                                <Divider orientation="vertical" thickness={1} color={colors.divider} style={{ marginHorizontal: 5 }} />
+                                                <AppText style={{ color: nutritionColors.fat1, fontSize: scaleFont(8) }}>F: {food.fat}</AppText>
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+
+                                ))}
+                            </>
+                            {selectedList !== 'My Foods' && (
+                                <AnimatedButton
+                                    style={{ marginTop: 25, backgroundColor: colors.background, padding: 15, borderRadius: 15, borderWidth: 1, borderColor: colors.mutedText, width: '40%', justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}
+                                    leftImage={Images.plus}
+                                    leftImageStyle={{ tintColor: colors.mutedText, width: 20, height: 20, marginEnd: 10 }}
+                                    textStyle={{ color: colors.mutedText }}
+                                    title="Load More"
+                                    onPress={() => {
+                                        if (selectedList === 'Library')
+                                            handleUSDASearch(lastUSDAQuery, 'loadmore');
+                                        else if (selectedList === 'Community')
+                                            handleLoadMoreCommunity();
+                                    }}
+                                />
+                            )}
+                        </AppScroll>
+                    </>
                 ) : (
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 }}>
                         <View style={{ justifyContent: 'flex-end', alignItems: 'center', height: '30%' }}>

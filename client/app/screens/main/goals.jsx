@@ -62,7 +62,7 @@ export default function Goals() {
         createInput({
             title: "Update Height",
             text: guide,
-            confirmText: "SAVE",
+            confirmText: "Save",
             placeholders: user.preferences.heightUnit.key === "ft/in" ? [["ft", "in"]] : ["cm"],
             initialValues: user.preferences.heightUnit.key === "ft/in" ? [[user.metrics.heightFt, user.metrics.heightIn]] : [user.metrics.heightCm],
             extraConfigs: user.preferences.heightUnit.key === "ft/in" ? [[{ keyboardType: "numeric" }, { keyboardType: "numeric" }]] : [{ keyboardType: "numeric" }],
@@ -138,7 +138,7 @@ export default function Goals() {
                 user.preferences.weightUnit.key === "lb"
                     ? "Enter your weight in lb"
                     : "Enter your weight in kg",
-            confirmText: "SAVE",
+            confirmText: "Save",
             placeholders: [user.preferences.weightUnit.key === "lb" ? "lb" : "kg"],
             initialValues: [
                 user.preferences.weightUnit.key === "lb"
@@ -307,7 +307,7 @@ export default function Goals() {
         createInput({
             title: "Water Intake",
             text: `${recommendation}`,
-            confirmText: "SAVE",
+            confirmText: "Save",
             placeholders: [user.preferences.fluidUnit.field],
             initialValues: [convertFluid(user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)],
             extraConfigs: [{ keyboardType: "numeric" }],

@@ -11,8 +11,8 @@ export default function Options({
     options = [],
     onAbort = () => {},
     onConfirm = () => {},
-    abortText = "CANCEL",
-    confirmText = "SELECT",
+    abortText = "Cancel",
+    confirmText = "Select",
 }) {
     const { opacity, translateY } = usePopupAnimation();
     const [selected, setSelected] = useState(current);

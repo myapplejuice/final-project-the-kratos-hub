@@ -8,7 +8,7 @@ import AppTextInput from '../screen-comps/app-text-input'
 export default function Input({
     title = "Update Details",
     text = "Enter new values below",
-    confirmText = "SUBMIT",
+    confirmText = "Submit",
     confirmButtonStyle = {},
     confirmButtonTextStyle = {},
     cancelButtonStyle = {},
@@ -162,7 +162,7 @@ export default function Input({
                             styles.cancelButtonText,
                             cancelButtonTextStyle
                         ]}>
-                            CANCEL
+                            Cancel
                         </AppText>
                     </TouchableOpacity>
 

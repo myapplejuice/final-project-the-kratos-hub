@@ -28,7 +28,7 @@ import FadeInOut from '../../../components/effects/fade-in-out';
 import Invert from '../../../components/effects/invert';
 
 export default function MealsPlans() {
-    const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
+    const { createInput, showSpinner, hideSpinner, createToast} = usePopups();
     const { user, setUser, setAdditionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const [scrollToTop, setScrollToTop] = useState(false);
@@ -37,7 +37,7 @@ export default function MealsPlans() {
     async function handlePlanAddition() {
         createInput({
             title: "Meal Addition",
-            confirmText: "ADD",
+            confirmText: "Add",
             text: `Enter a label & description for the plan`,
             placeholders: [`Meal Plan ${user.nutrition?.plans?.length + 1 || 1}`, `Write any explanation, notes, tips about your meal plan...`],
             initialValues: [``, ``],

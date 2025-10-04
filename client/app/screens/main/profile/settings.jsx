@@ -97,7 +97,7 @@ export default function Settings() {
     function initDeleteHandler() {
         createInput({
             title: 'Delete Account',
-            confirmText: 'DELETE',
+            confirmText: 'Delete',
             confirmButtonStyle: { backgroundColor: 'rgb(255,59,48)', borderColor: 'rgb(255,59,48)' },
             text: `Please enter your password to confirm`,
             placeholders: ['Password'],

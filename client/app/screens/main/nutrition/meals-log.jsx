@@ -114,7 +114,7 @@ export default function MealsLog() {
     async function handleWaterAmountChange() {
         createInput({
             title: "Water Intake",
-            confirmText: "OK",
+            confirmText: "Ok",
             text: `Enter water value (${user.preferences.fluidUnit.field})`,
             placeholders: [user.preferences.fluidUnit.field],
             initialValues: [waterAmount],
@@ -177,7 +177,7 @@ export default function MealsLog() {
     async function handleMealAddition() {
         createInput({
             title: "Meal Addition",
-            confirmText: "ADD",
+            confirmText: "Add",
             text: `Enter a label for the meal (e.g. Breakfast, Dinner, Pre-Workout...)`,
             placeholders: [`Meal ${currentDayLog?.meals?.length + 1 || 1}`],
             initialValues: [``],
@@ -261,7 +261,7 @@ export default function MealsLog() {
     async function handleMealRelabel(mealId) {
         createInput({
             title: "Relabel Meal",
-            confirmText: "SUBMIT",
+            confirmText: "Submit",
             text: `Enter new label for the meal`,
             placeholders: [`${currentDayLog?.meals?.find(meal => meal.id === mealId)?.label}`],
             initialValues: [`${currentDayLog?.meals?.find(meal => meal.id === mealId)?.label}`],

@@ -5,7 +5,7 @@ import usePopupAnimation from "./popup-animation";
 import { colors } from "../../common/settings/styling";
 import AppText from "../screen-comps/app-text";
 
-export default function Dialog({ title = "", text = "", onAbort = () => { }, onConfirm = () => { }, abortText = "CANCEL", confirmText = "YES" }) {
+export default function Dialog({ title = "", text = "", onAbort = () => { }, onConfirm = () => { }, abortText = "Cancel", confirmText = "Yes" }) {
     const { opacity, translateY } = usePopupAnimation();
 
     return (

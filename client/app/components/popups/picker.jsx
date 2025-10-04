@@ -104,7 +104,7 @@ export default function Picker({
                         onPress={onCancel}
                     >
                         <AppText style={[styles.buttonText, styles.cancelButtonText]}>
-                            CANCEL
+                            Cancel
                         </AppText>
                     </TouchableOpacity>
 
@@ -113,7 +113,7 @@ export default function Picker({
                         onPress={() => onSubmit(selectedValue)}
                     >
                         <AppText style={[styles.buttonText, styles.confirmButtonText]}>
-                            SELECT
+                            Select
                         </AppText>
                     </TouchableOpacity>
                 </View>

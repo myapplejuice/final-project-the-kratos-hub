@@ -9,7 +9,7 @@ export default function Alert({
     title = "Alert",
     text = "Something happened.",
     onPress = () => {},
-    buttonText = "OK"
+    buttonText = "Ok"
 }) {
     const { opacity, translateY } = usePopupAnimation();
 
