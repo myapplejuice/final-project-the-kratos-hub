@@ -370,7 +370,7 @@ export default function Goals() {
 
     return (
         <AppScroll hideNavBarOnScroll={true} hideTopBarOnScroll={true} extraBottom={100} topPadding={false}>
-            <View style={[styles.card, { margin: 0, borderTopEndRadius: 0, borderTopStartRadius: 0, paddingTop: 90, marginBottom: 15, borderRadius: 30  }]}>
+            <View style={[styles.card, { margin: 0, borderTopEndRadius: 0, borderTopStartRadius: 0, paddingTop: 90, marginBottom: 15, borderRadius: 30 }]}>
                 <View style={styles.metricRow}>
                     <TouchableOpacity onPress={handleHeightChange} style={styles.metricItem}>
                         <View style={{ padding: 15, backgroundColor: "#d8001d44", borderRadius: 50 }}>
@@ -640,16 +640,39 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         margin: 15,
     },
-
-    metricRow: { flexDirection: "row", justifyContent: "space-evenly" },
-    metricItem: { flex: 1, alignItems: "center", paddingBottom: 10 },
-    metricLabel: { fontSize: scaleFont(10), color: "rgb(102,102,102)" },
-    divider: { width: 1, backgroundColor: "rgba(102,102,102,0.2)", alignSelf: "center", height: "60%" },
-    heightText: { fontSize: scaleFont(12), color: "rgba(255,83,106,1)" },
-    weightText: { fontSize: scaleFont(12), color: "rgba(255,205,97,1)" },
-    rowInfo: { justifyContent: "center", alignItems: "center", padding: 10 },
-    rowInfoValue: { color: "white", fontSize: scaleFont(12) },
-    rowInfoLabel: { color: "rgb(102,102,102)", fontSize: scaleFont(10) },
+    metricRow: {
+        flexDirection: "row",
+        justifyContent: "space-evenly"
+    },
+    metricItem: {
+        flex: 1,
+        alignItems: "center",
+        paddingBottom: 10
+    },
+    metricLabel: {
+        fontSize: scaleFont(10),
+        color: "rgb(102,102,102)"
+    },
+    heightText: {
+        fontSize: scaleFont(12),
+        color: "rgba(255,83,106,1)"
+    },
+    weightText: {
+        fontSize: scaleFont(12),
+        color: "rgba(255,205,97,1)"
+    },
+    rowInfo: {
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 10
+    },
+    rowInfoValue: {
+        color: "white",
+        fontSize: scaleFont(12)
+    },
+    rowInfoLabel: {
+        color: "rgb(102,102,102)", fontSize: scaleFont(10)
+    },
     heightUnit: {
         color: "rgb(102, 102, 102)",
     },
@@ -661,69 +684,17 @@ const styles = StyleSheet.create({
         fontSize: scaleFont(10),
         color: "rgb(102, 102, 102)",
     },
-
-    introText: {
-        color: 'white',
-        fontSize: scaleFont(17),
-        lineHeight: 24,
-    },
     sectionTitle: {
         fontSize: scaleFont(19),
         fontWeight: '700',
         color: 'white',
         marginBottom: 12,
     },
-    feedbackRow: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginBottom: 6,
-    },
-    feedbackBullet: {
-        color: 'white',
-        fontSize: scaleFont(14),
-        marginRight: 6,
-    },
     feedbackText: {
         color: 'white',
         fontSize: scaleFont(12),
         lineHeight: 20,
         flex: 1,
-    },
-    activityRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 15,
-        padding: 10
-    },
-    activityIconWrapper: {
-        padding: 12,
-        borderRadius: 12,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    activityIcon: {
-        width: 25,
-        height: 25,
-    },
-    activityTextWrapper: {
-        flex: 1,
-        marginLeft: 5,
-    },
-    activityLabel: {
-        fontWeight: '700',
-        fontSize: scaleFont(22),
-    },
-    activitySubText: {
-        fontSize: scaleFont(12),
-        color: colors.mutedText,
-        marginTop: 2,
-    },
-    activityArrow: {
-        width: 20,
-        height: 20,
-        tintColor: 'white',
-        marginLeft: 6,
-        alignSelf: 'center',
     },
     sectionHeader: {
         flexDirection: 'row',
@@ -737,7 +708,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
-        overflow:'hidden'
+        overflow: 'hidden'
     },
     sectionHeaderIcon: {
         width: 20,

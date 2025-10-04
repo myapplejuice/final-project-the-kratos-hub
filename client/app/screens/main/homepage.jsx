@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import { Animated, StyleSheet, TouchableOpacity, View } from "react-native";
+import {  StyleSheet, TouchableOpacity, View } from "react-native";
 import DateDisplay from "../../components/screen-comps/date-display";
 import AppText from "../../components/screen-comps/app-text";
 import { Images } from '../../common/settings/assets';
@@ -15,13 +15,9 @@ import { homeGreetingText, homeIntroText } from "../../common/utils/text-generat
 import Divider from "../../components/screen-comps/divider";
 import AppScroll from "../../components/screen-comps/app-scroll";
 import FadeInOut from "../../components/effects/fade-in-out";
-import BarcodeScanner from "../../components/screen-comps/barcode-scanner";
-import { CameraContext } from "../../common/contexts/camera-context";
-import APIService from "../../common/services/api-service";
 
 export default function Homepage() {
     const { user } = useContext(UserContext);
-    const { setCameraActive } = useContext(CameraContext);
     const [currentTime, setCurrentTime] = useState();
     const [introText, setIntroText] = useState('');
     const [greeting, setGreeting] = useState('');
@@ -136,7 +132,7 @@ export default function Homepage() {
                 <View style={{ backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15, marginBottom: 15 }}>
                     {BMRTab.map((item, index) => (
                         <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 30, height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
-                            <Image source={item.icon} style={[userStatsCard.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
+                            <Image source={item.icon} style={[styles.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
                             <View style={{ alignItems: 'center' }}>
                                 <AppText style={{ fontSize: scaleFont(15), fontWeight: 'bold', color: 'white', textAlign: 'center', marginTop: 15 }}>{item.value}</AppText>
                                 <AppText style={{ fontSize: scaleFont(12), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>{item.label}</AppText>
@@ -147,7 +143,7 @@ export default function Homepage() {
                 <View style={{ flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15, marginBottom: 15 }}>
                     {tabsGroupOne.map((item, index) => (
                         <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 20, width: '48%', height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
-                            <Image source={item.icon} style={[userStatsCard.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
+                            <Image source={item.icon} style={[styles.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
                             <View style={{ justifyContent: 'flex-start' }}>
                                 <AppText style={{ fontSize: scaleFont(15), fontWeight: 'bold', color: 'white', textAlign: 'center', marginTop: 15 }}>{item.value}</AppText>
                                 <AppText style={{ fontSize: scaleFont(12), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>{item.label}</AppText>
@@ -158,7 +154,7 @@ export default function Homepage() {
                 <View style={{ flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15 }}>
                     {tabsGroupTwo.map((item, index) => (
                         <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 20, width: '48%', height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
-                            <Image source={item.icon} style={[userStatsCard.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
+                            <Image source={item.icon} style={[styles.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
                             <View style={{ justifyContent: 'flex-start' }}>
                                 <AppText style={{ fontSize: scaleFont(15), fontWeight: 'bold', color: 'white', textAlign: 'center', marginTop: 15 }}>{item.value}</AppText>
                                 <AppText style={{ fontSize: scaleFont(12), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>{item.label}</AppText>
@@ -170,7 +166,7 @@ export default function Homepage() {
                 <TouchableOpacity onPress={() => router.push(routes.GOALS)} style={{ backgroundColor: colors.cardBackground, padding: 15, borderRadius: 20, marginTop: 15, marginHorizontal: 15 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <View style={{ backgroundColor: colors.lightMutedText, padding: 12, borderRadius: 15 }}>
-                            <Image source={Images.noGoals} style={[userStatsCard.statImage, { tintColor: 'white', width: 35, height: 35 }]} />
+                            <Image source={Images.noGoals} style={[styles.statImage, { tintColor: 'white', width: 35, height: 35 }]} />
                         </View>
                         <View style={{ marginStart: 15 }}>
                             <AppText style={{ fontSize: scaleFont(18), color: 'white', fontWeight: 'bold' }}>
@@ -185,12 +181,12 @@ export default function Homepage() {
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15, marginHorizontal: 15 }}>
                     <TouchableOpacity onPress={() => router.push(routes.NUTRITION_HUB)} style={{ padding: 15, backgroundColor: colors.accentGreen, borderRadius: 20, height: 180, justifyContent: 'center', alignItems: 'center', width: '48%' }}>
-                        <Image source={Images.nutrition} style={[userStatsCard.statImage, { width: 50, height: 50, tintColor: 'white' }]} />
+                        <Image source={Images.nutrition} style={[styles.statImage, { width: 50, height: 50, tintColor: 'white' }]} />
                         <AppText style={{ fontSize: scaleFont(18), color: 'white', fontWeight: 'bold', marginTop: 10 }}>Nutrition</AppText>
                         <AppText style={{ fontSize: scaleFont(12), color: 'white', marginTop: 5 }}>Track meals & progress</AppText>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => router.push(routes.TRAINING_HUB)} style={{ padding: 15, backgroundColor: colors.accentBlue, borderRadius: 20, height: 180, justifyContent: 'center', alignItems: 'center', width: '48%' }}>
-                        <Image source={Images.nutrition} style={[userStatsCard.statImage, { width: 50, height: 50, tintColor: 'white' }]} />
+                        <Image source={Images.workouts} style={[styles.statImage, { width: 50, height: 50, tintColor: 'white' }]} />
                         <AppText style={{ fontSize: scaleFont(18), color: 'white', fontWeight: 'bold', marginTop: 10 }}>Training</AppText>
                         <AppText style={{ fontSize: scaleFont(12), color: 'white', marginTop: 5 }}>Log your workouts</AppText>
                     </TouchableOpacity>
@@ -220,78 +216,194 @@ export default function Homepage() {
         </AppScroll>
     );
 }
-
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    scrollContent: {
-        backgroundColor: colors.background,
-    },
     introText: {
         color: 'white',
         fontSize: scaleFont(17),
     },
-    sectionTitle: {
-        fontSize: scaleFont(19),
-        fontWeight: '700',
-        color: 'white',
-        marginBottom: 12,
+
+    headerContainer: {
+        paddingHorizontal: 20,
+        paddingTop: 100,
+        paddingBottom: 30,
+        margin: 0,
+        backgroundColor: colors.main,
+        borderBottomEndRadius: 30,
+        borderBottomStartRadius: 30,
+        overflow: 'hidden',
     },
-    feedbackRow: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginBottom: 6,
-    },
-    feedbackBullet: {
-        color: 'white',
-        fontSize: scaleFont(14),
-        marginRight: 6,
-    },
-    activityRow: {
+    headerRow: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
+        alignContent: 'center',
+    },
+    timeBox: {
+        flexDirection: 'row',
+        backgroundColor: '#ffffff48',
+        padding: 12,
+        borderRadius: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+        alignContent: 'center',
+    },
+    timeText: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        fontSize: scaleFont(17),
+    },
+    divider: {
+        marginVertical: 20,
+    },
+    greeting: {
+        fontSize: scaleFont(25),
+        fontWeight: '700',
+        flexShrink: 1,
+    },
+    introSubText: {
+        fontSize: scaleFont(16),
+        marginTop: 5,
+        color: 'rgba(255, 255, 255, 0.75)',
+    },
+
+    sectionWrapper: {
+        backgroundColor: colors.background,
+        marginTop: 20,
+    },
+    sectionHeader: {
+        marginBottom: 15,
+    },
+    sectionHeaderText: {
+        marginTop: 15,
+        color: 'white',
+        paddingHorizontal: 25,
+        fontSize: scaleFont(20),
+        fontWeight: 'bold',
+    },
+
+    cardGrid: {
+        backgroundColor: 'transparent',
+        justifyContent: 'space-between',
+        marginHorizontal: 15,
+        marginBottom: 15,
+    },
+    cardGridRow: {
+        flexDirection: 'row',
+        backgroundColor: 'transparent',
+        justifyContent: 'space-between',
+        marginHorizontal: 15,
+        marginBottom: 15,
+    },
+    statCard: {
+        backgroundColor: colors.cardBackground,
+        padding: 30,
+        height: 180,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    statCardSmall: {
+        backgroundColor: colors.cardBackground,
+        padding: 20,
+        width: '48%',
+        height: 180,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    statValue: {
+        fontSize: scaleFont(15),
+        fontWeight: 'bold',
+        color: 'white',
+        textAlign: 'center',
         marginTop: 15,
     },
-    activityIconWrapper: {
+    statLabel: {
+        fontSize: scaleFont(12),
+        color: colors.mutedText,
+        textAlign: 'center',
+        marginTop: 5,
+    },
+
+    // Goals & Profile
+    goalsCard: {
+        backgroundColor: colors.cardBackground,
         padding: 15,
-        borderRadius: 12,
+        borderRadius: 20,
+        marginTop: 15,
+        marginHorizontal: 15,
+    },
+    goalsIconWrapper: {
+        backgroundColor: colors.lightMutedText,
+        padding: 12,
+        borderRadius: 15,
+    },
+    goalsTitle: {
+        fontSize: scaleFont(18),
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    goalsSubtitle: {
+        color: colors.mutedText,
+        fontSize: scaleFont(11),
+        flexShrink: 1,
+    },
+
+    hubRow: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 15,
+        marginHorizontal: 15,
     },
-    activityIcon: {
-        width: 50,
-        height: 50,
+    hubCard: {
+        padding: 15,
+        borderRadius: 20,
+        height: 180,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '48%',
     },
-    activityTextWrapper: {
-        flex: 1,
-        marginLeft: 12,
+    hubTitle: {
+        fontSize: scaleFont(18),
+        color: 'white',
+        fontWeight: 'bold',
+        marginTop: 10,
     },
-    activityLabel: {
-        fontWeight: '700',
-        fontSize: scaleFont(26),
+    hubSubtitle: {
+        fontSize: scaleFont(12),
+        color: 'white',
+        marginTop: 5,
     },
-    activitySubText: {
-        fontSize: scaleFont(13),
-        color: colors.mutedText,
-        marginTop: 2,
-    },
-    activityArrow: {
-        width: 20,
-        height: 20,
-        tintColor: 'white',
-        marginLeft: 6,
-        alignSelf: 'center',
-    },
-});
 
-const userStatsCard = StyleSheet.create({
-    statsContainer: { margin: 15, backgroundColor: colors.cardBackground, borderRadius: 20, padding: 15 },
-    statItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-    statItemLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
-    statImageContainer: { backgroundColor: colors.statImageBackground, padding: 8, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginRight: 8 },
+    profileCard: {
+        backgroundColor: colors.cardBackground,
+        marginHorizontal: 15,
+        marginTop: 15,
+        padding: 20,
+        borderRadius: 20,
+    },
+    profileRow: {
+        flexDirection: 'row',
+    },
+    profileIcon: {
+        width: 24,
+        height: 24,
+        marginRight: 8,
+        tintColor: 'white',
+    },
+    profileTitle: {
+        color: 'white',
+        fontSize: scaleFont(18),
+        flexShrink: 1,
+        fontWeight: 'bold',
+    },
+    profileSubtitle: {
+        color: colors.mutedText,
+        fontSize: scaleFont(11),
+        flexShrink: 1,
+        marginTop: 5,
     statImage: { width: 35, height: 35, resizeMode: 'contain' },
-    statLabel: { fontSize: scaleFont(13), color: colors.mutedText },
-    statArrow: { width: 20, height: 20, transform: [{ scaleX: -1 }], resizeMode: 'contain' }
+    },
 });
