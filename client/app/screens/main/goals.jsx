@@ -362,41 +362,37 @@ export default function Goals() {
                     </TouchableOpacity>
                 </View>
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-around', padding: 15, backgroundColor: colors.backgroundTop, borderRadius: 25, marginTop: 15 }}>
-                    <View style={[styles.rowInfo, { width: '40%' }]}>
-                        <AppText style={styles.rowInfoValue}>
-                            {activityOptions.find(opt => opt.key === user.metrics.activityLevel)?.label || "Unknown Activity Level"}
-                        </AppText>
-                        <AppText style={styles.rowInfoLabel}>Activity Level</AppText>
+                <View style={{ alignItems: 'center', padding: 20, backgroundColor: colors.backgroundTop, borderRadius: 25, marginTop: 15 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
+                        <View style={[styles.rowInfo, { width: '40%', marginTop: 0, padding: 0 }]}>
+                            <AppText style={styles.rowInfoValue}>
+                                {activityOptions.find(opt => opt.key === user.metrics.activityLevel)?.label || "Unknown Activity Level"}
+                            </AppText>
+                            <AppText style={styles.rowInfoLabel}>Activity Level</AppText>
+                        </View>
+
+                        <Divider orientation="vertical" />
+
+                        <View style={[styles.rowInfo, { width: '40%', marginTop: 0, padding: 0 }]}>
+                            <AppText style={styles.rowInfoValue}>
+                                {goalOptions.find(opt => opt.key === user.nutrition.goal)?.label || "Unknown Goal"}
+                            </AppText>
+                            <AppText style={styles.rowInfoLabel}>Weight Goal</AppText>
+                        </View>
                     </View>
+                    <Divider orientation="horizontal" style={{ marginVertical: 15 }} />
 
-                    <Divider orientation="vertical" />
-
-                    <View style={[styles.rowInfo, { width: '40%' }]}>
+                    <View style={[styles.rowInfo, { marginTop: 0, padding: 0 }]}>
                         <AppText style={styles.rowInfoValue}>
-                            {goalOptions.find(opt => opt.key === user.nutrition.goal)?.label || "Unknown Goal"}
+                            {diet?.label || "Unknown Goal"}
                         </AppText>
-                        <AppText style={styles.rowInfoLabel}>Current Goal</AppText>
-                    </View>
-                </View>
-            </View>
-
-            <View style={[styles.card, { padding: 18, marginTop: 0 }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Image
-                        source={Images.magnifier}
-                        style={{ width: 22, height: 22, tintColor: 'white' }}
-                    />
-                    <View style={{ flex: 1, marginStart: 13 }}>
-                        <AppText style={{ color: 'white', fontSize: scaleFont(11), }}>
-                            Adjusting a metric or measurement here can affect other data about you, (e.g. weight influencing BMI and BMR).
-                        </AppText>
+                        <AppText style={styles.rowInfoLabel}>Diet</AppText>
                     </View>
                 </View>
             </View>
 
             <AppText style={[styles.sectionTitle, { marginHorizontal: 25, marginTop: 15, marginBottom: 10 }]}>
-                Quick Updates
+                Current Lifestyle
             </AppText>
 
             <TouchableOpacity onPress={() => router.push(routes.EDIT_ACTIVITY)} style={{ backgroundColor: colors.cardBackground, borderRadius: 20, padding: 20, marginBottom: 15, marginHorizontal: 15, height: 250, alignItems: 'center', justifyContent: 'center' }}>
@@ -410,7 +406,7 @@ export default function Goals() {
 
                 <View style={{ alignItems: 'center', marginTop: 20 }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(15), fontWeight: 'bold' }}>Activity Level</AppText>
-                    <AppText style={{color: colors.mutedText,fontSize: scaleFont(11), textAlign: 'center'}}>{activityFeedbacks[0]}</AppText>
+                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11), textAlign: 'center' }}>{activityFeedbacks[0]}</AppText>
                 </View>
 
             </TouchableOpacity>
@@ -426,12 +422,12 @@ export default function Goals() {
 
                 <View style={{ alignItems: 'center', marginTop: 20 }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(15), fontWeight: 'bold' }}>Weight Goal</AppText>
-                    <AppText style={{color: colors.mutedText,fontSize: scaleFont(11), textAlign: 'center'}}>{weightGoalFeedbacks[0]}</AppText>
+                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11), textAlign: 'center' }}>{weightGoalFeedbacks[0]}</AppText>
                 </View>
 
             </TouchableOpacity>
 
- <TouchableOpacity onPress={() => router.push(routes.EDIT_DIET)} style={{ backgroundColor: colors.cardBackground, borderRadius: 20, padding: 20, marginBottom: 15, marginHorizontal: 15, height: 250, alignItems: 'center', justifyContent: 'center' }}>
+            <TouchableOpacity onPress={() => router.push(routes.EDIT_DIET)} style={{ backgroundColor: colors.cardBackground, borderRadius: 20, padding: 20, marginBottom: 15, marginHorizontal: 15, height: 250, alignItems: 'center', justifyContent: 'center' }}>
                 <View >
                     <Image source={diet.image} style={{ tintColor: diet.color, width: 60, height: 60 }} />
                 </View>
@@ -442,10 +438,24 @@ export default function Goals() {
 
                 <View style={{ alignItems: 'center', marginTop: 20 }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(15), fontWeight: 'bold' }}>Diet</AppText>
-                    <AppText style={{color: colors.mutedText,fontSize: scaleFont(11), textAlign: 'center'}}>{dietTips[0]}</AppText>
+                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11), textAlign: 'center' }}>{dietTips[0]}</AppText>
                 </View>
 
             </TouchableOpacity>
+
+            <View style={[styles.card, { padding: 18, marginTop: 0 }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Image
+                        source={Images.magnifier}
+                        style={{ width: 22, height: 22, tintColor: 'white' }}
+                    />
+                    <View style={{ flex: 1, marginStart: 13 }}>
+                        <AppText style={{ color: 'white', fontSize: scaleFont(11), }}>
+                            Adjusting a metric or measurement here can affect other data about you, (e.g. weight influencing BMI and BMR).
+                        </AppText>
+                    </View>
+                </View>
+            </View>
         </AppScroll >
     );
 }

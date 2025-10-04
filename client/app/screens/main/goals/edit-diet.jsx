@@ -396,7 +396,7 @@ export default function EditDiet() {
                         />
                     </View>
                     <View style={styles.dietText}>
-                        <AppText style={styles.currentDietLabel}>Current Diet Plan</AppText>
+                        <AppText style={styles.currentDietLabel}>Current Diet</AppText>
                         <AppText style={[styles.currentDietTitle, { color: diet.color }]}>
                             {diet.label}
                         </AppText>
@@ -712,7 +712,7 @@ const styles = StyleSheet.create({
     energyCard: {
         backgroundColor: 'rgba(255,255,255,0.05)',
         marginHorizontal: 15,
-        marginTop: 20,
+        marginTop: 15,
         padding: 20,
         borderRadius: 20,
     },
