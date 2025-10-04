@@ -8,8 +8,8 @@ import { adjustColor } from "../../../common/utils/random-functions";
 import { Image } from "expo-image";
 import { Images } from "../../../common/settings/assets";
 import usePopups from "../../../common/hooks/use-popups";
-import { macrosFromCalories, recalculateUserInformation } from "../../../common/utils/metrics-calculator";
-import { convertEnergy } from "../../../common/utils/unit-converter";
+import { macrosFromCalories, recalculateUserInformation, recommendedWaterIntake } from "../../../common/utils/metrics-calculator";
+import { convertEnergy, convertFluid } from "../../../common/utils/unit-converter";
 import { formatDate } from "../../../common/utils/date-time";
 import AppText from "../../../components/screen-comps/app-text";
 import PercentageBar from "../../../components/screen-comps/percentage-bar";
@@ -19,7 +19,7 @@ import APIService from "../../../common/services/api-service";
 import AppScroll from "../../../components/screen-comps/app-scroll";
 
 export default function EditDiet() {
-    const { createOptions, createToast, hideSpinner, showSpinner, createDialog } = usePopups();
+    const { createOptions, createToast, hideSpinner, showSpinner, createDialog, createInput } = usePopups();
     const { user, setUser } = useContext(UserContext);
 
     const [diet, setDiet] = useState({});
@@ -249,9 +249,9 @@ export default function EditDiet() {
             if (setEnergyKcal > user.nutrition.recommendedEnergyKcal) {
                 return createDialog({ title: "Warning", text: "This energy intake is too high for your TDEE!\n\nAre you sure you want to continue?", onConfirm: () => confirmEnergyIntake(setEnergyKcal) });
             } else {
-                return createDialog({  title: "Warning",text: "This energy intake is too low for your TDEE!\n\nAre you sure you want to continue?", onConfirm: () => confirmEnergyIntake(setEnergyKcal) });
+                return createDialog({ title: "Warning", text: "This energy intake is too low for your TDEE!\n\nAre you sure you want to continue?", onConfirm: () => confirmEnergyIntake(setEnergyKcal) });
             }
-        }else {
+        } else {
             confirmEnergyIntake(setEnergyKcal);
         }
     }
@@ -310,6 +310,75 @@ export default function EditDiet() {
         finally {
             hideSpinner();
         }
+    }
+
+    async function handleWaterChange() {
+        const waterMlRecommendation = recommendedWaterIntake(user.metrics.weightKg);
+        const water = convertFluid(waterMlRecommendation, 'ml', user.preferences.fluidUnit.key);
+        const recommendation = `Recommended daily water intake (${water} ${user.preferences.fluidUnit.field})`;
+
+        createInput({
+            title: "Water Intake",
+            text: `${recommendation}`,
+            confirmText: "Save",
+            placeholders: [user.preferences.fluidUnit.field],
+            initialValues: [convertFluid(user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)],
+            extraConfigs: [{ keyboardType: "numeric" }],
+            onSubmit: async (values) => {
+                try {
+                    const [waterVal] = values;
+
+                    if (waterVal == null || isNaN(waterVal) || waterVal <= 0) {
+                        createToast({ message: "Enter a valid number of water intake!" });
+                        return;
+                    }
+
+                    let waterMl = Number(waterVal);
+
+                    if (user.preferences.fluidUnit.key === 'floz')
+                        waterMl = convertFluid(Number(waterVal), 'floz', 'ml');
+                    else if (user.preferences.fluidUnit.key === 'cups')
+                        waterMl = convertFluid(Number(waterVal), 'cups', 'ml');
+
+                    if (waterMl === user.nutrition.waterMl) return;
+
+                    const updatedUser = recalculateUserInformation({
+                        ...user,
+                        nutrition: {
+                            ...user.nutrition,
+                            waterMl: Number(waterMl),
+                        },
+                    });
+
+                    const nutritionPayload = { ...updatedUser.nutrition };
+
+                    showSpinner();
+                    const result = await APIService.user.update({ nutrition: nutritionPayload });
+
+                    if (result.success) {
+                        const date = formatDate(new Date(), { format: 'YYYY-MM-DD' });
+                        const nutritionLogsResult = await APIService.nutrition.days.updateDay(date, { targetWaterMl: waterMl });
+                        const nutritionLogsUpdatedUser = {
+                            ...updatedUser,
+                            nutritionLogs: {
+                                ...user.nutritionLogs,
+                                ...nutritionLogsResult.data.updatedDays
+                            }
+                        }
+
+                        setUser(nutritionLogsUpdatedUser);
+                        createToast({ message: "Water intake updated" });
+                    } else {
+                        createToast({ message: `Failed to update water intake: ${result.message}` });
+                    }
+                } catch (err) {
+                    console.log(err.message);
+                    createToast({ message: "Failed to update water intake!" + err.message });
+                } finally {
+                    hideSpinner();
+                }
+            },
+        });
     }
 
     return (
@@ -464,7 +533,7 @@ export default function EditDiet() {
             <View style={styles.energyCard}>
                 <View style={styles.sectionHeader}>
                     <AppText style={styles.sectionTitle}>Daily Energy Intake</AppText>
-                    <AppText style={styles.sectionSubtitle}>Manage your calorie goals</AppText>
+                    <AppText style={styles.sectionSubtitle}>Always update you energy intake</AppText>
                 </View>
 
                 <View style={styles.goalBadge}>
@@ -483,7 +552,7 @@ export default function EditDiet() {
                             {convertEnergy(user.nutrition.setEnergyKcal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
                         </AppText>
                     </View>
-                    <View style={styles.energyStat}>
+                    <View style={[styles.energyStat, {marginVertical: 5}]}>
                         <AppText style={styles.energyStatLabel}>Your TDEE</AppText>
                         <AppText style={styles.energyStatValue}>
                             {convertEnergy(user.metrics.tdee, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
@@ -498,7 +567,6 @@ export default function EditDiet() {
                 </View>
 
                 <View style={styles.energyInputSection}>
-                    <AppText style={styles.energyInputLabel}>Adjust Daily Energy Intake</AppText>
                     <AppTextInput
                         value={String(energyIntake)}
                         onChangeText={setEnergyIntake}
@@ -514,6 +582,27 @@ export default function EditDiet() {
                     />
                 </View>
             </View>
+
+            <TouchableOpacity
+                onPress={handleWaterChange}
+                style={[styles.actionCard, { marginTop: 15, marginHorizontal: 15 }]}    >
+                <View style={styles.actionContent}>
+                    <View style={[styles.waterIcon, { backgroundColor: nutritionColors.water1 + '20' }]}>
+                        <Image source={Images.water} style={[styles.waterIconImage, { tintColor: nutritionColors.water1 }]} />
+                    </View>
+                    <View style={styles.actionText}>
+                        <AppText style={[styles.actionTitle, { color: nutritionColors.water1 }]}>
+                            Water Intake
+                        </AppText>
+                        <AppText style={styles.actionSubtitle}>
+                            Adjust daily consumption
+                        </AppText>
+                    </View>
+                    <View style={[styles.actionArrow]}>
+                        <Image source={Images.arrow} style={[styles.arrowIcon, { tintColor: 'white' }]} />
+                    </View>
+                </View>
+            </TouchableOpacity>
         </AppScroll>
     );
 }
@@ -577,7 +666,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 15,
         marginTop: 15,
         borderRadius: 20,
-        backgroundColor: 'rgba(255,255,255,0.03)',
+        backgroundColor: colors.cardBackground,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
     },
@@ -732,15 +821,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 20,
-        padding: 12,
+        marginBottom: 15,
+        padding: 15,
         backgroundColor: 'rgba(255,255,255,0.03)',
-        borderRadius: 16,
+        borderRadius: 20,
     },
     goalLabel: {
         fontSize: scaleFont(14),
         color: colors.mutedText,
-        fontWeight: '600',
+        fontWeight: 'bold',
     },
     goalValue: {
         paddingHorizontal: 12,
@@ -749,19 +838,20 @@ const styles = StyleSheet.create({
     },
     goalValueText: {
         fontSize: scaleFont(12),
-        fontWeight: '700',
+        fontWeight: 'bold',
     },
     energyStats: {
         backgroundColor: 'rgba(255,255,255,0.03)',
         borderRadius: 20,
-        padding: 20,
-        marginBottom: 20,
+        paddingVertical: 20,
+        paddingHorizontal: 15,
+        marginBottom: 15,
+        justifyContent: 'center',
     },
     energyStat: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 8,
     },
     energyStatLabel: {
         fontSize: scaleFont(13),
@@ -802,5 +892,41 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: '700',
         fontSize: scaleFont(14),
+    },
+    actionCard: {
+        backgroundColor: colors.backgroundTop,
+        borderLeftWidth: 4,
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 8,
+    },
+    actionContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    actionText: {
+        flex: 1,
+    },
+    actionTitle: {
+        fontSize: scaleFont(16),
+        fontWeight: '700',
+        marginBottom: 4,
+    },
+    actionSubtitle: {
+        fontSize: scaleFont(11),
+        color: colors.mutedText,
+    },
+    waterIcon: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    waterIconImage: {
+        width: 18,
+        height: 18,
     },
 });

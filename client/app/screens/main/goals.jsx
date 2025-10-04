@@ -298,76 +298,6 @@ export default function Goals() {
         })
     }
 
-
-    async function handleWaterChange() {
-        const waterMlRecommendation = recommendedWaterIntake(user.metrics.weightKg);
-        const water = convertFluid(waterMlRecommendation, 'ml', user.preferences.fluidUnit.key);
-        const recommendation = `Recommended daily water intake (${water} ${user.preferences.fluidUnit.field})`;
-
-        createInput({
-            title: "Water Intake",
-            text: `${recommendation}`,
-            confirmText: "Save",
-            placeholders: [user.preferences.fluidUnit.field],
-            initialValues: [convertFluid(user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key)],
-            extraConfigs: [{ keyboardType: "numeric" }],
-            onSubmit: async (values) => {
-                try {
-                    const [waterVal] = values;
-
-                    if (waterVal == null || isNaN(waterVal) || waterVal <= 0) {
-                        createToast({ message: "Enter a valid number of water intake!" });
-                        return;
-                    }
-
-                    let waterMl = Number(waterVal);
-
-                    if (user.preferences.fluidUnit.key === 'floz')
-                        waterMl = convertFluid(Number(waterVal), 'floz', 'ml');
-                    else if (user.preferences.fluidUnit.key === 'cups')
-                        waterMl = convertFluid(Number(waterVal), 'cups', 'ml');
-
-                    if (waterMl === user.nutrition.waterMl) return;
-
-                    const updatedUser = recalculateUserInformation({
-                        ...user,
-                        nutrition: {
-                            ...user.nutrition,
-                            waterMl: Number(waterMl),
-                        },
-                    });
-
-                    const nutritionPayload = { ...updatedUser.nutrition };
-
-                    showSpinner();
-                    const result = await APIService.user.update({ nutrition: nutritionPayload });
-
-                    if (result.success) {
-                        const date = formatDate(new Date(), { format: 'YYYY-MM-DD' });
-                        const nutritionLogsResult = await APIService.nutrition.days.updateDay(date, { targetWaterMl: waterMl });
-                        const nutritionLogsUpdatedUser = {
-                            ...updatedUser,
-                            nutritionLogs: {
-                                ...user.nutritionLogs,
-                                ...nutritionLogsResult.data.updatedDays
-                            }
-                        }
-
-                        setUser(nutritionLogsUpdatedUser);
-                        createToast({ message: "Water intake updated" });
-                    } else {
-                        createToast({ message: `Failed to update water intake: ${result.message}` });
-                    }
-                } catch (err) {
-                    console.log(err.message);
-                    createToast({ message: "Failed to update water intake!" + err.message });
-                } finally {
-                    hideSpinner();
-                }
-            },
-        });
-    }
-
     return (
         <AppScroll hideNavBarOnScroll={true} hideTopBarOnScroll={true} extraBottom={100} topPadding={false}>
             <View style={[styles.card, { margin: 0, borderTopEndRadius: 0, borderTopStartRadius: 0, paddingTop: 90, marginBottom: 15, borderRadius: 30 }]}>
@@ -432,7 +362,7 @@ export default function Goals() {
                     </TouchableOpacity>
                 </View>
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 15, backgroundColor: colors.backgroundTop, borderRadius: 25, marginTop: 15 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', padding: 15, backgroundColor: colors.backgroundTop, borderRadius: 25, marginTop: 15 }}>
                     <View style={[styles.rowInfo, { width: '40%' }]}>
                         <AppText style={styles.rowInfoValue}>
                             {activityOptions.find(opt => opt.key === user.metrics.activityLevel)?.label || "Unknown Activity Level"}
@@ -469,167 +399,54 @@ export default function Goals() {
                 Quick Updates
             </AppText>
 
-            <View style={[styles.card, { marginTop: 0 }]}>
-                {/* Activity Level Section */}
-                <View style={styles.sectionHeader}>
-                    <View style={[styles.sectionIcon, { backgroundColor: activity.color + '20' }]}>
-                        <Image source={activity.image} style={[styles.sectionHeaderIcon, { tintColor: activity.color }]} />
-                    </View>
-                    <View style={styles.sectionHeaderText}>
-                        <AppText style={styles.sectionTitle}>Activity Level & Lifestyle</AppText>
-                        <AppText style={styles.sectionSubtitle}>Optimize your daily movement</AppText>
-                    </View>
+            <TouchableOpacity onPress={() => router.push(routes.EDIT_ACTIVITY)} style={{ backgroundColor: colors.cardBackground, borderRadius: 20, padding: 20, marginBottom: 15, marginHorizontal: 15, height: 250, alignItems: 'center', justifyContent: 'center' }}>
+                <View >
+                    <Image source={activity.image} style={{ tintColor: activity.color, width: 60, height: 60 }} />
                 </View>
 
-                <View style={styles.feedbackContainer}>
-                    {activityFeedbacks.map((line, i) => (
-                        <View key={i} style={styles.feedbackItem}>
-                            <View style={[styles.feedbackDot, { backgroundColor: activity.color }]} />
-                            <AppText style={styles.feedbackText}>{line}</AppText>
-                        </View>
-                    ))}
+                <AppText style={[{ color: activity.color, marginTop: 5, marginBottom: 5, fontWeight: 'bold', fontSize: scaleFont(25) }]}>
+                    {activity.label}
+                </AppText>
+
+                <View style={{ alignItems: 'center', marginTop: 20 }}>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(15), fontWeight: 'bold' }}>Activity Level</AppText>
+                    <AppText style={{color: colors.mutedText,fontSize: scaleFont(11), textAlign: 'center'}}>{activityFeedbacks[0]}</AppText>
                 </View>
 
-                <TouchableOpacity
-                    onPress={() => router.push(routes.EDIT_ACTIVITY)}
-                    style={[
-                        styles.actionCard,
-                        { borderLeftColor: activity.color }
-                    ]}
-                >
-                    <View style={styles.actionContent}>
-                        <View style={styles.actionText}>
-                            <AppText style={[styles.actionTitle, { color: activity.color }]}>
-                                {activity.label}
-                            </AppText>
-                            <AppText style={styles.actionSubtitle}>
-                                Update your activity level
-                            </AppText>
-                        </View>
-                        <View style={[styles.actionArrow]}>
-                            <Image source={Images.arrow} style={[styles.arrowIcon, { tintColor: 'white' }]} />
-                        </View>
-                    </View>
-                </TouchableOpacity>
+            </TouchableOpacity>
 
-                <View style={styles.sectionDivider} />
-
-                {/* Weight Goal Section */}
-                <View style={styles.sectionHeader}>
-                    <View style={[styles.sectionIcon, { backgroundColor: goal.color + '20' }]}>
-                        <Image source={goal.image} style={[styles.sectionHeaderIcon, { tintColor: goal.color }]} />
-                    </View>
-                    <View style={styles.sectionHeaderText}>
-                        <AppText style={styles.sectionTitle}>Weight Goal</AppText>
-                        <AppText style={styles.sectionSubtitle}>Track your progress</AppText>
-                    </View>
+            <TouchableOpacity onPress={() => router.push(routes.EDIT_WEIGHT_GOAL)} style={{ backgroundColor: colors.cardBackground, borderRadius: 20, padding: 20, marginBottom: 15, marginHorizontal: 15, height: 250, alignItems: 'center', justifyContent: 'center' }}>
+                <View >
+                    <Image source={goal.image} style={{ tintColor: goal.color, width: 60, height: 60 }} />
                 </View>
 
-                <View style={styles.feedbackContainer}>
-                    {weightGoalFeedbacks.map((line, i) => (
-                        <View key={i} style={styles.feedbackItem}>
-                            <View style={[styles.feedbackDot, { backgroundColor: goal.color }]} />
-                            <AppText style={styles.feedbackText}>{line}</AppText>
-                        </View>
-                    ))}
+                <AppText style={[{ color: goal.color, marginTop: 5, marginBottom: 5, fontWeight: 'bold', fontSize: scaleFont(25) }]}>
+                    {goal.label}
+                </AppText>
+
+                <View style={{ alignItems: 'center', marginTop: 20 }}>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(15), fontWeight: 'bold' }}>Weight Goal</AppText>
+                    <AppText style={{color: colors.mutedText,fontSize: scaleFont(11), textAlign: 'center'}}>{weightGoalFeedbacks[0]}</AppText>
                 </View>
 
-                <TouchableOpacity
-                    onPress={() => router.push(routes.EDIT_WEIGHT_GOAL)}
-                    style={[
-                        styles.actionCard,
-                        { borderLeftColor: goal.color }
-                    ]}
-                >
-                    <View style={styles.actionContent}>
-                        <View style={styles.actionText}>
-                            <AppText style={[styles.actionTitle, { color: goal.color }]}>
-                                {goal.label}
-                            </AppText>
-                            <AppText style={styles.actionSubtitle}>
-                                Adjust your weight target
-                            </AppText>
-                        </View>
-                        <View style={[styles.actionArrow]}>
-                            <Image source={Images.arrow} style={[styles.arrowIcon, { tintColor: 'white' }]} />
-                        </View>
-                    </View>
-                </TouchableOpacity>
+            </TouchableOpacity>
 
-                <View style={styles.sectionDivider} />
-
-                {/* Diet Section */}
-                <View style={styles.sectionHeader}>
-                    <View style={[styles.sectionIcon, { backgroundColor: diet.color + '20' }]}>
-                        <Image source={diet.image} style={[styles.sectionHeaderIcon, { tintColor: diet.color }]} />
-                    </View>
-                    <View style={styles.sectionHeaderText}>
-                        <AppText style={styles.sectionTitle}>Current Diet</AppText>
-                        <AppText style={styles.sectionSubtitle}>Nutrition & meal planning</AppText>
-                    </View>
+ <TouchableOpacity onPress={() => router.push(routes.EDIT_DIET)} style={{ backgroundColor: colors.cardBackground, borderRadius: 20, padding: 20, marginBottom: 15, marginHorizontal: 15, height: 250, alignItems: 'center', justifyContent: 'center' }}>
+                <View >
+                    <Image source={diet.image} style={{ tintColor: diet.color, width: 60, height: 60 }} />
                 </View>
 
-                <View style={styles.feedbackContainer}>
-                    {dietTips.map((tip, i) => (
-                        <View key={i} style={styles.feedbackItem}>
-                            <View style={[styles.feedbackDot, { backgroundColor: diet.color }]} />
-                            <AppText style={styles.feedbackText}>{tip}</AppText>
-                        </View>
-                    ))}
+                <AppText style={[{ color: diet.color, marginTop: 5, marginBottom: 5, fontWeight: 'bold', fontSize: scaleFont(25) }]}>
+                    {diet.label}
+                </AppText>
+
+                <View style={{ alignItems: 'center', marginTop: 20 }}>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(15), fontWeight: 'bold' }}>Diet</AppText>
+                    <AppText style={{color: colors.mutedText,fontSize: scaleFont(11), textAlign: 'center'}}>{dietTips[0]}</AppText>
                 </View>
 
-                <TouchableOpacity
-                    onPress={() => router.push(routes.EDIT_DIET)}
-                    style={[
-                        styles.actionCard,
-                        { borderLeftColor: diet.color }
-                    ]}
-                >
-                    <View style={styles.actionContent}>
-                        <View style={styles.actionText}>
-                            <AppText style={[styles.actionTitle, { color: diet.color }]}>
-                                {diet.label}
-                            </AppText>
-                            <AppText style={styles.actionSubtitle}>
-                                Change diet plan
-                            </AppText>
-                        </View>
-                        <View style={[styles.actionArrow,]}>
-                            <Image source={Images.arrow} style={[styles.arrowIcon, { tintColor: 'white' }]} />
-                        </View>
-                    </View>
-                </TouchableOpacity>
-
-                {/* Water Section */}
-                <TouchableOpacity
-                    onPress={handleWaterChange}
-                    style={[
-                        styles.actionCard,
-                        {
-                            borderLeftColor: nutritionColors.water1,
-                            marginTop: 20
-                        }
-                    ]}
-                >
-                    <View style={styles.actionContent}>
-                        <View style={[styles.waterIcon, { backgroundColor: nutritionColors.water1 + '20' }]}>
-                            <Image source={Images.water} style={[styles.waterIconImage, { tintColor: nutritionColors.water1 }]} />
-                        </View>
-                        <View style={styles.actionText}>
-                            <AppText style={[styles.actionTitle, { color: nutritionColors.water1 }]}>
-                                Water Intake
-                            </AppText>
-                            <AppText style={styles.actionSubtitle}>
-                                Adjust daily consumption
-                            </AppText>
-                        </View>
-                        <View style={[styles.actionArrow]}>
-                            <Image source={Images.arrow} style={[styles.arrowIcon, { tintColor: 'white' }]} />
-                        </View>
-                    </View>
-                </TouchableOpacity>
-            </View>
-        </AppScroll>
+            </TouchableOpacity>
+        </AppScroll >
     );
 }
 
@@ -686,15 +503,13 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: scaleFont(19),
-        fontWeight: '700',
+        fontWeight: 'bold',
         color: 'white',
         marginBottom: 12,
     },
     feedbackText: {
         color: 'white',
-        fontSize: scaleFont(12),
-        lineHeight: 20,
-        flex: 1,
+        fontSize: scaleFont(12)
     },
     sectionHeader: {
         flexDirection: 'row',
@@ -711,8 +526,8 @@ const styles = StyleSheet.create({
         overflow: 'hidden'
     },
     sectionHeaderIcon: {
-        width: 20,
-        height: 20,
+        width: 40,
+        height: 40,
     },
     sectionHeaderText: {
         flex: 1,
@@ -732,7 +547,7 @@ const styles = StyleSheet.create({
     },
     feedbackItem: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         marginBottom: 8,
         marginHorizontal: 10
     },
