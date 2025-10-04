@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
         color: "rgb(102, 102, 102)",
     },
     sectionTitle: {
-        fontSize: scaleFont(19),
+        fontSize: scaleFont(20),
         fontWeight: 'bold',
         color: 'white',
         marginBottom: 12,

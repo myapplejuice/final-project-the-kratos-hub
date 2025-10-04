@@ -65,15 +65,6 @@ export default function NutritionHub() {
 
      return (
           <>
-               <FloatingActionMenu
-                    overlayColor="rgba(0, 0, 0, 0.8)"
-                    actions={[
-                         { icon: Images.statistics2, title: 'Statistical Analysis', onPress: () => console.log("Stats"), closeOnAction: true, delayClosure: true },
-                         { icon: Images.book4, title: 'Meals Log', onPress: () => router.push(routes.MEALS_LOG), closeOnAction: true, delayClosure: true },
-                    ]}
-                    position={{ bottom: 140, right: 20 }}
-                    syncWithNavBar={true}
-               />
                <AppScroll extraBottom={150} extraTop={0} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>
                     <View style={{ margin: 0, paddingHorizontal: 20, paddingTop: 60, paddingBottom: 20, borderBottomEndRadius: 30, borderBottomStartRadius: 30, backgroundColor: colors.cardBackground }}>
                          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
@@ -141,85 +132,70 @@ export default function NutritionHub() {
                          </AppText>
                     </View>
 
-                    <AppText style={[styles.sectionTitle, { marginHorizontal: 25, fontSize: scaleFont(15), marginBottom: 0, marginTop: 25 }]}>Make sure to always log your meals!</AppText>
+                    <AppText style={[styles.sectionTitle, { marginHorizontal: 25, fontSize: scaleFont(20), fontWeight: 'bold', marginBottom: 0, marginTop: 25 }]}>Nutrition Tabs</AppText>
 
-                    <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 0 }]}>
-                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <View style={{ flexDirection: 'row', alignItems: 'center', margin: 10 }}>
-                                   <View style={{ backgroundColor: colors.main + '20', borderRadius: 15, padding: 10 }}>
-                                        <Image
-                                             source={Images.book5}
-                                             style={{ width: 40, height: 40, tintColor: colors.main }}
-                                        />
-                                   </View>
-                                   <View style={{ justifyContent: 'flex-start', marginStart: 15 }}>
-                                        <View>
-                                             <AppText style={{ color: colors.main, fontSize: scaleFont(18), fontWeight: 'bold' }}>
-                                                  Meals Logger
-                                             </AppText>
-                                             <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
-                                                  Tap to go to your meals logger
-                                             </AppText>
-                                        </View>
-                                   </View>
-                              </View>
-                              <View style={{ alignItems: 'flex-end', marginEnd: 10 }}>
-                                   <Image source={Images.arrow} style={styles.arrow} />
+                    <TouchableOpacity onPress={() => router.push(routes.MEALS_LOG)} style={[styles.card, { padding: 20 }]}>
+                         <View style={{ alignItems: 'center', borderRadius: 15, padding: 20 }}>
+                              <Image
+                                   source={Images.book5}
+                                   style={{ width: 60, height: 60, tintColor: 'white' }}
+                              />
+                         </View>
+                         <View style={{ justifyContent: 'flex-start', paddingBottom: 20 }}>
+                              <View style={{ alignItems: 'center' }}>
+                                   <AppText style={{ color: 'white', fontSize: scaleFont(20), fontWeight: 'bold' }}>
+                                        Meals Diary
+                                   </AppText>
+                                   <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
+                                        Track and log all your meals in one place
+                                   </AppText>
                               </View>
                          </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => router.push(routes.MEAL_PLANS)} style={[styles.card, { padding: 0 }]}>
+                    <TouchableOpacity onPress={() => router.push(routes.MEAL_PLANS)} style={[styles.card, { padding: 15 }]}>
                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <View style={{ flexDirection: 'row', alignItems: 'center', margin: 10, flexShrink: 1 }}>
-                                   <View style={{ backgroundColor: colors.accentBlue + '20', borderRadius: 15, padding: 10 }}>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 1 }}>
+                                   <View style={{ borderRadius: 15, padding: 12, backgroundColor: colors.lightMutedText, overflow: 'hidden' }}>
                                         <Image
                                              source={Images.plan2}
-                                             style={{ width: 40, height: 40, tintColor: colors.accentBlue }}
+                                             style={{ width: 35, height: 35, tintColor: 'white' }}
                                         />
                                    </View>
                                    <View style={{ justifyContent: 'flex-start', marginStart: 15, marginEnd: 70 }}>
                                         <View>
-                                             <AppText style={{ color: colors.accentBlue, fontSize: scaleFont(18), fontWeight: 'bold' }}>
+                                             <AppText style={{ color: 'white', fontSize: scaleFont(18), fontWeight: 'bold' }}>
                                                   Nutrition Plans
                                              </AppText>
                                              <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
-                                                  Build and prepare your own meals which you can import to your logger
+                                                  Build and prepare your own meals ready for import to your diary
                                              </AppText>
                                         </View>
                                    </View>
                               </View>
-                              <View style={{ alignItems: 'flex-end', marginEnd: 10 }}>
-                                   <Image source={Images.arrow} style={styles.arrow} />
-                              </View>
                          </View>
                     </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => router.push(routes.FOODS)} style={[styles.card, { padding: 0 }]}>
+                    <TouchableOpacity onPress={() => router.push(routes.FOODS)} style={[styles.card, { padding: 15 }]}>
                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <View style={{ flexDirection: 'row', alignItems: 'center', margin: 10, flexShrink: 1 }}>
-                                   <View style={{ backgroundColor: colors.accentGreen + '20', borderRadius: 15, padding: 10 }}>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 1 }}>
+                                   <View style={{ borderRadius: 15, padding: 12, backgroundColor: colors.lightMutedText, overflow: 'hidden' }}>
                                         <Image
                                              source={Images.foodsOne}
-                                             style={{ width: 40, height: 40, tintColor: colors.accentGreen }}
+                                             style={{ width: 35, height: 35, tintColor: 'white' }}
                                         />
                                    </View>
                                    <View style={{ justifyContent: 'flex-start', marginStart: 15, marginEnd: 70 }}>
                                         <View>
-                                             <AppText style={{ color: colors.accentGreen, fontSize: scaleFont(18), fontWeight: 'bold' }}>
-                                                  My Foods
+                                             <AppText style={{ color: 'white', fontSize: scaleFont(18), fontWeight: 'bold' }}>
+                                                  Personal Foods
                                              </AppText>
                                              <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
-                                                  Tap to explore your food list and other community and library foods
+                                                  Create your own foods and share them with others
                                              </AppText>
                                         </View>
                                    </View>
                               </View>
-                              <View style={{ alignItems: 'flex-end', marginEnd: 10 }}>
-                                   <Image source={Images.arrow} style={styles.arrow} />
-                              </View>
                          </View>
-
                     </TouchableOpacity>
                </AppScroll >
           </>

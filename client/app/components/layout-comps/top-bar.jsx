@@ -57,7 +57,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.EDIT_ACTIVITY]: "Update Activity Level",
         [routes.EDIT_WEIGHT_GOAL]: "Update Weight Goal",
         [routes.EDIT_DIET]: "Update Diet",
-        [routes.MEALS_LOG]: "Meals Log",
+        [routes.MEALS_LOG]: "Meals Diary",
         [routes.FOOD_SELECTION]: "Foods",
         [routes.FOOD_PROFILE]: "Foods",
         [routes.FOOD_CREATOR]: "Create Food",
