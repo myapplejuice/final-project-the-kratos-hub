@@ -93,17 +93,12 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
                 </TouchableOpacity>
 
                 <ExpandInOut visible={expanded}>
-                    <Divider orientation='horizontal' style={{ marginTop: 15, marginBottom: 10 }} />
-                    <View style={{ marginTop: 5 }}>
-                        <AppText style={{ color: 'white', fontSize: scaleFont(15), fontWeight: 'bold', textAlign: 'left' }}>
-                            About this plan
-                        </AppText>
-                        <AppText style={{ marginTop: 10, color: colors.mutedText, fontSize: scaleFont(10), textAlign: description !== 'No description provided' ? 'left' : 'center' }}>
+                    <View style={{ marginVertical: 25, padding: 20, borderRadius: 15, backgroundColor: colors.backgroundTop }}>
+                        <AppText style={{color: colors.mutedText, fontSize: scaleFont(10), textAlign: description !== 'No description provided' ? 'left' : 'center' }}>
                             {description}
                         </AppText>
                     </View>
 
-                    <Divider orientation='horizontal' style={{ marginVertical: 15 }} />
 
                     <AppText style={{ color: 'white', fontSize: scaleFont(15), fontWeight: 'bold', textAlign: 'left', lineHeight: 16 }}>Macro' Distribution</AppText>
                     <PercentageBar
