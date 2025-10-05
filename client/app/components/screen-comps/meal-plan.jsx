@@ -32,6 +32,13 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
     );
 
     const formattedDate = formatDate(date, { format: user.preferences.dateFormat.key });
+    const mealCount = meals.length;
+    const foodCount = meals.reduce((acc, meal) => acc + meal.foods.length, 0);
+    const macroPercentages = {
+        carbs: Math.round((totals.carbs / totals.energyKcal) * 100),
+        protein: Math.round((totals.protein / totals.energyKcal) * 100),
+        fat: Math.round((totals.fat / totals.energyKcal) * 100),
+    }
 
     return (
         <FadeInOut visible={true}>
@@ -39,11 +46,23 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
                 <TouchableOpacity onPress={() => { setExpanded(prev => !prev) }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <View>
-                            <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold' }}>{label}</AppText>
+                            <AppText style={{ fontSize: scaleFont(15), color: 'white', fontWeight: 'bold' }}>{label}</AppText>
                             <AppText style={{ fontSize: scaleFont(9), color: colors.mutedText, fontWeight: 'bold' }}>{formattedDate}</AppText>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                             <View style={{ flexDirection: 'row' }}>
+                                <View style={{ alignItems: 'center', alignSelf: 'center' }}>
+                                    <AppText style={{ color: 'white', fontSize: scaleFont(13) }}>
+                                        {foodCount}
+                                    </AppText>
+                                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>Foods</AppText>
+                                </View>
+                                <View style={{ alignItems: 'center', marginHorizontal: 10, alignSelf: 'center' }}>
+                                    <AppText style={{ color: 'white', fontSize: scaleFont(13) }}>
+                                        {mealCount}
+                                    </AppText>
+                                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>Meals</AppText>
+                                </View>
                                 <TouchableOpacity
                                     style={{ backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 10, alignItems: 'center', justifyContent: 'center', paddingVertical: 8, marginEnd: 10, paddingHorizontal: 10 }}
                                     onPress={onDeletePress}
@@ -74,13 +93,32 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
                 </TouchableOpacity>
 
                 <ExpandInOut visible={expanded}>
-                    <View style={{ marginVertical: 25 }}>
-                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10), textAlign: description !== 'No description provided' ? 'left' : 'center', lineHeight: 16 }}>
+                    <Divider orientation='horizontal' style={{ marginTop: 15, marginBottom: 10 }} />
+                    <View style={{ marginTop: 5 }}>
+                        <AppText style={{ color: 'white', fontSize: scaleFont(15), fontWeight: 'bold', textAlign: 'left' }}>
+                            About this plan
+                        </AppText>
+                        <AppText style={{ marginTop: 10, color: colors.mutedText, fontSize: scaleFont(10), textAlign: description !== 'No description provided' ? 'left' : 'center' }}>
                             {description}
                         </AppText>
                     </View>
 
-                    <View style={{ padding: 15, alignItems: 'center', backgroundColor: 'rgba(58,58,58,0.49)', borderRadius: 15, marginTop: 0 }}>
+                    <Divider orientation='horizontal' style={{ marginVertical: 15 }} />
+
+                    <AppText style={{ color: 'white', fontSize: scaleFont(15), fontWeight: 'bold', textAlign: 'left', lineHeight: 16 }}>Macro' Distribution</AppText>
+                    <PercentageBar
+                        values={[
+                            { percentage: macroPercentages.carbs, color: nutritionColors.carbs1 },
+                            { percentage: macroPercentages.protein, color: nutritionColors.protein1 },
+                            { percentage: macroPercentages.fat, color: nutritionColors.fat1 },
+                        ]}
+                        barHeight={3}
+                        showTitles={false}
+                        barContainerStyle={{ borderRadius: 50, marginTop: 10, marginBottom: 5, paddingVertical: 4 }}
+
+                    />
+
+                    <View style={{ padding: 15, alignItems: 'center', backgroundColor: 'rgba(58,58,58,0.49)', borderRadius: 15, marginTop: 20 }}>
                         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                             <AppText style={{ color: nutritionColors.energy1, fontSize: scaleFont(10) }}>
                                 {convertEnergy(totals.energyKcal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
