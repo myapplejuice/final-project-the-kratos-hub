@@ -61,7 +61,7 @@ export default class NutritionMealPlansMealsDBService {
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, mealId);
             Database.addInput(request, 'Label', sql.VarChar(50), newLabel);
-            Database.addInput(request, 'Time', sql.VarChar(20), new Date(newTime));
+            Database.addInput(request, 'Time', sql.VarChar(20), newTime);
 
             const query = `
                 UPDATE dbo.MealPlansMeals

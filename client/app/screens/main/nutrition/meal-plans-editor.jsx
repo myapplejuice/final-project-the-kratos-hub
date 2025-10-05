@@ -36,17 +36,17 @@ export default function MealPlansEditor() {
     const [plan, setPlan] = useState(additionalContexts.selectedPlan);
     const [openMeals, setOpenMeals] = useState([]);
 
-    useEffect(()=>{
-      setPlan(prev => user.plans.find(p => p.id === prev.id));
-      console.log(user.plans[0].meals)
-    },[user.plans])
+    useEffect(() => {
+        setPlan(prev => user.plans.find(p => p.id === prev.id));
+        console.log(user.plans[0].meals)
+    }, [user.plans])
 
     async function handleMealAddition() {
         createInput({
             title: "Meal Addition",
             confirmText: "Add",
-            text: `OPTIONAL:\nEnter a label for the meal && timing of meal in 24-hour format (e.g. 18:00)`,
-            placeholders: [`Meal ${plan?.meals?.length + 1 || 1}`, [`HH`, `MM`]],
+            text: `OPTIONAL:\nEnter a label for the meal & timing of meal in 24-hour format (e.g. 18:00)`,
+            placeholders: [`Label`, [`HH`, `MM`]],
             initialValues: [``, [``, ``]],
             extraConfigs: [[], [{ keyboardType: "numeric" }, { keyboardType: "numeric" }]],
             onSubmit: async (vals) => {
@@ -65,10 +65,10 @@ export default function MealPlansEditor() {
 
                 if (time !== 'Timing not provided') {
                     if (!isValidTime(time)) {
-                        createDialog({
+                        return createDialog({
                             title: 'Invalid Time',
                             text: `${time} is an invalid time, are you sure you want to continue?`,
-                            onConfirm: async () => await handleMealAddition(label, time),
+                            onConfirm: async () => await confirmMealAddition(label, time),
                         });
                     }
                 }
@@ -117,6 +117,137 @@ export default function MealPlansEditor() {
         }
     }
 
+    async function handleMealUpdate(meal) {
+        let HH, MM;
+        if (meal.time !== 'Timing not provided') {
+            HH = meal.time.split(':')[0];
+            MM = meal.time.split(':')[1];
+        }
+
+        createInput({
+            title: "Meal Addition",
+            confirmText: "Add",
+            text: `Enter new label for the meal & timing`,
+            placeholders: [`Label`, [`HH`, `MM`]],
+            initialValues: [`${meal.label}`, [`${HH || ''}`, `${MM || ''}`]],
+            extraConfigs: [[], [{ keyboardType: "numeric" }, { keyboardType: "numeric" }]],
+            onSubmit: async (vals) => {
+                let label = vals[0];
+                let time = vals[1][0] + ':' + vals[1][1];
+
+                if (!time && !label)
+                    return createToast({ message: "No changes made" });
+
+                if (!vals[1][0] && !vals[1][1])
+                    time = 'Timing not provided';
+
+                if (!vals[0][1])
+                    time = `00:${vals[1][1]}`;
+                
+                if (!vals[1][0])
+                    time = `${vals[1][0]}:00`;
+
+                if (label === meal.label && time === meal.time)
+                    return createToast({ message: "No changes made" });
+
+                if (time !== 'Timing not provided') {
+                    if (!isValidTime(time)) {
+                        return createDialog({
+                            title: 'Invalid Time',
+                            text: `${time} is an invalid time, are you sure you want to continue?`,
+                            onConfirm: async () => await confirmMealUpdate(meal.id, label, time),
+                        });
+                    }
+                }
+
+                await confirmMealUpdate(meal.id, label, time);
+            },
+        });
+    }
+
+    async function confirmMealUpdate(mealId, label, time) {
+        try {
+            showSpinner();
+
+            const payload = {
+                mealId,
+                newLabel: label,
+                newTime: time,
+            };
+
+            console.log(payload)
+
+            const result = await APIService.nutrition.mealPlans.meals.update(payload);
+
+            if (result.success) {
+                const meal = result.data.meal;
+
+                setUser(prev => ({
+                    ...prev,
+                    plans: prev.plans.map(p =>
+                        p.id === plan.id
+                            ? {
+                                ...p,
+                                meals: p.meals.map(m =>
+                                    m.id === meal.id
+                                        ? { ...m, ...meal }
+                                        : m
+                                )
+                            }
+                            : p
+                    )
+                }))
+
+            } else {
+                createToast({ message: result.message || "Failed to update meal" });
+
+            }
+        } catch (err) {
+            console.error("Failed to update meal:", err);
+            createToast({ message: "Server error " + err });
+        } finally {
+            hideSpinner();
+        }
+    }
+
+
+    async function handleMealDeletion(mealId, meal) {
+        createDialog({
+            title: "Discard Meal",
+            text: `Are you sure you want to discard "${meal.label}"?`,
+            confirmText: "Discard",  
+            confirmButtonStyle: { backgroundColor: 'rgb(255,59,48)', borderColor: 'rgb(255,59,48)' },
+            onConfirm: async () => {
+                try {
+                    showSpinner();
+
+                    const result = await APIService.nutrition.mealPlans.meals.delete({ mealId });
+
+                    if (result.success) {
+                        setUser(prev => ({
+                            ...prev,
+                            plans: prev.plans.map(p =>
+                                p.id === plan.id
+                                    ? {
+                                        ...p,
+                                        meals: p.meals.filter(m => m.id !== mealId)
+                                    }
+                                    : p
+                            )
+                        }))
+                    } else {
+                        createToast({ message: result.message || "Failed to delete meal" });
+                    }
+                } catch (err) {
+                    console.error("Failed to delete meal:", err);
+                    createToast({ message: "Server error " + err });
+                } finally {
+                    hideSpinner();
+                }
+            },
+        })
+    }
+
     return (
         <>
             <FloatingActionButton
@@ -144,6 +275,8 @@ export default function MealPlansEditor() {
                             label={meal.label}
                             time={meal.time}
                             foods={meal.foods}
+                            onRenamePress={() => handleMealUpdate(meal)}
+                            onDeletePress={() => handleMealDeletion(meal.id, meal)}
                             expandedOnStart={openMeals.includes(meal.id)}
                             key={index}
                         />
