@@ -527,7 +527,7 @@ export default function Goals() {
                 </View>
             </TouchableOpacity>
 
-            <View style={[styles.card, { padding: 18, marginTop: 0 }]}>
+            <View style={[styles.card, { padding: 20, marginTop: 0 }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Image
                         source={Images.magnifier}
