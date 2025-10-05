@@ -5,6 +5,7 @@ import MiddlewaresManager from '../utils/middlewares-manager.js';
 import NutritionFoodsController from '../models/nutrition/foods/nutrition-foods-controller.js';
 import NutritionMealPlansController from '../models/nutrition/meal-plans/nutrition-meal-plans-controller.js';
 import NutritionMealsFoodsController from '../models/nutrition/meals/meal-foods/nutrition-meals-foods-controller.js';
+import NutritionMealPlansMealsController from '../models/nutrition/meal-plans/meal-plans-meals/nutrition-meal-plans-meals-controller.js';
 
 export default class NutritionRouter {
     static nutritionRouter;
@@ -35,10 +36,13 @@ export default class NutritionRouter {
         this.nutritionRouter.put("/foods/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionFoodsController.updateFood));
         this.nutritionRouter.delete("/foods/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionFoodsController.deleteFood));
 
-        this.nutritionRouter.get("/meal-plans/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansController.fetchPlans));
         this.nutritionRouter.post("/meal-plans/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansController.createPlan));
         this.nutritionRouter.delete("/meal-plans/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansController.deletePlan));
         this.nutritionRouter.put("/meal-plans/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansController.updatePlan));
+
+        this.nutritionRouter.post("/meal-plans/meal/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansMealsController.createMeal));
+        this.nutritionRouter.delete("/meal-plans/meal/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansMealsController.deleteMeal));
+        this.nutritionRouter.put("/meal-plans/meal/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansMealsController.updateMeal));
 
 
         return this.nutritionRouter;

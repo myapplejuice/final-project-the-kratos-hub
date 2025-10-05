@@ -117,3 +117,18 @@ export function getDayComparisons(compareDate, now = new Date()) {
         isYesterday: pageDay.getTime() === currentDay.getTime() - 86400000,
     };
 }
+
+export function isValidTime(timeStr) {
+    // Check pattern HH:mm (both parts must be 2 digits)
+    const match = /^(\d{1,2}):(\d{1,2})$/.exec(timeStr);
+    if (!match) return false;
+
+    const hours = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+
+    // Validate ranges
+    if (hours < 0 || hours > 23) return false;
+    if (minutes < 0 || minutes > 59) return false;
+
+    return true;
+}

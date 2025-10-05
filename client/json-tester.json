@@ -1,20 +1,37 @@
 [
     {
         "coachId": null,
-        "dateOfCreation": "2025-10-05T15:26:38.355Z",
-        "description": "Ehehe",
-        "id": 2,
+        "dateOfCreation": "2025-10-05T15:56:04.591Z",
+        "description": "Winter cut for this years winter for the next 5 months",
+        "id": 4,
         "isCreatedByCoach": false,
-        "label": "Winter cut",
+        "label": "Winter Cut",
+        "meals": [
+            [Object
+            ],
+            [Object
+            ]
+        ],
         "userId": "57E0CAF4-4C9A-4E67-A07F-B2D8D69ABBF5"
     },
     {
         "coachId": null,
-        "dateOfCreation": "2025-10-05T15:25:51.789Z",
-        "description": "Jhbbb",
-        "id": 1,
-        "isCreatedByCoach": true,
-        "label": "Winter cut",
+        "dateOfCreation": "2025-10-05T17:34:13.460Z",
+        "description": "No description provided",
+        "id": 5,
+        "isCreatedByCoach": false,
+        "label": "Meal 2",
+        "meals": [],
+        "userId": "57E0CAF4-4C9A-4E67-A07F-B2D8D69ABBF5"
+    },
+    {
+        "coachId": null,
+        "dateOfCreation": "2025-10-05T17:40:14.965Z",
+        "description": "No description provided",
+        "id": 6,
+        "isCreatedByCoach": false,
+        "label": "Meal Plan 3",
+        "meals": [],
         "userId": "57E0CAF4-4C9A-4E67-A07F-B2D8D69ABBF5"
     }
 ]

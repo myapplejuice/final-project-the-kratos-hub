@@ -47,7 +47,7 @@ export default function MealsPlans() {
                 let label = vals[0];
                 let description = vals[1];
                 if (!label)
-                    label = `Meal ${user.plans?.length + 1}`;
+                    label = `Meal Plan ${user.plans?.length + 1}`;
 
                 if (!description)
                     description = `No description provided`;
@@ -161,9 +161,8 @@ export default function MealsPlans() {
     }
 
     async function handlePlanPress(plan) {
-        console.log(plan)
         setAdditionalContexts(prev => ({ ...prev, selectedPlan: plan }));
-        router.push(routes.MEALS_PLANNER);
+        router.push(routes.MEAL_PLANS_EDITOR);
     }
 
     return (

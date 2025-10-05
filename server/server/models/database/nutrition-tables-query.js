@@ -138,7 +138,7 @@ export function nutritionTablesQuery() {
                 Id INT IDENTITY(1,1) PRIMARY KEY,
                 MealPlanId INT NOT NULL,
                 Label VARCHAR(50) NOT NULL,
-                Time DATETIME2 NOT NULL,
+                Time VARCHAR(20) NOT NULL,
                 CONSTRAINT FK_MealPlansMeals_MealPlans FOREIGN KEY (MealPlanId)
                     REFERENCES dbo.MealPlans(Id)
                     ON DELETE CASCADE
@@ -177,9 +177,15 @@ export function nutritionTablesQuery() {
             );
         END;`;
 
-    const query = [nutritionLogsQuery, mealLogsQuery, mealLogsFoodsQuery, foodsQuery, mealPlansQuery]
-        .map(q => q.trim())
-        .join('\n\n');
+    const query = [
+        nutritionLogsQuery,
+        mealLogsQuery,
+        mealLogsFoodsQuery,
+        foodsQuery,
+        mealPlansQuery,
+        mealPlansMealsQuery,
+        mealPlansMealsFoodsQuery
+    ].map(q => q.trim()).join('\n\n');
 
     return query;
 }

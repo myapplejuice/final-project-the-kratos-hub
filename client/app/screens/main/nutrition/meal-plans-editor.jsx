@@ -9,12 +9,11 @@ import DateDisplay from "../../../components/screen-comps/date-display";
 import Divider from "../../../components/screen-comps/divider";
 import FloatingActionButton from "../../../components/screen-comps/floating-action-button";
 import FloatingActionMenu from "../../../components/screen-comps/floating-action-menu";
-import Meal from "../../../components/screen-comps/meal";
 import ProgressBar from "../../../components/screen-comps/progress-bar";
 import { Images } from "../../../common/settings/assets";
 import { UserContext } from '../../../common/contexts/user-context';
 import { convertEnergy, convertFluid } from "../../../common/utils/unit-converter";
-import { formatDate } from '../../../common/utils/date-time';
+import { formatDate, isValidTime } from '../../../common/utils/date-time';
 import usePopups from "../../../common/hooks/use-popups";
 import { scaleFont } from "../../../common/utils/scale-fonts";
 import APIService from "../../../common/services/api-service";
@@ -26,7 +25,7 @@ import { getSQLTime } from '../../../common/utils/date-time';
 import { totalDayConsumption } from '../../../common/utils/metrics-calculator';
 import FadeInOut from '../../../components/effects/fade-in-out';
 import Invert from '../../../components/effects/invert';
-import MealPlan from '../../../components/screen-comps/meal-plan';
+import Meal from '../../../components/screen-comps/meal';
 
 export default function MealPlansEditor() {
     const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
@@ -34,8 +33,89 @@ export default function MealPlansEditor() {
     const insets = useSafeAreaInsets();
     const [scrollToTop, setScrollToTop] = useState(false);
     const [fabVisible, setFabVisible] = useState(true);
+    const [plan, setPlan] = useState(additionalContexts.selectedPlan);
+    const [openMeals, setOpenMeals] = useState([]);
 
-    
+    useEffect(()=>{
+      setPlan(prev => user.plans.find(p => p.id === prev.id));
+      console.log(user.plans[0].meals)
+    },[user.plans])
+
+    async function handleMealAddition() {
+        createInput({
+            title: "Meal Addition",
+            confirmText: "Add",
+            text: `OPTIONAL:\nEnter a label for the meal && timing of meal in 24-hour format (e.g. 18:00)`,
+            placeholders: [`Meal ${plan?.meals?.length + 1 || 1}`, [`HH`, `MM`]],
+            initialValues: [``, [``, ``]],
+            extraConfigs: [[], [{ keyboardType: "numeric" }, { keyboardType: "numeric" }]],
+            onSubmit: async (vals) => {
+                let label = vals[0];
+                let time = vals[1][0] + ':' + vals[1][1];
+
+                if (!label)
+                    label = `Meal ${plan.meals.length + 1}`;
+
+                if (!vals[1][0] && !vals[1][1])
+                    time = 'Timing not provided';
+                else if (!vals[1][0])
+                    time = `00:${vals[1][1]}`;
+                else if (!vals[1][1])
+                    time = `${vals[1][0]}:00`;
+
+                if (time !== 'Timing not provided') {
+                    if (!isValidTime(time)) {
+                        createDialog({
+                            title: 'Invalid Time',
+                            text: `${time} is an invalid time, are you sure you want to continue?`,
+                            onConfirm: async () => await handleMealAddition(label, time),
+                        });
+                    }
+                }
+
+                await confirmMealAddition(label, time);
+            },
+        });
+    }
+
+    async function confirmMealAddition(label, time) {
+        try {
+            showSpinner();
+
+            const payload = {
+                planId: plan.id,
+                label,
+                time,
+            };
+
+            const result = await APIService.nutrition.mealPlans.meals.add(payload);
+
+            if (result.success) {
+                const meal = result.data.meal;
+
+                setOpenMeals(prev => [...prev, meal.id]);
+                setUser(prev => ({
+                    ...prev,
+                    plans: prev.plans.map(p =>
+                        p.id === plan.id
+                            ? {
+                                ...p,
+                                meals: [...(p.meals || []), { ...meal }]
+                            }
+                            : p
+                    )
+                }));
+
+            } else {
+                createToast({ message: result.message || "Failed to add meal" });
+            }
+        } catch (err) {
+            console.error("Failed to add meal:", err);
+            createToast({ message: "Server error" });
+        } finally {
+            hideSpinner();
+        }
+    }
 
     return (
         <>
@@ -50,7 +130,7 @@ export default function MealPlansEditor() {
             />
 
             <FloatingActionButton
-                onPress={handlePlanAddition}
+                onPress={handleMealAddition}
                 visible={fabVisible}
                 position={{ bottom: insets.bottom + 50, right: 20 }}
                 icon={Images.plus}
@@ -58,34 +138,27 @@ export default function MealPlansEditor() {
             />
 
             <AppScroll avoidKeyboard={false} extraBottom={150} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
-                {user.plans?.length > 0 ?
-                    <View>
-                        {user.plans.map((plan, i) => (
-                            <MealPlan
-                                key={plan.id}
-                                date={plan.dateOfCreation}
-                                label={plan.label}
-                                description={plan.description}
-                                planId={plan.id}
-                                isCreatedByCoach={plan.isCreatedByCoach}
-                                coachId={plan.coachId}
-                                expandedOnStart={i === 0}
-                                onDeletePress={() => handlePlanDeletion(plan)}
-                                onUpdatePress={() => handlePlanUpdate(plan)}
-                                onPlanPress={() => handlePlanPress(plan)}
-                            />
-                        ))}
-                    </View>
-                    :
+                {plan?.meals?.length > 0 ? (
+                    plan.meals.map((meal, index) => (
+                        <Meal
+                            label={meal.label}
+                            time={meal.time}
+                            foods={meal.foods}
+                            expandedOnStart={openMeals.includes(meal.id)}
+                            key={index}
+                        />
+                    ))
+                ) : (
                     <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                        <Image source={Images.list3Outline} style={{ width: 120, height: 120, tintColor: colors.mutedText + '99' }} />
+                        <Image source={Images.mealPlan} style={{ width: 120, height: 120, tintColor: colors.mutedText + '99' }} />
                         <AppText style={{ fontSize: scaleFont(16), color: colors.mutedText, textAlign: 'center', fontWeight: 'bold', marginTop: 20 }}>
-                            You have no meal plans
+                            This plan is empty of any meals
                         </AppText>
                         <AppText style={{ fontSize: scaleFont(14), color: 'white', textAlign: 'center', marginTop: 5 }}>
-                            Tap on plus the "+" to add new meal plan
+                            Tap on plus the "+" to add a new meal
                         </AppText>
-                    </View>}
+                    </View>
+                )}
             </AppScroll >
         </>
     );

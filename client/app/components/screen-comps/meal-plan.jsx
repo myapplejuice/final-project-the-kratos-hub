@@ -107,7 +107,7 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
                     </View>
 
                     <AnimatedButton
-                        title="Meals"
+                        title="View Full Plan"
                         style={{
                             padding: 15,
                             backgroundColor: colors.accentGreen,
@@ -137,10 +137,10 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
 const styles = {
     card: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 15,
+        borderRadius: 20,
         marginHorizontal: 15,
         marginTop: 15,
-        padding: 15,
+        padding: 20,
         overflow: 'hidden',
     },
 };

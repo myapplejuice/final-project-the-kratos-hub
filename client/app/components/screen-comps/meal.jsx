@@ -39,7 +39,7 @@ export default function Meal({ label, time, foods = [], onDeletePress = () => { 
     };
 
     const localTime = fromSqlToLocalTime(time)
-    const formattedTime = formatTime(localTime, { format: user.preferences.timeFormat.key });
+    const formattedTime = formatTime(localTime, { format: user.preferences.timeFormat.key }) || time;
 
     return (
         <FadeInOut visible={true}>

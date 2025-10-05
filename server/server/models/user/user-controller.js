@@ -13,7 +13,6 @@ export default class UserController {
 
         if (!response) return res.status(500).json({ message: "Internal server error!" });
         if (!response?.success) {
-            console.log(response)
             return res.status(400).json({ message: response.message });
         }
 
@@ -54,7 +53,7 @@ export default class UserController {
         profile.foods = userFoods;
         profile.plans = userMealPlans;
 
-        return res.status(200).json({profile});
+        return res.status(200).json({ profile });
     }
 
     static async emailRecoveryCode(req, res) {
@@ -113,9 +112,5 @@ export default class UserController {
         }
 
         return res.status(200).json({ message: "Account deleted!" });
-    }
-
-    static async getHistory(req, res) {
-        // TODO
     }
 }

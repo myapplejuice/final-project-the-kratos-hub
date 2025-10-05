@@ -1,6 +1,7 @@
 import sql from 'mssql/msnodesqlv8.js';
 import Database from '../../database/database.js';
 import ObjectMapper from '../../../utils/object-mapper.js';
+import NutritionMealPlansMealsDBService from './meal-plans-meals/nutrition-meal-plans-meals-db-service.js';
 
 export default class NutritionMealPlansDBService {
     static normalizeDate(date) {
@@ -60,7 +61,7 @@ export default class NutritionMealPlansDBService {
 
     static async updatePlan(planId, newLabel, newDescription) {
         if (!planId || !newLabel || !newDescription) return null;
-        
+
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, planId);
@@ -73,7 +74,7 @@ export default class NutritionMealPlansDBService {
                 OUTPUT INSERTED.*
                 WHERE Id = @Id
             `;
-            
+
             const result = await request.query(query);
             if (!result.recordset[0]) return null;
 
@@ -81,7 +82,7 @@ export default class NutritionMealPlansDBService {
             for (const key in result.recordset[0]) {
                 plan[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
             }
-            
+
             return plan;
         } catch (err) {
             console.error('updatePlan error:', err);
@@ -99,13 +100,19 @@ export default class NutritionMealPlansDBService {
 
             if (result.recordset.length === 0) return [];
 
-            const plans = result.recordset.map(plan => {
-                const obj = {};
-                for (const key in plan) {
-                    obj[ObjectMapper.toCamelCase(key)] = plan[key];
-                }
-                return obj;
-            });
+            const plans = await Promise.all(
+                result.recordset.map(async plan => {
+                    const obj = {};
+                    for (const key in plan) {
+                        obj[ObjectMapper.toCamelCase(key)] = plan[key];
+                    }
+
+                    const meals = await NutritionMealPlansMealsDBService.fetchMealsByPlanId(plan.id);
+                    obj.meals = meals;
+                    return obj;
+                })
+            );
+
 
             return plans;
         } catch (err) {
