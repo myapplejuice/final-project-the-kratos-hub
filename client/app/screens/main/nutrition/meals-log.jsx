@@ -353,7 +353,7 @@ export default function MealsLog() {
 
             <AppScroll extraBottom={150} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
                 {/* Header */}
-                <View style={{ padding: 15, backgroundColor: colors.cardBackground }}>
+                <View style={{ padding: 20, paddingBottom: 30,  backgroundColor: colors.cardBackground, borderBottomEndRadius: 30, borderBottomStartRadius: 30,  }}>
                     <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
                         <TouchableOpacity onPress={() => handleDate(-1, 'prev')} style={{ justifyContent: 'center', width: '25%', alignItems: 'center' }}>
                             <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white', transform: [{ scaleX: -1 }] }} />
@@ -382,9 +382,9 @@ export default function MealsLog() {
                         </TouchableOpacity>
                     </View>
 
-                    <Divider orientation="horizontal" style={{ marginVertical: 15 }} />
+                    <Divider orientation="horizontal" style={{ marginVertical:20}} />
 
-                    <View style={{ marginBottom: 15 }}>
+                    <View style={{ marginBottom: 20}}>
                         <ProgressBar
                             title="Energy"
                             current={convertEnergy(currentDayLog?.consumedEnergyKcal ?? 0, 'kcal', user.preferences.energyUnit.key)}
@@ -429,7 +429,7 @@ export default function MealsLog() {
                 <View style={{ backgroundColor: colors.background }}>
                     <View>
                         <View style={[styles.card, { padding: 0 }]} >
-                            <View style={{ padding: 15 }}>
+                            <View style={{ padding: 20 }}>
                                 <ProgressBar
                                     title="Water"
                                     current={convertFluid(currentDayLog.consumedWaterMl ?? 0, 'ml', user.preferences.fluidUnit.key)}
@@ -444,7 +444,7 @@ export default function MealsLog() {
                             </View>
                             {!dateComparisons.isPast && (
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
-                                    <TouchableOpacity onPress={() => handleWater(-waterAmount)} style={{ backgroundColor: colors.accentPink, borderBottomLeftRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}>
+                                    <TouchableOpacity onPress={() => handleWater(-waterAmount)} style={{ backgroundColor: colors.accentPink, borderBottomLeftRadius: 20, paddingVertical: 12, flex: 1, alignItems: 'center', }}>
                                         <Image source={Images.minus} style={{ width: 20, height: 20, tintColor: 'white' }} />
                                     </TouchableOpacity>
 
@@ -454,7 +454,7 @@ export default function MealsLog() {
                                         </AppText>
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity onPress={() => handleWater(waterAmount)} style={{ backgroundColor: colors.main, borderBottomRightRadius: 12, paddingVertical: 12, flex: 1, alignItems: 'center', }}  >
+                                    <TouchableOpacity onPress={() => handleWater(waterAmount)} style={{ backgroundColor: colors.main, borderBottomRightRadius: 20, paddingVertical: 12, flex: 1, alignItems: 'center', }}  >
                                         <Image source={Images.plus} style={{ width: 20, height: 20, tintColor: 'white' }} />
                                     </TouchableOpacity>
                                 </View>
@@ -514,8 +514,8 @@ const styles = StyleSheet.create({
     },
     card: {
         backgroundColor: colors.cardBackground,
-        padding: 15,
-        borderRadius: 15,
+        padding: 20,
+        borderRadius: 20,
         marginTop: 15,
         marginHorizontal: 15
     },

@@ -17,6 +17,7 @@ import FloatingActionMenu from "../../components/screen-comps/floating-action-me
 import ProgressBar from "../../components/screen-comps/progress-bar";
 import DateDisplay from "../../components/screen-comps/date-display";
 import AppScroll from "../../components/screen-comps/app-scroll";
+import Divider from "../../components/screen-comps/divider";
 
 export default function NutritionHub() {
      const { showSpinner, hideSpinner, createToast } = usePopups();
@@ -67,7 +68,7 @@ export default function NutritionHub() {
           <>
                <AppScroll extraBottom={150} extraTop={0} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>
                     <View style={{ margin: 0, paddingHorizontal: 20, paddingTop: 60, paddingBottom: 20, borderBottomEndRadius: 30, borderBottomStartRadius: 30, backgroundColor: colors.cardBackground }}>
-                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
+                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 30 }}>
                               <AppText style={{ fontSize: scaleFont(15), color: colors.white, fontWeight: 'bold' }}>
                                    Daily Nutrition Targets
                               </AppText>
@@ -76,7 +77,19 @@ export default function NutritionHub() {
                               </View>
                          </View>
 
-                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
+                         <View style={{ marginBottom: 20 }}>
+                              <ProgressBar
+                                   title="Energy"
+                                   current={convertEnergy(log?.consumedEnergyKcal || 0, 'kcal', user.preferences.energyUnit.key)}
+                                   max={convertEnergy(log?.targetEnergyKcal || user.nutrition.setEnergyKcal, 'kcal', user.preferences.energyUnit.key)}
+                                   unit={user.preferences.energyUnit.field}
+                                   color={nutritionColors.energy1}
+                                   styleType="header"
+                                   height={10}
+                                   borderRadius={5}
+                              />
+                         </View>
+                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                               {[
                                    { label: 'Carbs', target: log?.targetCarbGrams || user.nutrition.carbGrams, consumed: log?.consumedCarbGrams || 0, color: nutritionColors.carbs1 },
                                    { label: 'Protein', target: log?.targetProteinGrams || user.nutrition.proteinGrams, consumed: log?.consumedProteinGrams || 0, color: nutritionColors.protein1 },
@@ -100,21 +113,9 @@ export default function NutritionHub() {
                               })}
                          </View>
 
-                         <View style={{ marginBottom: 15 }}>
-                              <ProgressBar
-                                   title="Energy"
-                                   current={convertEnergy(log?.consumedEnergyKcal || 0, 'kcal', user.preferences.energyUnit.key)}
-                                   max={convertEnergy(log?.targetEnergyKcal || user.nutrition.setEnergyKcal, 'kcal', user.preferences.energyUnit.key)}
-                                   unit={user.preferences.energyUnit.field}
-                                   color={nutritionColors.energy1}
-                                   styleType="header"
-                                   height={10}
-                                   borderRadius={5}
-                              />
-                         </View>
+                         <Divider orientation="horizontal" style={{ marginVertical: 20 }} />
 
-
-                         <View style={{ marginBottom: 10 }}>
+                         <View style={{ marginBottom: 20 }}>
                               <ProgressBar
                                    title="Water"
                                    current={convertFluid(log?.consumedWaterMl || 0, 'ml', user.preferences.fluidUnit.key).toFixed(0)}
@@ -208,7 +209,7 @@ const styles = StyleSheet.create({
      },
      card: {
           backgroundColor: colors.cardBackground,
-          padding: 15,
+          padding: 20,
           borderRadius: 20,
           marginTop: 15,
           marginHorizontal: 15,

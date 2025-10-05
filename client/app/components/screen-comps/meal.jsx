@@ -96,7 +96,7 @@ export default function Meal({ label, time, foods = [], onDeletePress = () => { 
                         barHeight={3}
                         showPercentage={false}
                         showTitles={false}
-                        barContainerStyle={{ borderRadius: 50, marginTop: 12 }}
+                        barContainerStyle={{ borderRadius: 50, marginTop: 20 }}
                     />
 
                     {foods.length > 0 ? (
@@ -191,10 +191,10 @@ export default function Meal({ label, time, foods = [], onDeletePress = () => { 
 const styles = {
     card: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 15,
+        borderRadius: 20,
         marginHorizontal: 15,
         marginTop: 15,
-        padding: 15,
+        padding: 20,
         overflow: 'hidden',
     },
 };
