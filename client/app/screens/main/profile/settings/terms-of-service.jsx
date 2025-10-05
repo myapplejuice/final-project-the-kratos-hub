@@ -9,9 +9,9 @@ import Divider from "../../../../components/screen-comps/divider";
 
 export default function TermsOfService() {
     return (
-        <AppScroll>
+        <AppScroll extraBottom={150}>
             <View style={styles.card}>
-                <AppText style={styles.subtitle}>1. Acceptance of Terms</AppText>
+                <AppText style={[styles.subtitle, {paddingTop: 5}]}>1. Acceptance of Terms</AppText>
                 <AppText style={styles.paragraph}>
                     By accessing or using The Kratos Hub, you agree to be bound by these
                     Terms of Service. If you do not agree, you may not use our app.
@@ -81,7 +81,8 @@ const styles = StyleSheet.create({
     paragraph: {
         fontSize: scaleFont(12),
         color: colors.detailText,
-        lineHeight: 18
+        lineHeight: 18,
+        padding: 5
     },
     backButton: {
         margin: 15,

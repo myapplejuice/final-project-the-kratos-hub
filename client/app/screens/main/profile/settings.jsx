@@ -17,6 +17,7 @@ import AnimatedButton from "../../../components/screen-comps/animated-button";
 import DeviceStorageService from "../../../common/services/device-storage-service";
 import Divider from "../../../components/screen-comps/divider";
 import AppScroll from "../../../components/screen-comps/app-scroll";
+import ExpandInOut from "../../../components/effects/expand-in-out";
 
 export default function Settings() {
     const { user } = useContext(UserContext);
@@ -250,7 +251,7 @@ Device Info (optional, but helpful):
                         <View key={i}>
                             <TouchableOpacity key={i} style={[styles.optionRow, i === 3 && { marginBottom: 0 }]} onPress={item.onPress}    >
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <View style={{ backgroundColor: 'rgba(61, 61, 61, 1)', padding: 8, borderRadius: 10 }}>
+                                    <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
                                         <Image source={item.icon} style={styles.settingIcon} />
                                     </View>
                                     <AppText style={styles.label}>
@@ -290,7 +291,7 @@ Device Info (optional, but helpful):
                         <View key={i}>
                             <TouchableOpacity key={i} style={[styles.optionRow, i === 4 && { marginBottom: 0 }]} onPress={item.onPress}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
-                                    <View style={{ backgroundColor: 'rgba(61, 61, 61, 1)', padding: 8, borderRadius: 10 }}>
+                                    <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
                                         <Image source={item.icon} style={styles.settingIcon} />
                                     </View>
                                     <AppText style={styles.label}>
@@ -316,7 +317,7 @@ Device Info (optional, but helpful):
                         <View key={i}>
                             <TouchableOpacity key={i} style={[styles.optionRow, { marginBottom: 0 }]} onPress={item.onPress}    >
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <View style={{ backgroundColor: 'rgba(61, 61, 61, 1)', padding: 8, borderRadius: 10 }}>
+                                    <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
                                         <Image source={item.icon} style={[styles.settingIcon, { width: 20, height: 20 }]} />
                                     </View>
                                     <AppText style={styles.label}>
@@ -345,21 +346,20 @@ Device Info (optional, but helpful):
                     ))}
 
 
-                    {advancedOpen && (
-                        <TouchableOpacity style={styles.deleteButton} onPress={initDeleteHandler}>
-                            <View style={styles.deleteButtonContent}>
-                                <Image source={Images.trash} style={styles.deleteIcon} />
-                                <AppText style={styles.deleteText}>Delete Account</AppText>
+                        <ExpandInOut visible={advancedOpen}>
+                            <TouchableOpacity style={styles.deleteButton} onPress={initDeleteHandler}>
+                                <View style={styles.deleteButtonContent}>
+                                    <Image source={Images.trash} style={styles.deleteIcon} />
+                                    <AppText style={styles.deleteText}>Delete Account</AppText>
+                                </View>
+                            </TouchableOpacity>
+
+                            <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 15 }}>
+                                <AppText style={[styles.label, { color: 'rgba(255, 70, 70, 0.7)', fontSize: scaleFont(9), marginStart: 0 }]}>
+                                    Deleted accounts are not restorable !
+                                </AppText>
                             </View>
-                        </TouchableOpacity>
-                    )}
-                    {advancedOpen &&
-                        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 15 }}>
-                            <AppText style={[styles.label, { color: 'rgba(255, 70, 70, 0.7)', fontSize: scaleFont(9), marginStart: 0 }]}>
-                                Deleted accounts are not restorable !
-                            </AppText>
-                        </View>
-                    }
+                        </ExpandInOut>
                 </View>
             </AppScroll>
         </View>
@@ -367,56 +367,6 @@ Device Info (optional, but helpful):
 }
 
 const styles = StyleSheet.create({
-    main: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    imageContainer: { justifyContent: 'center', alignItems: 'center' },
-    cardWrapper: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: colors.cardBackground,
-        padding: 15,
-        margin: 15,
-        borderRadius: 20,
-    },
-    imageWrapper: {
-        borderRadius: 50,
-        padding: 3,
-        backgroundColor: colors.mainSecond,
-    },
-    profileImage: {
-        width: 90,
-        height: 90,
-        borderRadius: 45,
-    },
-    infoContainer: {
-        flex: 1,
-        marginLeft: 15,
-    },
-    name: {
-        fontSize: scaleFont(18),
-        fontWeight: "700",
-        color: colors.main,
-        marginBottom: 6,
-    },
-    detailRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginVertical: 3,
-    },
-    detailIcon: {
-        width: 16,
-        height: 16,
-        tintColor: colors.mutedText,
-        marginRight: 6,
-        resizeMode: "contain",
-    },
-    detail: {
-        fontSize: scaleFont(13),
-        color: colors.detailText,
-    },
-
     card: {
         backgroundColor: colors.cardBackground,
         borderRadius: 20,
@@ -427,15 +377,25 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginVertical: 15
+        marginVertical: 15,
+        padding: 5
     },
     cardLabel: {
         fontSize: scaleFont(12),
         color: 'white',
         fontWeight: '600',
     },
-    label: { fontSize: scaleFont(12), color: 'white', fontWeight: '600', marginStart: 15 },
-    settingIcon: { tintColor: 'rgb(255,255,255)', width: 20, height: 20 },
+    label: {
+        fontSize: scaleFont(12),
+        color: 'white',
+        fontWeight: '600',
+        marginStart: 15
+    },
+    settingIcon: {
+        tintColor: 'rgb(255,255,255)',
+        width: 20,
+        height: 20
+    },
     deleteButton: {
         backgroundColor: 'rgb(255, 58, 48)',
         paddingVertical: 12,
@@ -443,22 +403,27 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         alignItems: 'center',
     },
-    deleteButtonContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-    deleteIcon: { width: 20, height: 20, tintColor: 'white', marginRight: 10 },
-    deleteText: { fontSize: scaleFont(14), color: 'white', fontWeight: 'bold' },
-
-    icon: {
-        width: 26,
-        height: 26,
-        resizeMode: "contain",
+    deleteButtonContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    deleteIcon: {
+        width: 23,
+        height: 23,
+        tintColor: 'white',
+        marginRight: 10
+    },
+    deleteText: {
+        fontSize: scaleFont(15),
+        color: 'white',
+        fontWeight: 'bold'
     },
     arrow: {
         width: 20,
         height: 20,
         resizeMode: "contain",
     },
-
-    // Spinner overlay
     spinnerOverlay: {
         ...StyleSheet.absoluteFillObject,
         backgroundColor: 'rgba(0,0,0,0.8)',
@@ -466,8 +431,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         zIndex: 9999,
     },
-    spinnerText: { color: 'red', fontSize: scaleFont(16), fontWeight: '500', textAlign: 'center' },
-    spinnerCountdown: { color: 'white', fontSize: scaleFont(15), marginTop: 8, fontWeight: '400' },
+    spinnerText: {
+        color: 'red',
+        fontSize: scaleFont(16),
+        fontWeight: '500',
+        textAlign: 'center'
+    },
+    spinnerCountdown: {
+        color: 'white',
+        fontSize: scaleFont(15),
+        marginTop: 8,
+        fontWeight: '400'
+    },
     cancelButton: {
         marginTop: 20,
         paddingVertical: 10,
@@ -475,69 +450,8 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         backgroundColor: colors.main,
     },
-    cancelText: { color: 'white', fontSize: scaleFont(15) },
-
-    buttonsContainer: {
-        marginHorizontal: 15,
-    },
-    buttonItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: colors.cardBackground,
-        borderRadius: 15,
-        padding: 8,
-        marginBottom: 15
-    },
-    buttonItemLeft: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1, // take remaining space so arrow goes to end
-    },
-    buttonImageContainer: {
-        backgroundColor: 'rgba(61, 61, 61, 1)',
-        padding: 8,
-        borderRadius: 15,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 8,
-    },
-    buttonImage: {
-        width: 30,
-        height: 30,
-        resizeMode: 'contain',
-    },
-    titleContainer: {
-        justifyContent: 'center',
-    },
-    buttonLabel: {
-        fontSize: scaleFont(15),
+    cancelText: {
         color: 'white',
-        textAlign: "left",
-    },
-    logoutButton: {
-        backgroundColor: 'rgba(255, 58, 48, 0.65)',
-        paddingVertical: 12,
-        borderRadius: 12,
-        alignItems: 'center',
-    },
-    logoutButtonContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-    logoutIcon: { width: 25, height: 25, tintColor: 'white', marginRight: 10 },
-    logoutButtonText: { fontSize: scaleFont(17), color: 'white', fontWeight: 'bold' },
-    optionRowLeft: { flexDirection: 'row', alignItems: 'center' },
-    iconContainer: { backgroundColor: 'rgba(61, 61, 61, 1)', padding: 8, borderRadius: 10 },
-    fixedFooter: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        paddingVertical: 10,
-        alignItems: 'center',
-        backgroundColor: colors.background,
-    },
-    footerText: {
-        fontSize: scaleFont(10),
-        color: colors.detailText,
-        textAlign: 'center',
-        marginBottom: 5,
+        fontSize: scaleFont(15)
     },
 });

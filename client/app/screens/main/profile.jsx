@@ -1,7 +1,7 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { useContext} from "react";
+import { useContext } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import BuildFooter from "../../components/layout-comps/build-footer";
 import AppText from "../../components/screen-comps/app-text";
@@ -20,12 +20,14 @@ import ImageCapture from '../../components/screen-comps/image-capture';
 import { CameraContext } from '../../common/contexts/camera-context';
 import { LibraryContext } from '../../common/contexts/library-context';
 import AnimatedButton from '../../components/screen-comps/animated-button';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function Profile() {
     const { setLibraryActive } = useContext(LibraryContext);
     const { setCameraActive } = useContext(CameraContext);
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, } = usePopups();
     const { user, setUser } = useContext(UserContext);
+    const insets = useSafeAreaInsets();
 
     async function openLogout() {
         createDialog({
@@ -115,66 +117,85 @@ export default function Profile() {
     return (
         <View style={styles.main}>
             <ImageCapture onConfirm={async (image) => setNewImage(image)} />
-            <AppScroll>
-                <View style={styles.card}>
-                    <View style={styles.cardWrapper}>
-                        <TouchableOpacity
-                            style={styles.imageWrapper}
-                            onPress={() => {
-                                createSelector({
-                                    title: "Profile Picture",
-                                    text: "Do you want to take a photo using camera or upload an image?",
-                                    optionAText: "Take a Photo",
-                                    optionBText: "Upload Image",
-                                    cancelText: "Cancel",
-                                    onPressA: async () => setCameraActive(true),
-                                    onPressB: async () => setLibraryActive(true)
-                                });
-                            }}
-                        >
-                            <Image
-                                source={user.image}
-                                style={styles.profileImage}
-                            />
-                        </TouchableOpacity>
+            <AppScroll extraBottom={20}>
+                <View style={[styles.card, { alignItems: 'center' }]}>
+                    <TouchableOpacity
+                        style={styles.imageWrapper}
+                        onPress={() => {
+                            createSelector({
+                                title: "Profile Picture",
+                                text: "Do you want to take a photo using camera or upload an image?",
+                                optionAText: "Take a Photo",
+                                optionBText: "Upload Image",
+                                cancelText: "Cancel",
+                                onPressA: async () => setCameraActive(true),
+                                onPressB: async () => setLibraryActive(true)
+                            });
+                        }}
+                    >
+                        <Image
+                            source={user.image}
+                            style={styles.profileImage}
+                        />
+                        <View style={styles.editBadge}>
+                            <Image source={Images.camera} style={styles.cameraIcon} />
+                        </View>
+                    </TouchableOpacity>
 
-                        <View style={styles.infoContainer}>
-                            <AppText style={styles.name}>
-                                {user.firstname} {user.lastname}
-                            </AppText>
+                    <AppText style={styles.name}>
+                        {user.firstname} {user.lastname}
+                    </AppText>
 
-                            <View style={styles.detailRow}>
-                                <Image source={Images.email} style={styles.detailIcon} />
-                                <AppText style={styles.detail}>
+                    <View style={styles.infoContainer}>
+                        <View style={styles.infoRow}>
+                            <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecond }]}>
+                                <Image source={Images.email} style={[styles.detailIcon]} />
+                            </View>
+                            <View style={styles.infoText}>
+                                <AppText style={styles.detailLabel}>Email Address</AppText>
+                                <AppText style={styles.detail} numberOfLines={1} ellipsizeMode="tail">
                                     {user.email}
                                 </AppText>
                             </View>
+                        </View>
 
-                            <View style={styles.detailRow}>
-                                <Image source={Images.phoneTwo} style={styles.detailIcon} />
+                        <View style={[styles.infoRow, {paddingVertical: 10}]}>
+                            <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecond }]}>
+                                <Image source={Images.phoneTwo} style={[styles.detailIcon]} />
+                            </View>
+                            <View style={styles.infoText}>
+                                <AppText style={styles.detailLabel}>Phone Number</AppText>
                                 <AppText style={styles.detail}>
                                     {user.phone}
                                 </AppText>
                             </View>
+                        </View>
 
-                            <View style={styles.detailRow}>
-                                <Image source={Images.calendar} style={styles.detailIcon} />
+                        <View style={styles.infoRow}>
+                            <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecond }]}>
+                                <Image source={Images.calendar} style={[styles.detailIcon]} />
+                            </View>
+                            <View style={styles.infoText}>
+                                <AppText style={styles.detailLabel}>Date Joined</AppText>
                                 <AppText style={styles.detail}>
-                                    Joined {formatDate(user.dateOfCreation, { format: user.preferences.dateFormat, includeMonthName: true })}
+                                    {formatDate(user.dateOfCreation, { format: user.preferences.dateFormat, includeMonthName: true })}
                                 </AppText>
                             </View>
                         </View>
                     </View>
+                </View>
 
+                <View style={[styles.card, { marginTop: 15 }]}>
+                    <AppText style={styles.cardLabel}>Account & Application</AppText>
                     {[
                         { icon: Images.password, label: 'Change Password', onPress: openPasswordChange },
                         { icon: Images.editTwo, label: 'Edit Profile', onPress: () => router.push(routes.EDIT_PROFILE) },
                         { icon: Images.settingsTwo, label: 'Settings', onPress: () => router.push(routes.SETTINGS) },
                     ].map((item, i) => (
                         <View key={i}>
-                            <TouchableOpacity key={i} style={[styles.optionRow, i === 2 && styles.optionRowLast]} onPress={item.onPress}>
+                            <TouchableOpacity key={i} style={[styles.optionRow, i === 2 && { marginBottom: 0 }]} onPress={item.onPress}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
-                                    <View style={{ backgroundColor: 'rgba(61, 61, 61, 1)', padding: 8, borderRadius: 10 }}>
+                                    <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
                                         <Image source={item.icon} style={styles.settingIcon} />
                                     </View>
                                     <AppText style={styles.label}>
@@ -186,7 +207,9 @@ export default function Profile() {
                             {i !== 2 && <Divider orientation='horizontal' color={colors.divider} />}
                         </View>
                     ))}
+                </View>
 
+                <View style={[styles.card, { marginTop: 15, paddingTop: 20, paddingHorizontal: 20, paddingBottom: 10 }]}>
                     <AnimatedButton
                         leftImage={Images.logout}
                         leftImageStyle={styles.deleteIcon}
@@ -195,80 +218,118 @@ export default function Profile() {
                         textStyle={styles.deleteText}
                         style={styles.deleteButton} />
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'center', paddingBottom: 10, marginTop: 5 }}>
-                        <AppText style={[styles.label, { color: colors.mutedText, fontSize: scaleFont(9), marginStart: 0 }]}>
+                    <View style={{ alignItems: 'center', marginTop: 10 }}>
+                        <AppText style={[styles.label, { color: colors.mutedText, fontSize: scaleFont(11), marginStart: 0 }]}>
                             All of your data is secure with us
+                        </AppText>
+                        <AppText style={[styles.label, { color: colors.mutedText, fontSize: scaleFont(9), marginStart: 0, marginTop: 5 }]}>
+                            End-to-end encrypted
                         </AppText>
                     </View>
                 </View>
-
+                <BuildFooter style={{ marginTop: 90, marginBottom: 0, paddingBottom: 0 }} />
             </AppScroll>
-            <BuildFooter />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    cardLabel: {
+        fontSize: scaleFont(12),
+        color: 'white',
+        fontWeight: '600',
+    },
     main: {
         flex: 1,
         backgroundColor: colors.background,
         paddingTop: 15,
     },
-    cardWrapper: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: colors.cardBackground,
-        marginBottom: 15,
-        paddingTop: 15
-    },
     imageWrapper: {
         borderRadius: 50,
-        padding: 3,
-        backgroundColor: colors.mainSecond,
+        padding: 2,
+        borderWidth: 2,
+        borderColor: colors.main,
+        position: 'relative',
     },
     profileImage: {
         width: 90,
         height: 90,
         borderRadius: 45,
     },
-    infoContainer: {
-        flex: 1,
-        marginLeft: 15,
+    editBadge: {
+        position: 'absolute',
+        bottom: 2,
+        right: 2,
+        backgroundColor: colors.main,
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: colors.cardBackground,
+    },
+    cameraIcon: {
+        width: 12,
+        height: 12,
+        tintColor: 'white',
     },
     name: {
-        fontSize: scaleFont(18),
+        fontSize: scaleFont(22),
         fontWeight: "700",
         color: colors.main,
-        marginBottom: 6,
+        marginTop: 15,
+        marginBottom: 20,
+        textAlign: 'center',
     },
-    detailRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginVertical: 3,
+    infoContainer: {
+        width: '100%',
+        paddingStart: 5
+    },
+    infoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: 12,
+        marginBottom: 10,
+    },
+    iconContainer: {
+        padding: 13,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
     },
     detailIcon: {
-        width: 16,
-        height: 16,
-        tintColor: colors.mutedText,
-        marginRight: 6,
-        resizeMode: "contain",
+        width: 20,
+        height: 20,
+        tintColor: 'white'
+    },
+    infoText: {
+        flex: 1,
+    },
+    detailLabel: {
+        fontSize: scaleFont(11),
+        color: colors.mutedText,
+        fontWeight: '600',
+        marginBottom: 2,
     },
     detail: {
         fontSize: scaleFont(13),
-        color: colors.detailText,
+        color: 'white',
+        fontWeight: '500',
     },
-
     card: {
         backgroundColor: colors.cardBackground,
         borderRadius: 20,
-        paddingHorizontal: 16,
         marginHorizontal: 15,
+        padding: 20
     },
     optionRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 14,
+        marginVertical: 15,
+        padding: 5
     },
     label: { fontSize: scaleFont(12), color: 'white', fontWeight: '600', marginStart: 15 },
     settingIcon: { tintColor: 'rgb(255,255,255)', width: 20, height: 20 },
@@ -276,12 +337,12 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgb(255, 58, 48)',
         borderRadius: 12,
         paddingVertical: 12,
-        marginVertical: 10,
+        marginBottom: 10,
         alignItems: 'center',
     },
     deleteButtonContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-    deleteIcon: { width: 20, height: 20, tintColor: 'white', marginRight: 5 },
-    deleteText: { fontSize: scaleFont(14), color: 'white', fontWeight: 'bold' },
+    deleteIcon: { width: 23, height: 23, tintColor: 'white', marginRight: 5 },
+    deleteText: { fontSize: scaleFont(15), color: 'white', fontWeight: 'bold' },
 
     arrow: {
         width: 20,

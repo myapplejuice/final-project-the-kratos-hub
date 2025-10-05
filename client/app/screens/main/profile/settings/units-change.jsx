@@ -14,7 +14,7 @@ export default function UnitsChange() {
 
     function renderOption(label, key, option, isLast = false) {
         return (
-            <View key={label}>
+            <View style={{paddingVertical: 5, paddingHorizontal: 10}} key={label}>
                 <TouchableOpacity
                     style={[styles.optionRow, isLast && {paddingBottom: 0}]}
                     onPress={async () => {
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 15,
+        paddingVertical: 20,
     },
     label: { fontSize: scaleFont(12), color: colors.mutedText, fontWeight: '600', marginStart: 15 },
     modeIcon: { width: 30, height: 30 },

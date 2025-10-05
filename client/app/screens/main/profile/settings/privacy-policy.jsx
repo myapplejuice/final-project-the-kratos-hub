@@ -10,16 +10,16 @@ import Divider from "../../../../components/screen-comps/divider";
 export default function PrivacyPolicy() {
 
     return (
-        <AppScroll>
+        <AppScroll extraBottom={150}>
             <View style={styles.card}>
-                <AppText style={styles.subtitle}>1. Information We Collect</AppText>
+                <AppText style={[styles.subtitle, { paddingTop: 5 }]}>1. Information We Collect</AppText>
                 <AppText style={styles.paragraph}>
                     We may collect information such as your name, email, workout logs,
                     nutrition entries, and chat messages with coaches or athletes. We
                     also collect basic device and usage data to improve the app.
                 </AppText>
 
-<Divider orientation="horizontal" style={{ marginVertical: 15 }} />
+                <Divider orientation="horizontal" style={{ marginVertical: 15 }} />
 
                 <AppText style={styles.subtitle}>2. How We Use Information</AppText>
                 <AppText style={styles.paragraph}>
@@ -28,7 +28,7 @@ export default function PrivacyPolicy() {
                     your personal information to third parties.
                 </AppText>
 
-<Divider orientation="horizontal" style={{ marginVertical: 15 }} />
+                <Divider orientation="horizontal" style={{ marginVertical: 15 }} />
 
                 <AppText style={styles.subtitle}>3. Data Sharing</AppText>
                 <AppText style={styles.paragraph}>
@@ -37,7 +37,7 @@ export default function PrivacyPolicy() {
                     health and chat data remain confidential.
                 </AppText>
 
-<Divider orientation="horizontal" style={{ marginVertical: 15 }} />
+                <Divider orientation="horizontal" style={{ marginVertical: 15 }} />
 
                 <AppText style={styles.subtitle}>4. Security</AppText>
                 <AppText style={styles.paragraph}>
@@ -46,7 +46,7 @@ export default function PrivacyPolicy() {
                     avoid sharing sensitive personal details in public chats.
                 </AppText>
 
-<Divider orientation="horizontal" style={{ marginVertical: 15 }} />
+                <Divider orientation="horizontal" style={{ marginVertical: 15 }} />
 
                 <AppText style={styles.subtitle}>5. Contact</AppText>
                 <AppText style={[styles.paragraph, { marginBottom: 0 }]}>
@@ -81,7 +81,8 @@ const styles = StyleSheet.create({
     paragraph: {
         fontSize: scaleFont(12),
         color: colors.detailText,
-        lineHeight: 18
+        lineHeight: 18,
+        padding: 5
     },
     backButton: {
         margin: 15,

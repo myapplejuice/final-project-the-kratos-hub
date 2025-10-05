@@ -177,9 +177,9 @@ export default function EditProfile() {
                     { icon: Images.phoneTwo, label: "Change Phone", onPress: handlePhone },
                 ].map((item, i) => (
                     <View key={i}>
-                        <TouchableOpacity key={i} style={[styles.optionRow]} onPress={item.onPress}>
+                        <TouchableOpacity key={i} style={[styles.optionRow, {padding: 5, borderRadius: 12}]} onPress={item.onPress}>
                             <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
-                                <View style={{ backgroundColor: 'rgba(61, 61, 61, 1)', padding: 8, borderRadius: 10 }}>
+                                <View style={{ backgroundColor: colors.backgroundSecond,padding: 13, borderRadius: 12 }}>
                                     <Image source={item.icon} style={styles.modeIcon} />
                                 </View>
                                 <AppText style={styles.label}>
@@ -206,13 +206,13 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: colors.cardBackground,
         borderRadius: 20,
-        padding: 15,
+        padding: 20,
         margin: 15
     },
     optionRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
+        alignItems: 'center'
     },
     label: {
         fontSize: scaleFont(12),
