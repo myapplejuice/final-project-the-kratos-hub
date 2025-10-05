@@ -1,6 +1,9 @@
 import UserDBService from "./user-db-service.js";
 import { signJwt } from "../../utils/jwt-utils.js";
 import EmailService from "../email/email-service.js";
+import NutritionDaysDBService from "../nutrition/days/nutrition-days-db-service.js";
+import NutritionFoodsDBService from "../nutrition/foods/nutrition-foods-db-service.js";
+import NutritionMealPlansDBService from "../nutrition/meal-plans/nutrition-meal-plans-db-service.js";
 
 export default class UserController {
     constructor() { }
@@ -43,6 +46,14 @@ export default class UserController {
         if (!profile) {
             return res.status(404).json({ message: "User not found." });
         }
+
+        const userDayLogs = await NutritionDaysDBService.fetchAllDays(id);
+        const userFoods = await NutritionFoodsDBService.fetchFoods(id);
+        const userMealPlans = await NutritionMealPlansDBService.fetchPlansByUserId(id);
+        profile.nutritionLogs = userDayLogs;
+        profile.foods = userFoods;
+        profile.plans = userMealPlans;
+
         return res.status(200).json({profile});
     }
 

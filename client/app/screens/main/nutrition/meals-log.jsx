@@ -219,11 +219,12 @@ export default function MealsLog() {
         });
     }
 
-    async function handleMealRemoval(mealId) {
-        const mealLabel = currentDayLog?.meals?.find(meal => meal.id === mealId)?.label;
+    async function handleMealRemoval(mealId, label) {
         createDialog({
-            title: `Remove Meal - (${mealLabel})`,
-            text: "Are you sure you want to remove this meal?",
+            title: `Drop Meal`,
+            text: `Are you sure you want to drop "${label}"?`,
+            confirmText: "Drop",
+            confirmButtonStyle: { backgroundColor: 'rgb(255,59,48)', borderColor: 'rgb(255,59,48)' },
             onConfirm: async () => {
                 showSpinner();
                 try {
@@ -246,10 +247,10 @@ export default function MealsLog() {
                             };
                         });
                     } else {
-                        createToast({ message: result.message || "Failed to remove meal" });
+                        createToast({ message: result.message || "Failed to drop meal" });
                     }
                 } catch (err) {
-                    console.error("Failed to remove meal:", err);
+                    console.error("Failed to drop meal:", err);
                     createToast({ message: "Server error" });
                 } finally {
                     hideSpinner();
@@ -353,7 +354,7 @@ export default function MealsLog() {
 
             <AppScroll extraBottom={150} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
                 {/* Header */}
-                <View style={{ padding: 20, paddingBottom: 30,  backgroundColor: colors.cardBackground, borderBottomEndRadius: 30, borderBottomStartRadius: 30,  }}>
+                <View style={{ padding: 20, paddingBottom: 30, backgroundColor: colors.cardBackground, borderBottomEndRadius: 30, borderBottomStartRadius: 30, }}>
                     <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
                         <TouchableOpacity onPress={() => handleDate(-1, 'prev')} style={{ justifyContent: 'center', width: '25%', alignItems: 'center' }}>
                             <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white', transform: [{ scaleX: -1 }] }} />
@@ -372,8 +373,8 @@ export default function MealsLog() {
                                         uppercaseDay={false}
                                         date={pageDate}
                                         showDay={false}
-                                        hideDateOnMount={true} 
-                                        />
+                                        hideDateOnMount={true}
+                                    />
                                 </FadeInOut>
                             </SlideInOut>
                         </TouchableOpacity>
@@ -382,9 +383,9 @@ export default function MealsLog() {
                         </TouchableOpacity>
                     </View>
 
-                    <Divider orientation="horizontal" style={{ marginVertical:20}} />
+                    <Divider orientation="horizontal" style={{ marginVertical: 20 }} />
 
-                    <View style={{ marginBottom: 20}}>
+                    <View style={{ marginBottom: 20 }}>
                         <ProgressBar
                             title="Energy"
                             current={convertEnergy(currentDayLog?.consumedEnergyKcal ?? 0, 'kcal', user.preferences.energyUnit.key)}
@@ -472,7 +473,7 @@ export default function MealsLog() {
                                     time={meal.time}
                                     num={i + 1}
                                     onRenamePress={() => handleMealRelabel(meal.id)}
-                                    onDeletePress={() => handleMealRemoval(meal.id)}
+                                    onDeletePress={() => handleMealRemoval(meal.id, meal.label)}
                                     onAddPress={() => handleFoodAddition(meal)}
                                     onFoodPress={(food) => handleMealFoodPress(meal, food)}
                                     onFoodPressDisabled={dateComparisons.isPast}

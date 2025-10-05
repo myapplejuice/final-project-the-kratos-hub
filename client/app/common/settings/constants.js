@@ -38,6 +38,7 @@ export const routes = {
     /* NUTRITION CHILDREN */
     MEALS_LOG: '/screens/main/nutrition/meals-log',
     MEAL_PLANS: '/screens/main/nutrition/meal-plans',
+    MEAL_PLANS_EDITOR: '/screens/main/nutrition/meal-plans-editor',
     FOOD_CREATOR: '/screens/main/nutrition/food-creator',
     FOOD_EDITOR: '/screens/main/nutrition/food-editor',
     FOOD_SELECTION: '/screens/main/nutrition/food-selection',

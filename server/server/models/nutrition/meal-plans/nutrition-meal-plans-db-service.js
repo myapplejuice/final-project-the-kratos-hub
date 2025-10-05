@@ -11,8 +11,8 @@ export default class NutritionMealPlansDBService {
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
-            Database.addInput(request, 'DateOfCreation', sql.DateTime2, details.dateOfCreation);
-            Database.addInput(request, 'IsCreatedByCoach', sql.Bit, new Date(details.isCreatedByCoach));
+            Database.addInput(request, 'DateOfCreation', sql.DateTime2, new Date(details.dateOfCreation));
+            Database.addInput(request, 'IsCreatedByCoach', sql.Bit, details.isCreatedByCoach);
             Database.addInput(request, 'CoachId', sql.UniqueIdentifier, details.coachId || null);
             Database.addInput(request, 'Label', sql.VarChar(50), details.label);
             Database.addInput(request, 'Description', sql.VarChar(400), details.description);
@@ -60,7 +60,7 @@ export default class NutritionMealPlansDBService {
 
     static async updatePlan(planId, newLabel, newDescription) {
         if (!planId || !newLabel || !newDescription) return null;
-
+        
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, planId);
@@ -73,7 +73,7 @@ export default class NutritionMealPlansDBService {
                 OUTPUT INSERTED.*
                 WHERE Id = @Id
             `;
-
+            
             const result = await request.query(query);
             if (!result.recordset[0]) return null;
 
@@ -81,7 +81,7 @@ export default class NutritionMealPlansDBService {
             for (const key in result.recordset[0]) {
                 plan[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
             }
-
+            
             return plan;
         } catch (err) {
             console.error('updatePlan error:', err);
@@ -94,8 +94,10 @@ export default class NutritionMealPlansDBService {
             const request = Database.getRequest();
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
 
-            const query = `SELECT * FROM dbo.MealPlans WHERE UserId = @UserId ORDER BY DateOfCreation DESC`;
+            const query = `SELECT * FROM dbo.MealPlans WHERE UserId = @UserId ORDER BY Id ASC`;
             const result = await request.query(query);
+
+            if (result.recordset.length === 0) return [];
 
             const plans = result.recordset.map(plan => {
                 const obj = {};

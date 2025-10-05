@@ -1,13 +1,19 @@
 import NutritionMealPlansDBService from "./nutrition-meal-plans-db-service.js";
 
 export default class NutritionMealPlansController {
+    static async fetchPlans(req, res) {
+        const userId = req.id;
+        if (!userId) return res.status(400).json({ success: false, error: "userId is required" });
+
+        const plans = await NutritionMealPlansDBService.fetchPlansByUserId(userId);
+        if (!plans) return res.status(500).json({ success: false, error: "Failed to fetch plans" });
+
+        return res.status(200).json({ success: true, plans });
+    }
+
     static async createPlan(req, res) {
         const userId = req.id;
         const details = req.body;
-
-        if (!details.dateOfCreation || (details.isCreatedByCoach === undefined || details.isCreatedByCoach === null) || (details.isCreatedByCoach === true && !details.coachId) || !details.label || !details.description) {
-            return res.status(400).json({ success: false, error: "missing information" });
-        }
 
         const plan = await NutritionMealPlansDBService.createPlan(userId, details);
         if (!plan) return res.status(500).json({ success: false, error: "Failed to create meal" });

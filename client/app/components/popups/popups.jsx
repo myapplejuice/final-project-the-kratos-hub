@@ -50,6 +50,8 @@ export default function Popups({
           text={dialogParams.text}
           abortText={dialogParams.abortText}
           confirmText={dialogParams.confirmText}
+          confirmButtonStyle={dialogParams.confirmButtonStyle}
+          confirmButtonTextStyle={dialogParams.confirmButtonTextStyle}
           onAbort={() => {
             setDialog(false);
             if (dialogParams.onAbort) {

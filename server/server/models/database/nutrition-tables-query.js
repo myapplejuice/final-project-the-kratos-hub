@@ -177,7 +177,7 @@ export function nutritionTablesQuery() {
             );
         END;`;
 
-    const query = [nutritionLogsQuery, mealLogsQuery, mealLogsFoodsQuery, foodsQuery]
+    const query = [nutritionLogsQuery, mealLogsQuery, mealLogsFoodsQuery, foodsQuery, mealPlansQuery]
         .map(q => q.trim())
         .join('\n\n');
 

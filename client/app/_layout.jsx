@@ -128,6 +128,7 @@ function Layout() {
                                             {/* NUTRITION CHILDREN */}
                                             <Stack.Screen name="screens/main/nutrition/meals-log" />
                                             <Stack.Screen name="screens/main/nutrition/meal-plans" />
+                                            <Stack.Screen name="screens/main/nutrition/meal-plans-editor" />
                                             <Stack.Screen name="screens/main/nutrition/food-creator" />
                                             <Stack.Screen name="screens/main/nutrition/food-editor" />
                                             <Stack.Screen name="screens/main/nutrition/food-selection" />

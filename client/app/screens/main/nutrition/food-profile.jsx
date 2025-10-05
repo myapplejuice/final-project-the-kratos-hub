@@ -158,10 +158,12 @@ export default function FoodProfile() {
         Keyboard.dismiss();
 
         createDialog({
-            title: (intent === 'meal/add' || intent === 'myfoods') ? 'Delete Food' : 'Remove Food',
+            title: (intent === 'meal/add' || intent === 'myfoods') ? 'Discard Food' : 'Remove Food',
             text: (intent === 'meal/add' || intent === 'myfoods') ?
-                "Are you sure you want to delete this food entry?" :
+                "Are you sure you want to discard this food entry?" :
                 "Are you sure you want to remove this food from the meal?",
+            confirmText: (intent === 'meal/add' || intent === 'myfoods') ? "Discard" : "Remove",
+            confirmButtonStyle: { backgroundColor: 'rgb(255,59,48)', borderColor: 'rgb(255,59,48)' },
             onConfirm: async () => {
                 showSpinner();
                 try {
@@ -200,13 +202,13 @@ export default function FoodProfile() {
                             });
                         }
 
-                        createToast({ message: (intent === 'meal/add' || intent === 'myfoods') ? 'Food entry deleted' : 'Food removed' });
+                        createToast({ message: (intent === 'meal/add' || intent === 'myfoods') ? 'Food entry discarded' : 'Food removed' });
                         router.back();
                     } else {
-                        createAlert({ title: 'Failure', text: "Food delete/removal failed!\n" + result.message });
+                        createAlert({ title: 'Failure', text: "Food discard/removal failed!\n" + result.message });
                     }
                 } catch (e) {
-                    createAlert({ title: 'Failure', text: "Food delete/removal failed!\n" + e.message });
+                    createAlert({ title: 'Failure', text: "Food discard/removal failed!\n" + e.message });
                 } finally {
                     hideSpinner();
                 }

@@ -51,7 +51,7 @@ export default class NutritionFoodsDBService {
             SELECT *
             FROM dbo.Foods
             WHERE OwnerId = @OwnerId
-            ORDER BY Id DESC;`;
+            ORDER BY Id ASC;`;
 
             const result = await request.query(query);
             if (!result.recordset || result.recordset.length === 0) return [];

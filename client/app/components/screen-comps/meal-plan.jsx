@@ -14,7 +14,7 @@ import Invert from '../effects/invert';
 import { formatDate, formatTime, toDateFromSQLTime } from '../../common/utils/date-time';
 import FadeInOut from '../effects/fade-in-out';
 
-export default function MealPlan({ label, date, description, meals = [], onDeletePress = () => { }, onRenamePress = () => { }, expandedOnStart = false, onExpand = () => { } }) {
+export default function MealPlan({ label, date, description, meals = [], onDeletePress = () => { }, onUpdatePress = () => { }, onPlanPress = () => { }, expandedOnStart = false, onExpand = () => { } }) {
     const { user } = useContext(UserContext);
     const [expanded, setExpanded] = useState(expandedOnStart);
 
@@ -32,7 +32,7 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
     );
 
     const formattedDate = formatDate(date, { format: user.preferences.dateFormat.key });
-    
+
     return (
         <FadeInOut visible={true}>
             <View style={styles.card}>
@@ -46,13 +46,13 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
                             <View style={{ flexDirection: 'row' }}>
                                 <TouchableOpacity
                                     style={{ backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 10, alignItems: 'center', justifyContent: 'center', paddingVertical: 8, marginEnd: 10, paddingHorizontal: 10 }}
-
+                                    onPress={onDeletePress}
                                 >
                                     <Image style={{ width: 16, height: 18, tintColor: nutritionColors.carbs1 }} source={Images.trash} />
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={{ backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 10, alignItems: 'center', justifyContent: 'center', paddingVertical: 8, paddingHorizontal: 10 }}
-
+                                    onPress={onUpdatePress}
                                 >
                                     <Image style={{ width: 16, height: 16, tintColor: 'white' }} source={Images.edit} />
                                 </TouchableOpacity>
@@ -75,11 +75,11 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
 
                 <ExpandInOut visible={expanded}>
                     <View style={{ marginVertical: 25 }}>
-                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10), textAlign: description !== 'No description provided.' ? 'left' : 'center', lineHeight: 16 }}>
+                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10), textAlign: description !== 'No description provided' ? 'left' : 'center', lineHeight: 16 }}>
                             {description}
                         </AppText>
                     </View>
-                      
+
                     <View style={{ padding: 15, alignItems: 'center', backgroundColor: 'rgba(58,58,58,0.49)', borderRadius: 15, marginTop: 0 }}>
                         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                             <AppText style={{ color: nutritionColors.energy1, fontSize: scaleFont(10) }}>
@@ -105,6 +105,29 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
                             </View>
                         </View>
                     </View>
+
+                    <AnimatedButton
+                        title="Meals"
+                        style={{
+                            padding: 15,
+                            backgroundColor: colors.accentGreen,
+                            borderRadius: 15,
+                            marginTop: 15,
+                        }}
+                        textStyle={{ fontSize: scaleFont(13), fontWeight: 'bold' }}
+                        rightImage={Images.arrow}
+                        rightImageStyle={{ tintColor: 'white', width: 18, height: 18 }}
+                        rightImageContainerStyle={{
+                            width: 16,
+                            height: 16,
+                            padding: 5,
+                            borderRadius: 50,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginStart: 8,
+                        }}
+                        onPress={onPlanPress}
+                    />
                 </ExpandInOut>
             </View>
         </FadeInOut>

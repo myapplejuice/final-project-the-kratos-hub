@@ -28,143 +28,14 @@ import FadeInOut from '../../../components/effects/fade-in-out';
 import Invert from '../../../components/effects/invert';
 import MealPlan from '../../../components/screen-comps/meal-plan';
 
-export default function MealsPlans() {
+export default function MealPlansEditor() {
     const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
-    const { user, setUser, setAdditionalContexts } = useContext(UserContext);
+    const { user, setUser, additionalContexts, setAdditionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const [scrollToTop, setScrollToTop] = useState(false);
     const [fabVisible, setFabVisible] = useState(true);
 
-    async function handlePlanAddition() {
-        createInput({
-            title: "Meal Addition",
-            confirmText: "Add",
-            text: `Enter a label & description for the plan`,
-            placeholders: [`Meal Plan ${user.plans?.length + 1 || 1}`, `Write any explanation, notes, tips about your meal plan...`],
-            initialValues: [``, ``],
-            largeTextIndices: [1],
-            onSubmit: async (vals) => {
-                let label = vals[0];
-                let description = vals[1];
-                if (!label)
-                    label = `Meal ${user.plans?.length + 1}`;
-
-                if (!description)
-                    description = `No description provided`;
-
-                showSpinner({ abandonable: true, text: "Adding meal plan...", abandonableText: 'Press "Hide" to continue using the app while you wait' });
-
-                const payload = {
-                    label,
-                    description,
-                    dateOfCreation: new Date(),
-                    isCreatedByCoach: false,
-                    coachId: null,
-                }
-                try {
-                    const result = await APIService.nutrition.mealPlans.create(payload);
-                    const newPlan = result.data.plan;
-
-                    if (result.success) {
-                        setUser(prev => ({
-                            ...prev,
-                            plans: [...prev.plans, newPlan]
-                        }))
-                    } else {
-                        createToast({ message: result.message || "Failed to add meal" });
-                    }
-                } catch (err) {
-                    console.error("Failed to add meal:", err);
-                    createToast({ message: "Server error" });
-                } finally {
-                    hideSpinner();
-                }
-            },
-        });
-    }
-
-    async function handlePlanDeletion(plan) {
-        const planId = plan.id
-        createDialog({
-            title: "Discard Meal Plan",
-            confirmButtonStyle: { backgroundColor: 'rgb(255,59,48)', borderColor: 'rgb(255,59,48)' },
-            confirmText: "Discard",
-            text: `Are you sure you want to discard "${plan.label}"?`,
-            onConfirm: async () => {
-                showSpinner({ abandonable: true, text: "Deleting meal plan...", abandonableText: 'Press "Hide" to continue using the app while you wait' });
-                try {
-                    const result = await APIService.nutrition.mealPlans.delete({ planId });
-                    if (result.success) {
-                        setUser(prev => ({
-                            ...prev,
-                            plans: prev.plans.filter(plan => plan.id !== planId)
-                        }))
-                    }
-                } catch (err) {
-                    console.error("Failed to delete meal plan:", err);
-                    createToast({ message: "Server error " + err });
-                } finally {
-                    hideSpinner();
-                }
-            }
-        })
-    }
-
-    async function handlePlanUpdate(plan) {
-        const planId = plan.id
-        createInput({
-            title: "Meal Plan Update",
-            confirmText: "Update",
-            text: `Enter a new label or description for the plan`,
-            placeholders: [`${plan.label}`, `Write any explanation, notes, tips about your meal plan...`],
-            initialValues: [`${plan.label}`, `${plan.description === 'No description provided' ? '' : plan.description}`],
-            largeTextIndices: [1],
-            onSubmit: async (vals) => {
-                try {
-                    showSpinner({ abandonable: true, text: "Updating meal plan...", abandonableText: 'Press "Hide" to continue using the app while you wait' });
-
-                    let newLabel = vals[0];
-                    let newDescription = vals[1];
-                    if ((newLabel === plan.label && newDescription === '') || (newLabel === plan.label && newDescription === plan.description) || (!newLabel && !newDescription)) {
-                        return createToast({ message: "No changes detected" });
-                    }
-
-                    if (!newLabel) {
-                        return createToast({ message: "Label cannot be empty" });
-                    }
-
-                    if (!newDescription) {
-                        newDescription = `No description provided`;
-                    }
-
-                    const payload = {
-                        planId,
-                        newLabel,
-                        newDescription
-                    }
-
-                    const result = await APIService.nutrition.mealPlans.update(payload);
-                    if (result.success) {
-                        setUser(prev => ({
-                            ...prev,
-                            plans: prev.plans.map(plan => plan.id === planId ? { ...plan, label: newLabel, description: newDescription } : plan)
-                        }))
-                    }
-                } catch (err) {
-                    console.error("Failed to update meal plan:", err);
-                    createToast({ message: "Server error " + err });
-                } finally {
-                    hideSpinner();
-                }
-            },
-        })
-    }
-
-    async function handlePlanPress(plan) {
-        console.log(plan)
-        setAdditionalContexts(prev => ({ ...prev, selectedPlan: plan }));
-        router.push(routes.MEALS_PLANNER);
-    }
+    
 
     return (
         <>

@@ -4,7 +4,7 @@ import NutritionDaysDBService from './nutrition-days-db-service.js';
 export default class NutritionDaysController {
     static async getAllDays(req, res) {
         const userId = req.id;
-        console.log(userId)
+        
         if (!userId) return res.status(401).json({ message: "Unauthorized! No user ID found in token." });
 
         const days = await NutritionDaysDBService.fetchAllDays(userId);

@@ -5,7 +5,7 @@ import usePopupAnimation from "./popup-animation";
 import { colors } from "../../common/settings/styling";
 import AppText from "../screen-comps/app-text";
 
-export default function Dialog({ title = "", text = "", onAbort = () => { }, onConfirm = () => { }, abortText = "Cancel", confirmText = "Yes" }) {
+export default function Dialog({ title = "", text = "", onAbort = () => { }, onConfirm = () => { }, abortText = "Cancel", confirmText = "Yes", confirmButtonStyle = {}, confirmButtonTextStyle = {}, cancelButtonStyle = {}, cancelButtonTextStyle = {} }) {
     const { opacity, translateY } = usePopupAnimation();
 
     return (
@@ -32,10 +32,10 @@ export default function Dialog({ title = "", text = "", onAbort = () => { }, onC
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        style={[styles.buttonContainer, styles.confirmButton]}
+                        style={[styles.buttonContainer, styles.confirmButton, confirmButtonStyle]}
                         onPress={onConfirm}
                     >
-                        <AppText style={[styles.buttonText, styles.confirmButtonText]}>
+                        <AppText style={[styles.buttonText, styles.confirmButtonText, confirmButtonTextStyle]}>
                             {confirmText}
                         </AppText>
                     </TouchableOpacity>

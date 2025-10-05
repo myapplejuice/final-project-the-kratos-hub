@@ -38,15 +38,6 @@ export default class DeviceStorageService {
 
             profile.preferences = await this.getUserPreferences();
 
-            const daysResponse = await APIService.nutrition.days.days();
-            profile.nutritionLogs = daysResponse.success ? daysResponse.data.days : {};
-
-            const result = await APIService.nutrition.foods.foods('user');
-            const foods = result.data.foods;
-            profile.foods = foods;
-
-            const result = await APIService.nutrition.mealPlans.
-
             return profile;
         } catch (error) {
             console.error("Error initializing user session:", error);
