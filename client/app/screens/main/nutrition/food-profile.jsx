@@ -76,7 +76,27 @@ export default function FoodProfile() {
         setProtein(protein);
         setFat(fat);
         setAdditionalProps(additionalProps);
-    }, [servingSize, selectedFood, intent]);
+    }, [servingSize, intent]);
+
+    useEffect(() => {
+        const servingSize = selectedFood.servingSize;
+        const energyKcal = selectedFood.energyKcal;
+        const carbs = selectedFood.carbs;
+        const protein = selectedFood.protein;
+        const fat = selectedFood.fat;
+        const additionalProps = (selectedFood.additionalProps || []).map((prop) => ({
+            ...prop,
+            originalAmount: prop.amount,
+            amount: Math.round(prop.amount)
+        }));
+ 
+        setServingSize(servingSize);
+        setEnergyKcal(energyKcal);
+        setCarbs(carbs);
+        setProtein(protein);
+        setFat(fat);
+        setAdditionalProps(additionalProps);
+    }, [selectedFood]);
 
     function handleFood() {
         Keyboard.dismiss();
@@ -416,13 +436,16 @@ export default function FoodProfile() {
                         onChangeText={(val) => { if (/^(?![.,])\d*\.?\d*$/.test(val)) { setServingSize(val); } }}
                         value={servingSize?.toString() || ''}
                         keyboardType="numeric"
+                        editable={intent !== 'myfoods'}
                     />
                     <AppText style={styles.servingInfo}>{selectedFood.servingUnit}</AppText>
                 </View>
-                <TouchableOpacity style={styles.addBtn} onPress={handleFood}>
-                    <Image source={Images.plus} style={{ width: 18, height: 18, tintColor: 'white', marginRight: 8 }} />
-                    <AppText style={{ color: 'white', fontSize: scaleFont(14) }}>{intent === 'meal/add' ? `Add` : `Update Serving`}</AppText>
-                </TouchableOpacity>
+                {intent !== 'myfoods' &&
+                    <TouchableOpacity style={styles.addBtn} onPress={handleFood}>
+                        <Image source={Images.plus} style={{ width: 18, height: 18, tintColor: 'white', marginRight: 8 }} />
+                        <AppText style={{ color: 'white', fontSize: scaleFont(14) }}>{intent === 'meal/add' ? `Add` : `Update Serving`}</AppText>
+                    </TouchableOpacity>
+                }
             </View>
 
 

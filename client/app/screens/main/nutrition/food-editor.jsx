@@ -219,23 +219,26 @@ export default function FoodEditor() {
                 onPress={validateEntries}
             />
             <AppScroll extraBottom={250} onScrollSetStates={setFabVisible} contentStyle={{ padding: 15 }}>
-                {additionalContexts.selectedFood.ownerId === additionalContexts.selectedFood.creatorId &&
-                    <>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 15, marginBottom: 15, }}>
-                            <AppText style={[styles.sectionTitle, { marginTop: 15 }]}>Share to Community</AppText>
-                            <TouchableOpacity style={{ height: 40, backgroundColor: colors.cardBackground, width: 120, borderRadius: 12, flexDirection: 'row', alignItems: 'center' }} onPress={() => setIsPublic(!isPublic)}>
-                                <View style={{ height: '100%', justifyContent: 'center', backgroundColor: isPublic ? colors.main : colors.cardBackground, borderTopLeftRadius: 8, borderBottomLeftRadius: 8, flex: 1, }}>
-                                    <AppText style={{ fontWeight: 'bold', color: isPublic ? 'white' : colors.main, textAlign: 'center' }}>Public</AppText>
-                                </View>
-                                <View style={{ height: '100%', justifyContent: 'center', backgroundColor: !isPublic ? colors.main : colors.cardBackground, borderTopRightRadius: 8, borderBottomRightRadius: 8, flex: 1, }}>
-                                    <AppText style={{ fontWeight: 'bold', color: !isPublic ? 'white' : colors.main, textAlign: 'center' }}>Private</AppText>
-                                </View>
-                            </TouchableOpacity>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 15, marginBottom: 15, }}>
+                    <AppText style={[styles.sectionTitle, { marginTop: 15 }]}>Share to Community</AppText>
+                    <TouchableOpacity
+                        style={{ height: 40, backgroundColor: colors.cardBackground, width: 120, borderRadius: 12, flexDirection: 'row', alignItems: 'center' }}
+                        onPress={() => {
+                            if (additionalContexts.selectedFood.ownerId !== additionalContexts.selectedFood.creatorId)
+                                return createToast({message: 'This food was not created by you and cannot be shared!'});
+                                setIsPublic(!isPublic)
+                        }}
+                    >
+                        <View style={{ height: '100%', justifyContent: 'center', backgroundColor: isPublic ? colors.main : colors.cardBackground, borderTopLeftRadius: 8, borderBottomLeftRadius: 8, flex: 1, }}>
+                            <AppText style={{ fontWeight: 'bold', color: isPublic ? 'white' : colors.main, textAlign: 'center' }}>Public</AppText>
                         </View>
+                        <View style={{ height: '100%', justifyContent: 'center', backgroundColor: !isPublic ? colors.main : colors.cardBackground, borderTopRightRadius: 8, borderBottomRightRadius: 8, flex: 1, }}>
+                            <AppText style={{ fontWeight: 'bold', color: !isPublic ? 'white' : colors.main, textAlign: 'center' }}>Private</AppText>
+                        </View>
+                    </TouchableOpacity>
+                </View>
 
-                        <Divider orientation="horizontal" thickness={2} color={colors.divider} style={{ borderRadius: 50 }} />
-                    </>
-                }
+                <Divider orientation="horizontal" thickness={2} color={colors.divider} style={{ borderRadius: 50 }} />
 
                 {/* Label & Category */}
                 <AppText style={[styles.sectionTitle, { marginTop: 15 }]}>Food Label</AppText>
