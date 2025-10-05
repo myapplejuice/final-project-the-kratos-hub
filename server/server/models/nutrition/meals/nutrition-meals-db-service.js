@@ -1,7 +1,7 @@
 import sql from 'mssql/msnodesqlv8.js';
 import Database from '../../database/database.js';
 import ObjectMapper from '../../../utils/object-mapper.js';
-import NutritionMealsFoodsDBService from '../meal-foods/nutrition-meals-foods-db-service.js';
+import NutritionMealsFoodsDBService from './meal-foods/nutrition-meals-foods-db-service.js';
 
 export default class NutritionMealsDBService {
     static normalizeDate(date) {

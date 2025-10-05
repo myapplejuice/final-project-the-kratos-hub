@@ -3,7 +3,8 @@ import NutritionDaysController from '../models/nutrition/days/nutrition-days-con
 import NutritionMealsController from '../models/nutrition/meals/nutrition-meals-controller.js';
 import MiddlewaresManager from '../utils/middlewares-manager.js';
 import NutritionFoodsController from '../models/nutrition/foods/nutrition-foods-controller.js';
-import NutritionMealsFoodsController from '../models/nutrition/meal-foods/nutrition-meals-foods-controller.js';
+import NutritionMealPlansController from '../models/nutrition/meal-plans/nutrition-meal-plans-controller.js';
+import NutritionMealsFoodsController from '../models/nutrition/meals/meal-foods/nutrition-meals-foods-controller.js';
 
 export default class NutritionRouter {
     static nutritionRouter;
@@ -33,6 +34,12 @@ export default class NutritionRouter {
         this.nutritionRouter.post("/foods/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionFoodsController.createFood));
         this.nutritionRouter.put("/foods/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionFoodsController.updateFood));
         this.nutritionRouter.delete("/foods/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionFoodsController.deleteFood));
+
+        this.nutritionRouter.get("/meal-plans/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansController.fetchPlans));
+        this.nutritionRouter.post("/meal-plans/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansController.createPlan));
+        this.nutritionRouter.delete("/meal-plans/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansController.deletePlan));
+        this.nutritionRouter.put("/meal-plans/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansController.updatePlan));
+
 
         return this.nutritionRouter;
     }

@@ -45,6 +45,8 @@ export default class DeviceStorageService {
             const foods = result.data.foods;
             profile.foods = foods;
 
+            const result = await APIService.nutrition.mealPlans.
+
             return profile;
         } catch (error) {
             console.error("Error initializing user session:", error);

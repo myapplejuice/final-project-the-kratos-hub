@@ -10,7 +10,7 @@ export function userTablesQuery() {
                     Gender VARCHAR(20) NOT NULL,
                     Email VARCHAR(50) NOT NULL UNIQUE,
                     Phone VARCHAR(50) NOT NULL UNIQUE,
-                    Password VARCHAR(256) NOT NULL,
+                    Password VARCHAR(512) NOT NULL,
                     ImageBase64 VARCHAR(MAX) NULL
                 );
             END;`

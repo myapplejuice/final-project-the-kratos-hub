@@ -35,7 +35,7 @@ export default class UserDBService {
                 Database.addInput(profileRequest, "Email", sql.VarChar(50), user.email);
                 Database.addInput(profileRequest, "Phone", sql.VarChar(50), user.phone);
                 const hashedPassword = await UserEncryption.hashPassword(user.password);
-                Database.addInput(profileRequest, "Password", sql.VarChar(256), hashedPassword);
+                Database.addInput(profileRequest, "Password", sql.VarChar(512), hashedPassword);
                 Database.addInput(profileRequest, "ImageBase64", sql.VarChar(sql.MAX), user.imageBase64 || null);
                 Database.addInput(profileRequest, "DateOfCreation", sql.DateTime2, new Date());
 

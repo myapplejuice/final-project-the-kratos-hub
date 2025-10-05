@@ -77,6 +77,9 @@ export default class ObjectMapper {
             IsPublic: 'isPublic',
             ServingUnit: 'servingUnit',
             ServingSize: 'servingSize',
+            IsCreatedByCoach: 'isCreatedByCoach',
+            MealPlanId: 'mealPlanId',
+            MealId: 'mealId',
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -157,6 +160,9 @@ export default class ObjectMapper {
             isPublic: 'IsPublic',
             servingUnit: 'ServingUnit',
             servingSize: 'ServingSize',
+            isCreatedByCoach: 'IsCreatedByCoach',
+            mealPlanId: 'MealPlanId',
+            mealId: 'MealId',
         };
         return map[key] || key;
     }
