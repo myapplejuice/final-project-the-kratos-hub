@@ -318,6 +318,11 @@ export default function MealsLog() {
         router.push(routes.FOOD_PROFILE);
     }
 
+    async function handleMealsImport() {
+         setAdditionalContexts(prev => ({ ...prev, day: currentDayLog, mealPlansIntent: 'import' }));
+        router.push(routes.MEAL_PLANS);
+    }
+
     return (
         <>
             {datePickerOpen &&
@@ -337,7 +342,7 @@ export default function MealsLog() {
             <FloatingActionMenu
                 overlayColor="rgba(0, 0, 0, 0.8)"
                 actions={[
-                    { icon: Images.list3, title: 'Import Plan', onPress: () => router.push(routes.MEAL_PLANS), closeOnAction: true, delayClosure: true },
+                    { icon: Images.list3, title: 'Import Plan', onPress: () => handleMealsImport(), closeOnAction: true, delayClosure: true },
                     { icon: Images.meals, title: 'Add Meal', onPress: () => handleMealAddition(), closeOnAction: true },
                 ]}
                 onPress={handleMealAddition}

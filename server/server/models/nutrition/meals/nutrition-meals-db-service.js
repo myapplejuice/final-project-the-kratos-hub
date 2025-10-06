@@ -111,4 +111,36 @@ export default class NutritionMealsDBService {
         }
     }
 
+    static async multiCreateMeals(nutritionLogId, meals) {
+    if (!nutritionLogId || !meals || meals.length === 0) return null;
+
+    const transaction = Database.getTransaction();
+
+    try {
+        await transaction.begin();
+
+        const createdMeals = [];
+
+        for (const meal of meals) {
+            const { label, time, foods } = meal;
+
+            const createdMeal = await NutritionMealsDBService.createMeal(nutritionLogId, label, time, transaction);
+            if (!createdMeal) throw new Error("Failed to create meal");
+
+            if (foods && foods.length > 0) {
+                await MealLogsFoodsDBService.addFoodsBulk(createdMeal.id, foods, transaction);
+            }
+
+            createdMeals.push({ ...createdMeal, foods });
+        }
+
+        await transaction.commit();
+        return createdMeals;
+    } catch (err) {
+        console.error("multiCreateMeals error:", err);
+        await transaction.rollback();
+        return null;
+    }
+}
+
 }

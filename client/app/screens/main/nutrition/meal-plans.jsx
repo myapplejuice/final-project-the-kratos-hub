@@ -30,7 +30,7 @@ import MealPlan from '../../../components/screen-comps/meal-plan';
 
 export default function MealsPlans() {
     const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
-    const { user, setUser, setAdditionalContexts } = useContext(UserContext);
+    const { user, setUser, additionalContexts, setAdditionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const [scrollToTop, setScrollToTop] = useState(false);
     const [fabVisible, setFabVisible] = useState(true);
@@ -125,7 +125,7 @@ export default function MealsPlans() {
 
                     let newLabel = vals[0];
                     let newDescription = vals[1];
-                    if ((newLabel === plan.label && newDescription === '') || (newLabel === plan.label && newDescription === plan.description) || (!newLabel && !newDescription)) {
+                    if ((newLabel === plan.label && newDescription === plan.description) || (!newLabel && !newDescription)) {
                         return createToast({ message: "No changes detected" });
                     }
 
@@ -158,6 +158,44 @@ export default function MealsPlans() {
                 }
             },
         })
+    }
+
+    async function handlePlanImport(plan) {
+        if (!plan.meals || plan.meals.length === 0) {
+            return createToast({ message: "No meals to import in this plan, click \"View Full Plan\" to start adding meals" });
+        }
+
+        const meals = plan.meals;
+        const day = additionalContexts.day;
+        console.log(day)
+
+        try {
+            showSpinner();
+            const result = await APIService.nutrition.meals.createMultiple({ nutritionLogId: day.id, meals });
+
+            if (result.success) {
+                setUser(prev => ({
+                    ...prev,
+                    nutritionLogs: {
+                        ...prev.nutritionLogs,
+                        [day]: {
+                            ...prev.nutritionLogs[day],
+                            meals: [
+                                ...prev.nutritionLogs[day].meals,
+                                ...result.data.meals
+                            ]
+                        }
+                    }
+                }))
+            } else {
+                createToast({ message: result.message });
+            }
+        } catch (err) {
+            console.error("Failed to import meal plan:", err);
+            createToast({ message: "Server error " + err });
+        } finally {
+            hideSpinner();
+        }
     }
 
     async function handlePlanPress(plan) {
@@ -199,6 +237,8 @@ export default function MealsPlans() {
                                 isCreatedByCoach={plan.isCreatedByCoach}
                                 coachId={plan.coachId}
                                 expandedOnStart={i === 0}
+                                intent={additionalContexts.mealPlansIntent}
+                                onImportPlanPress={() => handlePlanImport(plan)}
                                 onDeletePress={() => handlePlanDeletion(plan)}
                                 onUpdatePress={() => handlePlanUpdate(plan)}
                                 onPlanPress={() => handlePlanPress(plan)}
@@ -219,91 +259,3 @@ export default function MealsPlans() {
         </>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    scrollContent: {
-        backgroundColor: colors.background,
-    },
-    card: {
-        backgroundColor: colors.cardBackground,
-        padding: 15,
-        borderRadius: 15,
-        marginTop: 15,
-        marginHorizontal: 15
-    },
-    sectionTitle: {
-        fontSize: scaleFont(19),
-        fontWeight: '700',
-        color: 'white',
-        marginBottom: 12,
-    },
-    feedbackRow: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginBottom: 6,
-    },
-    feedbackBullet: {
-        color: 'white',
-        fontSize: scaleFont(14),
-        marginRight: 6,
-    },
-    feedbackText: {
-        color: 'white',
-        fontSize: scaleFont(12),
-        lineHeight: 20,
-        flex: 1,
-    },
-    row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 15,
-    },
-    iconWrapper: {
-        padding: 12,
-        borderRadius: 12,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    icon: {
-        width: 40,
-        height: 40,
-    },
-    textWrapper: {
-        flex: 1,
-        marginLeft: 5,
-    },
-    label: {
-        fontWeight: '700',
-        fontSize: scaleFont(22),
-    },
-    subText: {
-        fontSize: scaleFont(12),
-        color: colors.mutedText,
-        marginTop: 2,
-    },
-    arrow: {
-        width: 20,
-        height: 20,
-        tintColor: 'white',
-        marginLeft: 6,
-        alignSelf: 'center',
-    },
-    divider: { width: 1, backgroundColor: "rgba(102,102,102,0.2)", alignSelf: "center", height: "60%" },
-    button: {
-        marginTop: 18,
-        height: 50,
-        borderRadius: 15,
-        backgroundColor: 'linear-gradient(90deg, rgba(0,140,255,1) 0%, rgba(0,200,255,1) 100%)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    buttonText: {
-        color: 'white',
-        fontWeight: '700',
-        fontSize: scaleFont(14),
-    }
-});

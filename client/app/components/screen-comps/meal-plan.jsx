@@ -14,7 +14,7 @@ import Invert from '../effects/invert';
 import { formatDate, formatTime, toDateFromSQLTime } from '../../common/utils/date-time';
 import FadeInOut from '../effects/fade-in-out';
 
-export default function MealPlan({ label, date, description, meals = [], onDeletePress = () => { }, onUpdatePress = () => { }, onPlanPress = () => { }, expandedOnStart = false, onExpand = () => { } }) {
+export default function MealPlan({ label, date, description, meals = [], onDeletePress = () => { }, onUpdatePress = () => { }, onPlanPress = () => { }, onImportPlanPress = () => { }, expandedOnStart = false, intent = 'normal' }) {
     const { user } = useContext(UserContext);
     const [expanded, setExpanded] = useState(expandedOnStart);
 
@@ -34,10 +34,11 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
     const formattedDate = formatDate(date, { format: user.preferences.dateFormat.key });
     const mealCount = meals?.length;
     const foodCount = meals.reduce((acc, meal) => acc + meal.foods?.length, 0 || 0);
+    const totalMacros = (totals.carbs + totals.protein + totals.fat) || 0;
     const macroPercentages = {
-        carbs: Math.round((totals.carbs / totals.energyKcal) * 100),
-        protein: Math.round((totals.protein / totals.energyKcal) * 100),
-        fat: Math.round((totals.fat / totals.energyKcal) * 100),
+        carbs: Math.round((totals.carbs / totalMacros * 100)),
+        protein: Math.round((totals.protein / totalMacros * 100)),
+        fat: Math.round((totals.fat / totalMacros * 100)),
     }
 
     return (
@@ -94,7 +95,7 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
 
                 <ExpandInOut visible={expanded}>
                     <View style={{ marginVertical: 25, padding: 20, borderRadius: 15, backgroundColor: colors.backgroundTop }}>
-                        <AppText style={{color: colors.mutedText, fontSize: scaleFont(10), textAlign: description !== 'No description provided' ? 'left' : 'center' }}>
+                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10), textAlign: description !== 'No description provided' ? 'left' : 'center' }}>
                             {description}
                         </AppText>
                     </View>
@@ -107,10 +108,9 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
                             { percentage: macroPercentages.protein, color: nutritionColors.protein1 },
                             { percentage: macroPercentages.fat, color: nutritionColors.fat1 },
                         ]}
-                        barHeight={3}
+                        barHeight={10}
                         showTitles={false}
-                        barContainerStyle={{ borderRadius: 50, marginTop: 10, marginBottom: 5, paddingVertical: 4 }}
-
+                        barContainerStyle={{ borderRadius: 50, marginTop: 10, marginBottom: 5 }}
                     />
 
                     <View style={{ padding: 15, alignItems: 'center', backgroundColor: 'rgba(58,58,58,0.49)', borderRadius: 15, marginTop: 20 }}>
@@ -139,28 +139,56 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
                         </View>
                     </View>
 
-                    <AnimatedButton
-                        title="View Full Plan"
-                        style={{
-                            padding: 15,
-                            backgroundColor: colors.accentGreen,
-                            borderRadius: 15,
-                            marginTop: 15,
-                        }}
-                        textStyle={{ fontSize: scaleFont(13), fontWeight: 'bold' }}
-                        rightImage={Images.arrow}
-                        rightImageStyle={{ tintColor: 'white', width: 18, height: 18 }}
-                        rightImageContainerStyle={{
-                            width: 16,
-                            height: 16,
-                            padding: 5,
-                            borderRadius: 50,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            marginStart: 8,
-                        }}
-                        onPress={onPlanPress}
-                    />
+                    <View style={intent === 'import' ? { flexDirection: 'row', justifyContent: 'space-between' } : {}}>
+                        {intent === 'import' &&
+                            <AnimatedButton
+                                title="Import Plan"
+                                style={{
+                                    padding: 15,
+                                    backgroundColor: colors.accentGreen,
+                                    borderRadius: 15,
+                                    marginTop: 15,
+                                    width: '48%'
+                                }}
+                                textStyle={{ fontSize: scaleFont(13), fontWeight: 'bold' }}
+                                leftImage={Images.plus}
+                                leftImageStyle={{ tintColor: 'white', width: 18, height: 18 }}
+                                leftImageContainerStyle={{
+                                    width: 16,
+                                    height: 16,
+                                    padding: 5,
+                                    borderRadius: 50,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    marginEnd: 8,
+                                }}
+                                onPress={onImportPlanPress}
+                            />
+                        }
+                        <AnimatedButton
+                            title="View Full Plan"
+                            style={{
+                                padding: 15,
+                                backgroundColor: colors.accentGreen,
+                                borderRadius: 15,
+                                marginTop: 15,
+                                width: intent === 'import' ? '48%' : '100%',
+                            }}
+                            textStyle={{ fontSize: scaleFont(13), fontWeight: 'bold' }}
+                            rightImage={Images.arrow}
+                            rightImageStyle={{ tintColor: 'white', width: 18, height: 18 }}
+                            rightImageContainerStyle={{
+                                width: 16,
+                                height: 16,
+                                padding: 5,
+                                borderRadius: 50,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                marginStart: 8,
+                            }}
+                            onPress={onPlanPress}
+                        />
+                    </View>
                 </ExpandInOut>
             </View>
         </FadeInOut>

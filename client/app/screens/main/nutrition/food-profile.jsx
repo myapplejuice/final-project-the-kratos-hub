@@ -174,6 +174,10 @@ export default function FoodProfile() {
             onConfirm: async () => {
                 showSpinner();
                 try {
+                    if (intent === 'mealplan/update') {
+                        return handleMealPlanFoodDeletion();
+                    }
+
                     let result
                     result = ((intent === 'meal/add' || intent === 'mealplan/add') || intent === 'myfoods') ?
                         await APIService.nutrition.foods.delete({ foodId: selectedFood.id })
@@ -181,7 +185,7 @@ export default function FoodProfile() {
                         await APIService.nutrition.meals.foods.delete({ mealId: selectedMeal.id, foodId: selectedFood.id });
 
                     if (result.success) {
-                        if ((intent === 'meal/add' || intent === 'mealplan/add') || intent === 'myfoods') {
+                        if ((intent === 'meal/add'|| intent === 'mealplan/add') || intent === 'myfoods') {
                             setUser(prev => ({
                                 ...prev,
                                 foods: prev.foods.filter(f => f.id !== selectedFood.id)
@@ -209,7 +213,7 @@ export default function FoodProfile() {
                             });
                         }
 
-                        createToast({ message: ((intent === 'meal/add' || intent === 'mealplan/add') || intent === 'myfoods') ? 'Food entry discarded' : 'Food removed' });
+                        createToast({ message: ((intent === 'meal/add'|| intent === 'mealplan/add') || intent === 'myfoods') ? 'Food entry discarded' : 'Food removed' });
                         router.back();
                     } else {
                         createAlert({ title: 'Failure', text: "Food discard/removal failed!\n" + result.message });
@@ -221,6 +225,44 @@ export default function FoodProfile() {
                 }
             }
         })
+    }
+
+    async function handleMealPlanFoodDeletion() {
+        Keyboard.dismiss();
+
+        try {
+            const result = await APIService.nutrition.mealPlans.meals.foods.delete({ mealId: selectedMeal.id, foodId: selectedFood.id });
+
+            if (result.success) {
+                setUser(prev => ({
+                    ...prev,
+                    plans: prev.plans.map(plan =>
+                        plan.id === additionalContexts.selectedPlan.id
+                            ? {
+                                ...plan,
+                                meals: plan.meals.map(meal =>
+                                    meal.id === selectedMeal.id
+                                        ? {
+                                            ...meal,
+                                            foods: meal.foods.filter(f => f.id !== selectedFood.id)
+                                        }
+                                        : meal
+                                )
+                            }
+                            : plan
+                    )
+                }));
+
+                createToast({ message: 'Food removed' });
+                router.back();
+            } else {
+                createAlert({ title: 'Failure', text: "Food removal failed!\n" + result.message });
+            }
+        } catch (e) {
+            createAlert({ title: 'Failure', text: "Food removal failed!\n" + e.message });
+        } finally {
+            hideSpinner();
+        }
     }
 
     async function handleFoodAddition() {
@@ -384,7 +426,7 @@ export default function FoodProfile() {
         }
     }
 
-    async function handleMealPlanFoodUpdate(){
+    async function handleMealPlanFoodUpdate() {
         showSpinner();
         const payload = {
             mealId: selectedMeal.id,

@@ -1,117 +1,22 @@
 {
-    "foodProfileIntent": "meal/add",
-    "foodSelectionIntent": "mealplan",
-    "selectedFood": {
-        "additionalProps": [],
-        "carbs": 0,
-        "category": "Dingus",
-        "creatorId": "0DD28B1D-3717-497F-88D5-69924C5800B9",
-        "creatorName": "Ibrahem Abu Shah",
-        "dominantMacro": "Protein",
-        "energyKcal": 250,
-        "fat": 0,
-        "id": 1,
-        "isPublic": true,
-        "isUSDA": false,
-        "label": "Dingus",
-        "ownerId": "0DD28B1D-3717-497F-88D5-69924C5800B9",
-        "protein": 60,
-        "servingSize": 100,
-        "servingUnit": "g",
-        "usdaId": -1
-    },
-    "selectedMeal": {
-        "foods": [],
-        "id": 4,
-        "label": "Meal 1",
-        "mealPlanId": 1,
-        "time": null
-    },
-    "selectedPlan": {
-        "coachId": null,
-        "dateOfCreation": "2025-10-06T12:18:57.078Z",
-        "description": "5 months plan for this winter ",
-        "id": 1,
-        "isCreatedByCoach": false,
-        "label": "Winter Cut",
-        "meals": [
-            [Object
-            ],
-            [Object
-            ]
-        ],
-        "userId": "0DD28B1D-3717-497F-88D5-69924C5800B9"
-    }
-}
-
-
-{
-    "day": {
-        "carbRate": 60,
-        "consumedCarbGrams": 0,
-        "consumedEnergyKcal": 0,
-        "consumedFatGrams": 0,
-        "consumedProteinGrams": 0,
-        "consumedWaterMl": 0,
-        "date": "2025-10-06",
-        "diet": "lowFat",
-        "fatRate": 15,
-        "goal": "mildWeightLoss",
-        "id": 1,
-        "meals": [
-            [Object
-            ]
-        ],
-        "proteinRate": 25,
-        "proteinRequirement": 111,
-        "targetCarbGrams": 375,
-        "targetEnergyKcal": 2500,
-        "targetFatGrams": 42,
-        "targetProteinGrams": 156,
-        "targetWaterMl": 2900,
-        "userId": "0DD28B1D-3717-497F-88D5-69924C5800B9"
-    },
-    "foodProfileIntent": "meal/add",
-    "foodSelectionIntent": "meallog",
-    "selectedFood": {
-        "additionalProps": [],
-        "carbs": 0,
-        "category": "Dingus",
-        "creatorId": "0DD28B1D-3717-497F-88D5-69924C5800B9",
-        "creatorName": "Ibrahem Abu Shah",
-        "dominantMacro": "Protein",
-        "energyKcal": 250,
-        "fat": 0,
-        "id": 1,
-        "isPublic": true,
-        "isUSDA": false,
-        "label": "Dingus",
-        "ownerId": "0DD28B1D-3717-497F-88D5-69924C5800B9",
-        "protein": 60,
-        "servingSize": 100,
-        "servingUnit": "g",
-        "usdaId": -1
-    },
-    "selectedMeal": {
-        "foods": [],
-        "id": 1,
-        "label": "Meal 1",
-        "nutritionLogId": 1,
-        "time": "1970-01-01T15:22:00.000Z"
-    },
-    "selectedPlan": {
-        "coachId": null,
-        "dateOfCreation": "2025-10-06T12:18:57.078Z",
-        "description": "5 months plan for this winter ",
-        "id": 1,
-        "isCreatedByCoach": false,
-        "label": "Winter Cut",
-        "meals": [
-            [Object
-            ],
-            [Object
-            ]
-        ],
-        "userId": "0DD28B1D-3717-497F-88D5-69924C5800B9"
-    }
+    "carbRate": 20,
+    "consumedCarbGrams": 0,
+    "consumedEnergyKcal": 0,
+    "consumedFatGrams": 0,
+    "consumedProteinGrams": 0,
+    "consumedWaterMl": 750,
+    "date": "2025-10-06",
+    "diet": "lowCarb",
+    "fatRate": 40,
+    "goal": "mildWeightLoss",
+    "id": 9,
+    "meals": [],
+    "proteinRate": 40,
+    "proteinRequirement": 74,
+    "targetCarbGrams": 90,
+    "targetEnergyKcal": 1800,
+    "targetFatGrams": 80,
+    "targetProteinGrams": 180,
+    "targetWaterMl": 9000,
+    "userId": "D00CF94D-D3BC-4101-8DEE-A6B6C4D2D161"
 }

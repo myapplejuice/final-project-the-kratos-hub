@@ -32,4 +32,14 @@ export default class NutritionMealsController {
 
         return res.status(200).json({ success: true, meal });
     }
+
+    static async multiCreateMeals(req, res) {
+        const { nutritionLogId, meals } = req.body;
+        if (!nutritionLogId || !meals) return res.status(400).json({ success: false, error: "nutritionLogId and meals are required" });
+
+        const result = await NutritionMealsDBService.multiCreateMeals(nutritionLogId, meals);
+        if (!result) return res.status(500).json({ success: false, error: "Failed to create meals" });
+
+        return res.status(200).json({ success: true, result });
+    }
 }
