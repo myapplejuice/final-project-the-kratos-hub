@@ -138,7 +138,7 @@ export function nutritionTablesQuery() {
                 Id INT IDENTITY(1,1) PRIMARY KEY,
                 MealPlanId INT NOT NULL,
                 Label VARCHAR(50) NOT NULL,
-                Time VARCHAR(20) NOT NULL,
+                Time TIME,
                 CONSTRAINT FK_MealPlansMeals_MealPlans FOREIGN KEY (MealPlanId)
                     REFERENCES dbo.MealPlans(Id)
                     ON DELETE CASCADE

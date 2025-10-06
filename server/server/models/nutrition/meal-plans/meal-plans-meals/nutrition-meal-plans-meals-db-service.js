@@ -12,7 +12,7 @@ export default class NutritionMealPlansMealsDBService {
             const request = Database.getRequest();
             Database.addInput(request, 'MealPlanId', sql.Int, planId);
             Database.addInput(request, 'Label', sql.VarChar(50), label);
-            Database.addInput(request, 'Time', sql.VarChar(20), time);
+            Database.addInput(request, 'Time', sql.Time, time || null);
 
             const query = `
                 INSERT INTO dbo.MealPlansMeals (MealPlanId, Label, Time)
@@ -61,7 +61,7 @@ export default class NutritionMealPlansMealsDBService {
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, mealId);
             Database.addInput(request, 'Label', sql.VarChar(50), newLabel);
-            Database.addInput(request, 'Time', sql.VarChar(20), newTime);
+            Database.addInput(request, 'Time', sql.Time, newTime || null);
 
             const query = `
                 UPDATE dbo.MealPlansMeals
@@ -85,6 +85,7 @@ export default class NutritionMealPlansMealsDBService {
     }
 
     static async fetchMealsByPlanId(planId) {
+        console.log(planId)
         if (!planId) return [];
 
         try {
