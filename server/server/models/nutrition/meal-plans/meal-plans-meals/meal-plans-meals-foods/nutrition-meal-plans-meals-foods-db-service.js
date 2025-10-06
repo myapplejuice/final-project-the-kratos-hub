@@ -5,9 +5,9 @@ import ObjectMapper from '../../../../../utils/object-mapper.js';
 export default class NutritionMealPlansMealsFoodsDBService {
     static async addFood(food) {
         if (!food) return false;
-
-        console.log(food);
-
+        
+        console.log(food.energyKcal, food.carbs, food.protein, food.fat);
+        console.log(food.originalEnergyKcal, food.originalCarbs, food.originalProtein, food.originalFat);
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'MealId', sql.Int, food.mealId);
@@ -23,6 +23,10 @@ export default class NutritionMealPlansMealsFoodsDBService {
             Database.addInput(request, 'ServingUnit', sql.VarChar(20), food.servingUnit);
             Database.addInput(request, 'OriginalServingSize', sql.Decimal(7, 2), food.originalServingSize);
             Database.addInput(request, 'ServingSize', sql.Decimal(7, 2), food.servingSize);
+            Database.addInput(request, 'OriginalEnergyKcal', sql.Decimal(7, 2), food.originalEnergyKcal ?? 0);
+            Database.addInput(request, 'OriginalCarbs', sql.Decimal(7, 2), food.originalCarbs ?? 0);
+            Database.addInput(request, 'OriginalProtein', sql.Decimal(7, 2), food.originalProtein ?? 0);
+            Database.addInput(request, 'OriginalFat', sql.Decimal(7, 2), food.originalFat ?? 0);
             Database.addInput(request, 'EnergyKcal', sql.Decimal(7, 2), food.energyKcal ?? 0);
             Database.addInput(request, 'Carbs', sql.Decimal(7, 2), food.carbs ?? 0);
             Database.addInput(request, 'Protein', sql.Decimal(7, 2), food.protein ?? 0);
@@ -32,16 +36,14 @@ export default class NutritionMealPlansMealsFoodsDBService {
 
             const query = `
                 INSERT INTO dbo.MealPlansMealsFoods (
-                    MealId, OwnerId, CreatorId, CreatorName, USDAId, IsUSDA,
-                    Label, Category,
-                    ServingUnit, OriginalServingSize, ServingSize, EnergyKcal, Carbs, Protein, Fat,
+                    MealId, OwnerId, CreatorId, CreatorName, USDAId, IsUSDA,Label, Category,
+                    ServingUnit, OriginalServingSize,  OriginalEnergyKcal, ServingSize, OriginalCarbs, OriginalProtein, OriginalFat, EnergyKcal, Carbs, Protein, Fat,
                     DominantMacro, AdditionalProps
                 )
                 OUTPUT INSERTED.Id
                 VALUES (
-                    @MealId, @OwnerId, @CreatorId, @CreatorName, @USDAId, @IsUSDA,
-                    @Label, @Category,
-                    @ServingUnit, @OriginalServingSize, @ServingSize, @EnergyKcal, @Carbs, @Protein, @Fat,
+                    @MealId, @OwnerId, @CreatorId, @CreatorName, @USDAId, @IsUSDA, @Label, @Category,
+                    @ServingUnit, @OriginalServingSize, @OriginalEnergyKcal, @ServingSize, @OriginalCarbs, @OriginalProtein, @OriginalFat,  @EnergyKcal, @Carbs, @Protein, @Fat,
                     @DominantMacro, @AdditionalProps
                 );
             `;

@@ -129,11 +129,9 @@ export default function FoodSelection() {
                 return createAlert({ message: result.message });
 
             if (result.data.length === 0) {
-                // try lowercased
                 requestBody.query = searchQuery.toLowerCase();
                 result = await APIService.USDARequest(JSON.stringify(requestBody));
 
-                // try uppercased
                 if (result.data.length === 0) {
                     requestBody.query = searchQuery.toUpperCase();
                     result = await APIService.USDARequest(JSON.stringify(requestBody));
@@ -145,11 +143,9 @@ export default function FoodSelection() {
 
             let fetchedFoods = result.data || [];
 
-            // remove duplicates based on USDAId
             const existingIds = new Set(USDAFoods.map(f => f.USDAId));
             let newFoods = fetchedFoods.filter(f => !existingIds.has(f.fdcId));
 
-            // remove duplicates with same description + category
             const seenFoods = new Set();
             newFoods = newFoods.filter(f => {
                 const key = `${f.description.toLowerCase()}|${(f.foodCategory || '').toLowerCase()}`;
@@ -161,20 +157,16 @@ export default function FoodSelection() {
             const queryLower = searchQuery.toLowerCase();
 
             const prioritizedFoods = newFoods.sort((a, b) => {
-                // 1. foundation first
                 if (a.dataType === 'Foundation' && b.dataType !== 'Foundation') return -1;
                 if (a.dataType !== 'Foundation' && b.dataType === 'Foundation') return 1;
 
-                // 2. exact description match first
                 const aExact = a.description.toLowerCase() === queryLower ? -1 : 0;
                 const bExact = b.description.toLowerCase() === queryLower ? -1 : 0;
                 if (aExact !== bExact) return aExact - bExact;
 
-                // 3. more nutrients = more complete food
                 return (b.foodNutrients?.length || 0) - (a.foodNutrients?.length || 0);
             });
 
-            // remove foods with almost no energy
             newFoods = prioritizedFoods.filter(f => f.foodNutrients.some(n => n.nutrientName === 'Energy' && n.value >= 5));
 
             const parsedFoods = newFoods.map(f => {
@@ -215,17 +207,17 @@ export default function FoodSelection() {
                     isPublic: true,
                     isUSDA: true,
                     USDAId: f.fdcId,
-                    originalServingSize: servingSize,
-                    originalEnergyKcal: energyKcal,
-                    originalCarbs: carbs,
-                    originalProtein: protein,
-                    originalFat: fat,
-                    energyKcal,
-                    carbs,
-                    protein,
-                    fat,
+                    originalServingSize: Math.round(servingSize),
+                    originalEnergyKcal: Math.round(energyKcal),
+                    originalCarbs: Math.round(carbs),
+                    originalProtein: Math.round(protein),
+                    originalFat: Math.round(fat),
+                    servingSize: Math.round(servingSize),
+                    energyKcal: Math.round(energyKcal),
+                    carbs: Math.round(carbs),
+                    protein: Math.round(protein),
+                    fat: Math.round(fat),
                     dominantMacro,
-                    servingSize,
                     servingUnit,
                     additionalProps
                 };

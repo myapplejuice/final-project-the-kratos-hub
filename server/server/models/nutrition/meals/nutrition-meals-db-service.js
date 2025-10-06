@@ -8,18 +8,18 @@ export default class NutritionMealsDBService {
         return new Date(date).toISOString().split('T')[0];
     }
 
-    static async createMeal(nutritionLogId, label, time) {
+    static async createMeal(nutritionLogId, label, time, transaction = null) {
         try {
-            const request = Database.getRequest();
+            const request = Database.getRequest(transaction);
             Database.addInput(request, "NutritionLogId", sql.Int, nutritionLogId);
             Database.addInput(request, "Label", sql.VarChar(100), label);
             Database.addInput(request, "Time", sql.Time, time);
 
             const query = `
-                INSERT INTO dbo.MealLogs (NutritionLogId, Label, Time)
-                OUTPUT INSERTED.*
-                VALUES (@NutritionLogId, @Label, @Time);
-            `;
+            INSERT INTO dbo.MealLogs (NutritionLogId, Label, Time)
+            OUTPUT INSERTED.*
+            VALUES (@NutritionLogId, @Label, @Time);
+        `;
 
             const result = await request.query(query);
             if (!result.recordset[0]) return null;
@@ -32,7 +32,7 @@ export default class NutritionMealsDBService {
             return meal;
         } catch (e) {
             console.error("createMeal error:", e);
-            return { success: false, meal: null };
+            return null;
         }
     }
 
@@ -112,35 +112,49 @@ export default class NutritionMealsDBService {
     }
 
     static async multiCreateMeals(nutritionLogId, meals) {
-    if (!nutritionLogId || !meals || meals.length === 0) return null;
+        if (!nutritionLogId || !meals || meals.length === 0)
+            return { success: false, message: "Missing parameters" };
 
-    const transaction = Database.getTransaction();
+        try {
+            const result = await Database.runTransaction(async (transaction) => {
+                const createdMeals = [];
 
-    try {
-        await transaction.begin();
+                for (const meal of meals) {
+                    const { label, time, foods } = meal;
 
-        const createdMeals = [];
+                    // Create meal
+                    const createdMeal = await NutritionMealsDBService.createMeal(
+                        nutritionLogId,
+                        label,
+                        time,
+                        transaction
+                    );
+                    if (!createdMeal) throw new Error("Failed to create meal");
 
-        for (const meal of meals) {
-            const { label, time, foods } = meal;
+                    // Create foods
+                    let addedFoods = [];
+                    if (foods && foods.length > 0) {
+                        addedFoods = await NutritionMealsFoodsDBService.multiAddFoods(
+                            createdMeal.id,
+                            foods,
+                            transaction
+                        );
+                        if (!addedFoods) throw new Error("Failed to insert foods");
+                    }
 
-            const createdMeal = await NutritionMealsDBService.createMeal(nutritionLogId, label, time, transaction);
-            if (!createdMeal) throw new Error("Failed to create meal");
+                    createdMeals.push({ ...createdMeal, foods: addedFoods });
+                }
 
-            if (foods && foods.length > 0) {
-                await MealLogsFoodsDBService.addFoodsBulk(createdMeal.id, foods, transaction);
-            }
+                if (createdMeals.length === 0)
+                    throw new Error("No meals created");
 
-            createdMeals.push({ ...createdMeal, foods });
+                return { success: true, meals: createdMeals };
+            });
+
+            return result;
+        } catch (err) {
+            console.error("multiCreateMeals transaction error:", err);
+            return { success: false, message: err.message || "Transaction failed" };
         }
-
-        await transaction.commit();
-        return createdMeals;
-    } catch (err) {
-        console.error("multiCreateMeals error:", err);
-        await transaction.rollback();
-        return null;
     }
-}
-
 }

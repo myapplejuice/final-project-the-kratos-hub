@@ -1,22 +1,152 @@
 {
-    "carbRate": 20,
-    "consumedCarbGrams": 0,
-    "consumedEnergyKcal": 0,
-    "consumedFatGrams": 0,
-    "consumedProteinGrams": 0,
-    "consumedWaterMl": 750,
-    "date": "2025-10-06",
-    "diet": "lowCarb",
-    "fatRate": 40,
-    "goal": "mildWeightLoss",
-    "id": 9,
-    "meals": [],
-    "proteinRate": 40,
-    "proteinRequirement": 74,
-    "targetCarbGrams": 90,
-    "targetEnergyKcal": 1800,
-    "targetFatGrams": 80,
-    "targetProteinGrams": 180,
-    "targetWaterMl": 9000,
-    "userId": "D00CF94D-D3BC-4101-8DEE-A6B6C4D2D161"
+    "USDAId": 2466144,
+    "additionalProps": [
+        {
+            "amount": 1,
+            "id": 0,
+            "label": "Total Sugars",
+            "originalAmount": 1,
+            "unit": "G"
+        },
+        {
+            "amount": 4,
+            "id": 1,
+            "label": "Fiber, total dietary",
+            "originalAmount": 4,
+            "unit": "G"
+        },
+        {
+            "amount": 159,
+            "id": 2,
+            "label": "Calcium, Ca",
+            "originalAmount": 159,
+            "unit": "MG"
+        },
+        {
+            "amount": 4,
+            "id": 3,
+            "label": "Iron, Fe",
+            "originalAmount": 4,
+            "unit": "MG"
+        },
+        {
+            "amount": 133,
+            "id": 4,
+            "label": "Phosphorus, P",
+            "originalAmount": 133,
+            "unit": "MG"
+        },
+        {
+            "amount": 619,
+            "id": 5,
+            "label": "Potassium, K",
+            "originalAmount": 619,
+            "unit": "MG"
+        },
+        {
+            "amount": 327,
+            "id": 6,
+            "label": "Sodium, Na",
+            "originalAmount": 327,
+            "unit": "MG"
+        },
+        {
+            "amount": 7,
+            "id": 7,
+            "label": "Zinc, Zn",
+            "originalAmount": 7,
+            "unit": "MG"
+        },
+        {
+            "amount": 0,
+            "id": 8,
+            "label": "Vitamin D (D2 + D3), International Units",
+            "originalAmount": 0,
+            "unit": "IU"
+        },
+        {
+            "amount": 1,
+            "id": 9,
+            "label": "Thiamin",
+            "originalAmount": 1,
+            "unit": "MG"
+        },
+        {
+            "amount": 0,
+            "id": 10,
+            "label": "Riboflavin",
+            "originalAmount": 0,
+            "unit": "MG"
+        },
+        {
+            "amount": 11,
+            "id": 11,
+            "label": "Niacin",
+            "originalAmount": 11,
+            "unit": "MG"
+        },
+        {
+            "amount": 0,
+            "id": 12,
+            "label": "Vitamin B-6",
+            "originalAmount": 0,
+            "unit": "MG"
+        },
+        {
+            "amount": 71,
+            "id": 13,
+            "label": "Folate, total",
+            "originalAmount": 71,
+            "unit": "UG"
+        },
+        {
+            "amount": 1,
+            "id": 14,
+            "label": "Sugars, added",
+            "originalAmount": 1,
+            "unit": "G"
+        },
+        {
+            "amount": 0,
+            "id": 15,
+            "label": "Cholesterol",
+            "originalAmount": 0,
+            "unit": "MG"
+        },
+        {
+            "amount": 0,
+            "id": 16,
+            "label": "Fatty acids, total trans",
+            "originalAmount": 0,
+            "unit": "G"
+        },
+        {
+            "amount": 5,
+            "id": 17,
+            "label": "Fatty acids, total saturated",
+            "originalAmount": 5,
+            "unit": "G"
+        }
+    ],
+    "carbs": 0,
+    "category": "Other Meats",
+    "creatorId": "00000000-0000-0000-0000-000000000000",
+    "creatorName": "USDA",
+    "dominantMacro": "Protein",
+    "energyKcal": 204,
+    "fat": 12,
+    "id": 11,
+    "isPublic": false,
+    "isUSDA": true,
+    "label": "Beef (Impossible Foods Inc.)",
+    "mealId": 21,
+    "originalCarbs": 0,
+    "originalEnergyKcal": 204,
+    "originalFat": 12,
+    "originalProtein": 17,
+    "originalServingSize": 113,
+    "ownerId": "D00CF94D-D3BC-4101-8DEE-A6B6C4D2D161",
+    "protein": 17,
+    "servingSize": 113,
+    "servingUnit": "g"
 }

@@ -37,9 +37,9 @@ export default class NutritionMealsController {
         const { nutritionLogId, meals } = req.body;
         if (!nutritionLogId || !meals) return res.status(400).json({ success: false, error: "nutritionLogId and meals are required" });
 
-        const result = await NutritionMealsDBService.multiCreateMeals(nutritionLogId, meals);
-        if (!result) return res.status(500).json({ success: false, error: "Failed to create meals" });
+        const createdMeals = await NutritionMealsDBService.multiCreateMeals(nutritionLogId, meals);
+        if (!createdMeals || createdMeals === null) return res.status(500).json({ success: false, error: "Failed to create meals" });
 
-        return res.status(200).json({ success: true, result });
+        return res.status(200).json({ success: true, meals: createdMeals });
     }
 }

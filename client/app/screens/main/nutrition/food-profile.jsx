@@ -59,16 +59,16 @@ export default function FoodProfile() {
         if (!servingSize)
             factor = 0;
         else
-            factor = servingSize / (intent === 'meal/update' ? selectedFood.originalServingSize : selectedFood.servingSize);
+            factor = servingSize / ((intent === 'meal/update' || intent === 'mealplan/update') ? selectedFood.originalServingSize : selectedFood.servingSize);
 
-        const energyKcal = Math.round((intent === 'meal/update' ? selectedFood.originalEnergyKcal : selectedFood.energyKcal) * factor);
-        const carbs = Math.round((intent === 'meal/update' ? selectedFood.originalCarbs : selectedFood.carbs) * factor);
-        const protein = Math.round((intent === 'meal/update' ? selectedFood.originalProtein : selectedFood.protein) * factor);
-        const fat = Math.round((intent === 'meal/update' ? selectedFood.originalFat : selectedFood.fat) * factor);
+        const energyKcal = Math.round(((intent === 'meal/update' || intent === 'mealplan/update') ? selectedFood.originalEnergyKcal : selectedFood.energyKcal) * factor);
+        const carbs = Math.round(((intent === 'meal/update' || intent === 'mealplan/update') ? selectedFood.originalCarbs : selectedFood.carbs) * factor);
+        const protein = Math.round(((intent === 'meal/update' || intent === 'mealplan/update') ? selectedFood.originalProtein : selectedFood.protein) * factor);
+        const fat = Math.round(((intent === 'meal/update' || intent === 'mealplan/update') ? selectedFood.originalFat : selectedFood.fat) * factor);
         const additionalProps = (selectedFood.additionalProps || []).map((prop) => ({
             ...prop,
-            originalAmount: intent === 'meal/update' ? prop.originalAmount : prop.amount,
-            amount: Math.round((intent === 'meal/update' ? prop.originalAmount : prop.amount) * factor)
+            originalAmount: Math.round((intent === 'meal/update' || intent === 'mealplan/update') ? prop.originalAmount : prop.amount),
+            amount: Math.round(((intent === 'meal/update' || intent === 'mealplan/update') ? prop.originalAmount : prop.amount) * factor)
         }));
 
         setEnergyKcal(energyKcal);
@@ -86,7 +86,7 @@ export default function FoodProfile() {
         const fat = selectedFood.fat;
         const additionalProps = (selectedFood.additionalProps || []).map((prop) => ({
             ...prop,
-            originalAmount: prop.amount,
+            originalAmount: Math.round(prop.amount),
             amount: Math.round(prop.amount)
         }));
 
@@ -185,7 +185,7 @@ export default function FoodProfile() {
                         await APIService.nutrition.meals.foods.delete({ mealId: selectedMeal.id, foodId: selectedFood.id });
 
                     if (result.success) {
-                        if ((intent === 'meal/add'|| intent === 'mealplan/add') || intent === 'myfoods') {
+                        if ((intent === 'meal/add' || intent === 'mealplan/add') || intent === 'myfoods') {
                             setUser(prev => ({
                                 ...prev,
                                 foods: prev.foods.filter(f => f.id !== selectedFood.id)
@@ -213,7 +213,7 @@ export default function FoodProfile() {
                             });
                         }
 
-                        createToast({ message: ((intent === 'meal/add'|| intent === 'mealplan/add') || intent === 'myfoods') ? 'Food entry discarded' : 'Food removed' });
+                        createToast({ message: ((intent === 'meal/add' || intent === 'mealplan/add') || intent === 'myfoods') ? 'Food entry discarded' : 'Food removed' });
                         router.back();
                     } else {
                         createAlert({ title: 'Failure', text: "Food discard/removal failed!\n" + result.message });
@@ -225,44 +225,6 @@ export default function FoodProfile() {
                 }
             }
         })
-    }
-
-    async function handleMealPlanFoodDeletion() {
-        Keyboard.dismiss();
-
-        try {
-            const result = await APIService.nutrition.mealPlans.meals.foods.delete({ mealId: selectedMeal.id, foodId: selectedFood.id });
-
-            if (result.success) {
-                setUser(prev => ({
-                    ...prev,
-                    plans: prev.plans.map(plan =>
-                        plan.id === additionalContexts.selectedPlan.id
-                            ? {
-                                ...plan,
-                                meals: plan.meals.map(meal =>
-                                    meal.id === selectedMeal.id
-                                        ? {
-                                            ...meal,
-                                            foods: meal.foods.filter(f => f.id !== selectedFood.id)
-                                        }
-                                        : meal
-                                )
-                            }
-                            : plan
-                    )
-                }));
-
-                createToast({ message: 'Food removed' });
-                router.back();
-            } else {
-                createAlert({ title: 'Failure', text: "Food removal failed!\n" + result.message });
-            }
-        } catch (e) {
-            createAlert({ title: 'Failure', text: "Food removal failed!\n" + e.message });
-        } finally {
-            hideSpinner();
-        }
     }
 
     async function handleFoodAddition() {
@@ -306,61 +268,6 @@ export default function FoodProfile() {
                             )
                         }
                     }
-                }));
-
-                createToast({ message: 'Food added' });
-                router.back();
-            } else {
-                createAlert({ title: 'Failure', text: "Food addition failed!\n" + result.message });
-            }
-        } catch (err) {
-            createAlert({ title: 'Failure', text: "Food addition failed!\n" + err });
-        } finally {
-            hideSpinner();
-        }
-    }
-
-    async function handleMealPlanFoodAddition() {
-        showSpinner();
-        const payload = {
-            mealId: selectedMeal.id,
-            originalServingSize: selectedFood.servingSize,
-            originalEnergyKcal: selectedFood.energyKcal,
-            originalCarbs: selectedFood.carbs,
-            originalProtein: selectedFood.protein,
-            originalFat: selectedFood.fat,
-            ...selectedFood,
-            ownerId: user.id,
-            servingSize: Number(servingSize),
-            energyKcal,
-            carbs,
-            protein,
-            fat,
-            additionalProps,
-        };
-
-        try {
-            const result = await APIService.nutrition.mealPlans.meals.foods.add({ food: payload });
-
-            if (result.success) {
-                payload.id = result.data.id;
-                const planId = additionalContexts.selectedPlan.id;
-                const mealId = selectedMeal.id;
-
-                setUser(prev => ({
-                    ...prev,
-                    plans: prev.plans.map(plan =>
-                        plan.id === planId
-                            ? {
-                                ...plan,
-                                meals: plan.meals.map(meal =>
-                                    meal.id === mealId
-                                        ? { ...meal, foods: [...meal.foods, payload] }
-                                        : meal
-                                )
-                            }
-                            : plan
-                    )
                 }));
 
                 createToast({ message: 'Food added' });
@@ -426,6 +333,65 @@ export default function FoodProfile() {
         }
     }
 
+    async function handleMealPlanFoodAddition() {
+        showSpinner();
+
+        const payload = {
+            mealId: selectedMeal.id,
+            originalServingSize: selectedFood.servingSize,
+            originalEnergyKcal: selectedFood.energyKcal,
+            originalCarbs: selectedFood.carbs,
+            originalProtein: selectedFood.protein,
+            originalFat: selectedFood.fat,
+            ...selectedFood,
+            ownerId: user.id,
+            servingSize: Number(servingSize),
+            energyKcal,
+            carbs,
+            protein,
+            fat,
+            additionalProps,
+        };
+
+        console.log('goes through here ')
+        console.log(payload)
+
+       try {
+           const result = await APIService.nutrition.mealPlans.meals.foods.add({ food: payload });
+
+           if (result.success) {
+               payload.id = result.data.id;
+               const planId = additionalContexts.selectedPlan.id;
+               const mealId = selectedMeal.id;
+
+               setUser(prev => ({
+                   ...prev,
+                   plans: prev.plans.map(plan =>
+                       plan.id === planId
+                           ? {
+                               ...plan,
+                               meals: plan.meals.map(meal =>
+                                   meal.id === mealId
+                                       ? { ...meal, foods: [...meal.foods, payload] }
+                                       : meal
+                               )
+                           }
+                           : plan
+                   )
+               }));
+
+               createToast({ message: 'Food added' });
+               router.back();
+           } else {
+               createAlert({ title: 'Failure', text: "Food addition failed!\n" + result.message });
+           }
+       } catch (err) {
+           createAlert({ title: 'Failure', text: "Food addition failed!\n" + err });
+       } finally {
+           hideSpinner();
+       }
+    }
+
     async function handleMealPlanFoodUpdate() {
         showSpinner();
         const payload = {
@@ -473,6 +439,44 @@ export default function FoodProfile() {
             }
         } catch (err) {
             createAlert({ title: 'Failure', text: "Updating serving failed!\n" + err });
+        } finally {
+            hideSpinner();
+        }
+    }
+
+    async function handleMealPlanFoodDeletion() {
+        Keyboard.dismiss();
+
+        try {
+            const result = await APIService.nutrition.mealPlans.meals.foods.delete({ mealId: selectedMeal.id, foodId: selectedFood.id });
+
+            if (result.success) {
+                setUser(prev => ({
+                    ...prev,
+                    plans: prev.plans.map(plan =>
+                        plan.id === additionalContexts.selectedPlan.id
+                            ? {
+                                ...plan,
+                                meals: plan.meals.map(meal =>
+                                    meal.id === selectedMeal.id
+                                        ? {
+                                            ...meal,
+                                            foods: meal.foods.filter(f => f.id !== selectedFood.id)
+                                        }
+                                        : meal
+                                )
+                            }
+                            : plan
+                    )
+                }));
+
+                createToast({ message: 'Food removed' });
+                router.back();
+            } else {
+                createAlert({ title: 'Failure', text: "Food removal failed!\n" + result.message });
+            }
+        } catch (e) {
+            createAlert({ title: 'Failure', text: "Food removal failed!\n" + e.message });
         } finally {
             hideSpinner();
         }

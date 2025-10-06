@@ -167,35 +167,35 @@ export default function MealsPlans() {
 
         const meals = plan.meals;
         const day = additionalContexts.day;
-        console.log(day)
+        console.log(meals[0].foods)
 
-        try {
-            showSpinner();
-            const result = await APIService.nutrition.meals.createMultiple({ nutritionLogId: day.id, meals });
-
-            if (result.success) {
-                setUser(prev => ({
-                    ...prev,
-                    nutritionLogs: {
-                        ...prev.nutritionLogs,
-                        [day]: {
-                            ...prev.nutritionLogs[day],
-                            meals: [
-                                ...prev.nutritionLogs[day].meals,
-                                ...result.data.meals
-                            ]
-                        }
-                    }
-                }))
-            } else {
-                createToast({ message: result.message });
-            }
-        } catch (err) {
-            console.error("Failed to import meal plan:", err);
-            createToast({ message: "Server error " + err });
-        } finally {
-            hideSpinner();
-        }
+        //try {
+        //    showSpinner();
+        //    const result = await APIService.nutrition.meals.bulk({ nutritionLogId: day.id, meals });
+//
+        //    if (result.success) {
+        //        setUser(prev => ({
+        //            ...prev,
+        //            nutritionLogs: {
+        //                ...prev.nutritionLogs,
+        //                [day.date]: {
+        //                    ...prev.nutritionLogs[day.date],
+        //                    meals: [
+        //                        ...(prev.nutritionLogs[day.date]?.meals || []),
+        //                        ...result.data.meals
+        //                    ]
+        //                }
+        //            }
+        //        }))
+        //    } else {
+        //        createToast({ message: result.message });
+        //    }
+        //} catch (err) {
+        //    console.error("Failed to import meal plan:", err);
+        //    createToast({ message: "Server error " + err });
+        //} finally {
+        //    hideSpinner();
+        //}
     }
 
     async function handlePlanPress(plan) {
