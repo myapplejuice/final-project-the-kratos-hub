@@ -85,7 +85,6 @@ export default class NutritionMealPlansMealsDBService {
     }
 
     static async fetchMealsByPlanId(planId) {
-        console.log(planId)
         if (!planId) return [];
 
         try {
@@ -102,9 +101,11 @@ export default class NutritionMealPlansMealsDBService {
                 const obj = {};
                 for (const key in row)
                     obj[ObjectMapper.toCamelCase(key)] = row[key];
+
                 return obj;
             });
 
+            console.log(meals)
             return meals;
         } catch (err) {
             console.error('fetchMealsByPlanId error:', err);

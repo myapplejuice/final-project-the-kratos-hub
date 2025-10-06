@@ -13,7 +13,7 @@ import ProgressBar from "../../../components/screen-comps/progress-bar";
 import { Images } from "../../../common/settings/assets";
 import { UserContext } from '../../../common/contexts/user-context';
 import { convertEnergy, convertFluid } from "../../../common/utils/unit-converter";
-import { formatDate, isValidTime } from '../../../common/utils/date-time';
+import { formatDate, formatTime, isValidTime } from '../../../common/utils/date-time';
 import usePopups from "../../../common/hooks/use-popups";
 import { scaleFont } from "../../../common/utils/scale-fonts";
 import APIService from "../../../common/services/api-service";
@@ -38,7 +38,6 @@ export default function MealPlansEditor() {
 
     useEffect(() => {
         setPlan(prev => user.plans.find(p => p.id === prev.id));
-        console.log(user.plans[0].meals)
     }, [user.plans])
 
     async function handleMealAddition() {
@@ -51,26 +50,32 @@ export default function MealPlansEditor() {
             extraConfigs: [[], [{ keyboardType: "numeric" }, { keyboardType: "numeric" }]],
             onSubmit: async (vals) => {
                 let label = vals[0];
-                let time = vals[1][0] + ':' + vals[1][1];
+                let hour = Number(vals[1][0]);
+                let minute = Number(vals[1][1]);
 
-                if (!label)
-                    label = `Meal ${plan.meals.length + 1}`;
+                if (!label) label = `Meal ${plan.meals.length + 1}`;
 
-                if (!vals[1][0] && !vals[1][1])
-                    time = 'Timing not provided';
-                else if (!vals[1][0])
-                    time = `00:${vals[1][1]}`;
-                else if (!vals[1][1])
-                    time = `${vals[1][0]}:00`;
+                let time = null; 
 
-                if (time !== 'Timing not provided') {
-                    if (!isValidTime(time)) {
-                        return createDialog({
-                            title: 'Invalid Time',
-                            text: `${time} is an invalid time, are you sure you want to continue?`,
-                            onConfirm: async () => await confirmMealAddition(label, time),
-                        });
+                if (vals[1][0] || vals[1][1]) {
+                    if (!vals[1][0]) hour = 0;
+                    if (!vals[1][1]) minute = 0;
+
+                    const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+
+                    if (!isValidTime(timeStr)) {
+                        return createToast({ message: `${timeStr} is an invalid time, please try again` });
                     }
+
+                    time = `${timeStr}:00`;
+                }
+
+                if (!time) {
+                    return createDialog({
+                        title: 'Warning',
+                        text: `Time was not provided, are you sure you want to continue?`,
+                        onConfirm: async () => await confirmMealAddition(label, time),
+                    });
                 }
 
                 await confirmMealAddition(label, time);
@@ -118,12 +123,6 @@ export default function MealPlansEditor() {
     }
 
     async function handleMealUpdate(meal) {
-        let HH, MM;
-        if (meal.time !== 'Timing not provided') {
-            HH = meal.time.split(':')[0];
-            MM = meal.time.split(':')[1];
-        }
-
         createInput({
             title: "Meal Addition",
             confirmText: "Add",
@@ -143,7 +142,7 @@ export default function MealPlansEditor() {
 
                 if (!vals[0][1])
                     time = `00:${vals[1][1]}`;
-                
+
                 if (!vals[1][0])
                     time = `${vals[1][0]}:00`;
 
@@ -174,8 +173,6 @@ export default function MealPlansEditor() {
                 newLabel: label,
                 newTime: time,
             };
-
-            console.log(payload)
 
             const result = await APIService.nutrition.mealPlans.meals.update(payload);
 
@@ -215,7 +212,7 @@ export default function MealPlansEditor() {
         createDialog({
             title: "Discard Meal",
             text: `Are you sure you want to discard "${meal.label}"?`,
-            confirmText: "Discard",  
+            confirmText: "Discard",
             confirmButtonStyle: { backgroundColor: 'rgb(255,59,48)', borderColor: 'rgb(255,59,48)' },
             onConfirm: async () => {
                 try {
@@ -278,6 +275,7 @@ export default function MealPlansEditor() {
                             onRenamePress={() => handleMealUpdate(meal)}
                             onDeletePress={() => handleMealDeletion(meal.id, meal)}
                             expandedOnStart={openMeals.includes(meal.id)}
+                            isTimeByDate={false}
                             key={index}
                         />
                     ))

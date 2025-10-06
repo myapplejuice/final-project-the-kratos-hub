@@ -11,11 +11,11 @@ import { UserContext } from '../../common/contexts/user-context';
 import { convertEnergy } from '../../common/utils/unit-converter';
 import ExpandInOut from '../effects/expand-in-out';
 import Invert from '../effects/invert';
-import { formatTime, fromSqlToLocalTime } from '../../common/utils/date-time';
+import { formatSqlTime, formatTime, fromSqlToLocalTime } from '../../common/utils/date-time';
 import FadeInOut from '../effects/fade-in-out';
 
 export default function Meal({ label, time, foods = [], onDeletePress = () => { }, onRenamePress = () => { }, onAddPress = () => { }, onFoodPress = () => { },
-    onAddPressVisible = true, onRenamePressVisible = true, onFoodPressDisabled = false, onDeletePressVisible = true, expandedOnStart = false, onExpand = () => { } }) {
+    onAddPressVisible = true, onRenamePressVisible = true, onFoodPressDisabled = false, onDeletePressVisible = true, expandedOnStart = false, onExpand = () => { }, isTimeByDate = true }) {
 
     const { user } = useContext(UserContext);
     const [expanded, setExpanded] = useState(expandedOnStart);
@@ -38,8 +38,18 @@ export default function Meal({ label, time, foods = [], onDeletePress = () => { 
         fat: Math.round((totals.fat / totalMacros) * 100),
     };
 
-    const localTime = fromSqlToLocalTime(time)
-    const formattedTime = formatTime(localTime, { format: user.preferences.timeFormat.key }) || time;
+    let formattedTime;
+
+    if (time !== null) {
+        if (isTimeByDate) {
+            const localTime = fromSqlToLocalTime(time);
+            formattedTime = formatTime(localTime, { format: user.preferences.timeFormat.key });
+        }
+        else {
+            const extractedTime = time.split('T')[1].split('.')[0];
+            formattedTime = formatSqlTime(extractedTime, { format: user.preferences.timeFormat.key });
+        }
+    }
 
     return (
         <FadeInOut visible={true}>
@@ -51,7 +61,7 @@ export default function Meal({ label, time, foods = [], onDeletePress = () => { 
                 >
                     <View>
                         <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold' }}>{label}</AppText>
-                        <AppText style={{ fontSize: scaleFont(9), color: colors.mutedText, fontWeight: 'bold' }}>{formattedTime}</AppText>
+                        <AppText style={{ fontSize: scaleFont(9), color: colors.mutedText, fontWeight: 'bold' }}>{time !== null ? formattedTime : 'Timing not provided'}</AppText>
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                         {onRenamePressVisible && onDeletePressVisible && (

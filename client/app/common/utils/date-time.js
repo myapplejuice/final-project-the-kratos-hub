@@ -132,3 +132,26 @@ export function isValidTime(timeStr) {
 
     return true;
 }
+
+export function formatSqlTime(timeStr, options = {}) {
+    if (!timeStr) return '';
+    
+    const [hour, minute, second] = timeStr.split(':');
+    const paddedHours = hour.padStart(2, '0');
+    const paddedMinutes = minute.padStart(2, '0');
+    const paddedSeconds = second.padStart(2, '0');
+
+    const { format = '24h', includeSeconds = false } = options;
+
+    if (format === '12h') {
+        let h = Number(hour) % 12 || 12;
+        const ampm = Number(hour) >= 12 ? 'PM' : 'AM';
+        return includeSeconds
+            ? `${h}:${paddedMinutes}:${paddedSeconds} ${ampm}`
+            : `${h}:${paddedMinutes} ${ampm}`;
+    } else {
+        return includeSeconds
+            ? `${paddedHours}:${paddedMinutes}:${paddedSeconds}`
+            : `${paddedHours}:${paddedMinutes}`;
+    }
+}

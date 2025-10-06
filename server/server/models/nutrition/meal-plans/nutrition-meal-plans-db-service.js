@@ -107,7 +107,7 @@ export default class NutritionMealPlansDBService {
                         obj[ObjectMapper.toCamelCase(key)] = plan[key];
                     }
 
-                    const meals = await NutritionMealPlansMealsDBService.fetchMealsByPlanId(plan.id);
+                    const meals = await NutritionMealPlansMealsDBService.fetchMealsByPlanId(obj.id);
                     obj.meals = meals;
                     return obj;
                 })
