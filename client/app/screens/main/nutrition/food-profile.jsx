@@ -106,7 +106,7 @@ export default function FoodProfile() {
             return;
         }
 
-        if (intent !== 'mealplan/add') {
+        if (intent !== 'mealplan/add' && intent !== 'mealplan/update') {
             const maxKcal = day.targetEnergyKcal || 0;
             const currentKcal = day.meals
                 ?.map(m => m.foods?.reduce((sum, f) => sum + (f.energyKcal || 0), 0) || 0)
@@ -154,7 +154,10 @@ export default function FoodProfile() {
                     handleFoodUpdate();
             }
         } else {
-            handleMealPlanFoodAddition();
+            if (intent === 'mealplan/add')
+                handleMealPlanFoodAddition();
+            else
+                handleMealPlanFoodUpdate();
         }
     }
 
@@ -162,23 +165,23 @@ export default function FoodProfile() {
         Keyboard.dismiss();
 
         createDialog({
-            title: ((intent === 'meal/add' || intent ==='mealplan/add') || intent === 'myfoods') ? 'Discard Food' : 'Remove Food',
-            text: ((intent === 'meal/add' || intent ==='mealplan/add') || intent === 'myfoods') ?
+            title: ((intent === 'meal/add' || intent === 'mealplan/add') || intent === 'myfoods') ? 'Discard Food' : 'Remove Food',
+            text: ((intent === 'meal/add' || intent === 'mealplan/add') || intent === 'myfoods') ?
                 "Are you sure you want to discard this food entry?" :
                 "Are you sure you want to remove this food from the meal?",
-            confirmText: ((intent === 'meal/add' || intent ==='mealplan/add') || intent === 'myfoods') ? "Discard" : "Remove",
+            confirmText: ((intent === 'meal/add' || intent === 'mealplan/add') || intent === 'myfoods') ? "Discard" : "Remove",
             confirmButtonStyle: { backgroundColor: 'rgb(255,59,48)', borderColor: 'rgb(255,59,48)' },
             onConfirm: async () => {
                 showSpinner();
                 try {
                     let result
-                    result = ((intent === 'meal/add' || intent ==='mealplan/add') || intent === 'myfoods') ?
+                    result = ((intent === 'meal/add' || intent === 'mealplan/add') || intent === 'myfoods') ?
                         await APIService.nutrition.foods.delete({ foodId: selectedFood.id })
                         :
                         await APIService.nutrition.meals.foods.delete({ mealId: selectedMeal.id, foodId: selectedFood.id });
 
                     if (result.success) {
-                        if ((intent === 'meal/add' || intent ==='mealplan/add') || intent === 'myfoods') {
+                        if ((intent === 'meal/add' || intent === 'mealplan/add') || intent === 'myfoods') {
                             setUser(prev => ({
                                 ...prev,
                                 foods: prev.foods.filter(f => f.id !== selectedFood.id)
@@ -206,7 +209,7 @@ export default function FoodProfile() {
                             });
                         }
 
-                        createToast({ message: ((intent === 'meal/add' || intent ==='mealplan/add') || intent === 'myfoods') ? 'Food entry discarded' : 'Food removed' });
+                        createToast({ message: ((intent === 'meal/add' || intent === 'mealplan/add') || intent === 'myfoods') ? 'Food entry discarded' : 'Food removed' });
                         router.back();
                     } else {
                         createAlert({ title: 'Failure', text: "Food discard/removal failed!\n" + result.message });
@@ -367,6 +370,58 @@ export default function FoodProfile() {
                             )
                         }
                     }
+                }))
+
+                createToast({ message: 'Serving updated' });
+                router.back();
+            } else {
+                createAlert({ title: 'Failure', text: "Updating serving failed!\n" + result.message });
+            }
+        } catch (err) {
+            createAlert({ title: 'Failure', text: "Updating serving failed!\n" + err });
+        } finally {
+            hideSpinner();
+        }
+    }
+
+    async function handleMealPlanFoodUpdate(){
+        showSpinner();
+        const payload = {
+            mealId: selectedMeal.id,
+            ...selectedFood,
+            servingSize: Number(servingSize),
+            energyKcal,
+            carbs,
+            protein,
+            fat,
+            additionalProps,
+        };
+
+        try {
+            const result = await APIService.nutrition.mealPlans.meals.foods.update({ food: payload });
+
+            if (result.success) {
+                setUser(prev => ({
+                    ...prev,
+                    plans: prev.plans.map(plan =>
+                        plan.id === additionalContexts.selectedPlan.id
+                            ? {
+                                ...plan,
+                                meals: plan.meals.map(meal =>
+                                    meal.id === selectedMeal.id
+                                        ? {
+                                            ...meal,
+                                            foods: meal.foods.map(f =>
+                                                f.id === selectedFood.id
+                                                    ? payload
+                                                    : f
+                                            )
+                                        }
+                                        : meal
+                                )
+                            }
+                            : plan
+                    )
                 }))
 
                 createToast({ message: 'Serving updated' });

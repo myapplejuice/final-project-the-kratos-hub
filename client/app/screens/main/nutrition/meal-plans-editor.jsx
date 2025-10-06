@@ -258,8 +258,8 @@ export default function MealPlansEditor() {
     }
 
     async function handleMealFoodPress(meal, food) {
-        //setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, selectedFood: food, day: currentDayLog, foodProfileIntent: 'meal/update' }));
-        //router.push(routes.FOOD_PROFILE);
+        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, selectedFood: food, foodProfileIntent: 'mealplan/update' }));
+        router.push(routes.FOOD_PROFILE);
     }
 
     return (
@@ -294,6 +294,7 @@ export default function MealPlansEditor() {
                             expandedOnStart={openMeals.includes(meal.id)}
                             isTimeByDate={false}
                             onAddPress={() => handleFoodAddition(meal)}
+                            onFoodPress={(food) => handleMealFoodPress(meal, food)}
                             key={index}
                         />
                     ))
