@@ -186,10 +186,14 @@ export default function MealsLog() {
                 if (!label)
                     label = `Meal ${currentDayLog?.meals?.length + 1}`;
 
-                const time = new Date();
+                let time = new Date();
+                let hour = time.getHours();
+                let minute = time.getMinutes();
+                const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+                time = `${timeStr}:00`;
+
                 showSpinner();
                 try {
-                    // Backend call
                     const result = await APIService.nutrition.meals.create({ nutritionLogId: currentDayLog.id, label, time });
 
                     if (result.success) {

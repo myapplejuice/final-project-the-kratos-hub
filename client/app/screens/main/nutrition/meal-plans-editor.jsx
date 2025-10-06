@@ -13,7 +13,7 @@ import ProgressBar from "../../../components/screen-comps/progress-bar";
 import { Images } from "../../../common/settings/assets";
 import { UserContext } from '../../../common/contexts/user-context';
 import { convertEnergy, convertFluid } from "../../../common/utils/unit-converter";
-import { formatDate, formatTime, isValidTime } from '../../../common/utils/date-time';
+import { formatDate, formatSqlTime, formatTime, isValidTime } from '../../../common/utils/date-time';
 import usePopups from "../../../common/hooks/use-popups";
 import { scaleFont } from "../../../common/utils/scale-fonts";
 import APIService from "../../../common/services/api-service";
@@ -55,7 +55,7 @@ export default function MealPlansEditor() {
 
                 if (!label) label = `Meal ${plan.meals.length + 1}`;
 
-                let time = null; 
+                let time = null;
 
                 if (vals[1][0] || vals[1][1]) {
                     if (!vals[1][0]) hour = 0;
@@ -123,6 +123,10 @@ export default function MealPlansEditor() {
     }
 
     async function handleMealUpdate(meal) {
+        const formatedTime = formatSqlTime(meal.time);
+        const HH = formatedTime.split('T')[1].split(':')[0];
+        const MM = formatedTime.split('T')[1].split(':')[1];
+
         createInput({
             title: "Meal Addition",
             confirmText: "Add",
@@ -132,30 +136,30 @@ export default function MealPlansEditor() {
             extraConfigs: [[], [{ keyboardType: "numeric" }, { keyboardType: "numeric" }]],
             onSubmit: async (vals) => {
                 let label = vals[0];
-                let time = vals[1][0] + ':' + vals[1][1];
+                let hour = Number(vals[1][0]);
+                let minute = Number(vals[1][1]);
+                let time;
 
-                if (!time && !label)
+                if (!hour && !minute && !label)
                     return createToast({ message: "No changes made" });
 
-                if (!vals[1][0] && !vals[1][1])
-                    time = 'Timing not provided';
+                if (!label)
+                    label = meal.label;
 
-                if (!vals[0][1])
-                    time = `00:${vals[1][1]}`;
+                if (!vals[1][0] && !vals[1][1]) {
+                    time = meal.time;
+                } else {
+                    if (vals[1][0] || vals[1][1]) {
+                        if (!vals[1][0]) hour = 0;
+                        if (!vals[1][1]) minute = 0;
 
-                if (!vals[1][0])
-                    time = `${vals[1][0]}:00`;
+                        const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 
-                if (label === meal.label && time === meal.time)
-                    return createToast({ message: "No changes made" });
+                        if (!isValidTime(timeStr)) {
+                            return createToast({ message: `${timeStr} is an invalid time, please try again` });
+                        }
 
-                if (time !== 'Timing not provided') {
-                    if (!isValidTime(time)) {
-                        return createDialog({
-                            title: 'Invalid Time',
-                            text: `${time} is an invalid time, are you sure you want to continue?`,
-                            onConfirm: async () => await confirmMealUpdate(meal.id, label, time),
-                        });
+                        time = `${timeStr}:00`;
                     }
                 }
 
@@ -195,6 +199,7 @@ export default function MealPlansEditor() {
                     )
                 }))
 
+                createToast({ message: "Meal updated" });
             } else {
                 createToast({ message: result.message || "Failed to update meal" });
 

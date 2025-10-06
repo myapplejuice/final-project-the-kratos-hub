@@ -15,7 +15,7 @@ import { formatSqlTime, formatTime, fromSqlToLocalTime } from '../../common/util
 import FadeInOut from '../effects/fade-in-out';
 
 export default function Meal({ label, time, foods = [], onDeletePress = () => { }, onRenamePress = () => { }, onAddPress = () => { }, onFoodPress = () => { },
-    onAddPressVisible = true, onRenamePressVisible = true, onFoodPressDisabled = false, onDeletePressVisible = true, expandedOnStart = false, onExpand = () => { }, isTimeByDate = true }) {
+    onAddPressVisible = true, onRenamePressVisible = true, onFoodPressDisabled = false, onDeletePressVisible = true, expandedOnStart = false, onExpand = () => { } }) {
 
     const { user } = useContext(UserContext);
     const [expanded, setExpanded] = useState(expandedOnStart);
@@ -39,18 +39,11 @@ export default function Meal({ label, time, foods = [], onDeletePress = () => { 
     };
 
     let formattedTime;
-
     if (time !== null) {
-        if (isTimeByDate) {
-            const localTime = fromSqlToLocalTime(time);
-            formattedTime = formatTime(localTime, { format: user.preferences.timeFormat.key });
-        }
-        else {
-            const extractedTime = time.split('T')[1].split('.')[0];
-            formattedTime = formatSqlTime(extractedTime, { format: user.preferences.timeFormat.key });
-        }
+        const extractedTime = time.split('T')[1].split('.')[0];
+        formattedTime = formatSqlTime(extractedTime, { format: user.preferences.timeFormat.key });
     }
-
+    
     return (
         <FadeInOut visible={true}>
             <View style={styles.card}>
