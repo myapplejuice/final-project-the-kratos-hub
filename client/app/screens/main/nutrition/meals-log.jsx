@@ -352,7 +352,7 @@ export default function MealsLog() {
                 size={40}
             />
 
-            <AppScroll extraBottom={150} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
+            <AppScroll extraBottom={250} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
                 {/* Header */}
                 <View style={{ padding: 20, paddingBottom: 30, backgroundColor: colors.cardBackground, borderBottomEndRadius: 30, borderBottomStartRadius: 30, }}>
                     <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>

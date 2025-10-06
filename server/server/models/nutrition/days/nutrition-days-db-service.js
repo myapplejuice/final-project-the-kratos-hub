@@ -141,6 +141,55 @@ export default class NutritionDaysDBService {
         }
     }
 
+     static async updateConsumption(userId, date, payload) {
+        try {
+            if (!payload || Object.keys(payload).length === 0) {
+                return { success: false, message: 'No target fields provided.' };
+            }
+
+            const updateRequest = Database.getRequest();
+            Database.addInput(updateRequest, 'UserId', sql.UniqueIdentifier, userId);
+            Database.addInput(updateRequest, 'Date', sql.DateTime2, new Date(date));
+
+            const setClauses = [];
+            for (const key in payload) {
+                const pascalKey = ObjectMapper.toPascalCase(key);
+                const type = ObjectMapper.getSQLType(pascalKey);
+                const value = payload[key];
+                Database.addInput(updateRequest, pascalKey, type, value);
+                setClauses.push(`${pascalKey} = @${pascalKey}`);
+            }
+
+            const updateQuery = `
+            UPDATE UserNutritionLogs
+            SET ${setClauses.join(', ')}
+            OUTPUT inserted.*
+            WHERE UserId = @UserId AND CAST(Date AS DATE) = CAST(@Date AS DATE)
+        `;
+
+            const result = await updateRequest.query(updateQuery);
+            if (!result.recordset || result.recordset.length === 0) {
+                return { success: false, message: 'No rows updated.' };
+            }
+
+            const updatedDay = {};
+            for (const key in result.recordset[0]) {
+                let value = result.recordset[0][key];
+                if (key.toLowerCase() === 'date') value = this.normalizeDate(value);
+                updatedDay[ObjectMapper.toCamelCase(key)] = value;
+            }
+
+            // Fetch meals
+            const meals = await NutritionMealsDBService.fetchMealsByNutritionLogId(result.recordset[0].Id);
+            updatedDay.meals = meals.map(meal => ({ ...meal, foods: [] }));
+
+            return { success: true, updated: updatedDay };
+        } catch (err) {
+            console.error('updateConsumption error:', err);
+            return { success: false, message: 'Database error while updating day targets' };
+        }
+    }
+
     static async ensureDayAndFutureDays(userId, date) {
         try {
             const normalizedDate = new Date(date);

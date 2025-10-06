@@ -43,6 +43,8 @@ export default function FoodEditor() {
     const [propertyCounter, setPropertyCounter] = useState(additionalContexts.selectedFood.additionalProps.length);
     const [additionalProps, setAdditionalProps] = useState(additionalContexts.selectedFood.additionalProps || []);
 
+    useEffect(() => { hideSpinner(); }, []);
+
     useEffect(() => {
         const original = additionalContexts.selectedFood;
 
@@ -225,8 +227,8 @@ export default function FoodEditor() {
                         style={{ height: 40, backgroundColor: colors.cardBackground, width: 120, borderRadius: 12, flexDirection: 'row', alignItems: 'center' }}
                         onPress={() => {
                             if (additionalContexts.selectedFood.ownerId !== additionalContexts.selectedFood.creatorId)
-                                return createToast({message: 'This food was not created by you and cannot be shared!'});
-                                setIsPublic(!isPublic)
+                                return createToast({ message: 'This food was not created by you and cannot be shared!' });
+                            setIsPublic(!isPublic)
                         }}
                     >
                         <View style={{ height: '100%', justifyContent: 'center', backgroundColor: isPublic ? colors.main : colors.cardBackground, borderTopLeftRadius: 8, borderBottomLeftRadius: 8, flex: 1, }}>

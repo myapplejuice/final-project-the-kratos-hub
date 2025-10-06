@@ -89,7 +89,7 @@ export default function FoodProfile() {
             originalAmount: prop.amount,
             amount: Math.round(prop.amount)
         }));
- 
+
         setServingSize(servingSize);
         setEnergyKcal(energyKcal);
         setCarbs(carbs);
@@ -367,7 +367,7 @@ export default function FoodProfile() {
                     {(() => {
                         const icons = [
                             (intent === 'meal/update' || user.id === selectedFood.ownerId) && { onPress: handleFoodDeletion, source: Images.trash, tint: nutritionColors.carbs1 },
-                            ((intent === 'meal/add' || intent === 'myfoods') && selectedFood.ownerId === user.id) && { onPress: () => router.push(routes.FOOD_EDITOR), source: Images.edit, tint: 'white' },
+                            ((intent === 'meal/add' || intent === 'myfoods') && selectedFood.ownerId === user.id) && { onPress: () => { showSpinner(), setTimeout(() => { router.push(routes.FOOD_EDITOR) }, 1) }, source: Images.edit, tint: 'white' },
                             (user.id !== selectedFood.ownerId) && { onPress: handleFoodAdoption, source: Images.plus, tint: 'white' },
                         ].filter(Boolean);
 
