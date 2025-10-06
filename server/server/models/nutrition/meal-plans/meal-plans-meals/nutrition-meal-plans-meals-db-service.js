@@ -1,13 +1,14 @@
 import sql from 'mssql/msnodesqlv8.js';
 import Database from '../../../database/database.js';
 import ObjectMapper from '../../../../utils/object-mapper.js';
+import NutritionMealPlansMealsFoodsDBService from './meal-plans-meals-foods/nutrition-meal-plans-meals-foods-db-service.js';
 
 export default class NutritionMealPlansMealsDBService {
     static normalizeDate(date) {
         return new Date(date).toISOString().split('T')[0];
     }
 
-       static async createMeal(planId, label, time) {
+    static async createMeal(planId, label, time) {
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'MealPlanId', sql.Int, planId);
@@ -97,16 +98,17 @@ export default class NutritionMealPlansMealsDBService {
             `;
 
             const result = await request.query(query);
-            const meals = result.recordset.map(row => {
+            const meals = await Promise.all(result.recordset.map(async row => {
                 const obj = {};
                 for (const key in row)
                     obj[ObjectMapper.toCamelCase(key)] = row[key];
 
-                return obj;
-            });
+                obj.foods = await NutritionMealPlansMealsFoodsDBService.fetchFoodsByMealId(obj.id);
 
-            console.log(meals)
-            return meals;
+                return obj;
+            }));
+
+            return meals || [];
         } catch (err) {
             console.error('fetchMealsByPlanId error:', err);
             return [];

@@ -111,7 +111,12 @@ export default class APIService {
             meals: {
                 add: (payload) => APIService.request(`/nutrition/meal-plans/meal/${APIService.USER_ID}`, 'POST', payload),
                 update: (payload) => APIService.request(`/nutrition/meal-plans/meal/${APIService.USER_ID}`, 'PUT', payload),
-                delete: (payload) => APIService.request(`/nutrition/meal-plans/meal/${APIService.USER_ID}`, 'DELETE', payload)
+                delete: (payload) => APIService.request(`/nutrition/meal-plans/meal/${APIService.USER_ID}`, 'DELETE', payload),
+                foods: {
+                    add: (payload) => APIService.request(`/nutrition/meal-plans/meal/food/${APIService.USER_ID}`, 'POST', payload),
+                    update: (payload) => APIService.request(`/nutrition/meal-plans/meal/food/${APIService.USER_ID}`, 'PUT', payload),
+                    delete: (payload) => APIService.request(`/nutrition/meal-plans/meal/food/${APIService.USER_ID}`, 'DELETE', payload)
+                }
             }
         },
         foods: {

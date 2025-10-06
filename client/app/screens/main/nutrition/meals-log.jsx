@@ -309,7 +309,7 @@ export default function MealsLog() {
     }
 
     async function handleFoodAddition(meal) {
-        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, day: currentDayLog }));
+        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, foodSelectionIntent: 'meallog', day: currentDayLog, foodProfileIntent: 'meal/add' }));
         router.push(routes.FOOD_SELECTION);
     }
 

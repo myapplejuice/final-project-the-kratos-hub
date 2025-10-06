@@ -53,7 +53,7 @@ export default function MealPlansEditor() {
                 let hour = Number(vals[1][0]);
                 let minute = Number(vals[1][1]);
 
-                if (!label) label = `Meal ${plan.meals.length + 1}`;
+                if (!label) label = `Meal ${plan.meals?.length + 1 || 1}`;
 
                 let time = null;
 
@@ -105,7 +105,7 @@ export default function MealPlansEditor() {
                         p.id === plan.id
                             ? {
                                 ...p,
-                                meals: [...(p.meals || []), { ...meal }]
+                                meals: [...(p.meals || []), { ...meal, foods: [] }]
                             }
                             : p
                     )
@@ -212,7 +212,6 @@ export default function MealPlansEditor() {
         }
     }
 
-
     async function handleMealDeletion(mealId, meal) {
         createDialog({
             title: "Discard Meal",
@@ -250,6 +249,16 @@ export default function MealPlansEditor() {
         })
     }
 
+    async function handleFoodAddition(meal) {
+        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, foodProfileIntent: 'mealplan/add' }));
+        router.push(routes.FOOD_SELECTION);
+    }
+
+    async function handleMealFoodPress(meal, food) {
+        //setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, selectedFood: food, day: currentDayLog, foodProfileIntent: 'meal/update' }));
+        //router.push(routes.FOOD_PROFILE);
+    }
+
     return (
         <>
             <FloatingActionButton
@@ -281,6 +290,7 @@ export default function MealPlansEditor() {
                             onDeletePress={() => handleMealDeletion(meal.id, meal)}
                             expandedOnStart={openMeals.includes(meal.id)}
                             isTimeByDate={false}
+                            onAddPress={() => handleFoodAddition(meal)}
                             key={index}
                         />
                     ))

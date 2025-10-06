@@ -20,7 +20,7 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
 
     const totals = meals.reduce(
         (acc, meal) => {
-            meal.foods.forEach(food => {
+            meal.foods?.forEach(food => {
                 acc.energyKcal += food.energyKcal;
                 acc.carbs += food.carbs;
                 acc.protein += food.protein;
@@ -32,8 +32,8 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
     );
 
     const formattedDate = formatDate(date, { format: user.preferences.dateFormat.key });
-    const mealCount = meals.length;
-    const foodCount = meals.reduce((acc, meal) => acc + meal.foods.length, 0);
+    const mealCount = meals?.length;
+    const foodCount = meals.reduce((acc, meal) => acc + meal.foods?.length, 0 || 0);
     const macroPercentages = {
         carbs: Math.round((totals.carbs / totals.energyKcal) * 100),
         protein: Math.round((totals.protein / totals.energyKcal) * 100),

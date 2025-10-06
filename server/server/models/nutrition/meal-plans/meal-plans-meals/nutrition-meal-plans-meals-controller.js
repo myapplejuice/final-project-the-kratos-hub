@@ -3,7 +3,7 @@ import NutritionMealPlansMealsDBService from "./nutrition-meal-plans-meals-db-se
 export default class NutritionMealPlansMealsController {
     static async createMeal(req, res) {
         const { planId, label, time } = req.body;
-
+        
         const meal = await NutritionMealPlansMealsDBService.createMeal(planId, label, time);
         if (!meal) return res.status(500).json({ success: false, error: 'Failed to create meal' });
 

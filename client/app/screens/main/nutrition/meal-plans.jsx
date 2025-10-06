@@ -47,7 +47,7 @@ export default function MealsPlans() {
                 let label = vals[0];
                 let description = vals[1];
                 if (!label)
-                    label = `Meal Plan ${user.plans?.length + 1}`;
+                    label = `Meal Plan ${user.plans?.length + 1 || 1}`;
 
                 if (!description)
                     description = `No description provided`;
@@ -185,7 +185,7 @@ export default function MealsPlans() {
                 iconStyle={{ transform: [{ rotate: '-90deg' }], marginBottom: 2 }}
             />
 
-            <AppScroll avoidKeyboard={false} extraBottom={150} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
+            <AppScroll avoidKeyboard={false} extraBottom={250} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
                 {user.plans?.length > 0 ?
                     <View>
                         {user.plans.map((plan, i) => (
@@ -195,6 +195,7 @@ export default function MealsPlans() {
                                 label={plan.label}
                                 description={plan.description}
                                 planId={plan.id}
+                                meals={plan.meals}
                                 isCreatedByCoach={plan.isCreatedByCoach}
                                 coachId={plan.coachId}
                                 expandedOnStart={i === 0}

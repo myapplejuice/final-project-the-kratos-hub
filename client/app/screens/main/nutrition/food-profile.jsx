@@ -49,7 +49,7 @@ export default function FoodProfile() {
             return;
         }
 
-        const day = user.nutritionLogs[additionalContexts.day.date];
+        const day = user.nutritionLogs[additionalContexts.day?.date];
         setAdditionalContexts(prev => ({ ...prev, day }));
         setDay(day);
     }, [user.nutritionLogs]);
@@ -106,51 +106,55 @@ export default function FoodProfile() {
             return;
         }
 
-        const maxKcal = day.targetEnergyKcal || 0;
-        const currentKcal = day.meals
-            ?.map(m => m.foods?.reduce((sum, f) => sum + (f.energyKcal || 0), 0) || 0)
-            .reduce((a, b) => a + b, 0) || 0;
+        if (intent !== 'mealplan/add') {
+            const maxKcal = day.targetEnergyKcal || 0;
+            const currentKcal = day.meals
+                ?.map(m => m.foods?.reduce((sum, f) => sum + (f.energyKcal || 0), 0) || 0)
+                .reduce((a, b) => a + b, 0) || 0;
 
-        let projectedKcal;
+            let projectedKcal;
 
-        if (intent === 'meal/add' || !selectedFood) {
-            projectedKcal = currentKcal + energyKcal;
-        } else {
-            projectedKcal = currentKcal - (selectedFood.energyKcal || 0) + energyKcal;
-        }
-
-        if (intent === 'meal/update') {
-            if (servingSize === selectedFood.servingSize) {
-                createToast({ message: 'No changes detected' })
-                return;
-            }
-        }
-
-        if (projectedKcal > maxKcal) {
-            if (intent === 'meal/add') {
-                createDialog({
-                    title: 'Warning',
-                    text: currentKcal > maxKcal
-                        ? 'You have already exceeded your daily energy limit! Adding this food would only make it worse.\n\nAre you sure you want to continue?'
-                        : 'Adding this food would exceed your daily energy limit!\n\nAre you sure you want to continue?',
-                    onConfirm: handleFoodAddition
-                });
-            } else if (servingSize > selectedFood.servingSize) {
-                createDialog({
-                    title: 'Warning',
-                    text: currentKcal > maxKcal
-                        ? 'You have already exceeded your daily energy limit! Increasing serving size of this food would only make it worse.\n\nAre you sure you want to continue?'
-                        : 'Increasing serving size of this food would exceed your daily energy limit!\n\nAre you sure you want to continue?',
-                    onConfirm: () => handleFoodUpdate()
-                });
+            if (intent === 'meal/add' || !selectedFood) {
+                projectedKcal = currentKcal + energyKcal;
             } else {
-                handleFoodUpdate();
+                projectedKcal = currentKcal - (selectedFood.energyKcal || 0) + energyKcal;
+            }
+
+            if (intent === 'meal/update') {
+                if (servingSize === selectedFood.servingSize) {
+                    createToast({ message: 'No changes detected' })
+                    return;
+                }
+            }
+
+            if (projectedKcal > maxKcal) {
+                if (intent === 'meal/add') {
+                    createDialog({
+                        title: 'Warning',
+                        text: currentKcal > maxKcal
+                            ? 'You have already exceeded your daily energy limit! Adding this food would only make it worse.\n\nAre you sure you want to continue?'
+                            : 'Adding this food would exceed your daily energy limit!\n\nAre you sure you want to continue?',
+                        onConfirm: handleFoodAddition
+                    });
+                } else if (servingSize > selectedFood.servingSize) {
+                    createDialog({
+                        title: 'Warning',
+                        text: currentKcal > maxKcal
+                            ? 'You have already exceeded your daily energy limit! Increasing serving size of this food would only make it worse.\n\nAre you sure you want to continue?'
+                            : 'Increasing serving size of this food would exceed your daily energy limit!\n\nAre you sure you want to continue?',
+                        onConfirm: () => handleFoodUpdate()
+                    });
+                } else {
+                    handleFoodUpdate();
+                }
+            } else {
+                if (intent === 'meal/add')
+                    handleFoodAddition();
+                else
+                    handleFoodUpdate();
             }
         } else {
-            if (intent === 'meal/add')
-                handleFoodAddition();
-            else
-                handleFoodUpdate();
+            handleMealPlanFoodAddition();
         }
     }
 
@@ -271,6 +275,61 @@ export default function FoodProfile() {
         }
     }
 
+    async function handleMealPlanFoodAddition() {
+        showSpinner();
+        const payload = {
+            mealId: selectedMeal.id,
+            originalServingSize: selectedFood.servingSize,
+            originalEnergyKcal: selectedFood.energyKcal,
+            originalCarbs: selectedFood.carbs,
+            originalProtein: selectedFood.protein,
+            originalFat: selectedFood.fat,
+            ...selectedFood,
+            ownerId: user.id,
+            servingSize: Number(servingSize),
+            energyKcal,
+            carbs,
+            protein,
+            fat,
+            additionalProps,
+        };
+
+        try {
+            const result = await APIService.nutrition.mealPlans.meals.foods.add({ food: payload });
+
+            if (result.success) {
+                payload.id = result.data.id;
+                const planId = additionalContexts.selectedPlan.id;
+                const mealId = selectedMeal.id;
+
+                setUser(prev => ({
+                    ...prev,
+                    plans: prev.plans.map(plan =>
+                        plan.id === planId
+                            ? {
+                                ...plan,
+                                meals: plan.meals.map(meal =>
+                                    meal.id === mealId
+                                        ? { ...meal, foods: [...meal.foods, payload] }
+                                        : meal
+                                )
+                            }
+                            : plan
+                    )
+                }));
+
+                createToast({ message: 'Food added' });
+                router.back();
+            } else {
+                createAlert({ title: 'Failure', text: "Food addition failed!\n" + result.message });
+            }
+        } catch (err) {
+            createAlert({ title: 'Failure', text: "Food addition failed!\n" + err });
+        } finally {
+            hideSpinner();
+        }
+    }
+
     async function handleFoodUpdate() {
         showSpinner();
         const payload = {
@@ -366,8 +425,8 @@ export default function FoodProfile() {
                 <View style={{ flexDirection: 'row' }}>
                     {(() => {
                         const icons = [
-                            (intent === 'meal/update' || user.id === selectedFood.ownerId) && { onPress: handleFoodDeletion, source: Images.trash, tint: nutritionColors.carbs1 },
-                            ((intent === 'meal/add' || intent === 'myfoods') && selectedFood.ownerId === user.id) && { onPress: () => { showSpinner(), setTimeout(() => { router.push(routes.FOOD_EDITOR) }, 1) }, source: Images.edit, tint: 'white' },
+                            ((intent === 'meal/add' || intent ==='mealplan/add') && user.id === selectedFood.ownerId) && { onPress: handleFoodDeletion, source: Images.trash, tint: nutritionColors.carbs1 },
+                            (((intent === 'meal/add' || intent ==='mealplan/add') || intent === 'myfoods') && selectedFood.ownerId === user.id) && { onPress: () => { showSpinner(), setTimeout(() => { router.push(routes.FOOD_EDITOR) }, 1) }, source: Images.edit, tint: 'white' },
                             (user.id !== selectedFood.ownerId) && { onPress: handleFoodAdoption, source: Images.plus, tint: 'white' },
                         ].filter(Boolean);
 
@@ -445,7 +504,7 @@ export default function FoodProfile() {
                 {intent !== 'myfoods' &&
                     <TouchableOpacity style={styles.addBtn} onPress={handleFood}>
                         <Image source={Images.plus} style={{ width: 18, height: 18, tintColor: 'white', marginRight: 8 }} />
-                        <AppText style={{ color: 'white', fontSize: scaleFont(14) }}>{intent === 'meal/add' ? `Add` : `Update Serving`}</AppText>
+                        <AppText style={{ color: 'white', fontSize: scaleFont(14) }}>{intent === 'meal/add' || intent === 'mealplan/add' ? `Add` : `Update Serving`}</AppText>
                     </TouchableOpacity>
                 }
             </View>

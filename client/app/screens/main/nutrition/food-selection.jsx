@@ -109,7 +109,7 @@ export default function FoodSelection() {
     }, [communityFoods]);
 
     function handleFoodSelection(food) {
-        setAdditionalContexts(prev => ({ ...prev, selectedFood: food, foodProfileIntent: 'meal/add' }));
+        setAdditionalContexts(prev => ({ ...prev, selectedFood: food }));
         router.push(routes.FOOD_PROFILE)
     }
 

@@ -6,6 +6,7 @@ import NutritionFoodsController from '../models/nutrition/foods/nutrition-foods-
 import NutritionMealPlansController from '../models/nutrition/meal-plans/nutrition-meal-plans-controller.js';
 import NutritionMealsFoodsController from '../models/nutrition/meals/meal-foods/nutrition-meals-foods-controller.js';
 import NutritionMealPlansMealsController from '../models/nutrition/meal-plans/meal-plans-meals/nutrition-meal-plans-meals-controller.js';
+import NutritionMealPlansMealsFoodsController from '../models/nutrition/meal-plans/meal-plans-meals/meal-plans-meals-foods/nutrition-meal-plans-meals-foods-controller.js';
 
 export default class NutritionRouter {
     static nutritionRouter;
@@ -43,6 +44,10 @@ export default class NutritionRouter {
         this.nutritionRouter.post("/meal-plans/meal/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansMealsController.createMeal));
         this.nutritionRouter.delete("/meal-plans/meal/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansMealsController.deleteMeal));
         this.nutritionRouter.put("/meal-plans/meal/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansMealsController.updateMeal));
+
+        this.nutritionRouter.post("/meal-plans/meal/food/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansMealsFoodsController.addFood));
+        this.nutritionRouter.delete("/meal-plans/meal/food/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansMealsFoodsController.deleteFood));
+        this.nutritionRouter.put("/meal-plans/meal/food/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansMealsFoodsController.updateFood));
 
 
         return this.nutritionRouter;
