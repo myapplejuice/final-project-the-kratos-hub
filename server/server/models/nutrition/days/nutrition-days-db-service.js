@@ -161,7 +161,7 @@ export default class NutritionDaysDBService {
             }
 
             const updateQuery = `
-            UPDATE UserNutritionLogs
+            UPDATE NutritionLogs
             SET ${setClauses.join(', ')}
             OUTPUT inserted.*
             WHERE UserId = @UserId AND CAST(Date AS DATE) = CAST(@Date AS DATE)

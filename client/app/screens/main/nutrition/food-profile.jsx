@@ -162,23 +162,23 @@ export default function FoodProfile() {
         Keyboard.dismiss();
 
         createDialog({
-            title: (intent === 'meal/add' || intent === 'myfoods') ? 'Discard Food' : 'Remove Food',
-            text: (intent === 'meal/add' || intent === 'myfoods') ?
+            title: ((intent === 'meal/add' || intent ==='mealplan/add') || intent === 'myfoods') ? 'Discard Food' : 'Remove Food',
+            text: ((intent === 'meal/add' || intent ==='mealplan/add') || intent === 'myfoods') ?
                 "Are you sure you want to discard this food entry?" :
                 "Are you sure you want to remove this food from the meal?",
-            confirmText: (intent === 'meal/add' || intent === 'myfoods') ? "Discard" : "Remove",
+            confirmText: ((intent === 'meal/add' || intent ==='mealplan/add') || intent === 'myfoods') ? "Discard" : "Remove",
             confirmButtonStyle: { backgroundColor: 'rgb(255,59,48)', borderColor: 'rgb(255,59,48)' },
             onConfirm: async () => {
                 showSpinner();
                 try {
                     let result
-                    result = (intent === 'meal/add' || intent === 'myfoods') ?
+                    result = ((intent === 'meal/add' || intent ==='mealplan/add') || intent === 'myfoods') ?
                         await APIService.nutrition.foods.delete({ foodId: selectedFood.id })
                         :
                         await APIService.nutrition.meals.foods.delete({ mealId: selectedMeal.id, foodId: selectedFood.id });
 
                     if (result.success) {
-                        if (intent === 'meal/add' || intent === 'myfoods') {
+                        if ((intent === 'meal/add' || intent ==='mealplan/add') || intent === 'myfoods') {
                             setUser(prev => ({
                                 ...prev,
                                 foods: prev.foods.filter(f => f.id !== selectedFood.id)
@@ -206,7 +206,7 @@ export default function FoodProfile() {
                             });
                         }
 
-                        createToast({ message: (intent === 'meal/add' || intent === 'myfoods') ? 'Food entry discarded' : 'Food removed' });
+                        createToast({ message: ((intent === 'meal/add' || intent ==='mealplan/add') || intent === 'myfoods') ? 'Food entry discarded' : 'Food removed' });
                         router.back();
                     } else {
                         createAlert({ title: 'Failure', text: "Food discard/removal failed!\n" + result.message });
@@ -425,8 +425,11 @@ export default function FoodProfile() {
                 <View style={{ flexDirection: 'row' }}>
                     {(() => {
                         const icons = [
-                            ((intent === 'meal/add' || intent ==='mealplan/add') && user.id === selectedFood.ownerId) && { onPress: handleFoodDeletion, source: Images.trash, tint: nutritionColors.carbs1 },
-                            (((intent === 'meal/add' || intent ==='mealplan/add') || intent === 'myfoods') && selectedFood.ownerId === user.id) && { onPress: () => { showSpinner(), setTimeout(() => { router.push(routes.FOOD_EDITOR) }, 1) }, source: Images.edit, tint: 'white' },
+                            (((intent === 'meal/add' || intent === 'mealplan/add') && user.id === selectedFood.ownerId) ||
+                                (intent === 'meal/update' || intent === 'mealplan/update') ||
+                                intent === 'myfoods') &&
+                            { onPress: handleFoodDeletion, source: Images.trash, tint: nutritionColors.carbs1 },
+                            (((intent === 'meal/add' || intent === 'mealplan/add') || intent === 'myfoods') && selectedFood.ownerId === user.id) && { onPress: () => { showSpinner(), setTimeout(() => { router.push(routes.FOOD_EDITOR) }, 1) }, source: Images.edit, tint: 'white' },
                             (user.id !== selectedFood.ownerId) && { onPress: handleFoodAdoption, source: Images.plus, tint: 'white' },
                         ].filter(Boolean);
 
