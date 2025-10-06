@@ -123,9 +123,12 @@ export default function MealPlansEditor() {
     }
 
     async function handleMealUpdate(meal) {
-        const formatedTime = formatSqlTime(meal.time);
-        const HH = formatedTime.split('T')[1].split(':')[0];
-        const MM = formatedTime.split('T')[1].split(':')[1];
+        let HH, MM;
+        if (meal.time !== null) {
+            const formatedTime = formatSqlTime(meal.time);
+            HH = formatedTime.split('T')[1].split(':')[0];
+            MM = formatedTime.split('T')[1].split(':')[1];
+        }
 
         createInput({
             title: "Meal Addition",
