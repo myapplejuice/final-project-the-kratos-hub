@@ -21,7 +21,7 @@ import Divider from "../../components/screen-comps/divider";
 
 export default function NutritionHub() {
      const { showSpinner, hideSpinner, createToast } = usePopups();
-     const { user, setUser, setAdditionalContexts } = useContext(UserContext);
+     const { user, setUser} = useContext(UserContext);
      const [log, setLog] = useState({})
 
      useEffect(() => {
@@ -64,6 +64,13 @@ export default function NutritionHub() {
           prepareDayLog();
      }, [user.nutritionLogs]);
 
+     function handleMealPlansPress() {
+          router.push({
+               pathname: routes.MEAL_PLANS,
+               params: { mealPlansIntent: 'normal' }
+          });
+     }
+
      return (
           <>
                <AppScroll extraBottom={150} extraTop={0} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>
@@ -86,6 +93,8 @@ export default function NutritionHub() {
                                    color={nutritionColors.energy1}
                                    styleType="header"
                                    height={10}
+                                   warningText="(Excess Energy Consumed)"
+                                   showWarningText={true}
                                    borderRadius={5}
                               />
                          </View>
@@ -154,7 +163,7 @@ export default function NutritionHub() {
                          </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => { setAdditionalContexts(prev => ({ ...prev, mealPlansIntent: 'normal' })), router.push(routes.MEAL_PLANS) }} style={[styles.card, { padding: 15 }]}>
+                    <TouchableOpacity onPress={handleMealPlansPress} style={[styles.card, { padding: 15 }]}>
                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                               <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 1 }}>
                                    <View style={{ borderRadius: 15, padding: 12, backgroundColor: colors.lightMutedText, overflow: 'hidden' }}>

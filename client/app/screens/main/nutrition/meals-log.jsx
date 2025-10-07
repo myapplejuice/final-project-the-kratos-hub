@@ -29,7 +29,7 @@ import SlideInOut from '../../../components/effects/slide-in-out';
 
 export default function MealsLog() {
     const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
-    const { user, setUser, setAdditionalContexts } = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const [scrollToTop, setScrollToTop] = useState(false);
 
@@ -309,18 +309,39 @@ export default function MealsLog() {
     }
 
     async function handleFoodAddition(meal) {
-        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, foodSelectionIntent: 'meallog', day: currentDayLog, foodProfileIntent: 'meal/add' }));
-        router.push(routes.FOOD_SELECTION);
+        const selectedMeal = JSON.stringify(meal);
+        const day = JSON.stringify(currentDayLog);
+
+        router.push({
+            pathname: routes.FOOD_SELECTION,
+            params: {
+                selectedMeal,
+                day,
+                foodProfileIntent: 'meal/add'
+            }
+        });
     }
 
     async function handleMealFoodPress(meal, food) {
-        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, selectedFood: food, day: currentDayLog, foodProfileIntent: 'meal/update' }));
-        router.push(routes.FOOD_PROFILE);
+        router.push({
+            pathname: routes.FOOD_PROFILE,
+            params: {
+                selectedMeal: JSON.stringify(meal),
+                selectedFood: JSON.stringify(food),
+                day: JSON.stringify(currentDayLog),
+                foodProfileIntent: 'meal/update'
+            }
+        });
     }
 
     async function handleMealsImport() {
-         setAdditionalContexts(prev => ({ ...prev, day: currentDayLog, mealPlansIntent: 'import' }));
-        router.push(routes.MEAL_PLANS);
+        router.push({
+            pathname: routes.MEAL_PLANS,
+            params: {
+                day: JSON.stringify(currentDayLog),
+                mealPlansIntent: 'import'
+            }
+        });
     }
 
     return (
@@ -497,7 +518,7 @@ export default function MealsLog() {
                         : (
                             <View style={{ justifyContent: 'center', alignItems: 'center', padding: 30, marginTop: 25 }}>
                                 <Image
-                                    source={Images.mealTwoOutline} // replace with your image
+                                    source={Images.mealTwoOutline}
                                     style={{ width: 120, height: 120, marginBottom: 15, tintColor: colors.mutedText + '60' }}
                                 />
                                 <AppText style={{ fontSize: scaleFont(16), color: colors.mutedText + '80', textAlign: 'center', fontWeight: 'bold' }}>

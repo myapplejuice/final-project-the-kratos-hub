@@ -20,10 +20,14 @@ import usePopups from "../../../common/hooks/use-popups";
 import AnimatedButton from "../../../components/screen-comps/animated-button";
 import BarcodeScanner from '../../../components/screen-comps/barcode-scanner';
 import { CameraContext } from '../../../common/contexts/camera-context';
+import { useBackHandlerContext } from '../../../common/contexts/back-handler-context';
 
 export default function FoodSelection() {
-    const { user, setAdditionalContexts } = useContext(UserContext);
+    const context = useLocalSearchParams();
+
+    const { user } = useContext(UserContext);
     const { setCameraActive } = useContext(CameraContext);
+    const { setBackHandler } = useBackHandlerContext();
     const { createAlert, showSpinner, hideSpinner, createToast } = usePopups();
     const insets = useSafeAreaInsets();
     const [fabVisible, setFabVisible] = useState(true);
@@ -46,8 +50,17 @@ export default function FoodSelection() {
 
     const pageSize = 10;
 
-
     useEffect(() => {
+        function adjustBackHandler() {
+            setBackHandler(() => {
+                if (selectedList !== 'My Foods')
+                    setSelectedList('My Foods');
+                else
+                    router.back();
+                return true;
+            })
+        }
+
         async function fetchCommunityFoods() {
             const result = await APIService.nutrition.foods.foods('community');
             const foods = result.data.foods || [];
@@ -56,7 +69,9 @@ export default function FoodSelection() {
         }
 
         fetchCommunityFoods();
-    }, []);
+        adjustBackHandler();
+        return () => { setBackHandler(null); };
+    }, [selectedList]);
 
     useEffect(() => {
         const userFoods = user.foods || [];
@@ -109,8 +124,22 @@ export default function FoodSelection() {
     }, [communityFoods]);
 
     function handleFoodSelection(food) {
-        setAdditionalContexts(prev => ({ ...prev, selectedFood: food }));
-        router.push(routes.FOOD_PROFILE)
+        showSpinner();
+        setTimeout(() => {
+            const day = context.day;
+            const selectedMeal = context.selectedMeal;
+            const selectedFood = JSON.stringify(food);
+
+            router.push({
+                pathname: routes.FOOD_PROFILE,
+                params: {
+                    day,
+                    selectedMeal,
+                    selectedFood,
+                    foodProfileIntent: 'meal/add'
+                }
+            });
+        }, 1);
     }
 
     async function handleUSDASearch(searchQuery, source) {
@@ -174,7 +203,8 @@ export default function FoodSelection() {
                 const excludedNutrients = ['Energy', 'Protein', 'Total lipid (fat)', 'Carbohydrate, by difference'];
 
                 const additionalProps = nutrients
-                    .filter(n => !excludedNutrients.includes(n.nutrientName))
+                    .filter(n => !excludedNutrients.includes(n.nutrientName) && Math.round(n.value) >= 1)
+                    .sort((a, b) => b.value - a.value)
                     .map((n, i) => ({
                         id: i,
                         label: n.nutrientName,

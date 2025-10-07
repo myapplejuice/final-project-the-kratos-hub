@@ -12,48 +12,55 @@ import { scaleFont } from "../../../common/utils/scale-fonts";
 import { colors, nutritionColors } from "../../../common/settings/styling";
 import usePopups from "../../../common/hooks/use-popups";
 import APIService from "../../../common/services/api-service";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { routes } from "../../../common/settings/constants";
 import { Keyboard } from "react-native";
 
 export default function FoodProfile() {
-    const { setUser, user, setAdditionalContexts, additionalContexts } = useContext(UserContext);
     const { createDialog, createAlert, showSpinner, hideSpinner, createToast } = usePopups();
-    const [servingSize, setServingSize] = useState(additionalContexts.selectedFood.servingSize);
-    const [energyKcal, setEnergyKcal] = useState(0);
-    const [carbs, setCarbs] = useState(0);
-    const [protein, setProtein] = useState(0);
-    const [fat, setFat] = useState(0);
-    const [additionalProps, setAdditionalProps] = useState([]);
-    const [intent, setIntent] = useState('');
-    const [day, setDay] = useState({});
-    const [selectedFood, setSelectedFood] = useState({});
-    const [selectedMeal, setSelectedMeal] = useState({});
-    const didMountRef = useRef(false);
+    const context = useLocalSearchParams();
+    const intent = context.foodProfileIntent;
+    const day = context.day ? JSON.parse(context.day) : {};
+    const selectedMeal = context.selectedMeal ? JSON.parse(context.selectedMeal) : {};
+    const selectedPlan = context.selectedPlan ? JSON.parse(context.selectedPlan) : {};
 
+    const { setUser, user } = useContext(UserContext);
+    const [selectedFood, setSelectedFood] = useState(context.selectedFood ? JSON.parse(context.selectedFood) : {});
+    const [servingSize, setServingSize] = useState(selectedFood.servingSize);
+    const [energyKcal, setEnergyKcal] = useState(selectedFood.energyKcal);
+    const [carbs, setCarbs] = useState(selectedFood.carbs);
+    const [protein, setProtein] = useState(selectedFood.protein);
+    const [fat, setFat] = useState(selectedFood.fat);
+    const [additionalProps, setAdditionalProps] = useState((selectedFood.additionalProps || []).map((prop) => ({
+        ...prop,
+        originalAmount: Math.round(prop.amount),
+        amount: Math.round(prop.amount)
+    })));
+    const screenMountedRef = useRef(false);
+
+    // Update food on edit unless its in update intent
     useEffect(() => {
-        const intent = additionalContexts.foodProfileIntent;
-        const day = additionalContexts.day;
-        const food = additionalContexts.selectedFood;
-        const meal = additionalContexts.selectedMeal;
-
-        setIntent(intent);
-        setDay(day);
-        setSelectedFood(food);
-        setSelectedMeal(meal);
-    }, [additionalContexts.day, additionalContexts.foodProfileIntent, additionalContexts.selectedFood, additionalContexts.selectedMeal]);
-
-    useEffect(() => {
-        if (!didMountRef.current) {
-            didMountRef.current = true;
+        hideSpinner();
+        if (screenMountedRef.current === false) {
+            screenMountedRef.current = true;
             return;
         }
 
-        const day = user.nutritionLogs[additionalContexts.day?.date];
-        setAdditionalContexts(prev => ({ ...prev, day }));
-        setDay(day);
-    }, [user.nutritionLogs]);
+        const editedFood = user.foods.find((food) => food.id === selectedFood.id);
+        setSelectedFood(editedFood || {});
+        setServingSize(editedFood?.servingSize || '');
+        setEnergyKcal(editedFood?.energyKcal || 0);
+        setCarbs(editedFood?.carbs || 0);
+        setProtein(editedFood?.protein || 0);
+        setFat(editedFood?.fat || 0);
+        setAdditionalProps((editedFood?.additionalProps || []).map((prop) => ({
+            ...prop,
+            originalAmount: Math.round(prop.amount),
+            amount: Math.round(prop.amount)
+        })));
+    }, [user.foods])
 
+    // Update details on serving change
     useEffect(() => {
         let factor;
         if (!servingSize)
@@ -77,26 +84,6 @@ export default function FoodProfile() {
         setFat(fat);
         setAdditionalProps(additionalProps);
     }, [servingSize, intent]);
-
-    useEffect(() => {
-        const servingSize = selectedFood.servingSize;
-        const energyKcal = selectedFood.energyKcal;
-        const carbs = selectedFood.carbs;
-        const protein = selectedFood.protein;
-        const fat = selectedFood.fat;
-        const additionalProps = (selectedFood.additionalProps || []).map((prop) => ({
-            ...prop,
-            originalAmount: Math.round(prop.amount),
-            amount: Math.round(prop.amount)
-        }));
-
-        setServingSize(servingSize);
-        setEnergyKcal(energyKcal);
-        setCarbs(carbs);
-        setProtein(protein);
-        setFat(fat);
-        setAdditionalProps(additionalProps);
-    }, [selectedFood]);
 
     function handleFood() {
         Keyboard.dismiss();
@@ -356,40 +343,40 @@ export default function FoodProfile() {
         console.log('goes through here ')
         console.log(payload)
 
-       try {
-           const result = await APIService.nutrition.mealPlans.meals.foods.add({ food: payload });
+        try {
+            const result = await APIService.nutrition.mealPlans.meals.foods.add({ food: payload });
 
-           if (result.success) {
-               payload.id = result.data.id;
-               const planId = additionalContexts.selectedPlan.id;
-               const mealId = selectedMeal.id;
+            if (result.success) {
+                payload.id = result.data.id;
+                const planId = selectedPlan.id;
+                const mealId = selectedMeal.id;
 
-               setUser(prev => ({
-                   ...prev,
-                   plans: prev.plans.map(plan =>
-                       plan.id === planId
-                           ? {
-                               ...plan,
-                               meals: plan.meals.map(meal =>
-                                   meal.id === mealId
-                                       ? { ...meal, foods: [...meal.foods, payload] }
-                                       : meal
-                               )
-                           }
-                           : plan
-                   )
-               }));
+                setUser(prev => ({
+                    ...prev,
+                    plans: prev.plans.map(plan =>
+                        plan.id === planId
+                            ? {
+                                ...plan,
+                                meals: plan.meals.map(meal =>
+                                    meal.id === mealId
+                                        ? { ...meal, foods: [...meal.foods, payload] }
+                                        : meal
+                                )
+                            }
+                            : plan
+                    )
+                }));
 
-               createToast({ message: 'Food added' });
-               router.back();
-           } else {
-               createAlert({ title: 'Failure', text: "Food addition failed!\n" + result.message });
-           }
-       } catch (err) {
-           createAlert({ title: 'Failure', text: "Food addition failed!\n" + err });
-       } finally {
-           hideSpinner();
-       }
+                createToast({ message: 'Food added' });
+                router.back();
+            } else {
+                createAlert({ title: 'Failure', text: "Food addition failed!\n" + result.message });
+            }
+        } catch (err) {
+            createAlert({ title: 'Failure', text: "Food addition failed!\n" + err });
+        } finally {
+            hideSpinner();
+        }
     }
 
     async function handleMealPlanFoodUpdate() {
@@ -412,7 +399,7 @@ export default function FoodProfile() {
                 setUser(prev => ({
                     ...prev,
                     plans: prev.plans.map(plan =>
-                        plan.id === additionalContexts.selectedPlan.id
+                        plan.id === selectedPlan.id
                             ? {
                                 ...plan,
                                 meals: plan.meals.map(meal =>
@@ -454,7 +441,7 @@ export default function FoodProfile() {
                 setUser(prev => ({
                     ...prev,
                     plans: prev.plans.map(plan =>
-                        plan.id === additionalContexts.selectedPlan.id
+                        plan.id === selectedPlan.id
                             ? {
                                 ...plan,
                                 meals: plan.meals.map(meal =>
@@ -512,9 +499,20 @@ export default function FoodProfile() {
         });
     }
 
+    function handleOnEditPress() {
+        showSpinner();
+        setTimeout(() => {
+            router.push({
+                pathname: routes.FOOD_EDITOR,
+                params: {
+                    selectedFood: JSON.stringify(selectedFood)
+                }
+            });
+        }, 1);
+    }
+
     return (
         <AppScroll contentStyle={{ padding: 15 }} extraTop={60} extraBottom={200}>
-            {/* Header */}
             <View style={styles.header}>
                 <View style={{ flexShrink: 1 }}>
                     <AppText style={styles.foodLabel}>{selectedFood.label}</AppText>
@@ -525,13 +523,34 @@ export default function FoodProfile() {
                 </View>
                 <View style={{ flexDirection: 'row' }}>
                     {(() => {
+                        const isMealAdd = intent === "meal/add";
+                        const isMealUpdate = intent === "meal/update";
+                        const isMealPlanAdd = intent === "mealplan/add";
+                        const isMealPlanUpdate = intent === "mealplan/update";
+                        const isMyFoods = intent === "myfoods";
+                        const isOwner = user.id === selectedFood.ownerId;
+
                         const icons = [
-                            (((intent === 'meal/add' || intent === 'mealplan/add') && user.id === selectedFood.ownerId) ||
-                                (intent === 'meal/update' || intent === 'mealplan/update') ||
-                                intent === 'myfoods') &&
-                            { onPress: handleFoodDeletion, source: Images.trash, tint: nutritionColors.carbs1 },
-                            (((intent === 'meal/add' || intent === 'mealplan/add') || intent === 'myfoods') && selectedFood.ownerId === user.id) && { onPress: () => { showSpinner(), setTimeout(() => { router.push(routes.FOOD_EDITOR) }, 1) }, source: Images.edit, tint: 'white' },
-                            (user.id !== selectedFood.ownerId) && { onPress: handleFoodAdoption, source: Images.plus, tint: 'white' },
+                            ((isMealAdd && isOwner) || (isMealPlanAdd && isOwner) ||
+                                isMealUpdate ||
+                                isMealPlanUpdate ||
+                                isMyFoods) && {
+                                onPress: handleFoodDeletion,
+                                source: Images.trash,
+                                tint: nutritionColors.carbs1,
+                            },
+
+                            ((isMealAdd || isMealPlanAdd || isMyFoods) && isOwner) && {
+                                onPress: handleOnEditPress,
+                                source: Images.edit,
+                                tint: "white",
+                            },
+
+                            (!isOwner) && {
+                                onPress: handleFoodAdoption,
+                                source: Images.plus,
+                                tint: "white",
+                            },
                         ].filter(Boolean);
 
                         return (

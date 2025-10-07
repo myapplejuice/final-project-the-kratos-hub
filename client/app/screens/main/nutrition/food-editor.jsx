@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { use, useContext, useEffect, useState } from "react";
 import { View, StyleSheet, TouchableOpacity, Image, Platform, Keyboard } from "react-native";
 import AppScroll from "../../../components/screen-comps/app-scroll";
 import { colors, nutritionColors } from "../../../common/settings/styling";
@@ -12,27 +12,29 @@ import usePopups from "../../../common/hooks/use-popups";
 import PercentageBar from "../../../components/screen-comps/percentage-bar";
 import { UserContext } from "../../../common/contexts/user-context";
 import { convertEnergy } from "../../../common/utils/unit-converter";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Images } from "../../../common/settings/assets";
 import APIService from "../../../common/services/api-service";
 
 export default function FoodEditor() {
-    const { user, setUser, setAdditionalContexts, additionalContexts } = useContext(UserContext);
+    const [context, setContext] = useState(useLocalSearchParams());
+    const selectedFood = JSON.parse(context.selectedFood);
+    const { user, setUser } = useContext(UserContext);
     const { createOptions, createToast, createDialog, createAlert, showSpinner, hideSpinner } = usePopups();
     const insets = useSafeAreaInsets();
 
     const [fabVisible, setFabVisible] = useState(true);
 
     const [isChange, setIsChange] = useState(false);
-    const [isPublic, setIsPublic] = useState(additionalContexts.selectedFood.isPublic);
-    const [label, setLabel] = useState(additionalContexts.selectedFood.label);
-    const [category, setCategory] = useState(additionalContexts.selectedFood.category);
-    const [servingUnit, setServingUnit] = useState(additionalContexts.selectedFood.servingUnit);
-    const [servingSize, setServingSize] = useState(additionalContexts.selectedFood.servingSize);
-    const [energyKcal, setEnergyKcal] = useState(additionalContexts.selectedFood.energyKcal);
-    const [carbs, setCarbs] = useState(additionalContexts.selectedFood.carbs);
-    const [protein, setProtein] = useState(additionalContexts.selectedFood.protein);
-    const [fat, setFat] = useState(additionalContexts.selectedFood.fat);
+    const [isPublic, setIsPublic] = useState(selectedFood.isPublic);
+    const [label, setLabel] = useState(selectedFood.label);
+    const [category, setCategory] = useState(selectedFood.category);
+    const [servingUnit, setServingUnit] = useState(selectedFood.servingUnit);
+    const [servingSize, setServingSize] = useState(selectedFood.servingSize);
+    const [energyKcal, setEnergyKcal] = useState(selectedFood.energyKcal);
+    const [carbs, setCarbs] = useState(selectedFood.carbs);
+    const [protein, setProtein] = useState(selectedFood.protein);
+    const [fat, setFat] = useState(selectedFood.fat);
 
     const [carbRate, setCarbRate] = useState(0);
     const [proteinRate, setProteinRate] = useState(0);
@@ -40,13 +42,15 @@ export default function FoodEditor() {
     const [macrosRateSum, setMacrosRateSum] = useState(0);
     const [macrosRateOffset, setMacrosRateOffset] = useState(0);
 
-    const [propertyCounter, setPropertyCounter] = useState(additionalContexts.selectedFood.additionalProps.length);
-    const [additionalProps, setAdditionalProps] = useState(additionalContexts.selectedFood.additionalProps || []);
-
-    useEffect(() => { hideSpinner(); }, []);
+    const [propertyCounter, setPropertyCounter] = useState(selectedFood.additionalProps.length);
+    const [additionalProps, setAdditionalProps] = useState(selectedFood.additionalProps || []);
 
     useEffect(() => {
-        const original = additionalContexts.selectedFood;
+        hideSpinner();
+    }, []);
+
+    useEffect(() => {
+        const original = selectedFood;
 
         const basicChanged =
             label !== original.label ||
@@ -63,7 +67,7 @@ export default function FoodEditor() {
 
         setIsChange(basicChanged || propsChanged);
         setFabVisible(basicChanged || propsChanged ? true : false);
-    }, [label, category, servingUnit, servingSize, energyKcal, carbs, protein, fat, isPublic, additionalProps, additionalContexts.selectedFood]);
+    }, [label, category, servingUnit, servingSize, energyKcal, carbs, protein, fat, isPublic, additionalProps, selectedFood]);
 
     useEffect(() => {
         const cRate = (carbs * 4 / energyKcal * 100) || 0;
@@ -169,7 +173,7 @@ export default function FoodEditor() {
                     'Fat';
 
         const payload = {
-            ...additionalContexts.selectedFood,
+            ...selectedFood,
             label,
             category: finalCategory,
             servingUnit,
@@ -194,7 +198,7 @@ export default function FoodEditor() {
                     ...prev,
                     foods: prev.foods.map(f => f.id === food.id ? food : f)
                 }));
-                setAdditionalContexts(prev => ({ ...prev, selectedFood: food }));
+
                 createToast({ message: "Food edited" });
                 router.back();
             }
@@ -226,7 +230,7 @@ export default function FoodEditor() {
                     <TouchableOpacity
                         style={{ height: 40, backgroundColor: colors.cardBackground, width: 120, borderRadius: 12, flexDirection: 'row', alignItems: 'center' }}
                         onPress={() => {
-                            if (additionalContexts.selectedFood.ownerId !== additionalContexts.selectedFood.creatorId)
+                            if (selectedFood.ownerId !== selectedFood.creatorId)
                                 return createToast({ message: 'This food was not created by you and cannot be shared!' });
                             setIsPublic(!isPublic)
                         }}

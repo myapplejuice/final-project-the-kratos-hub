@@ -19,7 +19,7 @@ import { scaleFont } from "../../../common/utils/scale-fonts";
 import APIService from "../../../common/services/api-service";
 import { colors, nutritionColors } from "../../../common/settings/styling";
 import { getDayComparisons } from '../../../common/utils/date-time'
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { routes } from '../../../common/settings/constants';
 import { getSQLTime } from '../../../common/utils/date-time';
 import { totalDayConsumption } from '../../../common/utils/metrics-calculator';
@@ -29,11 +29,12 @@ import Meal from '../../../components/screen-comps/meal';
 
 export default function MealPlansEditor() {
     const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
-    const { user, setUser, additionalContexts, setAdditionalContexts } = useContext(UserContext);
+    const [context, setContext] = useState(useLocalSearchParams());
+    const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const [scrollToTop, setScrollToTop] = useState(false);
     const [fabVisible, setFabVisible] = useState(true);
-    const [plan, setPlan] = useState(additionalContexts.selectedPlan);
+    const [plan, setPlan] = useState(JSON.parse(context.selectedPlan));
     const [openMeals, setOpenMeals] = useState([]);
 
     useEffect(() => {
@@ -253,13 +254,24 @@ export default function MealPlansEditor() {
     }
 
     async function handleFoodAddition(meal) {
-        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, foodProfileIntent: 'mealplan/add' }));
-        router.push(routes.FOOD_SELECTION);
+        router.push({
+            pathname: routes.FOOD_SELECTION,
+            params: {
+                selectedMeal: JSON.stringify(meal),
+                foodProfileIntent: 'mealplan/add'
+            }
+        });
     }
 
     async function handleMealFoodPress(meal, food) {
-        setAdditionalContexts(prev => ({ ...prev, selectedMeal: meal, selectedFood: food, foodProfileIntent: 'mealplan/update' }));
-        router.push(routes.FOOD_PROFILE);
+        router.push({
+            pathname: routes.FOOD_PROFILE,
+            params: {
+                selectedMeal: JSON.stringify(meal),
+                selectedFood: JSON.stringify(food),
+                foodProfileIntent: 'mealplan/update'
+            }
+        });
     }
 
     return (

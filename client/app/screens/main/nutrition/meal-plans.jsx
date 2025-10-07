@@ -20,7 +20,7 @@ import { scaleFont } from "../../../common/utils/scale-fonts";
 import APIService from "../../../common/services/api-service";
 import { colors, nutritionColors } from "../../../common/settings/styling";
 import { getDayComparisons } from '../../../common/utils/date-time'
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { routes } from '../../../common/settings/constants';
 import { getSQLTime } from '../../../common/utils/date-time';
 import { totalDayConsumption } from '../../../common/utils/metrics-calculator';
@@ -29,9 +29,11 @@ import Invert from '../../../components/effects/invert';
 import MealPlan from '../../../components/screen-comps/meal-plan';
 
 export default function MealsPlans() {
-    const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
-    const { user, setUser, additionalContexts, setAdditionalContexts } = useContext(UserContext);
+    const context = useLocalSearchParams();
     const insets = useSafeAreaInsets();
+
+    const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
+    const { user, setUser } = useContext(UserContext);
     const [scrollToTop, setScrollToTop] = useState(false);
     const [fabVisible, setFabVisible] = useState(true);
 
@@ -166,13 +168,13 @@ export default function MealsPlans() {
         }
 
         const meals = plan.meals;
-        const day = additionalContexts.day;
+        const day = JSON.parse(context.day);
         console.log(meals[0].foods)
 
         //try {
         //    showSpinner();
         //    const result = await APIService.nutrition.meals.bulk({ nutritionLogId: day.id, meals });
-//
+        //
         //    if (result.success) {
         //        setUser(prev => ({
         //            ...prev,
@@ -199,8 +201,10 @@ export default function MealsPlans() {
     }
 
     async function handlePlanPress(plan) {
-        setAdditionalContexts(prev => ({ ...prev, selectedPlan: plan }));
-        router.push(routes.MEAL_PLANS_EDITOR);
+        router.push({
+            pathname: routes.MEAL_PLANS_EDITOR,
+            params: { selectedPlan: plan }
+        });
     }
 
     return (
@@ -237,7 +241,7 @@ export default function MealsPlans() {
                                 isCreatedByCoach={plan.isCreatedByCoach}
                                 coachId={plan.coachId}
                                 expandedOnStart={i === 0}
-                                intent={additionalContexts.mealPlansIntent}
+                                intent={context.mealPlansIntent}
                                 onImportPlanPress={() => handlePlanImport(plan)}
                                 onDeletePress={() => handlePlanDeletion(plan)}
                                 onUpdatePress={() => handlePlanUpdate(plan)}

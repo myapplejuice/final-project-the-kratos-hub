@@ -19,7 +19,7 @@ import { CameraContext } from '../../../common/contexts/camera-context';
 import BarcodeScanner from '../../../components/screen-comps/barcode-scanner';
 
 export default function Foods() {
-    const { user, setAdditionalContexts } = useContext(UserContext);
+    const { user } = useContext(UserContext);
     const { setCameraActive } = useContext(CameraContext);
     const insets = useSafeAreaInsets();
     const [fabVisible, setFabVisible] = useState(true);
@@ -48,8 +48,13 @@ export default function Foods() {
     }, [searchQuery, userFoods]);
 
     function handleFoodSelection(food) {
-        setAdditionalContexts(prev => ({ ...prev, selectedFood: food, foodProfileIntent: 'myfoods' }));
-        router.push(routes.FOOD_PROFILE)
+        router.push({
+            pathname: routes.FOOD_PROFILE,
+            params: {
+                selectedFood: JSON.stringify(food), 
+                foodProfileIntent: 'myfoods'
+            }
+        });
     }
 
     async function handleBarcode(barcode) {
