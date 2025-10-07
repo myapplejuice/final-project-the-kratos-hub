@@ -28,17 +28,18 @@ import Invert from '../../../components/effects/invert';
 import Meal from '../../../components/screen-comps/meal';
 
 export default function MealPlansEditor() {
-    const context = useLocalSearchParams();
     const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
     const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const [scrollToTop, setScrollToTop] = useState(false);
     const [fabVisible, setFabVisible] = useState(true);
-    const [plan, setPlan] = useState(JSON.parse(context.selectedPlan));
+
+    const context = useLocalSearchParams();
+    const [plan, setPlan] = useState({});
     const [openMeals, setOpenMeals] = useState([]);
 
     useEffect(() => {
-        const newPlan = user.plans.find(p => p.id === plan.id);
+        const newPlan = user.plans.find(p => p.id === Number(context.selectedPlanId));
         setPlan(newPlan);
     }, [user.plans]);
 
@@ -135,7 +136,7 @@ export default function MealPlansEditor() {
         createInput({
             title: "Meal Addition",
             confirmText: "Add",
-            text: `Enter new label for the meal & timing`,
+            text: `Enter new label for the meal & timing of meal in 24-hour format (e.g. 18:00)`,
             placeholders: [`Label`, [`HH`, `MM`]],
             initialValues: [`${meal.label}`, [`${HH || ''}`, `${MM || ''}`]],
             extraConfigs: [[], [{ keyboardType: "numeric" }, { keyboardType: "numeric" }]],
@@ -152,7 +153,7 @@ export default function MealPlansEditor() {
                     label = meal.label;
 
                 if (!vals[1][0] && !vals[1][1]) {
-                    time = meal.time;
+                    time = null;
                 } else {
                     if (vals[1][0] || vals[1][1]) {
                         if (!vals[1][0]) hour = 0;
@@ -167,6 +168,9 @@ export default function MealPlansEditor() {
                         time = `${timeStr}:00`;
                     }
                 }
+                const mealTime = meal.time?.split('T')[1].split('.')[0] || null;
+                if ((time === mealTime && label === meal.label) || (time === mealTime && !label))
+                    return createToast({ message: "No changes made" });
 
                 await confirmMealUpdate(meal.id, label, time);
             },
@@ -258,8 +262,8 @@ export default function MealPlansEditor() {
         router.push({
             pathname: routes.FOOD_SELECTION,
             params: {
-                selectedMeal: JSON.stringify(meal),
-                selectedPlan: JSON.stringify(plan),
+                selectedMealId: meal.id,
+                selectedPlanId: plan.id,
                 foodProfileIntent: 'mealplan/add'
             }
         });
@@ -269,9 +273,9 @@ export default function MealPlansEditor() {
         router.push({
             pathname: routes.FOOD_PROFILE,
             params: {
-                selectedMeal: JSON.stringify(meal),
-                selectedFood: JSON.stringify(food),
-                selectedPlan: JSON.stringify(plan),
+                selectedMealId: meal.id,
+                selectedFoodId: food.id,
+                selectedPlanId: plan.id,
                 foodProfileIntent: 'mealplan/update'
             }
         });

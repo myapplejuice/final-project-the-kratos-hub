@@ -17,15 +17,17 @@ import { routes } from "../../../common/settings/constants";
 import { Keyboard } from "react-native";
 
 export default function FoodProfile() {
+    const { setUser, user } = useContext(UserContext);
     const { createDialog, createAlert, showSpinner, hideSpinner, createToast } = usePopups();
     const context = useLocalSearchParams();
     const intent = context.foodProfileIntent;
-    const day = context.day ? JSON.parse(context.day) : {};
-    const selectedMeal = context.selectedMeal ? JSON.parse(context.selectedMeal) : {};
-    const selectedPlan = context.selectedPlan ? JSON.parse(context.selectedPlan) : {};
+    const day = context.dayDate ? user.nutritionLogs[context.dayDate] : {};
+    const selectedMeal = context.foodProfileIntent.includes('meal/') ? user.nutritionLogs[context.dayDate].meals.find(m => m.id === Number(context.selectedMealId)) :
+        context.foodProfileIntent.includes('mealplan') ? user.plans.find(p => p.id === Number(context.selectedPlanId)).meals.find(m => m.id === Number(context.selectedMealId)) : {};
+    const selectedPlan = context.selectedPlanId ? user.plans.find(p => p.id === Number(context.selectedPlanId)) : {};
 
-    const { setUser, user } = useContext(UserContext);
-    const [selectedFood, setSelectedFood] = useState(context.selectedFood ? JSON.parse(context.selectedFood) : {});
+    const [selectedFood, setSelectedFood] = useState(context.foodProfileIntent.includes('update') ?
+        selectedMeal.foods.find(f => f.id === Number(context.selectedFoodId)) : context.selectedFood ? JSON.parse(context.selectedFood) : {});
     const [servingSize, setServingSize] = useState(selectedFood.servingSize);
     const [energyKcal, setEnergyKcal] = useState(selectedFood.energyKcal);
     const [carbs, setCarbs] = useState(selectedFood.carbs);
@@ -38,7 +40,6 @@ export default function FoodProfile() {
     })));
     const screenMountedRef = useRef(false);
 
-    // Update food on edit unless its in update intent
     useEffect(() => {
         hideSpinner();
         if (screenMountedRef.current === false) {
@@ -60,7 +61,6 @@ export default function FoodProfile() {
         })));
     }, [user.foods])
 
-    // Update details on serving change
     useEffect(() => {
         let factor;
         if (!servingSize)
@@ -323,6 +323,8 @@ export default function FoodProfile() {
     async function handleMealPlanFoodAddition() {
         showSpinner();
 
+        console.log(selectedPlan)
+
         const payload = {
             mealId: selectedMeal.id,
             originalServingSize: selectedFood.servingSize,
@@ -347,7 +349,7 @@ export default function FoodProfile() {
                 payload.id = result.data.id;
                 const planId = selectedPlan.id;
                 const mealId = selectedMeal.id;
-                
+
                 setUser(prev => ({
                     ...prev,
                     plans: prev.plans.map(plan =>
@@ -497,15 +499,12 @@ export default function FoodProfile() {
     }
 
     function handleOnEditPress() {
-        showSpinner();
-        setTimeout(() => {
-            router.push({
-                pathname: routes.FOOD_EDITOR,
-                params: {
-                    selectedFood: JSON.stringify(selectedFood)
-                }
-            });
-        }, 1);
+        router.push({
+            pathname: routes.FOOD_EDITOR,
+            params: {
+                selectedFoodId: selectedFood.id
+            }
+        });
     }
 
     return (

@@ -17,9 +17,9 @@ import { Images } from "../../../common/settings/assets";
 import APIService from "../../../common/services/api-service";
 
 export default function FoodEditor() {
-    const [context, setContext] = useState(useLocalSearchParams());
-    const selectedFood = JSON.parse(context.selectedFood);
+    const context = useLocalSearchParams();
     const { user, setUser } = useContext(UserContext);
+    const selectedFood = user.foods.find(f => f.id === Number(context.selectedFoodId)) || {};
     const { createOptions, createToast, createDialog, createAlert, showSpinner, hideSpinner } = usePopups();
     const insets = useSafeAreaInsets();
 
@@ -52,7 +52,7 @@ export default function FoodEditor() {
     useEffect(() => {
         const original = selectedFood;
 
-        const basicChanged =
+        const baseChanges =
             label !== original.label ||
             category !== original.category ||
             servingUnit !== original.servingUnit ||
@@ -63,10 +63,10 @@ export default function FoodEditor() {
             fat !== original.fat ||
             isPublic !== original.isPublic;
 
-        const propsChanged = JSON.stringify(additionalProps) !== JSON.stringify(original.additionalProps || []);
+        const propChanges = JSON.stringify(additionalProps) !== JSON.stringify(original.additionalProps || []);
 
-        setIsChange(basicChanged || propsChanged);
-        setFabVisible(basicChanged || propsChanged ? true : false);
+        setIsChange(baseChanges || propChanges);
+        setFabVisible(baseChanges || propChanges ? true : false);
     }, [label, category, servingUnit, servingSize, energyKcal, carbs, protein, fat, isPublic, additionalProps, selectedFood]);
 
     useEffect(() => {

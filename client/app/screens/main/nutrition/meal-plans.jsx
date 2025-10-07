@@ -1,38 +1,25 @@
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { Image } from "expo-image";
-import { useContext, useEffect, useState } from "react";
-import { Platform, StyleSheet, TouchableOpacity, View, } from "react-native";
+import { useContext, useState } from "react";
+import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppScroll from "../../../components/screen-comps/app-scroll";
 import AppText from "../../../components/screen-comps/app-text";
-import DateDisplay from "../../../components/screen-comps/date-display";
-import Divider from "../../../components/screen-comps/divider";
 import FloatingActionButton from "../../../components/screen-comps/floating-action-button";
-import FloatingActionMenu from "../../../components/screen-comps/floating-action-menu";
-import Meal from "../../../components/screen-comps/meal";
-import ProgressBar from "../../../components/screen-comps/progress-bar";
 import { Images } from "../../../common/settings/assets";
 import { UserContext } from '../../../common/contexts/user-context';
-import { convertEnergy, convertFluid } from "../../../common/utils/unit-converter";
-import { formatDate } from '../../../common/utils/date-time';
 import usePopups from "../../../common/hooks/use-popups";
 import { scaleFont } from "../../../common/utils/scale-fonts";
 import APIService from "../../../common/services/api-service";
-import { colors, nutritionColors } from "../../../common/settings/styling";
-import { getDayComparisons } from '../../../common/utils/date-time'
+import { colors,} from "../../../common/settings/styling";
 import { router, useLocalSearchParams } from 'expo-router';
 import { routes } from '../../../common/settings/constants';
-import { getSQLTime } from '../../../common/utils/date-time';
-import { totalDayConsumption } from '../../../common/utils/metrics-calculator';
-import FadeInOut from '../../../components/effects/fade-in-out';
-import Invert from '../../../components/effects/invert';
 import MealPlan from '../../../components/screen-comps/meal-plan';
 
 export default function MealsPlans() {
     const context = useLocalSearchParams();
     const insets = useSafeAreaInsets();
 
-    const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
+    const { createInput, showSpinner, hideSpinner, createToast, createDialog, createAlert } = usePopups();
     const { user, setUser } = useContext(UserContext);
     const [scrollToTop, setScrollToTop] = useState(false);
     const [fabVisible, setFabVisible] = useState(true);
@@ -163,23 +150,19 @@ export default function MealsPlans() {
     }
 
     async function handlePlanImport(plan) {
-        if (!plan.meals || plan.meals.length === 0) {
-            return createToast({ message: "No meals to import in this plan, click \"View Full Plan\" to start adding meals" });
-        }
-
-        const foodCount = plan.meals.reduce((acc, meal) => acc + meal.foods?.length, 0 || 0);
+        const foodCount = plan.meals?.reduce((acc, meal) => acc + meal.foods?.length, 0) || 0;
 
         if (foodCount === 0) {
-            return createToast({ message: "The meals in this plan do not contain any foods, click \"View Full Plan\" to start adding foods to the meals" });
+            return createAlert({ title: 'Empty Plan', text: "The plan you're trying to import doesn't have any meals or foods.\n\nClick \"View Full Plan\" to start adding foods to the meals" });
         }
 
         const meals = plan.meals;
-        const day = JSON.parse(context.day);
+        const day = user.nutritionLogs[context.dayDate]
 
         try {
             showSpinner();
             const result = await APIService.nutrition.meals.bulk({ nutritionLogId: day.id, meals });
-        
+
             if (result.success) {
                 setUser(prev => ({
                     ...prev,
@@ -208,10 +191,12 @@ export default function MealsPlans() {
         }
     }
 
-    async function handlePlanPress(plan) {
+    async function handlePlanPress(selectedPlanId) {
         router.push({
             pathname: routes.MEAL_PLANS_EDITOR,
-            params: { selectedPlan: JSON.stringify(plan) }
+            params: {
+                selectedPlanId
+            }
         });
     }
 
@@ -249,11 +234,11 @@ export default function MealsPlans() {
                                 isCreatedByCoach={plan.isCreatedByCoach}
                                 coachId={plan.coachId}
                                 expandedOnStart={i === 0}
-                                intent={context.mealPlansIntent}
+                                showImportButton={context.mealPlansIntent === 'import'}
                                 onImportPlanPress={() => handlePlanImport(plan)}
                                 onDeletePress={() => handlePlanDeletion(plan)}
                                 onUpdatePress={() => handlePlanUpdate(plan)}
-                                onPlanPress={() => handlePlanPress(plan)}
+                                onPlanPress={() => handlePlanPress(plan.id)}
                             />
                         ))}
                     </View>

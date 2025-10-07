@@ -24,7 +24,7 @@ export default class NutritionMealPlansMealsController {
 
     static async updateMeal(req, res) {
         const { mealId, newLabel, newTime } = req.body;
-        if (!mealId || !newLabel || !newTime)
+        if (!mealId)
             return res.status(400).json({ success: false, error: 'Missing required fields' });
 
         const meal = await NutritionMealPlansMealsDBService.updateMeal(mealId, newLabel, newTime);

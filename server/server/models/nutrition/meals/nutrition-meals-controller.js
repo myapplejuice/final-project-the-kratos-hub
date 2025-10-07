@@ -3,7 +3,7 @@ import NutritionMealsDBService from "./nutrition-meals-db-service.js";
 export default class NutritionMealsController {
     static async createMeal(req, res) {
         const { nutritionLogId, label, time } = req.body;
-        if (!nutritionLogId || !label || !time) {
+        if (!nutritionLogId) {
             return res.status(400).json({ success: false, error: "nutritionLogId and label are required" });
         }
 
@@ -23,11 +23,11 @@ export default class NutritionMealsController {
         return res.status(200).json({ success: true });
     }
 
-    static async updateMealLabel(req, res) {
-        const { mealId, newLabel } = req.body;
-        if (!mealId || !newLabel) return res.status(400).json({ success: false, error: 'mealId and newLabel are required' });
+    static async updateMeal(req, res) {
+        const { mealId, newLabel, newTime } = req.body;
+        if (!mealId) return res.status(400).json({ success: false, error: 'mealId and newLabel are required' });
 
-        const meal = await NutritionMealsDBService.updateMealLabel(mealId, newLabel);
+        const meal = await NutritionMealsDBService.updateMeal(mealId, newLabel, newTime);
         if (!meal) return res.status(404).json({ success: false, error: 'Meal not found or could not update' });
 
         return res.status(200).json({ success: true, meal });

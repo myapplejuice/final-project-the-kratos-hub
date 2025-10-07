@@ -1,162 +1,69 @@
-[
-    {
-        "USDAId": -1,
-        "additionalProps": [
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ]
-        ],
-        "carbs": 0,
-        "category": "Poultry",
-        "creatorId": "204EFF41-FF71-4636-9425-14DBB383E2BA",
-        "creatorName": "Ibrahem  Abu Shah",
-        "dominantMacro": "Protein",
-        "energyKcal": 248,
-        "fat": 6,
-        "id": 15,
-        "isPublic": false,
-        "isUSDA": false,
-        "label": "Chicken Breast",
-        "mealId": 2,
-        "originalCarbs": 0,
-        "originalEnergyKcal": 165,
-        "originalFat": 4.1,
-        "originalProtein": 33,
-        "originalServingSize": 100,
-        "ownerId": "9660511F-B551-4970-9160-D193B735723B",
-        "protein": 50,
-        "servingSize": 150,
-        "servingUnit": "g"
-    },
-    {
-        "USDAId": 746779,
-        "additionalProps": [
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ],
-            [Object
-            ]
-        ],
-        "carbs": 3,
-        "category": "Sausages and Luncheon Meats",
-        "creatorId": "00000000-0000-0000-0000-000000000000",
-        "creatorName": "USDA",
-        "dominantMacro": "Fat",
-        "energyKcal": 328,
-        "fat": 29,
-        "id": 16,
-        "isPublic": true,
-        "isUSDA": true,
-        "label": "Sausage, Breakfast Sausage, Beef, Pre-cooked, Unprepared",
-        "mealId": 2,
-        "originalCarbs": 3,
-        "originalEnergyKcal": 328,
-        "originalFat": 29,
-        "originalProtein": 13,
-        "originalServingSize": 100,
-        "ownerId": "9660511F-B551-4970-9160-D193B735723B",
-        "protein": 13,
-        "servingSize": 100,
-        "servingUnit": "g"
-    }
-]
+{
+    "USDAId": 2310033,
+    "additionalProps": [
+        {
+            "amount": 363,
+            "id": 0,
+            "label": "Sodium, Na",
+            "originalAmount": 363,
+            "unit": "MG"
+        },
+        {
+            "amount": 336,
+            "id": 1,
+            "label": "Potassium, K",
+            "originalAmount": 336,
+            "unit": "MG"
+        },
+        {
+            "amount": 27,
+            "id": 2,
+            "label": "Calcium, Ca",
+            "originalAmount": 27,
+            "unit": "MG"
+        },
+        {
+            "amount": 4.42,
+            "id": 3,
+            "label": "Sugars, Total",
+            "originalAmount": 4.42,
+            "unit": "G"
+        },
+        {
+            "amount": 0.9,
+            "id": 4,
+            "label": "Fiber, total dietary",
+            "originalAmount": 0.9,
+            "unit": "G"
+        },
+        {
+            "amount": 0.88,
+            "id": 5,
+            "label": "Iron, Fe",
+            "originalAmount": 0.88,
+            "unit": "MG"
+        },
+        {
+            "amount": 0.88,
+            "id": 6,
+            "label": "Fatty acids, total saturated",
+            "originalAmount": 0.88,
+            "unit": "G"
+        }
+    ],
+    "carbs": 5,
+    "category": "Pre-Packaged Fruit & Vegetables",
+    "creatorId": "00000000-0000-0000-0000-000000000000",
+    "creatorName": "USDA",
+    "dominantMacro": "Fat",
+    "energyKcal": 80,
+    "fat": 6,
+    "id": 15,
+    "isPublic": false,
+    "isUSDA": true,
+    "label": "Mushroom (Carbone Fine Food, LLC)",
+    "ownerId": "9660511F-B551-4970-9160-D193B735723B",
+    "protein": 1,
+    "servingSize": 0,
+    "servingUnit": "g"
+}

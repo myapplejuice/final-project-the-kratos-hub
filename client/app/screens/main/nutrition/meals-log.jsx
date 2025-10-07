@@ -14,7 +14,7 @@ import ProgressBar from "../../../components/screen-comps/progress-bar";
 import { Images } from "../../../common/settings/assets";
 import { UserContext } from '../../../common/contexts/user-context';
 import { convertEnergy, convertFluid } from "../../../common/utils/unit-converter";
-import { formatDate } from '../../../common/utils/date-time';
+import { formatDate, formatSqlTime, isValidTime } from '../../../common/utils/date-time';
 import usePopups from "../../../common/hooks/use-popups";
 import { scaleFont } from "../../../common/utils/scale-fonts";
 import APIService from "../../../common/services/api-service";
@@ -22,7 +22,6 @@ import { colors, nutritionColors } from "../../../common/settings/styling";
 import { getDayComparisons } from '../../../common/utils/date-time'
 import { router } from 'expo-router';
 import { routes } from '../../../common/settings/constants';
-import { getSQLTime } from '../../../common/utils/date-time';
 import { totalDayConsumption } from '../../../common/utils/metrics-calculator';
 import FadeInOut from '../../../components/effects/fade-in-out';
 import SlideInOut from '../../../components/effects/slide-in-out';
@@ -177,56 +176,168 @@ export default function MealsLog() {
         createInput({
             title: "Meal Addition",
             confirmText: "Add",
-            text: `Enter a label for the meal (e.g. Breakfast, Dinner, Pre-Workout...)`,
-            placeholders: [`Meal ${currentDayLog?.meals?.length + 1 || 1}`],
-            initialValues: [``],
+            text: `OPTIONAL:\nEnter a label & timing of meal in 24-hour format (e.g. 18:00)`,
+            placeholders: [`Meal ${currentDayLog?.meals?.length + 1 || 1}`, [`HH`, `MM`]],
+            initialValues: [``, [``, ``]],
+            extraConfigs: [[], [{ keyboardType: "numeric" }, { keyboardType: "numeric" }]],
             onSubmit: async (vals) => {
                 let label = vals[0];
-                if (!label)
-                    label = `Meal ${currentDayLog?.meals?.length + 1}`;
+                let hour = Number(vals[1][0]);
+                let minute = Number(vals[1][1]);
 
-                let time = new Date();
-                let hour = time.getHours();
-                let minute = time.getMinutes();
-                const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-                time = `${timeStr}:00`;
+                if (!label) label = `Meal ${currentDayLog?.meals?.length + 1}`;
+                let time = null;
 
-                showSpinner();
-                try {
-                    const result = await APIService.nutrition.meals.create({ nutritionLogId: currentDayLog.id, label, time });
+                if (vals[1][0] || vals[1][1]) {
+                    if (!vals[1][0]) hour = 0;
+                    if (!vals[1][1]) minute = 0;
 
-                    if (result.success) {
-                        const meal = result.data.meal;
+                    const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 
-                        setOpenMeals(prev => [...prev, meal.id]);
-                        setUser(prev => ({
-                            ...prev,
-                            nutritionLogs: {
-                                ...prev.nutritionLogs,
-                                [pageDateKey]: {
-                                    ...prev.nutritionLogs[pageDateKey],
-                                    meals: [...(prev.nutritionLogs[pageDateKey].meals || []), { ...meal, foods: [] }]
-                                }
-                            }
-                        }));
-                    } else {
-                        createToast({ message: result.message || "Failed to add meal" });
+                    if (!isValidTime(timeStr)) {
+                        return createToast({ message: `${timeStr} is an invalid time, please try again` });
                     }
-                } catch (err) {
-                    console.error("Failed to add meal:", err);
-                    createToast({ message: "Server error" });
-                } finally {
-                    hideSpinner();
+
+                    time = `${timeStr}:00`;
                 }
+
+                if (!time) {
+                    return createDialog({
+                        title: 'Warning',
+                        text: `Time was not provided, are you sure you want to continue?`,
+                        onConfirm: async () => await confirmMealAddition(label, time),
+                    });
+                }
+
+                await confirmMealAddition(label, time);
             },
         });
     }
 
+    async function confirmMealAddition(label, time) {
+        console.log(label, time)
+        showSpinner();
+        try {
+            const result = await APIService.nutrition.meals.create({ nutritionLogId: currentDayLog.id, label, time });
+
+            if (result.success) {
+                const meal = result.data.meal;
+
+                setOpenMeals(prev => [...prev, meal.id]);
+                setUser(prev => ({
+                    ...prev,
+                    nutritionLogs: {
+                        ...prev.nutritionLogs,
+                        [pageDateKey]: {
+                            ...prev.nutritionLogs[pageDateKey],
+                            meals: [...(prev.nutritionLogs[pageDateKey].meals || []), { ...meal, foods: [] }]
+                        }
+                    }
+                }));
+            } else {
+                createToast({ message: result.message || "Failed to add meal" });
+            }
+        } catch (err) {
+            console.error("Failed to add meal:", err);
+            createToast({ message: "Server error" });
+        } finally {
+            hideSpinner();
+        }
+    }
+
+    async function handleMealUpdate(meal) {
+        let HH, MM;
+        if (meal.time !== null) {
+            const formatedTime = formatSqlTime(meal.time);
+            HH = formatedTime.split('T')[1].split(':')[0];
+            MM = formatedTime.split('T')[1].split(':')[1];
+        }
+
+        createInput({
+            title: "Update Meal",
+            confirmText: "Submit",
+            text: `Enter new label & timing of meal in 24-hour format (e.g. 18:00)`,
+            placeholders: [`Label`, [`HH`, `MM`]],
+            initialValues: [`${meal?.label}`, [`${HH || ''}`, `${MM || ''}`]],
+            onSubmit: async (vals) => {
+                let label = vals[0];
+                let hour = Number(vals[1][0]);
+                let minute = Number(vals[1][1]);
+                let time;
+
+                if (!hour && !minute && !label)
+                    return createToast({ message: "No changes made" });
+
+                if (!label || label === meal?.label)
+                    label = meal.label;
+
+                if (!vals[1][0] && !vals[1][1]) {
+                    time = null;
+                } else {
+                    if (vals[1][0] || vals[1][1]) {
+                        if (!vals[1][0]) hour = 0;
+                        if (!vals[1][1]) minute = 0;
+
+                        const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+
+                        if (!isValidTime(timeStr)) {
+                            return createToast({ message: `${timeStr} is an invalid time, please try again` });
+                        }
+
+                        time = `${timeStr}:00`;
+                    }
+                }
+                const mealTime = meal.time?.split('T')[1].split('.')[0] || null;
+                if ((time === mealTime && label === meal.label) || (time === mealTime && !label))
+                    return createToast({ message: "No changes made" });
+
+                await confirmMealUpdate(meal.id, label, time);
+            },
+        });
+    }
+
+    async function confirmMealUpdate(mealId, label, time) {
+        showSpinner();
+        try {
+            const payload = {
+                mealId,
+                newLabel: label,
+                newTime: time,
+            };
+
+            const result = await APIService.nutrition.meals.update(payload);
+
+            if (result.success) {
+                const updatedMeal = result.data.meal;
+                const currentMeals = currentDayLog.meals || [];
+                const updatedMeals = currentMeals.map(meal => meal.id === mealId ? { ...updatedMeal } : meal);
+
+                setUser(prev => ({
+                    ...prev,
+                    nutritionLogs: {
+                        ...prev.nutritionLogs,
+                        [pageDateKey]: {
+                            ...prev.nutritionLogs[pageDateKey],
+                            meals: updatedMeals
+                        }
+                    }
+                }));
+            } else {
+                createToast({ message: result.message || "Failed to relabel meal" });
+            }
+        } catch (err) {
+            console.error("Failed to relabel meal:", err);
+            createToast({ message: "Server error" });
+        } finally {
+            hideSpinner();
+        }
+    }
+
     async function handleMealRemoval(mealId, label) {
         createDialog({
-            title: `Drop Meal`,
-            text: `Are you sure you want to drop "${label}"?`,
-            confirmText: "Drop",
+            title: `Discard Meal`,
+            text: `Are you sure you want to discard "${label}"?`,
+            confirmText: "Discard",
             confirmButtonStyle: { backgroundColor: 'rgb(255,59,48)', borderColor: 'rgb(255,59,48)' },
             onConfirm: async () => {
                 showSpinner();
@@ -250,10 +361,10 @@ export default function MealsLog() {
                             };
                         });
                     } else {
-                        createToast({ message: result.message || "Failed to drop meal" });
+                        createToast({ message: result.message || "Failed to discard meal" });
                     }
                 } catch (err) {
-                    console.error("Failed to drop meal:", err);
+                    console.error("Failed to dicard meal:", err);
                     createToast({ message: "Server error" });
                 } finally {
                     hideSpinner();
@@ -262,60 +373,12 @@ export default function MealsLog() {
         })
     }
 
-    async function handleMealRelabel(mealId) {
-        createInput({
-            title: "Relabel Meal",
-            confirmText: "Submit",
-            text: `Enter new label for the meal`,
-            placeholders: [`${currentDayLog?.meals?.find(meal => meal.id === mealId)?.label}`],
-            initialValues: [`${currentDayLog?.meals?.find(meal => meal.id === mealId)?.label}`],
-            onSubmit: async (vals) => {
-                let newLabel = vals[0];
-                if (!newLabel || newLabel === currentDayLog?.meals?.find(meal => meal.id === mealId)?.label)
-                    return;
-
-                const time = new Date().getTime();
-                showSpinner();
-                try {
-                    const result = await APIService.nutrition.meals.updateLabel({ mealId, newLabel });
-
-                    if (result.success) {
-                        const updatedMeal = result.data.meal;
-                        const currentMeals = currentDayLog.meals || [];
-                        const updatedMeals = currentMeals.map(meal => meal.id === mealId ? { ...updatedMeal } : meal);
-
-                        setUser(prev => ({
-                            ...prev,
-                            nutritionLogs: {
-                                ...prev.nutritionLogs,
-                                [pageDateKey]: {
-                                    ...prev.nutritionLogs[pageDateKey],
-                                    meals: updatedMeals
-                                }
-                            }
-                        }));
-                    } else {
-                        createToast({ message: result.message || "Failed to relabel meal" });
-                    }
-                } catch (err) {
-                    console.error("Failed to relabel meal:", err);
-                    createToast({ message: "Server error" });
-                } finally {
-                    hideSpinner();
-                }
-            },
-        });
-    }
-
     async function handleFoodAddition(meal) {
-        const selectedMeal = JSON.stringify(meal);
-        const day = JSON.stringify(currentDayLog);
-
         router.push({
             pathname: routes.FOOD_SELECTION,
             params: {
-                selectedMeal,
-                day,
+                selectedMealId: meal.id,
+                dayDate: currentDayLog.date,
                 foodProfileIntent: 'meal/add'
             }
         });
@@ -325,9 +388,9 @@ export default function MealsLog() {
         router.push({
             pathname: routes.FOOD_PROFILE,
             params: {
-                selectedMeal: JSON.stringify(meal),
-                selectedFood: JSON.stringify(food),
-                day: JSON.stringify(currentDayLog),
+                selectedMealId: meal.id,
+                selectedFoodId: food.id,
+                dayDate: currentDayLog.date,
                 foodProfileIntent: 'meal/update'
             }
         });
@@ -337,7 +400,7 @@ export default function MealsLog() {
         router.push({
             pathname: routes.MEAL_PLANS,
             params: {
-                day: JSON.stringify(currentDayLog),
+                dayDate: currentDayLog.date,
                 mealPlansIntent: 'import'
             }
         });
@@ -501,7 +564,7 @@ export default function MealsLog() {
                                     foods={meal.foods}
                                     time={meal.time}
                                     num={i + 1}
-                                    onRenamePress={() => handleMealRelabel(meal.id)}
+                                    onRenamePress={() => handleMealUpdate(meal)}
                                     onDeletePress={() => handleMealRemoval(meal.id, meal.label)}
                                     onAddPress={() => handleFoodAddition(meal)}
                                     onFoodPress={(food) => handleMealFoodPress(meal, food)}

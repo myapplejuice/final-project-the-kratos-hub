@@ -56,17 +56,16 @@ export default class NutritionMealsDBService {
         }
     }
 
-    static async updateMealLabel(mealId, newLabel) {
-        if (!mealId || !newLabel) return null;
-
+    static async updateMeal(mealId, newLabel, newTime) {
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, mealId);
             Database.addInput(request, 'Label', sql.VarChar(100), newLabel);
+            Database.addInput(request, 'Time', sql.Time, newTime);
 
             const query = `
                 UPDATE MealLogs
-                SET Label = @Label
+                SET Label = @Label, Time = @Time
                 OUTPUT INSERTED.*
                 WHERE Id = @Id
             `;

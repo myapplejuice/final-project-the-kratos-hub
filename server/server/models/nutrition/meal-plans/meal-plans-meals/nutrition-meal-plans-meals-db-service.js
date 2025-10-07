@@ -36,8 +36,6 @@ export default class NutritionMealPlansMealsDBService {
     }
 
     static async deleteMeal(mealId) {
-        if (!mealId) return false;
-
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, mealId);
@@ -56,8 +54,7 @@ export default class NutritionMealPlansMealsDBService {
     }
 
     static async updateMeal(mealId, newLabel, newTime) {
-        if (!mealId || !newLabel || !newTime) return null;
-
+        console.log()
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, mealId);

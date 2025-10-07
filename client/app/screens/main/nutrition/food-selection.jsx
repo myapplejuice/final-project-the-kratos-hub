@@ -124,28 +124,22 @@ export default function FoodSelection() {
     }, [communityFoods]);
 
     function handleFoodSelection(food) {
-        showSpinner();
         setTimeout(() => {
-            const day = context.day;
-            const selectedMeal = context.selectedMeal;
-            const selectedFood = JSON.stringify(food);
-            const foodProfileIntent = context.foodProfileIntent;
-            const selectedPlan = context.selectedPlan ? context.selectedPlan : null;
-
             router.push({
                 pathname: routes.FOOD_PROFILE,
                 params: {
-                    day,
-                    selectedMeal,
-                    selectedFood,
-                    selectedPlan,
-                    foodProfileIntent
+                    dayDate: context.dayDate,
+                    selectedMealId: context.selectedMealId,
+                    selectedFood: JSON.stringify(food),
+                    selectedPlanId: context.selectedPlanId ? context.selectedPlanId : null,
+                    foodProfileIntent: context.foodProfileIntent
                 }
             });
-        }, 1);
+        });
     }
 
     async function handleUSDASearch(searchQuery, source) {
+        c0js
         try {
             showSpinner();
             let requestBody = {

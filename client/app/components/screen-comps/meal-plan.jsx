@@ -14,7 +14,7 @@ import Invert from '../effects/invert';
 import { formatDate, formatTime, toDateFromSQLTime } from '../../common/utils/date-time';
 import FadeInOut from '../effects/fade-in-out';
 
-export default function MealPlan({ label, date, description, meals = [], onDeletePress = () => { }, onUpdatePress = () => { }, onPlanPress = () => { }, onImportPlanPress = () => { }, expandedOnStart = false, intent = 'normal' }) {
+export default function MealPlan({ label, date, description, meals = [], onDeletePress = () => { }, onUpdatePress = () => { }, onPlanPress = () => { }, onImportPlanPress = () => { }, expandedOnStart = false, showImportButton = false }) {
     const { user } = useContext(UserContext);
     const [expanded, setExpanded] = useState(expandedOnStart);
 
@@ -139,8 +139,8 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
                         </View>
                     </View>
 
-                    <View style={intent === 'import' ? { flexDirection: 'row', justifyContent: 'space-between' } : {}}>
-                        {intent === 'import' &&
+                    <View style={showImportButton ? { flexDirection: 'row', justifyContent: 'space-between' } : {}}>
+                        {showImportButton &&
                             <AnimatedButton
                                 title="Import Plan"
                                 style={{
@@ -172,7 +172,7 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
                                 backgroundColor: colors.accentGreen,
                                 borderRadius: 15,
                                 marginTop: 15,
-                                width: intent === 'import' ? '48%' : '100%',
+                                width: showImportButton ? '48%' : '100%',
                             }}
                             textStyle={{ fontSize: scaleFont(13), fontWeight: 'bold' }}
                             rightImage={Images.arrow}

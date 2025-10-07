@@ -67,7 +67,9 @@ export default function NutritionHub() {
      function handleMealPlansPress() {
           router.push({
                pathname: routes.MEAL_PLANS,
-               params: { mealPlansIntent: 'normal' }
+               params: { 
+                    mealPlansIntent: 'normal' 
+               }
           });
      }
 
@@ -90,7 +92,7 @@ export default function NutritionHub() {
                                    current={convertEnergy(log?.consumedEnergyKcal || 0, 'kcal', user.preferences.energyUnit.key)}
                                    max={convertEnergy(log?.targetEnergyKcal || user.nutrition.setEnergyKcal, 'kcal', user.preferences.energyUnit.key)}
                                    unit={user.preferences.energyUnit.field}
-                                   color={nutritionColors.energy1}
+                                   color={log?.consumedEnergyKcal > log?.targetEnergyKcal ? 'red' : nutritionColors.energy1}
                                    styleType="header"
                                    height={10}
                                    warningText="(Excess Energy Consumed)"
