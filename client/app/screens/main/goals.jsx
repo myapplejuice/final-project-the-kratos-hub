@@ -34,22 +34,22 @@ export default function Goals() {
         function updateFeedbacks() {
             const activityFeedbacks = goalsActivityFeedbackText(user, 1);
             const weightGoalFeedBacks = goalsWeightGoalFeedbackText(user, 1);
+            const dietTips = goalsDietaryFeedbackTips(user, 1);
 
             setActivityFeedbacks(activityFeedbacks);
             setWeightGoalFeedbacks(weightGoalFeedBacks);
+            setDietTips(dietTips);
         };
 
         const activity = activityOptions.find(item => item.key === user.metrics.activityLevel);
         const goal = goalOptions.find(item => item.key === user.nutrition.goal);
         const diet = dietOptions.find(item => item.key === user.nutrition.diet);
-        const dietTips = goalsDietaryFeedbackTips(user, 1);
 
-        setDiet(diet);
-        setDietTips(dietTips);
         setActivity(activity);
         setGoal(goal);
-
+        setDiet(diet);
         updateFeedbacks();
+
         const intervalId = setInterval(updateFeedbacks, 60 * 1000);
         return () => clearInterval(intervalId);
     }, [user]);

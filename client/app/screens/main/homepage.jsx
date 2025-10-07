@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import {  StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import DateDisplay from "../../components/screen-comps/date-display";
 import AppText from "../../components/screen-comps/app-text";
 import { Images } from '../../common/settings/assets';
@@ -52,55 +52,6 @@ export default function Homepage() {
         return () => clearInterval(interval);
     }, [user.preferences]);
 
-    const BMRTab = [
-        {
-            label: "Basal Metabolic Rate",
-            value: convertEnergy(user.metrics.bmr, 'kcal', user.preferences.energyUnit.key) + " " + user.preferences.energyUnit.field,
-            icon: Images.kcalBurn,
-            route: routes.BASAL_METABOLIC_RATE,
-            bgColor: colors.statImageBackground,
-            iconColor: colors.white
-        },
-    ];
-
-    const tabsGroupOne = [
-        {
-            label: "Body Mass Index",
-            value: user.metrics.bmi,
-            icon: Images.bmi,
-            route: routes.BODY_MASS_INDEX,
-            bgColor: '#9B59B633',
-            iconColor: '#9B59B6'
-        },
-        {
-            label: "Estimated Body Fat",
-            value: user.metrics.bodyFat + "%",
-            icon: Images.bodyFat,
-            route: routes.BODY_FAT,
-            bgColor: '#E74C3C33',
-            iconColor: '#E74C3C'
-        }
-    ];
-
-    const tabsGroupTwo = [
-        {
-            label: "Lean Body Mass",
-            value: convertWeight(user.metrics.leanBodyMass, 'kg', user.preferences.weightUnit.key) + ` ${user.preferences.weightUnit.field}`,
-            icon: Images.muscleFibers,
-            route: routes.LEAN_BODY_MASS,
-            bgColor: '#4DB6AC33',
-            iconColor: '#4DB6AC'
-        },
-        {
-            label: "Energy Expenditure",
-            value: convertEnergy(user.metrics.tdee, 'kcal', user.preferences.energyUnit.key) + " " + user.preferences.energyUnit.field,
-            icon: Images.tdee,
-            route: routes.TOTAL_DAILY_ENERGY_EXPENDITURE,
-            bgColor: '#3498DB33',
-            iconColor: '#3498DB'
-        }
-    ];
-
     return (
         <AppScroll paddingColor={colors.background} topPadding={false} extraBottom={100} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>
             <View style={{ paddingHorizontal: 20, paddingTop: 100, paddingBottom: 30, margin: 0, backgroundColor: colors.main, borderBottomEndRadius: 30, borderBottomStartRadius: 30, overflow: 'hidden' }}>
@@ -130,7 +81,16 @@ export default function Homepage() {
                     </AppText>
                 </View>
                 <View style={{ backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15, marginBottom: 15 }}>
-                    {BMRTab.map((item, index) => (
+                    {[
+                        {
+                            label: "Basal Metabolic Rate",
+                            value: convertEnergy(user.metrics.bmr, 'kcal', user.preferences.energyUnit.key) + " " + user.preferences.energyUnit.field,
+                            icon: Images.kcalBurn,
+                            route: routes.BASAL_METABOLIC_RATE,
+                            bgColor: colors.statImageBackground,
+                            iconColor: colors.white
+                        },
+                    ].map((item, index) => (
                         <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 30, height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
                             <Image source={item.icon} style={[styles.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
                             <View style={{ alignItems: 'center' }}>
@@ -141,7 +101,24 @@ export default function Homepage() {
                     ))}
                 </View>
                 <View style={{ flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15, marginBottom: 15 }}>
-                    {tabsGroupOne.map((item, index) => (
+                    {[
+                        {
+                            label: "Body Mass Index",
+                            value: user.metrics.bmi,
+                            icon: Images.bmi,
+                            route: routes.BODY_MASS_INDEX,
+                            bgColor: '#9B59B633',
+                            iconColor: '#9B59B6'
+                        },
+                        {
+                            label: "Estimated Body Fat",
+                            value: user.metrics.bodyFat + "%",
+                            icon: Images.bodyFat,
+                            route: routes.BODY_FAT,
+                            bgColor: '#E74C3C33',
+                            iconColor: '#E74C3C'
+                        }
+                    ].map((item, index) => (
                         <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 20, width: '48%', height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
                             <Image source={item.icon} style={[styles.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
                             <View style={{ justifyContent: 'flex-start' }}>
@@ -152,7 +129,24 @@ export default function Homepage() {
                     ))}
                 </View>
                 <View style={{ flexDirection: 'row', backgroundColor: 'transparent', justifyContent: 'space-between', marginHorizontal: 15 }}>
-                    {tabsGroupTwo.map((item, index) => (
+                    {[
+                        {
+                            label: "Lean Body Mass",
+                            value: convertWeight(user.metrics.leanBodyMass, 'kg', user.preferences.weightUnit.key) + ` ${user.preferences.weightUnit.field}`,
+                            icon: Images.muscleFibers,
+                            route: routes.LEAN_BODY_MASS,
+                            bgColor: '#4DB6AC33',
+                            iconColor: '#4DB6AC'
+                        },
+                        {
+                            label: "Energy Expenditure",
+                            value: convertEnergy(user.metrics.tdee, 'kcal', user.preferences.energyUnit.key) + " " + user.preferences.energyUnit.field,
+                            icon: Images.tdee,
+                            route: routes.TOTAL_DAILY_ENERGY_EXPENDITURE,
+                            bgColor: '#3498DB33',
+                            iconColor: '#3498DB'
+                        }
+                    ].map((item, index) => (
                         <TouchableOpacity onPress={() => router.push(item.route)} key={index} style={{ backgroundColor: colors.cardBackground, padding: 20, width: '48%', height: 180, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
                             <Image source={item.icon} style={[styles.statImage, item.label !== 'Basal Metabolic Rate' && { tintColor: item.iconColor }, { width: 50, height: 50 }]} />
                             <View style={{ justifyContent: 'flex-start' }}>
@@ -404,6 +398,6 @@ const styles = StyleSheet.create({
         fontSize: scaleFont(11),
         flexShrink: 1,
         marginTop: 5,
-    statImage: { width: 35, height: 35, resizeMode: 'contain' },
+        statImage: { width: 35, height: 35, resizeMode: 'contain' },
     },
 });
