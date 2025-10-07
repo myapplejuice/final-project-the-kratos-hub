@@ -1,6 +1,6 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Image } from "expo-image";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, TouchableOpacity, View, } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppScroll from "../../../components/screen-comps/app-scroll";
@@ -28,8 +28,8 @@ import Invert from '../../../components/effects/invert';
 import Meal from '../../../components/screen-comps/meal';
 
 export default function MealPlansEditor() {
+    const context = useLocalSearchParams();
     const { createInput, showSpinner, hideSpinner, createToast, createDialog } = usePopups();
-    const [context, setContext] = useState(useLocalSearchParams());
     const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const [scrollToTop, setScrollToTop] = useState(false);
@@ -38,6 +38,8 @@ export default function MealPlansEditor() {
     const [openMeals, setOpenMeals] = useState([]);
 
     useEffect(() => {
+        const newPlan = user.plans.find(p => p.id === plan.id);
+        console.log(newPlan.meals[0].foods)
         setPlan(prev => user.plans.find(p => p.id === prev.id));
     }, [user.plans])
 
@@ -258,6 +260,7 @@ export default function MealPlansEditor() {
             pathname: routes.FOOD_SELECTION,
             params: {
                 selectedMeal: JSON.stringify(meal),
+                selectedPlan: JSON.stringify(plan),
                 foodProfileIntent: 'mealplan/add'
             }
         });
@@ -269,6 +272,7 @@ export default function MealPlansEditor() {
             params: {
                 selectedMeal: JSON.stringify(meal),
                 selectedFood: JSON.stringify(food),
+                selectedPlan: JSON.stringify(plan),
                 foodProfileIntent: 'mealplan/update'
             }
         });

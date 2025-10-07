@@ -129,6 +129,8 @@ export default function FoodSelection() {
             const day = context.day;
             const selectedMeal = context.selectedMeal;
             const selectedFood = JSON.stringify(food);
+            const foodProfileIntent = context.foodProfileIntent;
+            const selectedPlan = context.selectedPlan ? context.selectedPlan : null;
 
             router.push({
                 pathname: routes.FOOD_PROFILE,
@@ -136,7 +138,8 @@ export default function FoodSelection() {
                     day,
                     selectedMeal,
                     selectedFood,
-                    foodProfileIntent: 'meal/add'
+                    selectedPlan,
+                    foodProfileIntent
                 }
             });
         }, 1);

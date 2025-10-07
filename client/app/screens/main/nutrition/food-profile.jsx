@@ -92,6 +92,7 @@ export default function FoodProfile() {
             createAlert({ text: 'Please enter a valid serving size' });
             return;
         }
+        console.log(intent)
 
         if (intent !== 'mealplan/add' && intent !== 'mealplan/update') {
             const maxKcal = day.targetEnergyKcal || 0;
@@ -340,9 +341,6 @@ export default function FoodProfile() {
             additionalProps,
         };
 
-        console.log('goes through here ')
-        console.log(payload)
-
         try {
             const result = await APIService.nutrition.mealPlans.meals.foods.add({ food: payload });
 
@@ -350,7 +348,7 @@ export default function FoodProfile() {
                 payload.id = result.data.id;
                 const planId = selectedPlan.id;
                 const mealId = selectedMeal.id;
-
+                
                 setUser(prev => ({
                     ...prev,
                     plans: prev.plans.map(plan =>

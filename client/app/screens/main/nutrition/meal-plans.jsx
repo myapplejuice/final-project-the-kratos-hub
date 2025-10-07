@@ -203,7 +203,7 @@ export default function MealsPlans() {
     async function handlePlanPress(plan) {
         router.push({
             pathname: routes.MEAL_PLANS_EDITOR,
-            params: { selectedPlan: plan }
+            params: { selectedPlan: JSON.stringify(plan) }
         });
     }
 
