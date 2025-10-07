@@ -148,13 +148,13 @@ export default class NutritionMealsDBService {
                 if (createdMeals.length === 0)
                     throw new Error("No meals created");
 
-                return { success: true, meals: createdMeals };
+                return createdMeals;
             });
 
             return result;
         } catch (err) {
             console.error("multiCreateMeals transaction error:", err);
-            return { success: false, message: err.message || "Transaction failed" };
+            return null;
         }
     }
 }

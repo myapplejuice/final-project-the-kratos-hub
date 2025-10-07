@@ -1,5 +1,162 @@
-{
-    "foodProfileIntent": "mealplan/add",
-    "selectedFood": "{\"id\":10,\"ownerId\":\"9660511F-B551-4970-9160-D193B735723B\",\"creatorId\":\"204EFF41-FF71-4636-9425-14DBB383E2BA\",\"creatorName\":\"Ibrahem  Abu Shah\",\"USDAId\":-1,\"isPublic\":false,\"isUSDA\":false,\"label\":\"Chicken Breast\",\"category\":\"Poultry\",\"servingUnit\":\"g\",\"servingSize\":100,\"energyKcal\":165,\"carbs\":0,\"protein\":33,\"fat\":4.1,\"dominantMacro\":\"Protein\",\"additionalProps\":[{\"id\":0,\"label\":\"Zinc\",\"amount\":100,\"unit\":\"mg\"},{\"id\":1,\"label\":\"Iron\",\"amount\":133,\"unit\":\"mg\"},{\"id\":2,\"label\":\"Vitamin K\",\"amount\":200,\"unit\":\"mg\"}]}",
-    "selectedMeal": "{\"id\":2,\"mealPlanId\":2,\"label\":\"Meal 1\",\"time\":null,\"foods\":[]}"
-}
+[
+    {
+        "USDAId": -1,
+        "additionalProps": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "carbs": 0,
+        "category": "Poultry",
+        "creatorId": "204EFF41-FF71-4636-9425-14DBB383E2BA",
+        "creatorName": "Ibrahem  Abu Shah",
+        "dominantMacro": "Protein",
+        "energyKcal": 248,
+        "fat": 6,
+        "id": 15,
+        "isPublic": false,
+        "isUSDA": false,
+        "label": "Chicken Breast",
+        "mealId": 2,
+        "originalCarbs": 0,
+        "originalEnergyKcal": 165,
+        "originalFat": 4.1,
+        "originalProtein": 33,
+        "originalServingSize": 100,
+        "ownerId": "9660511F-B551-4970-9160-D193B735723B",
+        "protein": 50,
+        "servingSize": 150,
+        "servingUnit": "g"
+    },
+    {
+        "USDAId": 746779,
+        "additionalProps": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "carbs": 3,
+        "category": "Sausages and Luncheon Meats",
+        "creatorId": "00000000-0000-0000-0000-000000000000",
+        "creatorName": "USDA",
+        "dominantMacro": "Fat",
+        "energyKcal": 328,
+        "fat": 29,
+        "id": 16,
+        "isPublic": true,
+        "isUSDA": true,
+        "label": "Sausage, Breakfast Sausage, Beef, Pre-cooked, Unprepared",
+        "mealId": 2,
+        "originalCarbs": 3,
+        "originalEnergyKcal": 328,
+        "originalFat": 29,
+        "originalProtein": 13,
+        "originalServingSize": 100,
+        "ownerId": "9660511F-B551-4970-9160-D193B735723B",
+        "protein": 13,
+        "servingSize": 100,
+        "servingUnit": "g"
+    }
+]
