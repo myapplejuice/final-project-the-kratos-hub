@@ -92,7 +92,6 @@ export default function FoodProfile() {
             createAlert({ text: 'Please enter a valid serving size' });
             return;
         }
-        console.log(intent)
 
         if (intent !== 'mealplan/add' && intent !== 'mealplan/update') {
             const maxKcal = day.targetEnergyKcal || 0;

@@ -335,10 +335,12 @@ export default function FoodSelection() {
             const excludedNutrients = ['Energy', 'Protein', 'Total lipid (fat)', 'Carbohydrate, by difference'];
 
             const additionalProps = nutrients
-                .filter(n => !excludedNutrients.includes(n.nutrientName))
+                .filter(n => !excludedNutrients.includes(n.nutrientName) && Math.round(n.value) >= 1)
+                .sort((a, b) => b.value - a.value)
                 .map((n, i) => ({
                     id: i,
                     label: n.nutrientName,
+                    originalAmount: n.value,
                     amount: n.value,
                     unit: n.unitName
                 }));
@@ -374,7 +376,16 @@ export default function FoodSelection() {
                 additionalProps,
             };
 
-            console.log("Extracted info:", info);
+            router.push({
+                pathname: routes.FOOD_PROFILE,
+                params: {
+                    day,
+                    selectedMeal,
+                    selectedPlan,
+                    selectedFood: JSON.stringify(info),
+                    foodProfileIntent
+                }
+            });
         } else {
             createAlert({ title: 'Barcode Scan', text: 'Barcode did not match a food' })
         }

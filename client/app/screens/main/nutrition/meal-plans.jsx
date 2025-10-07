@@ -167,13 +167,18 @@ export default function MealsPlans() {
             return createToast({ message: "No meals to import in this plan, click \"View Full Plan\" to start adding meals" });
         }
 
+        const foodCount = plan.meals.reduce((acc, meal) => acc + meal.foods?.length, 0 || 0);
+
+        if (foodCount === 0) {
+            return createToast({ message: "The meals in this plan do not contain any foods, click \"View Full Plan\" to start adding foods to the meals" });
+        }
+
         const meals = plan.meals;
         const day = JSON.parse(context.day);
-        
+
         try {
             showSpinner();
             const result = await APIService.nutrition.meals.bulk({ nutritionLogId: day.id, meals });
-            console.log(result)
         
             if (result.success) {
                 setUser(prev => ({
@@ -189,6 +194,9 @@ export default function MealsPlans() {
                         }
                     }
                 }));
+
+                createToast({ message: 'Meals imported' });
+                router.back();
             } else {
                 createToast({ message: result.message });
             }

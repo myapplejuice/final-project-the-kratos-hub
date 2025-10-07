@@ -105,7 +105,6 @@ export default function MealsLog() {
             }));
         } else {
             createToast({ message: `Server error, ${result.message}` });
-            console.log('failed to create today\'s nutrition day:', result.message);
             setCurrentDayLog({});
         }
         hideSpinner();

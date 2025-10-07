@@ -39,9 +39,8 @@ export default function MealPlansEditor() {
 
     useEffect(() => {
         const newPlan = user.plans.find(p => p.id === plan.id);
-        console.log(newPlan.meals[0].foods)
-        setPlan(prev => user.plans.find(p => p.id === prev.id));
-    }, [user.plans])
+        setPlan(newPlan);
+    }, [user.plans]);
 
     async function handleMealAddition() {
         createInput({
