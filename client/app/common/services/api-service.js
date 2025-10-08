@@ -88,6 +88,7 @@ export default class APIService {
         anotherProfile: (id) => APIService.request(`/user-to-user/another-profile/${id}`, 'GET'),
         multipleAnotherProfile: (payload) => APIService.request(`/user-to-user/multiple-another-profile/${APIService.USER_ID}`, 'POST', payload),
         friendRequest: (payload) => APIService.request(`/user-to-user/friend-request/${APIService.USER_ID}`, 'POST', payload),
+        replyRequest: (payload) => APIService.request(`/user-to-user/reply-request/${APIService.USER_ID}`, 'POST', payload),
     }
 
     static nutrition = {

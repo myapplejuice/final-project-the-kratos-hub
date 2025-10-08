@@ -39,7 +39,6 @@ export function userTablesQuery() {
                     AdderId UNIQUEIDENTIFIER NOT NULL,
                     ReceiverId UNIQUEIDENTIFIER NOT NULL,
                     Status VARCHAR(20) NOT NULL DEFAULT 'pending',
-                    Seen BIT NOT NULL DEFAULT 0,
                     Description VARCHAR(500) NULL,
                     DateOfCreation DATETIME2 NOT NULL,
                     CONSTRAINT UQ_FriendRequests UNIQUE (AdderId, ReceiverId),

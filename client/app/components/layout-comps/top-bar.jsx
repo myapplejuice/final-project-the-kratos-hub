@@ -1,5 +1,5 @@
-import { useContext, useEffect, useRef } from "react";
-import { View,  StyleSheet,  TouchableOpacity,  Image,} from "react-native";
+import { useContext, useEffect, useRef, useState } from "react";
+import { View, StyleSheet, TouchableOpacity, Image, } from "react-native";
 import { Images } from "../../common/settings/assets";
 import { router, usePathname } from "expo-router";
 import { colors } from "../../common/settings/styling";
@@ -16,6 +16,11 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
     const screen = usePathname();
     const topBarPosition = useRef(new Animated.Value(0)).current;
     const topBarOpacity = useRef(new Animated.Value(0)).current;
+    const [notificationsCount, setNotificationsCount] = useState(0);
+
+    useEffect(() => {
+        setNotificationsCount(user?.pendingFriends?.filter(f => f.adderId !== user.id).length || 0);
+    }, [user?.pendingFriends]);
 
     useEffect(() => {
         Animated.timing(topBarPosition, {
@@ -164,6 +169,29 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         socialButton: { marginRight: 6 },
         addressRow: { flexDirection: "row", alignItems: "center" },
         addressText: { marginLeft: 8, color: "rgba(161,161,161,1)", fontSize: 15 },
+        bellWrapper: {
+            position: 'relative',
+        },
+
+        badge: {
+            position: 'absolute',
+            bottom: 0,
+            right: 2,
+            backgroundColor: 'red',
+            borderRadius: 8,
+            minWidth: 16,
+            height: 16,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: 3,
+        },
+
+        badgeText: {
+            color: 'white',
+            fontSize: scaleFont(10),
+            fontWeight: 'bold',
+        },
+
     });
 
     return (
@@ -184,12 +212,33 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                 <View style={styles.right}>
                     {inMain && (
                         <>
-                            <TouchableOpacity onPress={() => router.push(routes.PROFILE)} style={{ marginRight: 10 }}>
-                                <Image style={styles.bellImage} source={Images.noMessage} />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => router.push(routes.NOTIFICATIONS)} style={{ marginRight: 10 }}>
-                                <Image style={styles.bellImage} source={Images.noNotification} />
-                            </TouchableOpacity>
+                            <View style={styles.bellWrapper}>
+                                <TouchableOpacity onPress={() => router.push(routes.PROFILE)} style={{ marginRight: 10 }}>
+                                    <Image style={styles.bellImage} source={Images.noMessage} />
+                                </TouchableOpacity>
+                                {user?.unreadMessages > 0 && (
+                                    <View style={styles.badge}>
+                                        <AppText style={styles.badgeText}>
+                                            {user.unreadMessages > 99 ? '99+' : user.unreadMessages}
+                                        </AppText>
+                                    </View>
+                                )}
+                            </View>
+
+                            {/* Notifications Bell */}
+                            <View style={[styles.bellWrapper, { marginEnd: notificationsCount > 0 ? 5 : 0 }]}>
+                                <TouchableOpacity onPress={() => router.push(routes.NOTIFICATIONS)} style={{ marginRight: 10 }}>
+                                    <Image style={styles.bellImage} source={notificationsCount > 0 ? Images.notification : Images.noNotification} />
+                                </TouchableOpacity>
+                                {notificationsCount > 0 && (
+                                    <View style={styles.badge}>
+                                        <AppText style={styles.badgeText}>
+                                            {notificationsCount > 99 ? '99+' : notificationsCount}
+                                        </AppText>
+                                    </View>
+                                )}
+                            </View>
+
                             <TouchableOpacity onPress={() => router.push(routes.PROFILE)}>
                                 <Image
                                     style={styles.profileImage}

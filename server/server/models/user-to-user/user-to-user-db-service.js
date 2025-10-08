@@ -91,10 +91,14 @@ export default class UserToUserDBService {
             Database.addInput(request, 'DateOfCreation', sql.DateTime2, details.dateOfCreation || new Date());
 
             const checkQuery = `
-                SELECT Id, Status 
-                FROM FriendRequests
-                WHERE AdderId = @AdderId AND ReceiverId = @ReceiverId
-            `;
+                    SELECT Id, Status 
+                    FROM FriendRequests
+                    WHERE 
+                        (AdderId = @AdderId AND ReceiverId = @ReceiverId)
+                        OR
+                        (AdderId = @ReceiverId AND ReceiverId = @AdderId)
+                        AND Status = 'pending'
+                `;
             const existing = await request.query(checkQuery);
 
             if (existing.recordset.length > 0) {
@@ -179,6 +183,58 @@ export default class UserToUserDBService {
         } catch (err) {
             console.error('fetchUserPendingFriendsList error:', err);
             return [];
+        }
+    }
+
+    static async replyToFriendRequest(details) {
+        try {
+            const request = Database.getRequest();
+            const reply = details.reply === 'accept' ? 'accepted' : 'declined';
+
+            console.log(details.id)
+            Database.addInput(request, 'Id', sql.Int, details.id);
+            Database.addInput(request, 'Status', sql.VarChar(20), reply);
+
+            const updateQuery = `
+            UPDATE FriendRequests
+            SET Status = @Status
+            WHERE Id = @Id
+        `;
+            await request.query(updateQuery);
+
+            let newRowId = null;
+
+            if (reply === 'accepted') {
+                let userOne = details.adderId;
+                let userTwo = details.receiverId;
+
+                // Swap so UserOne < UserTwo
+                if (userOne > userTwo) {
+                    [userOne, userTwo] = [userTwo, userOne];
+                }
+
+                Database.addInput(request, 'UserOne', sql.UniqueIdentifier, userOne);
+                Database.addInput(request, 'UserTwo', sql.UniqueIdentifier, userTwo);
+
+                const insertQuery = `
+                INSERT INTO UserFriendList (UserOne, UserTwo, Status)
+                OUTPUT INSERTED.Id
+                VALUES (@UserOne, @UserTwo, 'accepted')
+            `;
+
+                const result = await request.query(insertQuery);
+                newRowId = result.recordset[0]?.Id || null;
+            }
+
+            return {
+                success: true,
+                message: "Friend request updated successfully",
+                id: newRowId
+            };
+
+        } catch (err) {
+            console.error('replyToFriendRequest error:', err);
+            return { success: false, message: "Failed to update friend request" };
         }
     }
 

@@ -1,69 +1,20 @@
 {
-    "USDAId": 2310033,
-    "additionalProps": [
-        {
-            "amount": 363,
-            "id": 0,
-            "label": "Sodium, Na",
-            "originalAmount": 363,
-            "unit": "MG"
-        },
-        {
-            "amount": 336,
-            "id": 1,
-            "label": "Potassium, K",
-            "originalAmount": 336,
-            "unit": "MG"
-        },
-        {
-            "amount": 27,
-            "id": 2,
-            "label": "Calcium, Ca",
-            "originalAmount": 27,
-            "unit": "MG"
-        },
-        {
-            "amount": 4.42,
-            "id": 3,
-            "label": "Sugars, Total",
-            "originalAmount": 4.42,
-            "unit": "G"
-        },
-        {
-            "amount": 0.9,
-            "id": 4,
-            "label": "Fiber, total dietary",
-            "originalAmount": 0.9,
-            "unit": "G"
-        },
-        {
-            "amount": 0.88,
-            "id": 5,
-            "label": "Iron, Fe",
-            "originalAmount": 0.88,
-            "unit": "MG"
-        },
-        {
-            "amount": 0.88,
-            "id": 6,
-            "label": "Fatty acids, total saturated",
-            "originalAmount": 0.88,
-            "unit": "G"
-        }
-    ],
-    "carbs": 5,
-    "category": "Pre-Packaged Fruit & Vegetables",
-    "creatorId": "00000000-0000-0000-0000-000000000000",
-    "creatorName": "USDA",
-    "dominantMacro": "Fat",
-    "energyKcal": 80,
-    "fat": 6,
-    "id": 15,
-    "isPublic": false,
-    "isUSDA": true,
-    "label": "Mushroom (Carbone Fine Food, LLC)",
-    "ownerId": "9660511F-B551-4970-9160-D193B735723B",
-    "protein": 1,
-    "servingSize": 0,
-    "servingUnit": "g"
+    "adderId": "9660511F-B551-4970-9160-D193B735723B",
+    "dateOfCreation": "2025-10-08T15:23:56.124Z",
+    "description": "",
+    "id": 1,
+    "profile": {
+        "age": 33,
+        "dateOfCreation": "2025-10-07T13:00:48.250Z",
+        "email": "rawda1@gmail.com",
+        "firstname": "Rawda",
+        "gender": "female",
+        "id": "9660511F-B551-4970-9160-D193B735723B",
+        "lastname": "Abu Shah",
+        "phone": "0564848166"
+    },
+    "receiverId": "204EFF41-FF71-4636-9425-14DBB383E2BA",
+    "role": "receiver",
+    "seen": false,
+    "status": "pending"
 }
