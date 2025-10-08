@@ -67,6 +67,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.MEAL_PLANS_EDITOR]: "Edit Meal Plan",
         [routes.USER_PROFILE]: "User Profile",
         [routes.USDA_PROFILE]: "USDA Profile",
+        [routes.NOTIFICATIONS]: "Notifications",
     };
 
     const styles = StyleSheet.create({
@@ -186,7 +187,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                             <TouchableOpacity onPress={() => router.push(routes.PROFILE)} style={{ marginRight: 10 }}>
                                 <Image style={styles.bellImage} source={Images.noMessage} />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => router.push(routes.PROFILE)} style={{ marginRight: 10 }}>
+                            <TouchableOpacity onPress={() => router.push(routes.NOTIFICATIONS)} style={{ marginRight: 10 }}>
                                 <Image style={styles.bellImage} source={Images.noNotification} />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => router.push(routes.PROFILE)}>

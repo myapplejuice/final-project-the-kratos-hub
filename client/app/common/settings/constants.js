@@ -12,6 +12,7 @@ export const routes = {
     GOALS: '/screens/main/goals',
     NUTRITION_HUB: '/screens/main/nutrition-hub',
     TRAINING_HUB: '/screens/main/training-hub',
+    NOTIFICATIONS: '/screens/main/notifications',
 
     /* HOMEPAGE CHILDREN */
     LEAN_BODY_MASS: '/screens/main/homepage/lean-body-mass',

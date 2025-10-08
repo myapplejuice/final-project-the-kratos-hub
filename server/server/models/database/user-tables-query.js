@@ -45,12 +45,27 @@ export function userTablesQuery() {
                     CONSTRAINT UQ_FriendRequests UNIQUE (AdderId, ReceiverId),
                     CONSTRAINT FK_FriendRequests_Adder FOREIGN KEY (AdderId)
                         REFERENCES dbo.Users(Id)
-                        ON DELETE CASCADE,
+                        ON DELETE NO ACTION,
                     CONSTRAINT FK_FriendRequests_Receiver FOREIGN KEY (ReceiverId)
                         REFERENCES dbo.Users(Id)
-                        ON DELETE CASCADE
+                        ON DELETE NO ACTION
                 );
             END;
+
+            IF NOT EXISTS (SELECT * FROM sys.triggers WHERE name = 'TR_FriendRequests_Delete')
+                BEGIN
+                    EXEC('
+                        CREATE TRIGGER TR_FriendRequests_Delete
+                        ON dbo.Users
+                        AFTER DELETE
+                        AS
+                        BEGIN
+                            DELETE FROM dbo.FriendRequests
+                            WHERE AdderId IN (SELECT Id FROM DELETED)
+                               OR ReceiverId IN (SELECT Id FROM DELETED);
+                        END
+                    ')
+                END;
 
             IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='UserFriendList' AND xtype='U')
             BEGIN
@@ -60,12 +75,12 @@ export function userTablesQuery() {
                     UserTwo UNIQUEIDENTIFIER NOT NULL,
                     Status VARCHAR(20) NOT NULL,
                     -- enforce consistent order to prevent symmetric duplicates
-                    CONSTRAINT CK_UserFriendList_Order CHECK (User_One < User_Two),
-                    CONSTRAINT UQ_UserFriendList UNIQUE (User_One, User_Two),
-                    CONSTRAINT FK_UserFriendList_UserOne FOREIGN KEY (User_One)
+                    CONSTRAINT CK_UserFriendList_Order CHECK (UserOne < UserTwo),
+                    CONSTRAINT UQ_UserFriendList UNIQUE (UserOne, UserTwo),
+                    CONSTRAINT FK_UserFriendList_UserOne FOREIGN KEY (UserOne)
                         REFERENCES dbo.Users(Id)
                         ON DELETE NO ACTION,
-                    CONSTRAINT FK_UserFriendList_UserTwo FOREIGN KEY (User_Two)
+                    CONSTRAINT FK_UserFriendList_UserTwo FOREIGN KEY (UserTwo)
                         REFERENCES dbo.Users(Id)
                         ON DELETE NO ACTION
                 );
@@ -81,8 +96,8 @@ export function userTablesQuery() {
                     AS
                     BEGIN
                         DELETE FROM dbo.UserFriendList
-                        WHERE User_One IN (SELECT Id FROM DELETED)
-                           OR User_Two IN (SELECT Id FROM DELETED);
+                        WHERE UserOne IN (SELECT Id FROM DELETED)
+                           OR UserTwo IN (SELECT Id FROM DELETED);
                     END
                 ')
             END;`
@@ -194,7 +209,6 @@ export function userTablesQuery() {
 
     const query = [
         userQuery,
-        userNotificationsQuery,
         userFriendListQuery,
         metricsQuery,
         nutritionQuery,

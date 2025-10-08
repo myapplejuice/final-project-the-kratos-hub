@@ -101,6 +101,8 @@ function Layout() {
                                             <Stack.Screen name="screens/main/goals" />
                                             <Stack.Screen name="screens/main/nutrition-hub" />
                                             <Stack.Screen name="screens/main/training-hub" />
+                                            <Stack.Screen name="screens/main/notifications" />
+                                            
 
                                             {/* HOMEPAGE CHILDREN */}
                                             <Stack.Screen name="screens/main/homepage/lean-body-mass" />

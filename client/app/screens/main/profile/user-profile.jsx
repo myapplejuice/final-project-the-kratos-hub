@@ -20,6 +20,9 @@ export default function UserProfile() {
     const { user, setUser } = useContext(UserContext);
     const [profile, setProfile] = useState({});
     const [viewImage, setViewImage] = useState(false);
+    let friend = user.friends?.find(f => f.friendId === profile.id);
+    if (!friend) 
+        friend = user.pendingFriends?.find(f => f.adderId === profile.id || f.receiverId === profile.id);
 
     useEffect(() => {
         async function fetchUserProfile() {
@@ -53,7 +56,7 @@ export default function UserProfile() {
     async function handleAddFriend() {
         createInput({
             title: 'Add Friend',
-           confirmText: "Add",
+            confirmText: "Add",
             text: `OPTIONAL:\nEnter something about yourself for them to know about you`,
             placeholders: [`Let them know about you...`],
             initialValues: [``],
@@ -74,6 +77,10 @@ export default function UserProfile() {
                     const result = await APIService.userToUser.friendRequest(payload);
 
                     if (result.success) {
+                        setUser(prev => ({
+                            ...prev,
+                            friends: [...prev.friends, payload]
+                        }));
                         createToast({ message: "Friend request sent" });
                     } else {
                         createAlert({ title: 'Failure', text: result.message });
@@ -118,9 +125,23 @@ export default function UserProfile() {
                                 />
                             </TouchableOpacity>
 
-                            <AppText style={styles.name}>
+                            <AppText style={[styles.name, { marginBottom: 0, paddingBottom: 0 }]}>
                                 {profile.firstname} {profile.lastname}
                             </AppText>
+
+                            <View style={{ marginTop: 5, marginBottom: 15 }}>
+                                {friend && (
+                                    <View style={{ padding: 9, borderRadius: 20, backgroundColor: friend.status === 'active' ? colors.accentGreen : colors.accentYellow }}>
+                                        <AppText style={{ color: 'white', fontSize: scaleFont(11)}}>
+                                            {friend.status === 'pending'
+                                                ? 'Pending Friend'
+                                                : friend.status === 'active'
+                                                    ? 'Active Friend'
+                                                    : 'Friendship Terminated'}
+                                        </AppText>
+                                    </View>
+                                )}
+                            </View>
 
                             <View style={styles.infoContainer}>
                                 <View style={styles.infoRow}>

@@ -50,11 +50,13 @@ export default class UserController {
         const userDayLogs = await NutritionDaysDBService.fetchAllDays(id);
         const userFoods = await NutritionFoodsDBService.fetchFoods(id);
         const userMealPlans = await NutritionMealPlansDBService.fetchPlansByUserId(id);
-        const friendsList = await UserToUserDBService.fetchFriendsList(id);
+        const friends = await UserToUserDBService.fetchUserFriendsList(id);
+        const pendingFriends = await UserToUserDBService.fetchUserPendingFriendsList(id);
         profile.nutritionLogs = userDayLogs;
         profile.foods = userFoods;
         profile.plans = userMealPlans;
-        profile.friends
+        profile.friends = friends;
+        profile.pendingFriends = pendingFriends;
 
         return res.status(200).json({ profile });
     }

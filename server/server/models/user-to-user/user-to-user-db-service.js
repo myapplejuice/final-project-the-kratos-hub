@@ -75,4 +75,71 @@ export default class UserToUserDBService {
         }
     }
 
+    static async fetchUserFriendsList(userId) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
+
+            const query = `
+            SELECT 
+                Id,
+                CASE 
+                    WHEN UserOne = @UserId THEN UserTwo
+                    ELSE UserOne
+                END AS FriendId,
+                Status
+            FROM UserFriendList
+            WHERE UserOne = @UserId OR UserTwo = @UserId
+        `;
+
+            const result = await request.query(query);
+
+            if (!result.recordset.length) return [];
+
+            return result.recordset.map(r => ({
+                id: r.Id,
+                friendId: r.FriendId,
+                status: r.Status
+            }));
+        } catch (err) {
+            console.error('fetchUserFriendsList error:', err);
+            return [];
+        }
+    }
+
+    static async fetchUserPendingFriendsList(userId) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
+
+            const query = `
+            SELECT Id, AdderId, ReceiverId, Status, Description, Seen, DateOfCreation,
+                CASE 
+                    WHEN AdderId = @UserId THEN 'adder'
+                    ELSE 'receiver'
+                END AS Role
+            FROM FriendRequests
+            WHERE (AdderId = @UserId OR ReceiverId = @UserId)
+            AND Status = 'pending'
+        `;
+
+            const result = await request.query(query);
+            if (!result.recordset.length) return [];
+
+            return result.recordset.map(r => ({
+                id: r.Id,
+                adderId: r.AdderId,
+                receiverId: r.ReceiverId,
+                status: r.Status,
+                description: r.Description,
+                seen: r.Seen,
+                dateOfCreation: r.DateOfCreation,
+                role: r.Role
+            }));
+        } catch (err) {
+            console.error('fetchUserPendingFriendsList error:', err);
+            return [];
+        }
+    }
+
 }
