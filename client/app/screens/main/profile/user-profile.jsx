@@ -21,6 +21,7 @@ import { CameraContext } from '../../../common/contexts/camera-context';
 import { LibraryContext } from '../../../common/contexts/library-context';
 import AnimatedButton from '../../../components/screen-comps/animated-button';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FadeInOut from '../../../components/effects/fade-in-out';
 
 export default function UserProfile() {
     const context = useLocalSearchParams();
@@ -29,6 +30,7 @@ export default function UserProfile() {
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
     const { user, setUser } = useContext(UserContext);
     const [profile, setProfile] = useState({});
+    const [viewImage, setViewImage] = useState(false);
     const insets = useSafeAreaInsets();
 
     useEffect(() => {
@@ -146,90 +148,122 @@ export default function UserProfile() {
     }
 
     return (
-        <View style={styles.main}>
-            {Object.keys(profile).length > 0 && (
-                <AppScroll extraBottom={20}>
-                    <View style={[styles.card, { alignItems: 'center' }]}>
-                        <TouchableOpacity style={styles.imageWrapper}>
-                            <Image
-                                source={profile.image}
-                                style={styles.profileImage}
-                            />
-                        </TouchableOpacity>
+        <>
+            <FadeInOut visible={viewImage && profile.image} style={styles.imageOverlay}>
+                <TouchableOpacity
+                    activeOpacity={1}
+                    style={styles.imageOverlay}
+                    onPress={() => setViewImage(false)}
+                >
+                    <Image
+                        source={profile.image}
+                        style={styles.fullscreenImage}
+                    />
+                </TouchableOpacity>
+            </FadeInOut>
 
-                        <AppText style={styles.name}>
-                            {profile.firstname} {profile.lastname}
-                        </AppText>
+            <View style={styles.main}>
+                {Object.keys(profile).length > 0 && (
+                    <AppScroll extraBottom={20}>
+                        <View style={[styles.card, { alignItems: 'center' }]}>
+                            <TouchableOpacity onPress={() => setViewImage(true)} style={styles.imageWrapper}>
+                                <Image
+                                    source={profile.image}
+                                    style={styles.profileImage}
+                                />
+                            </TouchableOpacity>
 
-                        <View style={styles.infoContainer}>
-                            <View style={styles.infoRow}>
-                                <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecond }]}>
-                                    <Image source={Images.email} style={[styles.detailIcon]} />
-                                </View>
-                                <View style={styles.infoText}>
-                                    <AppText style={styles.detailLabel}>Email Address</AppText>
-                                    <AppText style={styles.detail} numberOfLines={1} ellipsizeMode="tail">
-                                        {profile.email}
-                                    </AppText>
-                                </View>
-                            </View>
+                            <AppText style={styles.name}>
+                                {profile.firstname} {profile.lastname}
+                            </AppText>
 
-                            <View style={[styles.infoRow, { paddingVertical: 10 }]}>
-                                <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecond }]}>
-                                    <Image source={Images.phoneTwo} style={[styles.detailIcon]} />
+                            <View style={styles.infoContainer}>
+                                <View style={styles.infoRow}>
+                                    <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecond }]}>
+                                        <Image source={Images.email} style={[styles.detailIcon]} />
+                                    </View>
+                                    <View style={styles.infoText}>
+                                        <AppText style={styles.detailLabel}>Email Address</AppText>
+                                        <AppText style={styles.detail} numberOfLines={1} ellipsizeMode="tail">
+                                            {profile.email}
+                                        </AppText>
+                                    </View>
                                 </View>
-                                <View style={styles.infoText}>
-                                    <AppText style={styles.detailLabel}>Phone Number</AppText>
-                                    <AppText style={styles.detail}>
-                                        {profile.phone}
-                                    </AppText>
-                                </View>
-                            </View>
 
-                            <View style={styles.infoRow}>
-                                <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecond }]}>
-                                    <Image source={Images.calendar} style={[styles.detailIcon]} />
+                                <View style={[styles.infoRow, { paddingVertical: 10 }]}>
+                                    <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecond }]}>
+                                        <Image source={Images.phoneTwo} style={[styles.detailIcon]} />
+                                    </View>
+                                    <View style={styles.infoText}>
+                                        <AppText style={styles.detailLabel}>Phone Number</AppText>
+                                        <AppText style={styles.detail}>
+                                            {profile.phone}
+                                        </AppText>
+                                    </View>
                                 </View>
-                                <View style={styles.infoText}>
-                                    <AppText style={styles.detailLabel}>Date Joined</AppText>
-                                    <AppText style={styles.detail}>
-                                        {formatDate(profile.dateOfCreation, { format: user.preferences.dateFormat, includeMonthName: true })}
-                                    </AppText>
+
+                                <View style={styles.infoRow}>
+                                    <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecond }]}>
+                                        <Image source={Images.calendar} style={[styles.detailIcon]} />
+                                    </View>
+                                    <View style={styles.infoText}>
+                                        <AppText style={styles.detailLabel}>Date Joined</AppText>
+                                        <AppText style={styles.detail}>
+                                            {formatDate(profile.dateOfCreation, { format: user.preferences.dateFormat, includeMonthName: true })}
+                                        </AppText>
+                                    </View>
                                 </View>
                             </View>
                         </View>
-                    </View>
 
-                    <View style={[styles.card, { marginTop: 15 }]}>
-                        <AppText style={styles.cardLabel}>Account & Application</AppText>
-                        {[
-                            { icon: Images.password, label: 'Change Password', onPress: openPasswordChange },
-                            { icon: Images.editTwo, label: 'Edit Profile', onPress: () => router.push(routes.EDIT_PROFILE) },
-                            { icon: Images.settingsTwo, label: 'Settings', onPress: () => router.push(routes.SETTINGS) },
-                        ].map((item, i) => (
-                            <View key={i}>
-                                <TouchableOpacity key={i} style={[styles.optionRow, i === 2 && { marginBottom: 0 }]} onPress={item.onPress}>
-                                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
-                                        <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
-                                            <Image source={item.icon} style={styles.settingIcon} />
+                        <View style={[styles.card, { marginTop: 15 }]}>
+                            <AppText style={styles.cardLabel}>Account & Application</AppText>
+                            {[
+                                { icon: Images.password, label: 'Change Password', onPress: openPasswordChange },
+                                { icon: Images.editTwo, label: 'Edit Profile', onPress: () => router.push(routes.EDIT_PROFILE) },
+                                { icon: Images.settingsTwo, label: 'Settings', onPress: () => router.push(routes.SETTINGS) },
+                            ].map((item, i) => (
+                                <View key={i}>
+                                    <TouchableOpacity key={i} style={[styles.optionRow, i === 2 && { marginBottom: 0 }]} onPress={item.onPress}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
+                                            <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
+                                                <Image source={item.icon} style={styles.settingIcon} />
+                                            </View>
+                                            <AppText style={styles.label}>
+                                                {item.label}
+                                            </AppText>
                                         </View>
-                                        <AppText style={styles.label}>
-                                            {item.label}
-                                        </AppText>
-                                    </View>
-                                    <Image source={Images.backArrow} style={[styles.arrow, { transform: [{ scaleX: -1 }] }]} />
-                                </TouchableOpacity>
-                                {i !== 2 && <Divider orientation='horizontal' color={colors.divider} />}
-                            </View>
-                        ))}
-                    </View>
-                </AppScroll>
-            )}
-        </View>
+                                        <Image source={Images.backArrow} style={[styles.arrow, { transform: [{ scaleX: -1 }] }]} />
+                                    </TouchableOpacity>
+                                    {i !== 2 && <Divider orientation='horizontal' color={colors.divider} />}
+                                </View>
+                            ))}
+                        </View>
+                    </AppScroll>
+                )}
+            </View >
+        </>
     );
 }
 
 const styles = StyleSheet.create({
+    imageOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 9999,
+    },
+
+    fullscreenImage: {
+        width: 250,
+        height: 250,
+        borderRadius: 125
+    },
     cardLabel: {
         fontSize: scaleFont(12),
         color: 'white',
