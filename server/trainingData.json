@@ -1,0 +1,56 @@
+{
+  "sessions": [
+    {
+      "sessionId": "a8de4334-807c-4fd5-966a-6d1ca13a0f70",
+      "userId": "9660511F-B551-4970-9160-D193B735723B",
+      "exercises": []
+    },
+    {
+      "sessionId": "d104f32a-c56e-4127-9763-399ee087164b",
+      "userId": "9660511F-B551-4970-9160-D193B735723B",
+      "exercises": [
+        {
+          "exerciseId": "b9bdb490-9b5f-4127-9fb1-0e7ac1f1daf8",
+          "name": "Plank",
+          "isTimerOnly": true,
+          "sets": []
+        }
+      ]
+    },
+    {
+      "sessionId": "5db142d7-bc31-4002-b8ae-239b360aff96",
+      "userId": "9660511F-B551-4970-9160-D193B735723B",
+      "exercises": [
+        {
+          "exerciseId": "53e50c0d-83ba-46fe-8e93-0763d4056444",
+          "name": "Bench Press",
+          "isTimerOnly": false,
+          "sets": [
+            {
+              "weight": "80",
+              "reps": "10",
+              "note": ""
+            },
+            {
+              "weight": "80",
+              "reps": "8",
+              "note": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sessionId": "d8e0779a-e4c6-41eb-ad33-f1fcfebdd241",
+      "userId": "9660511F-B551-4970-9160-D193B735723B",
+      "exercises": [
+        {
+          "exerciseId": "4b9ac4ba-aec6-43d4-a67f-5046a2de8045",
+          "name": "Pull Up",
+          "isTimerOnly": false,
+          "sets": []
+        }
+      ]
+    }
+  ]
+}

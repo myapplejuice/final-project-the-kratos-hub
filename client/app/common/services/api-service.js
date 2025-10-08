@@ -58,13 +58,11 @@ export default class APIService {
     static async USDARequest(body) {
         if (body === null || !body) return { success: false, message: 'Invalid request' };
 
-        const res = await fetch(
-            `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${APIService.USDA_API_KEY}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body
-            }
+        const res = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${APIService.USDA_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body
+        }
         );
 
         const json = await res.json();
@@ -126,5 +124,18 @@ export default class APIService {
             update: (payload) => APIService.request(`/nutrition/foods/${APIService.USER_ID}`, 'PUT', payload),
             delete: (payload) => APIService.request(`/nutrition/foods/${APIService.USER_ID}`, 'DELETE', payload)
         }
+    };
+
+    static training = {
+        fetch: {
+            masterExercises: () => APIService.request(`/training/master-exercises/${APIService.USER_ID}`, 'GET'),
+            session: (payload) => APIService.request(`/training/session/${APIService.USER_ID}`, 'GET', payload),
+            allSessions: () => APIService.request(`/training/sessions/${APIService.USER_ID}`, 'GET'),
+        },
+        post: {
+            startSession: () => APIService.request(`/training/start/${APIService.USER_ID}`, 'POST'),
+            addExercise: (payload) => APIService.request(`/training/exercise/${APIService.USER_ID}`, 'POST', payload),
+            addSet: (payload) => APIService.request(`/training/set/${APIService.USER_ID}`, 'POST', payload),
+        },
     };
 }
