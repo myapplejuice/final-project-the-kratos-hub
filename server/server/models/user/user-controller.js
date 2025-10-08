@@ -56,6 +56,24 @@ export default class UserController {
         return res.status(200).json({ profile });
     }
 
+    static async getAnotherUserProfile(req, res) {
+        const id = req.params.id;
+        
+        console.log(id)
+        if (!id) {
+            return res
+                .status(401)
+                .json({ message: "User ID needed" });
+        }
+
+        const profile = await UserDBService.fetchUserProfile(id, false);
+        if (!profile) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        return res.status(200).json({ profile });
+    }
+
     static async emailRecoveryCode(req, res) {
         const { email, recoveryCode } = req.body;
 

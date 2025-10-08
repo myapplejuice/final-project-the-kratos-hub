@@ -511,11 +511,11 @@ export default function FoodProfile() {
         if (selectedFood.isUSDA) {
             router.push(routes.USDA_PROFILE);
         } else {
-            const creatorId = selectedFood.creatorId;
+            const userId = selectedFood.creatorId;
             router.push({
                 pathname: routes.USER_PROFILE,
                 params: {
-                    creatorId
+                    userId
                 }
             });
         }

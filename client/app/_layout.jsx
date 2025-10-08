@@ -83,7 +83,7 @@ function Layout() {
                         <CameraContext.Provider value={{ cameraActive, setCameraActive, cameraPreviewActive, setCameraPreviewActive }}>
                             <LibraryContext.Provider value={{ libraryActive, setLibraryActive }} >
                                 <PopupsProvider popups={popups}>
-                                    <StatusBar hidden={cameraActive || cameraPreviewActive} style="light" />
+                                    <StatusBar hidden={cameraActive || cameraPreviewActive || libraryActive} style="light" />
                                     <Popups {...popupStates} />
                                     {bars && <TopBar visible={topBarVisibility} />}
                                     <View style={{ flex: 1, backgroundColor: colors.background }}>

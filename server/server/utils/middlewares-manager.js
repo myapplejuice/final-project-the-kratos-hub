@@ -12,11 +12,11 @@ export default class MiddlewaresManager {
     static userAuthorization(req, res, next) {
         const tokenId = req.id;
         const callId = req.params.id;
-
+        
         if (!tokenId || tokenId !== callId) {
             return res.status(403).json({ message: 'Forbidden! Invalid user ID.' });
         }
-
+        
         next();
     }
 

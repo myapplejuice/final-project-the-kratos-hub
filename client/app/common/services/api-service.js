@@ -78,6 +78,7 @@ export default class APIService {
         create: (payload) => APIService.request('/user/create', 'POST', payload, false),
         login: (payload) => APIService.request('/user/login', 'POST', payload, false),
         profile: () => APIService.request('/user/profile', 'GET'),
+        anotherProfile: (id) => APIService.request(`/user/another-profile/${id}`, 'GET'),
         update: (payload) => APIService.request(`/user/update/${APIService.USER_ID}`, 'PUT', payload),
         destroy: (payload) => APIService.request(`/user/delete/${APIService.USER_ID}`, 'DELETE', payload),
         recoveryMail: (payload) => APIService.request('/user/recovery/send-code', 'POST', payload, false),

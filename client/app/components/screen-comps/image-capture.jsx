@@ -67,6 +67,7 @@ export default function ImageCapture({ onConfirm, onCancel }) {
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
                 quality: 1,
+                presentationStyle: ImagePicker.UIImagePickerPresentationStyle.PAGE_SHEET,
             });
 
             if (!result.canceled) {

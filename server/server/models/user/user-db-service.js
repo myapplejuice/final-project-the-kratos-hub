@@ -133,7 +133,7 @@ export default class UserDBService {
         }
     }
 
-    static async fetchUserProfile(id) {
+    static async fetchUserProfile(id, withAdditionalInfo = true) {
         try {
             const request = Database.getRequest();
             const key = 'Id';
@@ -152,11 +152,16 @@ export default class UserDBService {
             if (!result.recordset.length) return null;
 
             const row = result.recordset[0];
-            return {
-                ...ObjectMapper.mapUser(row),
-                metrics: ObjectMapper.mapMetrics(row),
-                nutrition: ObjectMapper.mapNutrition(row)
-            };
+            if (withAdditionalInfo) {
+                return {
+                    ...ObjectMapper.mapUser(row),
+                    metrics: ObjectMapper.mapMetrics(row),
+                    nutrition: ObjectMapper.mapNutrition(row)
+                }
+            }
+            else {
+                return ObjectMapper.mapUser(row);
+            }
         } catch (err) {
             console.error('fetchUserProfile error:', err);
             return null;
