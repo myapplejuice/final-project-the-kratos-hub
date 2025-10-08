@@ -30,6 +30,7 @@ export default function Notifications() {
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
     const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
+    const [pageLoading, setPageLoading] = useState(true);
     const [requestsProfiles, setRequestsProfiles] = useState([]);
     const [openUser, setOpenUser] = useState(null);
 
@@ -63,60 +64,71 @@ export default function Notifications() {
                 console.error(error);
             } finally {
                 hideSpinner();
+                setPageLoading(false);
             }
         }
 
         fetchPendingRequestsProfiles();
     }, [])
 
-    async function handleFriendRequest(){
+    async function handleFriendRequest() {
 
     }
 
     return (
         <View style={styles.main}>
-            <AppScroll extraBottom={20}>
-                <View style={styles.card}>
-                    <View style={{marginBottom: 25}}>
-                    <AppText style={styles.label}>Friend Requests</AppText>
+            {!pageLoading ? (
+                <AppScroll extraBottom={20}>
+                    <View style={styles.card}>
+                        <View style={{ marginBottom: 25 }}>
+                            <AppText style={styles.label}>Friend Requests</AppText>
+                        </View>
+                        {requestsProfiles.length > 0 ? (
+                            requestsProfiles.map((adder, index) => (
+                                <TouchableOpacity onPress={() => setOpenUser(prev => (prev === adder.id ? null : adder.id))} key={index} style={{ marginBottom: index === requestsProfiles.length - 1 ? 0 : 15 }}>
+                                    <View style={{ flexDirection: 'row', }}>
+                                        <View style={{ width: '20%' }}>
+                                            <Image source={adder.image} style={{ width: 50, height: 50, borderRadius: 25 }} />
+                                        </View>
+                                        <View style={{ justifyContent: 'center', width: '70%' }}>
+                                            <AppText style={{ color: 'white', fontSize: scaleFont(14), fontWeight: 'bold' }}>{adder.firstname} {adder.lastname}</AppText>
+                                            <AppText style={{ color: 'white' }}>{adder.email}</AppText>
+                                        </View>
+                                        <View style={{ width: '10%', justifyContent: 'center', alignItems: 'flex-end' }}>
+                                            <Invert axis='horizontal' inverted={openUser === adder.id}>
+                                                <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white', transform: [{ rotate: '-90deg' }] }} />
+                                            </Invert>
+                                        </View>
+                                    </View>
+                                    <ExpandInOut visible={openUser === adder.id}>
+                                        <AppText style={{ color: colors.mutedText, textAlign: adder.description ? 'left' : 'center', marginVertical: 15 }}>
+                                            {adder.description || 'No introduction provided'}
+                                        </AppText>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
+                                            <TouchableOpacity onPress={handleFriendRequest} style={{ padding: 15, borderRadius: 10, backgroundColor: colors.accentPink, width: '48%', justifyContent: 'center', alignItems: 'center' }}>
+                                                <AppText style={{ color: 'white' }}>Decline</AppText>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={handleFriendRequest} style={{ padding: 15, borderRadius: 10, backgroundColor: colors.accentGreen, width: '48%', justifyContent: 'center', alignItems: 'center' }}>
+                                                <AppText style={{ color: 'white' }}>Accept</AppText>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </ExpandInOut>
+                                </TouchableOpacity>
+                            ))
+                        ) : (
+                            <AppText style={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}>No friend requests</AppText>
+                        )}
                     </View>
-                    {requestsProfiles.length > 0 ? (
-                        requestsProfiles.map((adder, index) => (
-                            <TouchableOpacity onPress={() => setOpenUser(prev => (prev === adder.id ? null : adder.id))} key={index} style={{ marginBottom: index === requestsProfiles.length - 1 ? 0 : 15 }}>
-                                <View style={{ flexDirection: 'row', }}>
-                                    <View style={{ width: '20%' }}>
-                                        <Image source={adder.image} style={{ width: 50, height: 50, borderRadius: 25 }} />
-                                    </View>
-                                    <View style={{ justifyContent: 'center', width: '70%' }}>
-                                        <AppText style={{ color: 'white', fontSize: scaleFont(14), fontWeight: 'bold' }}>{adder.firstname} {adder.lastname}</AppText>
-                                        <AppText style={{ color: 'white' }}>{adder.email}</AppText>
-                                    </View>
-                                    <View style={{ width: '10%', justifyContent: 'center', alignItems: 'flex-end' }}>
-                                        <Invert axis='horizontal' inverted={openUser === adder.id}>
-                                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white', transform: [{ rotate: '-90deg' }] }} />
-                                        </Invert>
-                                    </View>
-                                </View>
-                                <ExpandInOut visible={openUser === adder.id}>
-                                    <AppText style={{ color: colors.mutedText, textAlign: adder.description ? 'left' : 'center', marginVertical: 15 }}>
-                                        {adder.description || 'No introduction provided'}
-                                    </AppText>
-                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
-                                        <TouchableOpacity onPress={handleFriendRequest} style={{ padding: 15, borderRadius: 10, backgroundColor: colors.accentPink, width: '48%', justifyContent: 'center', alignItems: 'center' }}>
-                                            <AppText style={{ color: 'white' }}>Decline</AppText>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={handleFriendRequest} style={{ padding: 15, borderRadius: 10, backgroundColor: colors.accentGreen, width: '48%', justifyContent: 'center', alignItems: 'center' }}>
-                                            <AppText style={{ color: 'white' }}>Accept</AppText>
-                                        </TouchableOpacity>
-                                    </View>
-                                </ExpandInOut>
-                            </TouchableOpacity>
-                        ))
-                    ) : (
-                        <AppText style={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}>No friend requests</AppText>
-                    )}
-                </View>
-            </AppScroll>
+                </AppScroll>
+            ) : (
+                <>
+                <AppScroll>
+                    <View style={[styles.card, { height: '40%' }]} />
+                    <View style={[styles.card, { height: '50%', marginTop: 25 }]} />
+                    </AppScroll>
+                </>
+            )}
+
         </View>
     );
 }
