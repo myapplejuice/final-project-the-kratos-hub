@@ -21,6 +21,8 @@ import { CameraContext } from '../../common/contexts/camera-context';
 import { LibraryContext } from '../../common/contexts/library-context';
 import AnimatedButton from '../../components/screen-comps/animated-button';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Invert from '../../components/effects/invert';
+import ExpandInOut from '../../components/effects/expand-in-out';
 
 export default function Notifications() {
     const { setLibraryActive } = useContext(LibraryContext);
@@ -29,16 +31,29 @@ export default function Notifications() {
     const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const [requestsProfiles, setRequestsProfiles] = useState([]);
+    const [openUser, setOpenUser] = useState(null);
 
     useEffect(() => {
         async function fetchPendingRequestsProfiles() {
             try {
                 showSpinner();
-                const idList = user.pendingFriends.filter(f => f.adderId !== user.id).map(f => f.adderId);
+
+                const pendingRequests = user.pendingFriends.filter(f => f.adderId !== user.id);
+                const idList = pendingRequests.map(f => f.adderId);
 
                 const result = await APIService.userToUser.multipleAnotherProfile(idList);
                 if (result.success) {
-                    const profiles = result.data.profiles;
+                    const profiles = result.data.profiles.map(profile => {
+                        const req = pendingRequests.find(f => f.adderId === profile.id);
+                        return {
+                            ...profile,
+                            description: req?.description || '',
+                            image: profile.imageBase64
+                                ? { uri: `data:image/jpeg;base64,${profile.imageBase64}` }
+                                : null,
+                        };
+                    });
+
                     setRequestsProfiles(profiles);
                 } else {
                     createAlert({ title: 'Failure', text: result.message });
@@ -59,12 +74,38 @@ export default function Notifications() {
             <AppScroll extraBottom={20}>
                 <View style={styles.card}>
                     <AppText style={styles.label}>Friend Requests</AppText>
+                    <Divider orientation='horizontal' style={{ marginVertical: 15 }} />
                     {requestsProfiles.length > 0 ? (
                         requestsProfiles.map((adder, index) => (
-                            <View key={index}>
-                                <AppText>{adder.firstname} {adder.lastname}</AppText>
-                                <AppText>{adder.receiverId}</AppText>
-                            </View>
+                            <TouchableOpacity onPress={() => setOpenUser(prev => (prev === adder.id ? null : adder.id))} key={index} style={{ marginTop: 10 }}>
+                                <View style={{ flexDirection: 'row', }}>
+                                    <View style={{ width: '20%' }}>
+                                        <Image source={adder.image} style={{ width: 50, height: 50, borderRadius: 25 }} />
+                                    </View>
+                                    <View style={{ justifyContent: 'center', width: '70%' }}>
+                                        <AppText style={{ color: 'white', fontSize: scaleFont(14), fontWeight: 'bold' }}>{adder.firstname} {adder.lastname}</AppText>
+                                        <AppText style={{ color: 'white' }}>{adder.email}</AppText>
+                                    </View>
+                                    <View style={{ width: '10%', justifyContent: 'center', alignItems: 'flex-end' }}>
+                                        <Invert axis='horizontal' inverted={openUser === adder.id}>
+                                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white', transform: [{ rotate: '-90deg' }] }} />
+                                        </Invert>
+                                    </View>
+                                </View>
+                                <ExpandInOut visible={openUser === adder.id} style={{ marginTop: 25 }}>
+                                    <AppText style={{ color: colors.mutedText, textAlign: adder.description ? 'left' : 'center' }}>
+                                        {adder.description || 'User did not introduce themselves'}
+                                    </AppText>
+                                </ExpandInOut>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
+                                    <TouchableOpacity style={{ padding: 15, borderRadius: 10, backgroundColor: colors.accentPink, width: '48%' }}>
+                                        <AppText>Decline</AppText>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={{ padding: 15, borderRadius: 10, backgroundColor: colors.accentGreen, width: '48%' }}>
+                                        <AppText>Accept</AppText>
+                                    </TouchableOpacity>
+                                </View>
+                            </TouchableOpacity>
                         ))
                     ) : (
                         <AppText>No pending requests</AppText>
@@ -173,7 +214,7 @@ const styles = StyleSheet.create({
         marginVertical: 15,
         padding: 5
     },
-    label: { fontSize: scaleFont(12), color: 'white', fontWeight: '600', marginStart: 15 },
+    label: { fontSize: scaleFont(16), color: 'white', fontWeight: 'bold', marginStart: 15 },
     settingIcon: { tintColor: 'rgb(255,255,255)', width: 20, height: 20 },
     deleteButton: {
         backgroundColor: 'rgb(255, 58, 48)',
