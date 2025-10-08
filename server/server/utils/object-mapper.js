@@ -86,6 +86,9 @@ export default class ObjectMapper {
             UserOne: 'userOne',
             UserTwo: 'userTwo',
             Description: 'description',
+            Notification: 'notification',
+            Seen: 'seen',
+            ExtraInformation: 'extraInformation',
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -175,6 +178,9 @@ export default class ObjectMapper {
             userOne: 'UserOne',
             userTwo: 'UserTwo',
             description: 'Description',
+            notification: 'Notification',
+            seen: 'Seen',
+            extraInformation: 'ExtraInformation',
         };
         return map[key] || key;
     }
