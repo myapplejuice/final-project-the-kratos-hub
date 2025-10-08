@@ -40,6 +40,46 @@ export default class UserToUserDBService {
         }
     }
 
+    static async fetchMultipleUserProfiles(idList, withAdditionalInfo = true) {
+        try {
+            if (!idList || !idList.length) return [];
+
+            const request = Database.getRequest();
+
+            // Build dynamic WHERE clause with parameterized inputs
+            const idParams = idList.map((_, i) => `@Id${i}`).join(', ');
+            idList.forEach((id, i) => {
+                Database.addInput(request, `Id${i}`, sql.UniqueIdentifier, id);
+            });
+
+            const query = `
+            SELECT u.*, m.*, n.*
+            FROM Users u
+            LEFT JOIN UserMetrics m ON u.Id = m.UserId
+            LEFT JOIN UserNutrition n ON u.Id = n.UserId
+            WHERE u.Id IN (${idParams})
+        `;
+
+            const result = await request.query(query);
+            if (!result.recordset.length) return [];
+
+            return result.recordset.map(row => {
+                if (withAdditionalInfo) {
+                    return {
+                        ...ObjectMapper.mapUser(row),
+                        metrics: ObjectMapper.mapMetrics(row),
+                        nutrition: ObjectMapper.mapNutrition(row)
+                    };
+                } else {
+                    return ObjectMapper.mapUser(row);
+                }
+            });
+        } catch (err) {
+            console.error('fetchUsersByIdList error:', err);
+            return [];
+        }
+    }
+
     static async sendFriendRequest(details) {
         try {
             const request = Database.getRequest();

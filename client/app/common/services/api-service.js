@@ -86,6 +86,7 @@ export default class APIService {
 
     static userToUser = {
         anotherProfile: (id) => APIService.request(`/user-to-user/another-profile/${id}`, 'GET'),
+        multipleAnotherProfile: (payload) => APIService.request(`/user-to-user/multiple-another-profile/${APIService.USER_ID}`, 'POST', payload),
         friendRequest: (payload) => APIService.request(`/user-to-user/friend-request/${APIService.USER_ID}`, 'POST', payload),
     }
 

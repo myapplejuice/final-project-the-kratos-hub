@@ -1,7 +1,7 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import BuildFooter from "../../components/layout-comps/build-footer";
 import AppText from "../../components/screen-comps/app-text";
@@ -25,18 +25,50 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function Notifications() {
     const { setLibraryActive } = useContext(LibraryContext);
     const { setCameraActive } = useContext(CameraContext);
-    const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, } = usePopups();
+    const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
     const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
+    const [requestsProfiles, setRequestsProfiles] = useState([]);
+
+    useEffect(() => {
+        async function fetchPendingRequestsProfiles() {
+            try {
+                showSpinner();
+                const idList = user.pendingFriends.filter(f => f.adderId !== user.id).map(f => f.adderId);
+
+                const result = await APIService.userToUser.multipleAnotherProfile(idList);
+                if (result.success) {
+                    const profiles = result.data.profiles;
+                    setRequestsProfiles(profiles);
+                } else {
+                    createAlert({ title: 'Failure', text: result.message });
+                }
+            } catch (error) {
+                createAlert({ title: 'Failure', text: error.message });
+                console.error(error);
+            } finally {
+                hideSpinner();
+            }
+        }
+
+        fetchPendingRequestsProfiles();
+    }, [])
 
     return (
         <View style={styles.main}>
             <AppScroll extraBottom={20}>
                 <View style={styles.card}>
                     <AppText style={styles.label}>Friend Requests</AppText>
-                    {user.pendingFriends.length > 0 ? 
-
-}
+                    {requestsProfiles.length > 0 ? (
+                        requestsProfiles.map((adder, index) => (
+                            <View key={index}>
+                                <AppText>{adder.firstname} {adder.lastname}</AppText>
+                                <AppText>{adder.receiverId}</AppText>
+                            </View>
+                        ))
+                    ) : (
+                        <AppText>No pending requests</AppText>
+                    )}
                 </View>
             </AppScroll>
         </View>

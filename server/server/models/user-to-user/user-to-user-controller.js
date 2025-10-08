@@ -15,6 +15,16 @@ export default class UserToUserController {
         return res.status(200).json({ success: true, profile });
     }
 
+    static async getMultipleUserProfiles(req,res){
+        const idList = req.body;
+
+        console.log(idList)
+        const profiles = await UserToUserDBService.fetchMultipleUserProfiles(idList, false);
+        if (!profiles) return res.status(404).json({ message: "User not found." });
+
+        return res.status(200).json({ success: true, profiles });
+    }
+
     static async sendFriendRequest(req, res) {
         const details = req.body;
 
