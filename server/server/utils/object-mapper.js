@@ -80,6 +80,12 @@ export default class ObjectMapper {
             IsCreatedByCoach: 'isCreatedByCoach',
             MealPlanId: 'mealPlanId',
             MealId: 'mealId',
+            AdderId: 'adderId',
+            ReceiverId: 'receiverId',
+            Status: 'status',
+            UserOne: 'userOne',
+            UserTwo: 'userTwo',
+            Description: 'description',
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -163,6 +169,12 @@ export default class ObjectMapper {
             isCreatedByCoach: 'IsCreatedByCoach',
             mealPlanId: 'MealPlanId',
             mealId: 'MealId',
+            adderId: 'AdderId',
+            receiverId: 'ReceiverId',
+            status: 'Status',
+            userOne: 'UserOne',
+            userTwo: 'UserTwo',
+            description: 'Description',
         };
         return map[key] || key;
     }

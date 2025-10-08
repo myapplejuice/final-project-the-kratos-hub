@@ -18,7 +18,6 @@ export default class UserRouter {
         this.userRouter.post('/recovery/send-code', asyncHandler(UserController.emailRecoveryCode));
 
         this.userRouter.get('/profile', tokenAuthorization, asyncHandler(UserController.getProfile));
-        this.userRouter.get('/another-profile/:id', tokenAuthorization, asyncHandler(UserController.getAnotherUserProfile));
 
         this.userRouter.delete('/delete/:id', tokenAuthorization, userAuthorization, asyncHandler(UserController.destroyAccount));
 

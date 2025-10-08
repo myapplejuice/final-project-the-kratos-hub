@@ -1,37 +1,25 @@
-import * as FileSystem from 'expo-file-system/legacy';
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import BuildFooter from "../../../components/layout-comps/build-footer";
 import AppText from "../../../components/screen-comps/app-text";
 import { Images } from '../../../common/settings/assets';
 import { UserContext } from "../../../common/contexts/user-context";
 import { formatDate } from '../../../common/utils/date-time';
 import usePopups from "../../../common/hooks/use-popups";
 import { scaleFont } from "../../../common/utils/scale-fonts";
-import DeviceStorageService from '../../../common/services/device-storage-service';
 import APIService from '../../../common/services/api-service';
-import { routes } from "../../../common/settings/constants";
 import { colors } from "../../../common/settings/styling";
 import Divider from '../../../components/screen-comps/divider';
 import AppScroll from '../../../components/screen-comps/app-scroll'
-import ImageCapture from '../../../components/screen-comps/image-capture';
-import { CameraContext } from '../../../common/contexts/camera-context';
-import { LibraryContext } from '../../../common/contexts/library-context';
-import AnimatedButton from '../../../components/screen-comps/animated-button';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FadeInOut from '../../../components/effects/fade-in-out';
 
 export default function UserProfile() {
     const context = useLocalSearchParams();
-    const { setLibraryActive } = useContext(LibraryContext);
-    const { setCameraActive } = useContext(CameraContext);
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
     const { user, setUser } = useContext(UserContext);
     const [profile, setProfile] = useState({});
     const [viewImage, setViewImage] = useState(false);
-    const insets = useSafeAreaInsets();
 
     useEffect(() => {
         async function fetchUserProfile() {
@@ -39,7 +27,7 @@ export default function UserProfile() {
             const id = context.userId;
 
             if (id) {
-                const result = await APIService.user.anotherProfile(id);
+                const result = await APIService.userToUser.anotherProfile(id);
 
                 if (result.success) {
                     const profile = result.data.profile;
@@ -60,91 +48,48 @@ export default function UserProfile() {
         }
 
         fetchUserProfile();
-    }, [])
+    }, []);
 
-    async function openLogout() {
-        createDialog({
-            title: 'Signing Out',
-            text: "Are you sure you want to sign out of this account?",
-            onConfirm: () => DeviceStorageService.clearUserSession(),
-        })
-    };
-
-    async function setNewImage(newImage) {
-        showSpinner();
-        try {
-            let imageBase64 = await FileSystem.readAsStringAsync(newImage.uri, {
-                encoding: FileSystem.EncodingType.Base64,
-            });
-
-            const result = await APIService.user.update({ profile: { imageBase64 } })
-
-            if (result.success) {
-                setUser(prev => ({ ...prev, image: { uri: `data:image/jpeg;base64,${imageBase64}` } }));
-                createToast({ message: "Profile picture updated" });
-                return true;
-            }
-            else {
-                createToast({ message: result.message });
-                return false;
-            }
-        }
-        catch (e) {
-            createToast({ message: `${e}\nPlease try again later.` });
-            return false;
-        }
-        finally {
-            hideSpinner();
-        }
-    }
-
-    async function openPasswordChange() {
+    async function handleAddFriend() {
         createInput({
-            title: "Change Password",
-            confirmText: "Submit",
-            text: "Enter your new password",
-            placeholders: [
-                "Current Password",
-                "New Password",
-                "Confirm Password",
-            ],
-            extraConfigs: [{}, { secureTextEntry: true }, { secureTextEntry: true }],
-            onSubmit: async ([current, newPass, confirmPass]) => {
-                current = current.trim();
-                newPass = newPass.trim();
-                confirmPass = confirmPass.trim();
-
-                if (!current || !newPass || !confirmPass) {
-                    createToast({ message: "All fields are required!" });
-                    return;
-                }
-
-                if (newPass !== confirmPass) {
-                    createToast({ message: "Passwords do not match!" });
-                    return;
-                }
-
-                if (newPass.length < 6) {
-                    createToast({ message: "Password must be at least 6 characters!" });
-                    return;
-                }
+            title: 'Add Friend',
+           confirmText: "Add",
+            text: `OPTIONAL:\nEnter something about yourself for them to know about you`,
+            placeholders: [`Let them know about you...`],
+            initialValues: [``],
+            largeTextIndices: [0],
+            onSubmit: async (vals) => {
+                showSpinner();
 
                 const payload = {
-                    currentPassword: current,
-                    password: newPass
-                };
+                    adderId: user.id,
+                    receiverId: profile.id,
+                    status: 'pending',
+                    seen: false,
+                    description: vals[0],
+                    dateOfCreation: new Date(),
+                }
 
-                showSpinner();
-                const result = await APIService.user.update({ profile: payload });
-                hideSpinner();
+                try {
+                    const result = await APIService.userToUser.friendRequest(payload);
 
-                if (result.success) {
-                    createToast({ message: "Password changed" });
-                } else {
-                    createToast({ message: result.message });
+                    if (result.success) {
+                        createToast({ message: "Friend request sent" });
+                    } else {
+                        createAlert({ title: 'Failure', text: result.message });
+                    }
+                    hideSpinner();
+                } catch (error) {
+                    createAlert({ title: 'Failure', text: error });
+                } finally {
+                    hideSpinner();
                 }
             }
-        })
+        });
+    }
+
+    async function handleUserReport() {
+
     }
 
     return (
@@ -219,12 +164,11 @@ export default function UserProfile() {
                         <View style={[styles.card, { marginTop: 15 }]}>
                             <AppText style={styles.cardLabel}>Account & Application</AppText>
                             {[
-                                { icon: Images.password, label: 'Change Password', onPress: openPasswordChange },
-                                { icon: Images.editTwo, label: 'Edit Profile', onPress: () => router.push(routes.EDIT_PROFILE) },
-                                { icon: Images.settingsTwo, label: 'Settings', onPress: () => router.push(routes.SETTINGS) },
+                                { icon: Images.friend, label: 'Add Friend', onPress: handleAddFriend },
+                                { icon: Images.warning, label: 'Report User', onPress: handleUserReport },
                             ].map((item, i) => (
                                 <View key={i}>
-                                    <TouchableOpacity key={i} style={[styles.optionRow, i === 2 && { marginBottom: 0 }]} onPress={item.onPress}>
+                                    <TouchableOpacity key={i} style={[styles.optionRow, i === 1 && { marginBottom: 0 }]} onPress={item.onPress}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
                                             <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
                                                 <Image source={item.icon} style={styles.settingIcon} />
@@ -235,7 +179,7 @@ export default function UserProfile() {
                                         </View>
                                         <Image source={Images.backArrow} style={[styles.arrow, { transform: [{ scaleX: -1 }] }]} />
                                     </TouchableOpacity>
-                                    {i !== 2 && <Divider orientation='horizontal' color={colors.divider} />}
+                                    {i !== 1 && <Divider orientation='horizontal' color={colors.divider} />}
                                 </View>
                             ))}
                         </View>
@@ -258,7 +202,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         zIndex: 9999,
     },
-
     fullscreenImage: {
         width: 250,
         height: 250,

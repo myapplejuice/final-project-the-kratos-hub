@@ -4,6 +4,7 @@ import EmailService from "../email/email-service.js";
 import NutritionDaysDBService from "../nutrition/days/nutrition-days-db-service.js";
 import NutritionFoodsDBService from "../nutrition/foods/nutrition-foods-db-service.js";
 import NutritionMealPlansDBService from "../nutrition/meal-plans/nutrition-meal-plans-db-service.js";
+import UserToUserDBService from "../user-to-user/user-to-user-db-service.js";
 
 export default class UserController {
     constructor() { }
@@ -49,27 +50,11 @@ export default class UserController {
         const userDayLogs = await NutritionDaysDBService.fetchAllDays(id);
         const userFoods = await NutritionFoodsDBService.fetchFoods(id);
         const userMealPlans = await NutritionMealPlansDBService.fetchPlansByUserId(id);
+        const friendsList = await UserToUserDBService.fetchFriendsList(id);
         profile.nutritionLogs = userDayLogs;
         profile.foods = userFoods;
         profile.plans = userMealPlans;
-
-        return res.status(200).json({ profile });
-    }
-
-    static async getAnotherUserProfile(req, res) {
-        const id = req.params.id;
-        
-        console.log(id)
-        if (!id) {
-            return res
-                .status(401)
-                .json({ message: "User ID needed" });
-        }
-
-        const profile = await UserDBService.fetchUserProfile(id, false);
-        if (!profile) {
-            return res.status(404).json({ message: "User not found." });
-        }
+        profile.friends
 
         return res.status(200).json({ profile });
     }
