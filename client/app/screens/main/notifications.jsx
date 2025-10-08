@@ -69,15 +69,20 @@ export default function Notifications() {
         fetchPendingRequestsProfiles();
     }, [])
 
+    async function handleFriendRequest(){
+
+    }
+
     return (
         <View style={styles.main}>
             <AppScroll extraBottom={20}>
                 <View style={styles.card}>
+                    <View style={{marginBottom: 25}}>
                     <AppText style={styles.label}>Friend Requests</AppText>
-                    <Divider orientation='horizontal' style={{ marginVertical: 15 }} />
+                    </View>
                     {requestsProfiles.length > 0 ? (
                         requestsProfiles.map((adder, index) => (
-                            <TouchableOpacity onPress={() => setOpenUser(prev => (prev === adder.id ? null : adder.id))} key={index} style={{ marginTop: 10 }}>
+                            <TouchableOpacity onPress={() => setOpenUser(prev => (prev === adder.id ? null : adder.id))} key={index} style={{ marginBottom: index === requestsProfiles.length - 1 ? 0 : 15 }}>
                                 <View style={{ flexDirection: 'row', }}>
                                     <View style={{ width: '20%' }}>
                                         <Image source={adder.image} style={{ width: 50, height: 50, borderRadius: 25 }} />
@@ -92,23 +97,23 @@ export default function Notifications() {
                                         </Invert>
                                     </View>
                                 </View>
-                                <ExpandInOut visible={openUser === adder.id} style={{ marginTop: 25 }}>
-                                    <AppText style={{ color: colors.mutedText, textAlign: adder.description ? 'left' : 'center' }}>
-                                        {adder.description || 'User did not introduce themselves'}
+                                <ExpandInOut visible={openUser === adder.id}>
+                                    <AppText style={{ color: colors.mutedText, textAlign: adder.description ? 'left' : 'center', marginVertical: 15 }}>
+                                        {adder.description || 'No introduction provided'}
                                     </AppText>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
+                                        <TouchableOpacity onPress={handleFriendRequest} style={{ padding: 15, borderRadius: 10, backgroundColor: colors.accentPink, width: '48%', justifyContent: 'center', alignItems: 'center' }}>
+                                            <AppText style={{ color: 'white' }}>Decline</AppText>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={handleFriendRequest} style={{ padding: 15, borderRadius: 10, backgroundColor: colors.accentGreen, width: '48%', justifyContent: 'center', alignItems: 'center' }}>
+                                            <AppText style={{ color: 'white' }}>Accept</AppText>
+                                        </TouchableOpacity>
+                                    </View>
                                 </ExpandInOut>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
-                                    <TouchableOpacity style={{ padding: 15, borderRadius: 10, backgroundColor: colors.accentPink, width: '48%' }}>
-                                        <AppText>Decline</AppText>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={{ padding: 15, borderRadius: 10, backgroundColor: colors.accentGreen, width: '48%' }}>
-                                        <AppText>Accept</AppText>
-                                    </TouchableOpacity>
-                                </View>
                             </TouchableOpacity>
                         ))
                     ) : (
-                        <AppText>No pending requests</AppText>
+                        <AppText style={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}>No friend requests</AppText>
                     )}
                 </View>
             </AppScroll>
