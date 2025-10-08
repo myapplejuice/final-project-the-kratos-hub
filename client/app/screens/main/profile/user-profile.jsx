@@ -21,8 +21,10 @@ export default function UserProfile() {
     const [profile, setProfile] = useState({});
     const [viewImage, setViewImage] = useState(false);
     let friend = user.friends?.find(f => f.friendId === profile.id);
-    if (!friend) 
+    if (!friend)
         friend = user.pendingFriends?.find(f => f.adderId === profile.id || f.receiverId === profile.id);
+
+    console.log(friend)
 
     useEffect(() => {
         async function fetchUserProfile() {
@@ -132,7 +134,7 @@ export default function UserProfile() {
                             <View style={{ marginTop: 5, marginBottom: 15 }}>
                                 {friend && (
                                     <View style={{ padding: 9, borderRadius: 20, backgroundColor: friend.status === 'active' ? colors.accentGreen : colors.accentYellow }}>
-                                        <AppText style={{ color: 'white', fontSize: scaleFont(11)}}>
+                                        <AppText style={{ color: 'white', fontSize: scaleFont(11) }}>
                                             {friend.status === 'pending'
                                                 ? 'Pending Friend'
                                                 : friend.status === 'active'
@@ -180,29 +182,35 @@ export default function UserProfile() {
                                     </View>
                                 </View>
                             </View>
-                        </View>
 
-                        <View style={[styles.card, { marginTop: 15 }]}>
-                            <AppText style={styles.cardLabel}>Account & Application</AppText>
-                            {[
-                                { icon: Images.friend, label: 'Add Friend', onPress: handleAddFriend },
-                                { icon: Images.warning, label: 'Report User', onPress: handleUserReport },
-                            ].map((item, i) => (
-                                <View key={i}>
-                                    <TouchableOpacity key={i} style={[styles.optionRow, i === 1 && { marginBottom: 0 }]} onPress={item.onPress}>
-                                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
-                                            <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
-                                                <Image source={item.icon} style={styles.settingIcon} />
-                                            </View>
-                                            <AppText style={styles.label}>
-                                                {item.label}
-                                            </AppText>
+                            <Divider orientation="horizontal" color={colors.divider} style={{ marginTop: 15 }} />
+
+                            {friend.status !== 'active' && friend.status !== 'pending' && (
+                                <TouchableOpacity onPress={handleAddFriend} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                        <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
+                                            <Image source={Images.friend} style={styles.settingIcon} />
                                         </View>
-                                        <Image source={Images.backArrow} style={[styles.arrow, { transform: [{ scaleX: -1 }] }]} />
-                                    </TouchableOpacity>
-                                    {i !== 1 && <Divider orientation='horizontal' color={colors.divider} />}
+                                        <AppText style={styles.label}>Add Friend</AppText>
+                                    </View>
+                                    <Image
+                                        source={Images.backArrow}
+                                        style={[styles.arrow, { transform: [{ scaleX: -1 }] }]}
+                                    />
+                                </TouchableOpacity>
+                            )}
+
+                            <TouchableOpacity onPress={handleUserReport} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15  }}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
+                                    <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
+                                        <Image source={Images.warning} style={styles.settingIcon} />
+                                    </View>
+                                    <AppText style={styles.label}>
+                                        Report User
+                                    </AppText>
                                 </View>
-                            ))}
+                                <Image source={Images.backArrow} style={[styles.arrow, { transform: [{ scaleX: -1 }] }]} />
+                            </TouchableOpacity>
                         </View>
                     </AppScroll>
                 )}

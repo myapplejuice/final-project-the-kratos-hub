@@ -42,6 +42,17 @@ export default class UserToUserController {
         const response = await UserToUserDBService.replyToFriendRequest(details);
         if (!response.success) return res.status(400).json({ message: response.message });
 
+        const user = await UserToUserDBService.fetchUserProfile(details.adderId, false);
+        const notificationSubject = { subject: 'Friend Request' };
+
+        const payload = {
+            id: details.adder.id,
+            notification: `${user.firstname} ${user.lastname} ${details.reply === 'accept' ? 'accepted' : 'declined'} your friend request`,
+            extraInformation: JSON.stringify({ ...details, ...notificationSubject }),
+            seen: false,
+            dateOfCreation: new Date()
+        }
+
         return res.status(200).json({ success: true, message: response.message, id: response.id });
     }
 

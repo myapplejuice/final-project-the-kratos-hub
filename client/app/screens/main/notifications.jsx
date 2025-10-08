@@ -25,14 +25,13 @@ import Invert from '../../components/effects/invert';
 import ExpandInOut from '../../components/effects/expand-in-out';
 
 export default function Notifications() {
-    const { setLibraryActive } = useContext(LibraryContext);
-    const { setCameraActive } = useContext(CameraContext);
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
     const { user, setUser } = useContext(UserContext);
-    const insets = useSafeAreaInsets();
     const [pageLoading, setPageLoading] = useState(true);
+    const [openSection, setOpenSection] = useState('friendRequests');
     const [requests, setRequests] = useState([]);
     const [openRequest, setOpenRequest] = useState(null);
+    const [notifications, setNotifications] = useState([]);
 
     useEffect(() => {
         async function prepareRequests() {
@@ -138,8 +137,13 @@ export default function Notifications() {
             {!pageLoading ? (
                 <AppScroll extraBottom={20}>
                     <View style={styles.card}>
-                        <View style={{ marginBottom: 25 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                             <AppText style={styles.label}>Friend Requests</AppText>
+                            {notifications.length > 0 &&
+                                <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: 'red', borderWidth: 1, borderColor: 'red', justifyContent: 'center', alignItems: 'center' }}>
+                                    <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{requests.length}</AppText>
+                                </View>
+                            }
                         </View>
                         {requests.length > 0 ? (
                             requests.map((request, index) => {
@@ -235,8 +239,30 @@ export default function Notifications() {
                                 );
                             })
                         ) : (
-                            <AppText style={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}>
+                            <AppText style={{ color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginTop: 25 }}>
                                 No friend requests
+                            </AppText>
+                        )}
+                    </View>
+                    <View style={[styles.card, { marginTop: 15 }]}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <AppText style={styles.label}>Notifications</AppText>
+                            {notifications.length > 0 &&
+                                <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: 'red', borderWidth: 1, borderColor: 'red', justifyContent: 'center', alignItems: 'center' }}>
+                                    <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{requests.length}</AppText>
+                                </View>
+                            }
+                        </View>
+                        {notifications.length > 0 ? (
+
+                            notifications.map((notification) => {
+                                return (
+                                    <></>
+                                );
+                            })
+                        ) : (
+                            <AppText style={{ color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginTop: 25 }}>
+                                No notifications
                             </AppText>
                         )}
                     </View>

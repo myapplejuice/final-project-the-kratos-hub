@@ -15,21 +15,21 @@ export function userTablesQuery() {
                 );
             END;`
 
-    //const userNotificationsQuery = `
-    //        IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='UserNotifications' AND xtype='U')
-    //        BEGIN
-    //            CREATE TABLE dbo.UserNotifications (
-    //                Id INT IDENTITY(1,1) PRIMARY KEY,
-    //                UserId UNIQUEIDENTIFIER NOT NULL,
-    //                Notification VARCHAR(500) NOT NULL,
-    //                ExtraInformation VARCHAR(MAX) NULL, --JSON String
-    //                Seen BIT NOT NULL DEFAULT 0,
-    //                DateOfCreation DATETIME2 NOT NULL,
-    //                CONSTRAINT FK_UserNotifications_Users FOREIGN KEY (UserId)
-    //                    REFERENCES dbo.Users(Id)
-    //                    ON DELETE CASCADE
-    //            );
-    //        END;`
+    const userNotificationsQuery = `
+            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='UserNotifications' AND xtype='U')
+            BEGIN
+                CREATE TABLE dbo.UserNotifications (
+                    Id INT IDENTITY(1,1) PRIMARY KEY,
+                    UserId UNIQUEIDENTIFIER NOT NULL,
+                    Notification VARCHAR(500) NOT NULL,
+                    ExtraInformation VARCHAR(MAX) NULL, --JSON String
+                    Seen BIT NOT NULL DEFAULT 0,
+                    DateOfCreation DATETIME2 NOT NULL,
+                    CONSTRAINT FK_UserNotifications_Users FOREIGN KEY (UserId)
+                        REFERENCES dbo.Users(Id)
+                        ON DELETE CASCADE
+                );
+            END;`
 
     const userFriendListQuery = `
             IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='FriendRequests' AND xtype='U')
@@ -208,6 +208,7 @@ export function userTablesQuery() {
 
     const query = [
         userQuery,
+        userNotificationsQuery,
         userFriendListQuery,
         metricsQuery,
         nutritionQuery,

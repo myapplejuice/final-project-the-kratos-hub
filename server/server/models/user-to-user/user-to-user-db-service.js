@@ -219,7 +219,7 @@ export default class UserToUserDBService {
                 const insertQuery = `
                 INSERT INTO UserFriendList (UserOne, UserTwo, Status)
                 OUTPUT INSERTED.Id
-                VALUES (@UserOne, @UserTwo, 'accepted')
+                VALUES (@UserOne, @UserTwo, 'active')
             `;
 
                 const result = await request.query(insertQuery);
