@@ -87,7 +87,7 @@ function Layout() {
                                     <Popups {...popupStates} />
                                     {bars && <TopBar visible={topBarVisibility} />}
                                     <View style={{ flex: 1, backgroundColor: colors.background }}>
-                                        <Stack screenOptions={{ headerShown: false, animation: 'none' }}>
+                                        <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
                                             {/* AUTHENTICATION */}
                                             <Stack.Screen name="index" />
                                             <Stack.Screen name="screens/authentication/introduction" />
@@ -112,6 +112,8 @@ function Layout() {
                                             {/* PROFILE & CHILDREN */}
                                             <Stack.Screen name="screens/main/profile/settings" />
                                             <Stack.Screen name="screens/main/profile/edit-profile" />
+                                            <Stack.Screen name="screens/main/profile/usda-profile" />
+                                            <Stack.Screen name="screens/main/profile/user-profile" />
 
                                             {/* SETTINGS CHILDREN */}
                                             <Stack.Screen name="screens/main/profile/settings/units-change" />

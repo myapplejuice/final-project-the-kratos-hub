@@ -23,6 +23,8 @@ export const routes = {
     /* PROFILE CHILDREN */
     SETTINGS: '/screens/main/profile/settings',
     EDIT_PROFILE: '/screens/main/profile/edit-profile',
+    USDA_PROFILE: '/screens/main/profile/usda-profile',
+    USER_PROFILE: '/screens/main/profile/user-profile',
 
     /* SETTINGS CHILDREN */
     UNITS_CHANGE: '/screens/main/profile/settings/units-change',

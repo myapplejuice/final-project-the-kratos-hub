@@ -91,4 +91,9 @@ export const Images_2 = {
     barcode2: require('../../../assets/images/barcode-2.png'),
     barcode3: require('../../../assets/images/barcode-3.png'),
     barcode4: require('../../../assets/images/barcode-4.png'),
+    usdaLogo: require('../../../assets/images/usda-logo.png'),
+    usdaBackground: require('../../../assets/images/usda-background.png'),
+    website: require('../../../assets/images/website.png'),
+    externalLink: require('../../../assets/images/external-link.png'),
+    research: require('../../../assets/images/research.png'),
 };

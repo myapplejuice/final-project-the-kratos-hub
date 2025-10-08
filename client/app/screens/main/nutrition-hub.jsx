@@ -21,7 +21,7 @@ import Divider from "../../components/screen-comps/divider";
 
 export default function NutritionHub() {
      const { showSpinner, hideSpinner, createToast } = usePopups();
-     const { user, setUser} = useContext(UserContext);
+     const { user, setUser } = useContext(UserContext);
      const [log, setLog] = useState({})
 
      useEffect(() => {
@@ -67,8 +67,8 @@ export default function NutritionHub() {
      function handleMealPlansPress() {
           router.push({
                pathname: routes.MEAL_PLANS,
-               params: { 
-                    mealPlansIntent: 'normal' 
+               params: {
+                    mealPlansIntent: 'normal'
                }
           });
      }
@@ -187,6 +187,7 @@ export default function NutritionHub() {
                               </View>
                          </View>
                     </TouchableOpacity>
+
                     <TouchableOpacity onPress={() => router.push(routes.FOODS)} style={[styles.card, { padding: 15 }]}>
                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                               <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 1 }}>
@@ -203,6 +204,30 @@ export default function NutritionHub() {
                                              </AppText>
                                              <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
                                                   Create your own foods and share them with others
+                                             </AppText>
+                                        </View>
+                                   </View>
+                              </View>
+                         </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => router.push(routes.USDA_PROFILE)} style={[styles.card, { padding: 15 }]}>
+                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 1 }}>
+                                   <View style={{ borderRadius: 15, padding: 12, backgroundColor: colors.lightMutedText, overflow: 'hidden' }}>
+                                        <Image
+                                             source={Images.usdaLogo}
+                                             style={{ width: 35, height: 35, tintColor: 'white' }}
+                                             contentFit="contain"
+                                        />
+                                   </View>
+                                   <View style={{ justifyContent: 'flex-start', marginStart: 15, marginEnd: 70 }}>
+                                        <View>
+                                             <AppText style={{ color: 'white', fontSize: scaleFont(18), fontWeight: 'bold' }}>
+                                                  Food Source
+                                             </AppText>
+                                             <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
+                                                  Tap for more information about the United States Department of Agriculture, our foods provider
                                              </AppText>
                                         </View>
                                    </View>

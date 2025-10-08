@@ -65,6 +65,8 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.MEAL_PLANS]: "Meal Plans",
         [routes.FOODS]: "My Foods",
         [routes.MEAL_PLANS_EDITOR]: "Edit Meal Plan",
+        [routes.USER_PROFILE]: "User Profile",
+        [routes.USDA_PROFILE]: "USDA Profile",
     };
 
     const styles = StyleSheet.create({

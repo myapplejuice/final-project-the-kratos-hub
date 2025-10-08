@@ -507,6 +507,20 @@ export default function FoodProfile() {
         });
     }
 
+    function handleCreatorPress() {
+        if (selectedFood.isUSDA) {
+            router.push(routes.USDA_PROFILE);
+        } else {
+            const creatorId = selectedFood.creatorId;
+            router.push({
+                pathname: routes.USER_PROFILE,
+                params: {
+                    creatorId
+                }
+            });
+        }
+    }
+
     return (
         <AppScroll contentStyle={{ padding: 15 }} extraTop={60} extraBottom={200}>
             <View style={styles.header}>
@@ -514,7 +528,11 @@ export default function FoodProfile() {
                     <AppText style={styles.foodLabel}>{selectedFood.label}</AppText>
                     <AppText style={styles.foodCategory}>{selectedFood.category}</AppText>
                     <Divider orientation="horizontal" style={{ marginVertical: 10 }} />
-                    <AppText style={styles.creator}>{selectedFood.isUSDA ? 'United States Department of Agriculture' : selectedFood.creatorName}</AppText>
+                    <TouchableOpacity onPress={handleCreatorPress}>
+                        <AppText style={styles.creator}>
+                            {selectedFood.isUSDA ? 'United States Department of Agriculture' : selectedFood.creatorName}
+                        </AppText>
+                    </TouchableOpacity>
                     <AppText style={[styles.creator, { fontSize: scaleFont(10) }]}>{selectedFood.isUSDA ? 'Public' : selectedFood.isPublic ? 'Public' : 'Private'}</AppText>
                 </View>
                 <View style={{ flexDirection: 'row' }}>
