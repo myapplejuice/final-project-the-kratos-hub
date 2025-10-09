@@ -227,11 +227,11 @@ export default function Notifications() {
                                                 <AppText
                                                     style={{
                                                         color: colors.mutedText,
-                                                        textAlign: profile.description ? 'left' : 'center',
+                                                        textAlign: request.description ? 'left' : 'center',
                                                         marginVertical: 15,
                                                     }}
                                                 >
-                                                    {profile.description || 'No introduction provided'}
+                                                    {request.description || 'No introduction provided'}
                                                 </AppText>
                                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
                                                     <TouchableOpacity

@@ -24,8 +24,6 @@ export default function UserProfile() {
     if (!friend)
         friend = user.pendingFriends?.find(f => f.adderId === profile.id || f.receiverId === profile.id);
 
-    console.log(friend)
-
     useEffect(() => {
         async function fetchUserProfile() {
             showSpinner();

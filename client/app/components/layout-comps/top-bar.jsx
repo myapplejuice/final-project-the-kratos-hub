@@ -23,7 +23,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         const notificationsCount = user?.notifications?.filter(n => !n.seen).length || 0;
         
         setNotificationsCount(friendRequestsCount + notificationsCount);
-    }, [user?.pendingFriends]);
+    }, [user?.pendingFriends, user?.notifications]);
 
     useEffect(() => {
         Animated.timing(topBarPosition, {
