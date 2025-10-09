@@ -131,7 +131,8 @@ export default class UserToUserDBService {
                     WHEN UserOne = @UserId THEN UserTwo
                     ELSE UserOne
                 END AS FriendId,
-                Status
+                Status,
+                TerminatedBy
             FROM UserFriendList
             WHERE UserOne = @UserId OR UserTwo = @UserId
         `;
@@ -143,6 +144,7 @@ export default class UserToUserDBService {
             return result.recordset.map(r => ({
                 id: r.Id,
                 friendId: r.FriendId,
+                terminatedBy: r.TerminatedBy,
                 status: r.Status
             }));
         } catch (err) {
@@ -187,7 +189,7 @@ export default class UserToUserDBService {
     static async replyToFriendRequest(details) {
         try {
             const request = Database.getRequest();
-            
+
             Database.addInput(request, 'Id', sql.Int, details.id);
             Database.addInput(request, 'Status', sql.VarChar(20), details.reply);
 
@@ -234,4 +236,47 @@ export default class UserToUserDBService {
         }
     }
 
+    static async disableFriendship(id, terminatorId) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'Id', sql.Int, id);
+            Database.addInput(request, 'TerminatedBy', sql.UniqueIdentifier, terminatorId);
+
+            const updateQuery = `
+            UPDATE UserFriendList
+            SET Status = 'inactive', TerminatedBy = @TerminatedBy
+            WHERE Id = @Id
+        `;
+            const result = await request.query(updateQuery);
+            if (!result.rowsAffected[0]) return { success: false, message: "Failed to disable friendship" };
+
+            return { success: true, message: "Friendship disabled successfully" };
+
+        } catch (err) {
+            console.error('disableFriendship error:', err);
+            return { success: false, message: "Failed to disable friendship" };
+        }
+    }
+
+    static async restoreFriendship(id) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'Id', sql.Int, id);
+            Database.addInput(request, 'TerminatedBy', sql.UniqueIdentifier, null);
+
+            const updateQuery = `
+            UPDATE UserFriendList
+            SET Status = 'active', TerminatedBy = @TerminatedBy
+            WHERE Id = @Id
+        `;
+            const result = await request.query(updateQuery);
+            if (!result.rowsAffected[0]) return { success: false, message: "Failed to disable friendship" };
+
+            return { success: true, message: "Friendship disabled successfully" };
+
+        } catch (err) {
+            console.error('disableFriendship error:', err);
+            return { success: false, message: "Failed to disable friendship" };
+        }
+    }
 }

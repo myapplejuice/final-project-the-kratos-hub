@@ -147,7 +147,7 @@ export default function USDAProfile() {
                 </View>
 
                 <View style={[styles.card, { marginTop: 15 }]}>
-                    <AppText style={styles.cardLabel}>Contact & Links</AppText>
+                    <AppText style={styles.label}>Contact & Links</AppText>
 
                     <TouchableOpacity style={styles.linkItem} onPress={() => Linking.openURL('https://fdc.nal.usda.gov')}>
                         <View style={styles.linkContent}>
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
         marginVertical: 15,
         padding: 5
     },
-    label: { fontSize: scaleFont(12), color: 'white', fontWeight: '600', marginStart: 15 },
+    label: { fontSize: scaleFont(12), color: 'white', fontWeight: '600', marginBottom: 5 },
     settingIcon: { tintColor: 'rgb(255,255,255)', width: 20, height: 20 },
     deleteButton: {
         backgroundColor: 'rgb(255, 58, 48)',

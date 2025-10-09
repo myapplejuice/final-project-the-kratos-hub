@@ -89,6 +89,8 @@ export default class ObjectMapper {
             Notification: 'notification',
             Seen: 'seen',
             ExtraInformation: 'extraInformation',
+               TerminatedBy: 'terminatedBy',
+               Role: 'role'
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -181,6 +183,8 @@ export default class ObjectMapper {
             notification: 'Notification',
             seen: 'Seen',
             extraInformation: 'ExtraInformation',
+            role: 'Role',
+            terminatedBy: 'TerminatedBy',
         };
         return map[key] || key;
     }

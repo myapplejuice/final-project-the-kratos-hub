@@ -95,11 +95,11 @@ export default function UserProfile() {
     }
 
     async function handleRemoveFriend() {
-        //TODO REMOVE
+
     }
 
     async function handleToMessages() {
-        //TODO BLOCK
+        
     }
 
     async function handleUserReport() {
@@ -190,7 +190,7 @@ export default function UserProfile() {
                         </View>
 
                         <View style={[styles.card, { marginTop: 15 }]}>
-                            <AppText style={[styles.cardLabel, { fontSize: scaleFont(15) }]}>
+                            <AppText style={[styles.cardLabel]}>
                                 Actions
                             </AppText>
                             {!friend && (

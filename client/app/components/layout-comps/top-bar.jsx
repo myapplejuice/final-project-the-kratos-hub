@@ -224,7 +224,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                         <>
                             <View style={styles.bellWrapper}>
                                 <TouchableOpacity onPress={() => router.push(routes.FRIENDS)}>
-                                    <Image style={styles.bellImage} source={Images.noMessage} />
+                                    <Image style={styles.bellImage} source={unreadMessagesCount > 0 ? Images.message : Images.noMessage} />
                                 </TouchableOpacity>
                                 {unreadMessagesCount > 0 && (
                                     <View style={styles.badge}>

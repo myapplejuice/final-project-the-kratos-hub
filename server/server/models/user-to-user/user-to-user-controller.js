@@ -62,4 +62,22 @@ export default class UserToUserController {
 
         return res.status(200).json({ success: true, message: response.message, id: response.id });
     }
+
+    static async disableFriendship(req, res) {
+        const details = req.body;
+
+        const response = await UserToUserDBService.disableFriendship(details.id, details.terminatorId);
+        if (!response.success) return res.status(400).json({ message: response.message });
+
+        return res.status(200).json({ success: true, message: response.message });
+    }
+
+    static async restoreFriendship(req, res) {
+        const id = req.body;
+
+        const response = await UserToUserDBService.restoreFriendship(id);
+        if (!response.success) return res.status(400).json({ message: response.message });
+
+        return res.status(200).json({ success: true, message: response.message });
+    }
 }

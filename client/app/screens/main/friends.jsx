@@ -87,7 +87,7 @@ setVisibleList(filtered);
     }
 
     return (
-        <AppScroll extraBottom={loading ? 0 : 150}>
+        <AppScroll extraBottom={loading ? 0 : 150} avoidKeyboard={false}>
             {!loading ? (
                 <View style={{ flex: 1, margin: 15 }}>
                     <View>
@@ -121,7 +121,7 @@ setVisibleList(filtered);
                             {visibleList.map((friend, i) => (
                                 <TouchableOpacity
                                     onPress={() => console.log('go to messaging')}
-                                    style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+                                    style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}
                                     key={i}
                                 >
                                     <View style={{ flexDirection: 'row' }}>
@@ -149,18 +149,13 @@ setVisibleList(filtered);
                     ) : (
                         friendsList.length > 0 ? (
                             <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, margin: 15 }}>
-                                <Image source={Images.sad} style={{ width: 100, height: 100, tintColor: colors.mutedText + '40' }} />
+                                <Image source={Images.noProfile} style={{ width: 100, height: 100, tintColor: colors.mutedText + '40' }} />
                                 <AppText style={{ color: colors.mutedText + '60', fontWeight: 'bold', fontSize: scaleFont(25), marginTop: 15 }}>
-                                    Your friends list is empty
+                                    User not found
                                 </AppText>
                                 <AppText style={{ color: colors.mutedText, fontSize: scaleFont(15), marginTop: 5, textAlign: 'center' }}>
-                                    Explore the app, contribute to the community, make new friends, and grow your network.
+                                    Try a again and make sure your friend is in your friends list
                                 </AppText>
-                                <AnimatedButton
-                                    title="Community Hub"
-                                    onPress={() => console.log('replace with hub later')}
-                                    style={{ marginTop: 20, padding: 15, borderRadius: 20, width: 200, backgroundColor: colors.main }}
-                                />
                             </View>
                         ) :
                             <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, margin: 15 }}>
