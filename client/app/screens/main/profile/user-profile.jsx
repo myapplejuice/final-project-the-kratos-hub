@@ -21,7 +21,7 @@ export default function UserProfile() {
     const [viewImage, setViewImage] = useState(false);
     let friend = user.friends?.find(f => f.friendId === profile.id);
     if (!friend)
-        friend = user.pendingFriends?.find(f => f.adderId === profile.id || f.receiverId === profile.id);
+        friend = user.pendingFriends?.find(f => (f.adderId === profile.id || f.receiverId === profile.id) && f.status !== 'declined');
 
     useEffect(() => {
         async function fetchUserProfile() {
@@ -108,7 +108,7 @@ export default function UserProfile() {
 
     return (
         <>
-            <FadeInOut visible={viewImage && profile.image} style={styles.imageOverlay}>
+            <FadeInOut visible={viewImage && profile.image} style={styles.imageOverlay} initialVisible={false}>
                 <TouchableOpacity
                     activeOpacity={1}
                     style={styles.imageOverlay}
@@ -175,7 +175,7 @@ export default function UserProfile() {
                                     </View>
                                 </View>
 
-                                <View style={[styles.infoRow, {marginBottom: 0}]}>
+                                <View style={[styles.infoRow, { marginBottom: 0 }]}>
                                     <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecond }]}>
                                         <Image source={Images.calendar} style={[styles.detailIcon]} />
                                     </View>
@@ -189,11 +189,11 @@ export default function UserProfile() {
                             </View>
                         </View>
 
-                        <View style={[styles.card, {marginTop: 15}]}>
-                            <AppText style={[styles.cardLabel, {fontSize: scaleFont(15)}]}>
+                        <View style={[styles.card, { marginTop: 15 }]}>
+                            <AppText style={[styles.cardLabel, { fontSize: scaleFont(15) }]}>
                                 Actions
-                                </AppText>
-                            {friend.status !== 'active' && friend.status !== 'pending' && (
+                            </AppText>
+                            {!friend && (
                                 <TouchableOpacity onPress={handleAddFriend} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
                                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                         <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
@@ -208,7 +208,7 @@ export default function UserProfile() {
                                 </TouchableOpacity>
                             )}
 
-                            {friend.status === 'active' && (
+                            {friend && friend.status === 'active' && (
                                 <>
                                     <TouchableOpacity onPress={handleToMessages} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>

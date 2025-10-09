@@ -212,7 +212,8 @@ export default function Notifications() {
                                                         <AppText style={{ color: 'white', fontSize: scaleFont(14), fontWeight: 'bold' }}>
                                                             {profile.firstname || 'Unknown'} {profile.lastname || ''}
                                                         </AppText>
-                                                        <AppText style={{ color: 'white' }}>{profile.email || ''}</AppText>
+                                                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12) }}>{profile.email || ''}</AppText>
+                                                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12) }}>{formatDate(request.dateOfCreation, { format: user.preferences.dateFormat.key }) || ''} {formatTime(request.dateOfCreation, { format: user.preferences.timeFormat.key }) || ''}</AppText>
                                                     </View>
                                                 </View>
                                                 <View style={{ width: '30%', justifyContent: 'center', alignItems: 'flex-end' }}>

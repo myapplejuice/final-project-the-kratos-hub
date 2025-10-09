@@ -1,20 +1,46 @@
-{
-    "adderId": "9660511F-B551-4970-9160-D193B735723B",
-    "dateOfCreation": "2025-10-08T15:23:56.124Z",
-    "description": "",
-    "id": 1,
-    "profile": {
-        "age": 33,
-        "dateOfCreation": "2025-10-07T13:00:48.250Z",
-        "email": "rawda1@gmail.com",
-        "firstname": "Rawda",
-        "gender": "female",
-        "id": "9660511F-B551-4970-9160-D193B735723B",
-        "lastname": "Abu Shah",
-        "phone": "0564848166"
+[
+    {
+        "adderId": "9660511F-B551-4970-9160-D193B735723B",
+        "dateOfCreation": "2025-10-08T15:23:56.124Z",
+        "description": "",
+        "id": 1,
+        "profile": {
+            "age": 33,
+            "dateOfCreation": "2025-10-07T13:00:48.250Z",
+            "email": "rawda1@gmail.com",
+            "firstname": "Rawda",
+            "gender": "female",
+            "id": "9660511F-B551-4970-9160-D193B735723B",
+            "image": [Object
+            ],
+            "lastname": "Abu Shah",
+            "phone": "0564848166"
+        },
+        "receiverId": "204EFF41-FF71-4636-9425-14DBB383E2BA",
+        "role": "receiver",
+        "seen": false,
+        "status": "accepted"
     },
-    "receiverId": "204EFF41-FF71-4636-9425-14DBB383E2BA",
-    "role": "receiver",
-    "seen": false,
-    "status": "pending"
-}
+    {
+        "adderId": "A8652FDB-980B-4AFD-9495-46F809F7E777",
+        "dateOfCreation": "2025-10-08T18:26:13.038Z",
+        "description": "Hi, can u coach me",
+        "id": 4,
+        "profile": {
+            "age": 33,
+            "dateOfCreation": "2025-10-08T18:25:42.537Z",
+            "email": "Kokomelon@gmail.com",
+            "firstname": "Koko",
+            "gender": "female",
+            "id": "A8652FDB-980B-4AFD-9495-46F809F7E777",
+            "image": [Object
+            ],
+            "lastname": "Melon",
+            "phone": "0506484846"
+        },
+        "receiverId": "204EFF41-FF71-4636-9425-14DBB383E2BA",
+        "role": "receiver",
+        "seen": false,
+        "status": "declined"
+    }
+]

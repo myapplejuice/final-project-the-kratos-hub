@@ -42,15 +42,23 @@ export default class UserToUserController {
 
         const receiver = await UserToUserDBService.fetchUserProfile(details.receiverId, false);
 
-        const payload = {
+        const adderPayload = {
             userId: details.adderId,
             notification: `${receiver.firstname} ${receiver.lastname} ${details.reply} your friend request`,
             seen: false,
             dateOfCreation: new Date()
         }
 
-        await NotificationsDBService.pushNotification(payload);
+        await NotificationsDBService.pushNotification(adderPayload);
+
+        const receiverPayload = {
+            userId: details.receiverId,
+            notification: `You ${reply === 'declined' ? 'rejected' : 'confirmed'} ${adder.firstname} ${adder.lastname}'s friend request`,
+            seen: false,
+            dateOfCreation: new Date()
+        }
         
+        await NotificationsDBService.pushNotification(receiverPayload);
 
         return res.status(200).json({ success: true, message: response.message, id: response.id });
     }

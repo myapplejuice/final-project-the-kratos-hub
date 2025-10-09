@@ -17,6 +17,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
     const topBarPosition = useRef(new Animated.Value(0)).current;
     const topBarOpacity = useRef(new Animated.Value(0)).current;
     const [notificationsCount, setNotificationsCount] = useState(0);
+    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
     useEffect(() => {
         const friendRequestsCount = user?.pendingFriends?.filter(f => f.adderId !== user.id && f.status === 'pending').length || 0;
@@ -24,6 +25,11 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
 
         setNotificationsCount(friendRequestsCount + notificationsCount);
     }, [user?.pendingFriends, user?.notifications]);
+
+    useEffect(() => {
+        const unreadMessagesCount = user.friends?.reduce((acc, f) => acc + (f.messages?.filter(m => !m.seen).length || 0), 0);
+        setUnreadMessagesCount(unreadMessagesCount);
+    }, [user.friends])
 
     useEffect(() => {
         Animated.timing(topBarPosition, {
@@ -220,10 +226,10 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                                 <TouchableOpacity onPress={() => router.push(routes.FRIENDS)}>
                                     <Image style={styles.bellImage} source={Images.noMessage} />
                                 </TouchableOpacity>
-                                {user?.unreadMessages > 0 && (
+                                {unreadMessagesCount > 0 && (
                                     <View style={styles.badge}>
                                         <AppText style={styles.badgeText}>
-                                            {user.unreadMessages > 99 ? '99+' : user.unreadMessages}
+                                            {unreadMessagesCount > 99 ? '99+' : unreadMessagesCount}
                                         </AppText>
                                     </View>
                                 )}
