@@ -175,7 +175,7 @@ export default function Notifications() {
                         <View style={[styles.card]}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 }}>
                                 <AppText style={styles.label}>Friend Requests</AppText>
-                                {requests.length > 0 &&
+                                {requests.filter(r => r.status === 'pending').length > 0 &&
                                     <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: 'red', borderWidth: 1, borderColor: 'red', justifyContent: 'center', alignItems: 'center' }}>
                                         <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{requests.filter(r => r.status === 'pending').length}</AppText>
                                     </View>
@@ -187,37 +187,43 @@ export default function Notifications() {
                                     return (
                                         <TouchableOpacity
                                             key={index}
-                                            onPress={() => setOpenRequest(prev => (prev === profile.id ? null : profile.id))}
+                                            onPress={() => request.status === 'pending' ? setOpenRequest(prev => (prev === profile.id ? null : profile.id)) : handleProfile(profile)}
                                             style={{ marginBottom: index === requests.length - 1 ? 0 : 25 }}
                                         >
-                                            <View style={{ flexDirection: 'row' }}>
-                                                <View style={{ width: '20%' }}>
-                                                    <Image
-                                                        source={profile.image || Images.profilePic}
-                                                        style={{ width: 50, height: 50, borderRadius: 25 }}
-                                                    />
-                                                </View>
-                                                <View style={{ justifyContent: 'center', width: '70%' }}>
-                                                    <AppText style={{ color: 'white', fontSize: scaleFont(14), fontWeight: 'bold' }}>
-                                                        {profile.firstname || 'Unknown'} {profile.lastname || ''}
-                                                    </AppText>
-                                                    <AppText style={{ color: 'white' }}>{profile.email || ''}</AppText>
-                                                </View>
-                                                <View style={{ width: '10%', justifyContent: 'center', alignItems: 'flex-end' }}>
-                                                    <Invert axis='horizontal' inverted={openRequest === profile.id}>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                <View style={{ flexDirection: 'row', width: '70%' }}>
+                                                    <View style={{marginEnd: 15}}>
                                                         <Image
-                                                            source={Images.arrow}
-                                                            style={{
-                                                                width: 20,
-                                                                height: 20,
-                                                                tintColor: 'white',
-                                                                transform: [{ rotate: '-90deg' }],
-                                                            }}
+                                                            source={profile.image || Images.profilePic}
+                                                            style={{ width: 50, height: 50, borderRadius: 25 }}
                                                         />
-                                                    </Invert>
+                                                    </View>
+                                                    <View style={{ justifyContent: 'center' }}>
+                                                        <AppText style={{ color: 'white', fontSize: scaleFont(14), fontWeight: 'bold' }}>
+                                                            {profile.firstname || 'Unknown'} {profile.lastname || ''}
+                                                        </AppText>
+                                                        <AppText style={{ color: 'white' }}>{profile.email || ''}</AppText>
+                                                    </View>
                                                 </View>
+                                                <View style={{ width: '30%', justifyContent: 'center', alignItems: 'flex-end' }}>
+                                                {request.status === 'pending' ?
+                                                    <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
+                                                        <Invert axis='horizontal' inverted={openRequest === profile.id}>
+                                                            <Image
+                                                                source={Images.arrow}
+                                                                style={{
+                                                                    width: 20,
+                                                                    height: 20,
+                                                                    tintColor: 'white',
+                                                                    transform: [{ rotate: '-90deg' }],
+                                                                }}
+                                                            />
+                                                        </Invert>
+                                                    </View>
+                                                    : <AppText style={{ alignSelf: 'flex-end', color: request.status === 'accepted' ? colors.accentGreen : colors.accentPink }}>{request.status === 'accepted' ? 'Accepted' : 'Declined'}</AppText>}
+                                                     </View>
                                             </View>
-                                            <ExpandInOut visible={openRequest === profile.id}>
+                                            {request.status === 'pending' && <ExpandInOut visible={openRequest === profile.id}>
                                                 <AppText
                                                     style={{
                                                         color: colors.mutedText,
@@ -270,7 +276,7 @@ export default function Notifications() {
                                                     textStyle={{ color: 'white', fontSize: scaleFont(12) }}
                                                     title={'View Profile'}
                                                 />
-                                            </ExpandInOut>
+                                            </ExpandInOut>}
                                         </TouchableOpacity>
                                     );
                                 })
