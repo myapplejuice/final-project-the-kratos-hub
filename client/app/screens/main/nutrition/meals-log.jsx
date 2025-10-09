@@ -452,23 +452,21 @@ export default function MealsLog() {
                             <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white', transform: [{ scaleX: -1 }] }} />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setDatePickerOpen(true)} style={{ height: 30, width: '50%', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
+                          {(dateComparisons.isToday || dateComparisons.isYesterday || dateComparisons.isTomorrow) &&
                             <AppText style={{ color: 'white', fontSize: scaleFont(14), fontWeight: 'bold' }}>
-                                {dateComparisons.isToday ? 'Today' : dateComparisons.isYesterday ? 'Yesterday' : 'Tomorrow'}
+                                {dateComparisons.isToday ? 'Today' : dateComparisons.isYesterday ? 'Yesterday' : dateComparisons.isTomorrow ? 'Tomorrow' : ''}
                             </AppText>
-                            <SlideInOut removeWhenHidden distance={3} visible={!dateComparisons.isToday && !dateComparisons.isYesterday && !dateComparisons.isTomorrow}>
-                                <FadeInOut removeWhenHidden visible={!dateComparisons.isToday && !dateComparisons.isYesterday && !dateComparisons.isTomorrow}>
-                                    <DateDisplay
-                                        styles={{ textAlign: 'center', marginBottom: 0, marginTop: 0 }} dateStyle={{ color: 'white', fontSize: scaleFont(16) }}
-                                        dayStyle={{ color: 'white' }}
-                                        centered={true}
-                                        uppercaseDate={false}
-                                        uppercaseDay={false}
-                                        date={pageDate}
-                                        showDay={false}
-                                        hideDateOnMount={true}
-                                    />
-                                </FadeInOut>
-                            </SlideInOut>
+                            }
+                            <DateDisplay
+                                styles={{ textAlign: 'center', marginBottom: 0, marginTop: 0 }} dateStyle={{ color: 'white', fontSize: scaleFont(16) }}
+                                dayStyle={{ color: 'white' }}
+                                centered={true}
+                                uppercaseDate={false}
+                                uppercaseDay={false}
+                                date={pageDate}
+                                showDay={false}
+                                hideDateOnMount={true}
+                            />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => handleDate(1, 'next')} style={{ justifyContent: 'center', width: '25%', alignItems: 'center' }}>
                             <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white' }} />
