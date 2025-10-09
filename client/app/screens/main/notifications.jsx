@@ -76,10 +76,6 @@ export default function Notifications() {
                     .filter(n => !n.seen)
                     .map(n => n.id);
 
-                console.log(user.notifications);
-
-                console.log(notSeenNotificationsIds);
-
                 // Example call:
                 // const result = await APIService.user.setNotificationsSeen(notSeenNotificationsIds);
                 // if (result.success) {
@@ -163,20 +159,23 @@ export default function Notifications() {
         <View style={styles.main}>
             {!pageLoading ? (
                 <AppScroll extraBottom={20} extraTop={30}>
-                    <TouchableOpacity onPress={() => setSelectedList(selectedList === 'notifications' ? 'friendRequests' : 'notifications')} style={{ flexDirection: 'row', width: '100%', height: 50, marginBottom: 15 }}>
-                        <View style={{ justifyContent: 'center', alignItems: 'center', width: '50%', backgroundColor: selectedList === 'notifications' ? colors.main : colors.backgroundTop }}>
+                    <TouchableOpacity
+                        onPress={() => setSelectedList(selectedList === 'notifications' ? 'friendRequests' : 'notifications')}
+                        style={{ flexDirection: 'row', height: 50, borderRadius: 15, overflow: 'hidden', margin: 15, backgroundColor: colors.backgroundTop }}
+                    >
+                        <View style={{ justifyContent: 'center', alignItems: 'center', width: '48%', backgroundColor: selectedList === 'notifications' ? colors.main : colors.backgroundTop, marginVertical: 5, marginStart: 5, borderRadius: 12 }}>
                             <AppText style={{ color: 'white', fontWeight: 'bold' }}>
                                 Notifications
                             </AppText>
                         </View>
-                        <View style={{ justifyContent: 'center', alignItems: 'center', width: '50%', backgroundColor: selectedList === 'friendRequests' ? colors.main : colors.backgroundTop }}>
+                        <View style={{ justifyContent: 'center', alignItems: 'center', width: '48%', backgroundColor: selectedList === 'friendRequests' ? colors.main : colors.backgroundTop, marginVertical: 5, marginStart: 5, borderRadius: 12 }}>
                             <AppText style={{ color: 'white', fontWeight: 'bold' }}>
                                 Friend Requests
                             </AppText>
                         </View>
                     </TouchableOpacity>
                     {selectedList === 'friendRequests' &&
-                        <View style={styles.card}>
+                        <View style={[styles.card]}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 }}>
                                 <AppText style={styles.label}>Friend Requests</AppText>
                                 {requests.length > 0 &&
@@ -279,7 +278,7 @@ export default function Notifications() {
                                     );
                                 })
                             ) : (
-                                <AppText style={{ color: colors.mutedText, fontWeight: 'bold', textAlign: 'center' }}>
+                                <AppText style={{ color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginVertical: 40 }}>
                                     No friend requests
                                 </AppText>
                             )}
@@ -296,20 +295,27 @@ export default function Notifications() {
                                 }
                             </View>
                             {notifications.length > 0 ? (
-                                notifications.map((notification) => {
-                                    return (
-                                        <View key={notification.id}>
-                                            <AppText style={[styles.cardLabel, { color: notification.seen ? colors.mutedText : 'white' }]}>
-                                                {notification.notification}
-                                            </AppText>
-                                            <AppText style={[styles.cardLabel, { color: colors.mutedText, fontSize: scaleFont(12) }]}>
-                                                {formatDate(notification.dateOfCreation, { format: user.preferences.dateFormat.key })}, {formatTime(notification.dateOfCreation, { format: user.preferences.timeFormat.key })}
-                                            </AppText>
-                                        </View>
-                                    );
-                                })
+                                <>
+                                    {notifications.map((notification, index) => {
+                                        const isLastUnseen = !notification.seen && (index === notifications.findIndex(n => n.seen) - 1 || index === notifications.filter(n => !n.seen).length - 1);
+                                        const seenNotificationsExist = notifications.some(n => n.seen);
+                                        return (
+                                            <View key={notification.id}>
+                                                <View style={{ borderStartColor: 'white', borderStartWidth: 2, paddingHorizontal: 15 }}>
+                                                    <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: notification.seen ? colors.mutedText : 'white' }}>
+                                                        {notification.notification}
+                                                    </AppText>
+                                                    <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: colors.mutedText }}>
+                                                        {formatDate(notification.dateOfCreation, { format: user.preferences.dateFormat.key })}, {formatTime(notification.dateOfCreation, { format: user.preferences.timeFormat.key })}
+                                                    </AppText>
+                                                </View>
+                                                {isLastUnseen && seenNotificationsExist &&  <Divider orientation='horizontal' style={{marginTop: 25}}/>}
+                                            </View>
+                                        );
+                                    })}
+                                </>
                             ) : (
-                                <AppText style={{ color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginTop: 25 }}>
+                                <AppText style={{ color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginVertical: 40 }}>
                                     No notifications
                                 </AppText>
                             )}
