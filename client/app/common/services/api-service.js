@@ -74,6 +74,12 @@ export default class APIService {
         return { success: true, message: json?.message || 'Success!', data: json?.foods || [] };
     }
 
+    static notifications = {
+        all: () => APIService.request(`/notifications/${APIService.USER_ID}`, 'GET'),
+        push: (payload) => APIService.request(`/notifications/${APIService.USER_ID}`, 'POST', payload),
+        seen: (payload) => APIService.request(`/notifications/${APIService.USER_ID}`, 'PUT', payload)
+    };
+
     static user = {
         create: (payload) => APIService.request('/user/create', 'POST', payload, false),
         login: (payload) => APIService.request('/user/login', 'POST', payload, false),

@@ -7,50 +7,48 @@ import ObjectMapper from '../../utils/object-mapper.js';
 export default class NotificationsDBService {
     static async fetchNotifications(userId) {
         try {
-            const request = Database.getRequest(Database.getPool().transaction);
-            Database.addInput(request, "UserId", sql.Int, userId);
+            const request = Database.getRequest();
+            Database.addInput(request, "UserId", sql.UniqueIdentifier, userId);
+
             const query = `
-                SELECT * FROM UserNotifications
-                WHERE UserId = @UserId
-                ORDER BY DateOfCreation DESC
-            `
+            SELECT * FROM UserNotifications
+            WHERE UserId = @UserId
+            ORDER BY DateOfCreation DESC, Id DESC
+        `;
+
             const queryResult = await request.query(query);
             if (queryResult.recordset.length === 0) return [];
 
             return queryResult.recordset.map(row => {
                 const notification = {};
                 for (const key in row) {
-                    const value = row[key];
-                    
-                    if(key === 'ExtraInformation')
-                        value = JSON.parse(value);
-                    
-                    notification[ObjectMapper.toCamelCase(key)] = row[key];
+                    let value = row[key];
+                    notification[ObjectMapper.toCamelCase(key)] = value;
                 }
                 return notification;
             });
         } catch (err) {
-            console.error('getNotifications error:', err);
+            console.error('fetchNotifications error:', err);
             return [];
         }
     }
 
-    static async pushNotification(details){
+
+    static async pushNotification(details) {
         try {
-            const request = Database.getRequest(Database.getPool().transaction);
-            Database.addInput(request, "UserId", sql.Int, details.userId);
+            const request = Database.getRequest();
+            Database.addInput(request, "UserId", sql.UniqueIdentifier, details.userId);
             Database.addInput(request, "Notification", sql.VarChar(500), details.notification);
-            Database.addInput(request, "ExtraInformation", sql.VarChar(500), JSON.stringify(details.extraInformation));
             Database.addInput(request, "Seen", sql.Bit, details.seen);
             Database.addInput(request, "DateOfCreation", sql.DateTime2, details.dateOfCreation || new Date());
 
             const query = `
-                INSERT INTO UserNotifications (UserId, Notification, ExtraInformation, Seen, DateOfCreation)
-                VALUES (@UserId, @Notification, @ExtraInformation, @Seen, @DateOfCreation)
+                INSERT INTO UserNotifications (UserId, Notification, Seen, DateOfCreation)
+                VALUES (@UserId, @Notification, @Seen, @DateOfCreation)
             `;
 
             const result = await request.query(query);
-            if (!result.recordset[0]) return false;
+            if (result.rowsAffected[0] === 0) return false;
 
             return true;
         } catch (err) {
@@ -58,23 +56,32 @@ export default class NotificationsDBService {
         }
     }
 
-    static async setNotificationSeen(id){
+    static async setNotificationsSeen(idList) {
         try {
-            const request = Database.getRequest(Database.getPool().transaction);
-            Database.addInput(request, "Id", sql.Int, id);
+            if (!Array.isArray(idList) || idList.length === 0)
+                throw new Error("idList must be a non-empty array.");
+
+            const request = Database.getRequest();
+
+              idList.forEach((id, i) => {
+            Database.addInput(request, `Id${i}`, sql.Int, parseInt(id, 10));
+        });
+
+        const idParams = idList.map((_, i) => `@Id${i}`).join(', ');
 
             const query = `
-                UPDATE UserNotifications
-                SET Seen = 1
-                WHERE Id = @Id
-            `;
+            UPDATE UserNotifications
+            SET Seen = 1
+            WHERE Id IN (${idParams})
+        `;
 
-            const result = await request.query(query);
-            if (!result.recordset[0]) return false;
+            await request.query(query);
 
-            return true;
+            return { success: true };
         } catch (err) {
             console.error('setNotificationSeen error:', err);
+            return { success: false, message: err.message };
         }
     }
+
 }

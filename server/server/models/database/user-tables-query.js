@@ -22,7 +22,6 @@ export function userTablesQuery() {
                     Id INT IDENTITY(1,1) PRIMARY KEY,
                     UserId UNIQUEIDENTIFIER NOT NULL,
                     Notification VARCHAR(500) NOT NULL,
-                    ExtraInformation VARCHAR(MAX) NULL, --JSON String
                     Seen BIT NOT NULL DEFAULT 0,
                     DateOfCreation DATETIME2 NOT NULL,
                     CONSTRAINT FK_UserNotifications_Users FOREIGN KEY (UserId)

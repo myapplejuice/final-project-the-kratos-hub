@@ -5,6 +5,7 @@ import NutritionDaysDBService from "../nutrition/days/nutrition-days-db-service.
 import NutritionFoodsDBService from "../nutrition/foods/nutrition-foods-db-service.js";
 import NutritionMealPlansDBService from "../nutrition/meal-plans/nutrition-meal-plans-db-service.js";
 import UserToUserDBService from "../user-to-user/user-to-user-db-service.js";
+import NotificationsDBService from "../notifications/notifications-db-service.js";
 
 export default class UserController {
     constructor() { }
@@ -47,16 +48,24 @@ export default class UserController {
             return res.status(404).json({ message: "User not found." });
         }
 
-        const userDayLogs = await NutritionDaysDBService.fetchAllDays(id);
-        const userFoods = await NutritionFoodsDBService.fetchFoods(id);
-        const userMealPlans = await NutritionMealPlansDBService.fetchPlansByUserId(id);
-        const friends = await UserToUserDBService.fetchUserFriendsList(id);
-        const pendingFriends = await UserToUserDBService.fetchUserPendingFriendsList(id);
-        profile.nutritionLogs = userDayLogs;
-        profile.foods = userFoods;
-        profile.plans = userMealPlans;
+        const [nutritionLogs, foods, plans,
+            friends, pendingFriends, notifications
+        ] = await Promise.all([
+            NutritionDaysDBService.fetchAllDays(id),
+            NutritionFoodsDBService.fetchFoods(id),
+            NutritionMealPlansDBService.fetchPlansByUserId(id),
+            UserToUserDBService.fetchUserFriendsList(id),
+            UserToUserDBService.fetchUserPendingFriendsList(id),
+            NotificationsDBService.fetchNotifications(id)
+        ]);
+
+        profile.nutritionLogs = nutritionLogs;
+        profile.foods = foods;
+        profile.plans = plans;
         profile.friends = friends;
         profile.pendingFriends = pendingFriends;
+        profile.notifications = notifications;
+
 
         return res.status(200).json({ profile });
     }

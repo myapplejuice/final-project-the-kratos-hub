@@ -19,7 +19,10 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
     const [notificationsCount, setNotificationsCount] = useState(0);
 
     useEffect(() => {
-        setNotificationsCount(user?.pendingFriends?.filter(f => f.adderId !== user.id).length || 0);
+        const friendRequestsCount = user?.pendingFriends?.filter(f => f.adderId !== user.id).length || 0;
+        const notificationsCount = user?.notifications?.filter(n => !n.seen).length || 0;
+        
+        setNotificationsCount(friendRequestsCount + notificationsCount);
     }, [user?.pendingFriends]);
 
     useEffect(() => {

@@ -7,7 +7,7 @@ import BuildFooter from "../../components/layout-comps/build-footer";
 import AppText from "../../components/screen-comps/app-text";
 import { Images } from '../../common/settings/assets';
 import { UserContext } from "../../common/contexts/user-context";
-import { formatDate } from '../../common/utils/date-time';
+import { formatDate, formatTime } from '../../common/utils/date-time';
 import usePopups from "../../common/hooks/use-popups";
 import { scaleFont } from "../../common/utils/scale-fonts";
 import DeviceStorageService from '../../common/services/device-storage-service';
@@ -28,7 +28,7 @@ export default function Notifications() {
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
     const { user, setUser } = useContext(UserContext);
     const [pageLoading, setPageLoading] = useState(true);
-    const [openSection, setOpenSection] = useState('friendRequests');
+    const [selectedList, setSelectedList] = useState('notifications');
     const [requests, setRequests] = useState([]);
     const [openRequest, setOpenRequest] = useState(null);
     const [notifications, setNotifications] = useState([]);
@@ -70,8 +70,35 @@ export default function Notifications() {
             }
         }
 
+        async function confirmSeen() {
+            try {
+                const notSeenNotificationsIds = notifications
+                    .filter(n => !n.seen)
+                    .map(n => n.id);
+
+                console.log(user.notifications);
+
+                console.log(notSeenNotificationsIds);
+
+                // Example call:
+                // const result = await APIService.user.setNotificationsSeen(notSeenNotificationsIds);
+                // if (result.success) {
+                //     setNotifications([]);
+                // } else {
+                //     createAlert({ title: 'Failure', text: result.message });
+                // }
+            } catch (error) {
+                createAlert({ title: 'Failure', text: error.message });
+                console.error(error);
+            }
+        }
+
         prepareRequests();
+        setNotifications(user.notifications);
+
+        return () => { confirmSeen(); };
     }, []);
+
 
     async function handleFriendRequest(reply, request) {
         createDialog({
@@ -135,137 +162,159 @@ export default function Notifications() {
     return (
         <View style={styles.main}>
             {!pageLoading ? (
-                <AppScroll extraBottom={20}>
-                    <View style={styles.card}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <AppText style={styles.label}>Friend Requests</AppText>
-                            {notifications.length > 0 &&
-                                <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: 'red', borderWidth: 1, borderColor: 'red', justifyContent: 'center', alignItems: 'center' }}>
-                                    <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{requests.length}</AppText>
-                                </View>
-                            }
+                <AppScroll extraBottom={20} extraTop={30}>
+                    <TouchableOpacity onPress={() => setSelectedList(selectedList === 'notifications' ? 'friendRequests' : 'notifications')} style={{ flexDirection: 'row', width: '100%', height: 50, marginBottom: 15 }}>
+                        <View style={{ justifyContent: 'center', alignItems: 'center', width: '50%', backgroundColor: selectedList === 'notifications' ? colors.main : colors.backgroundTop }}>
+                            <AppText style={{ color: 'white', fontWeight: 'bold' }}>
+                                Notifications
+                            </AppText>
                         </View>
-                        {requests.length > 0 ? (
-                            requests.map((request, index) => {
-                                const profile = request.profile || {}; // fallback if undefined
-                                return (
-                                    <TouchableOpacity
-                                        key={index}
-                                        onPress={() => setOpenRequest(prev => (prev === profile.id ? null : profile.id))}
-                                        style={{ marginBottom: index === requests.length - 1 ? 0 : 15 }}
-                                    >
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <View style={{ width: '20%' }}>
-                                                <Image
-                                                    source={profile.image || Images.profilePic}
-                                                    style={{ width: 50, height: 50, borderRadius: 25 }}
-                                                />
-                                            </View>
-                                            <View style={{ justifyContent: 'center', width: '70%' }}>
-                                                <AppText style={{ color: 'white', fontSize: scaleFont(14), fontWeight: 'bold' }}>
-                                                    {profile.firstname || 'Unknown'} {profile.lastname || ''}
-                                                </AppText>
-                                                <AppText style={{ color: 'white' }}>{profile.email || ''}</AppText>
-                                            </View>
-                                            <View style={{ width: '10%', justifyContent: 'center', alignItems: 'flex-end' }}>
-                                                <Invert axis='horizontal' inverted={openRequest === profile.id}>
+                        <View style={{ justifyContent: 'center', alignItems: 'center', width: '50%', backgroundColor: selectedList === 'friendRequests' ? colors.main : colors.backgroundTop }}>
+                            <AppText style={{ color: 'white', fontWeight: 'bold' }}>
+                                Friend Requests
+                            </AppText>
+                        </View>
+                    </TouchableOpacity>
+                    {selectedList === 'friendRequests' &&
+                        <View style={styles.card}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 }}>
+                                <AppText style={styles.label}>Friend Requests</AppText>
+                                {requests.length > 0 &&
+                                    <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: 'red', borderWidth: 1, borderColor: 'red', justifyContent: 'center', alignItems: 'center' }}>
+                                        <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{requests.length}</AppText>
+                                    </View>
+                                }
+                            </View>
+                            {requests.length > 0 ? (
+                                requests.map((request, index) => {
+                                    const profile = request.profile || {};
+                                    return (
+                                        <TouchableOpacity
+                                            key={index}
+                                            onPress={() => setOpenRequest(prev => (prev === profile.id ? null : profile.id))}
+                                            style={{ marginBottom: index === requests.length - 1 ? 0 : 25 }}
+                                        >
+                                            <View style={{ flexDirection: 'row' }}>
+                                                <View style={{ width: '20%' }}>
                                                     <Image
-                                                        source={Images.arrow}
-                                                        style={{
-                                                            width: 20,
-                                                            height: 20,
-                                                            tintColor: 'white',
-                                                            transform: [{ rotate: '-90deg' }],
-                                                        }}
+                                                        source={profile.image || Images.profilePic}
+                                                        style={{ width: 50, height: 50, borderRadius: 25 }}
                                                     />
-                                                </Invert>
+                                                </View>
+                                                <View style={{ justifyContent: 'center', width: '70%' }}>
+                                                    <AppText style={{ color: 'white', fontSize: scaleFont(14), fontWeight: 'bold' }}>
+                                                        {profile.firstname || 'Unknown'} {profile.lastname || ''}
+                                                    </AppText>
+                                                    <AppText style={{ color: 'white' }}>{profile.email || ''}</AppText>
+                                                </View>
+                                                <View style={{ width: '10%', justifyContent: 'center', alignItems: 'flex-end' }}>
+                                                    <Invert axis='horizontal' inverted={openRequest === profile.id}>
+                                                        <Image
+                                                            source={Images.arrow}
+                                                            style={{
+                                                                width: 20,
+                                                                height: 20,
+                                                                tintColor: 'white',
+                                                                transform: [{ rotate: '-90deg' }],
+                                                            }}
+                                                        />
+                                                    </Invert>
+                                                </View>
                                             </View>
-                                        </View>
-                                        <ExpandInOut visible={openRequest === profile.id}>
-                                            <AppText
-                                                style={{
-                                                    color: colors.mutedText,
-                                                    textAlign: profile.description ? 'left' : 'center',
-                                                    marginVertical: 15,
-                                                }}
-                                            >
-                                                {profile.description || 'No introduction provided'}
-                                            </AppText>
-                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
-                                                <TouchableOpacity
-                                                    onPress={() => handleFriendRequest('decline', request)}
+                                            <ExpandInOut visible={openRequest === profile.id}>
+                                                <AppText
+                                                    style={{
+                                                        color: colors.mutedText,
+                                                        textAlign: profile.description ? 'left' : 'center',
+                                                        marginVertical: 15,
+                                                    }}
+                                                >
+                                                    {profile.description || 'No introduction provided'}
+                                                </AppText>
+                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
+                                                    <TouchableOpacity
+                                                        onPress={() => handleFriendRequest('decline', request)}
+                                                        style={{
+                                                            padding: 15,
+                                                            borderRadius: 10,
+                                                            backgroundColor: colors.accentPink,
+                                                            width: '48%',
+                                                            justifyContent: 'center',
+                                                            alignItems: 'center',
+                                                        }}
+                                                    >
+                                                        <AppText style={{ color: 'white' }}>Decline</AppText>
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity
+                                                        onPress={() => handleFriendRequest('accept', request)}
+                                                        style={{
+                                                            padding: 15,
+                                                            borderRadius: 10,
+                                                            backgroundColor: colors.accentGreen,
+                                                            width: '48%',
+                                                            justifyContent: 'center',
+                                                            alignItems: 'center',
+                                                        }}
+                                                    >
+                                                        <AppText style={{ color: 'white' }}>Accept</AppText>
+                                                    </TouchableOpacity>
+                                                </View>
+                                                <AnimatedButton
+                                                    onPress={() => handleProfile(request.profile)}
                                                     style={{
                                                         padding: 15,
                                                         borderRadius: 10,
-                                                        backgroundColor: colors.accentPink,
-                                                        width: '48%',
+                                                        backgroundColor: colors.main,
                                                         justifyContent: 'center',
                                                         alignItems: 'center',
+                                                        marginTop: 15
                                                     }}
-                                                >
-                                                    <AppText style={{ color: 'white' }}>Decline</AppText>
-                                                </TouchableOpacity>
-                                                <TouchableOpacity
-                                                    onPress={() => handleFriendRequest('accept', request)}
-                                                    style={{
-                                                        padding: 15,
-                                                        borderRadius: 10,
-                                                        backgroundColor: colors.accentGreen,
-                                                        width: '48%',
-                                                        justifyContent: 'center',
-                                                        alignItems: 'center',
-                                                    }}
-                                                >
-                                                    <AppText style={{ color: 'white' }}>Accept</AppText>
-                                                </TouchableOpacity>
-                                            </View>
-                                            <AnimatedButton
-                                                onPress={() => handleProfile(request.profile)}
-                                                style={{
-                                                    padding: 15,
-                                                    borderRadius: 10,
-                                                    backgroundColor: colors.main,
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center',
-                                                    marginTop: 15
-                                                }}
-                                                rightImage={Images.arrow}
-                                                rightImageStyle={{ width: 15, height: 15, tintColor: 'white', marginStart: 5 }}
-                                                textStyle={{ color: 'white', fontSize: scaleFont(12) }}
-                                                title={'View Profile'}
-                                            />
-                                        </ExpandInOut>
-                                    </TouchableOpacity>
-                                );
-                            })
-                        ) : (
-                            <AppText style={{ color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginTop: 25 }}>
-                                No friend requests
-                            </AppText>
-                        )}
-                    </View>
-                    <View style={[styles.card, { marginTop: 15 }]}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <AppText style={styles.label}>Notifications</AppText>
-                            {notifications.length > 0 &&
-                                <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: 'red', borderWidth: 1, borderColor: 'red', justifyContent: 'center', alignItems: 'center' }}>
-                                    <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{requests.length}</AppText>
-                                </View>
-                            }
+                                                    rightImage={Images.arrow}
+                                                    rightImageStyle={{ width: 15, height: 15, tintColor: 'white', marginStart: 5 }}
+                                                    textStyle={{ color: 'white', fontSize: scaleFont(12) }}
+                                                    title={'View Profile'}
+                                                />
+                                            </ExpandInOut>
+                                        </TouchableOpacity>
+                                    );
+                                })
+                            ) : (
+                                <AppText style={{ color: colors.mutedText, fontWeight: 'bold', textAlign: 'center' }}>
+                                    No friend requests
+                                </AppText>
+                            )}
                         </View>
-                        {notifications.length > 0 ? (
-
-                            notifications.map((notification) => {
-                                return (
-                                    <></>
-                                );
-                            })
-                        ) : (
-                            <AppText style={{ color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginTop: 25 }}>
-                                No notifications
-                            </AppText>
-                        )}
-                    </View>
+                    }
+                    {selectedList === 'notifications' &&
+                        <View style={[styles.card]}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 }}>
+                                <AppText style={styles.label}>Notifications</AppText>
+                                {notifications.length > 0 &&
+                                    <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: 'red', borderWidth: 1, borderColor: 'red', justifyContent: 'center', alignItems: 'center' }}>
+                                        <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{notifications.length}</AppText>
+                                    </View>
+                                }
+                            </View>
+                            {notifications.length > 0 ? (
+                                notifications.map((notification) => {
+                                    return (
+                                        <View key={notification.id}>
+                                            <AppText style={[styles.cardLabel, { color: notification.seen ? colors.mutedText : 'white' }]}>
+                                                {notification.notification}
+                                            </AppText>
+                                            <AppText style={[styles.cardLabel, { color: colors.mutedText, fontSize: scaleFont(12) }]}>
+                                                {formatDate(notification.dateOfCreation, { format: user.preferences.dateFormat.key })}, {formatTime(notification.dateOfCreation, { format: user.preferences.timeFormat.key })}
+                                            </AppText>
+                                        </View>
+                                    );
+                                })
+                            ) : (
+                                <AppText style={{ color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginTop: 25 }}>
+                                    No notifications
+                                </AppText>
+                            )}
+                        </View>
+                    }
                 </AppScroll>
             ) : (
                 <>

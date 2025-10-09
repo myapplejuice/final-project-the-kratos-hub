@@ -3,6 +3,7 @@ import UserRouter from './user-router.js';
 import NutritionRouter from './nutrition-router.js';
 import TrainingRouter from './training-router.js';
 import UserToUserRouter from './user-to-user-router.js';
+import NotificationsRouter from './notifications-router.js';
 
 export default class ServerRouter {
     static serverRouter;
@@ -16,6 +17,7 @@ export default class ServerRouter {
         const nutritionRouter = NutritionRouter.init();
         const trainingRouter = TrainingRouter.init();
         const userToUserRouter = UserToUserRouter.init();
+        const notificationsRouter = NotificationsRouter.init();
 
         this.serverRouter = new Router();
         this.serverRouter.get('/ping', this.ping);
@@ -23,6 +25,7 @@ export default class ServerRouter {
         this.serverRouter.use('/nutrition', nutritionRouter);
         this.serverRouter.use('/training', trainingRouter);
         this.serverRouter.use('/user-to-user', userToUserRouter)
+        this.serverRouter.use('/notifications', notificationsRouter);
 
         return this.serverRouter;
     }

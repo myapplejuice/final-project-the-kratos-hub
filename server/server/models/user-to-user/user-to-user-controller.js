@@ -1,5 +1,6 @@
 import { signJwt } from "../../utils/jwt-utils.js";
 import EmailService from "../email/email-service.js";
+import NotificationsDBService from "../notifications/notifications-db-service.js";
 import NutritionDaysDBService from "../nutrition/days/nutrition-days-db-service.js";
 import NutritionFoodsDBService from "../nutrition/foods/nutrition-foods-db-service.js";
 import NutritionMealPlansDBService from "../nutrition/meal-plans/nutrition-meal-plans-db-service.js";
@@ -43,15 +44,15 @@ export default class UserToUserController {
         if (!response.success) return res.status(400).json({ message: response.message });
 
         const receiver = await UserToUserDBService.fetchUserProfile(details.receiverId, false);
-        const notificationSubject = { subject: 'Friend Request' };
 
         const payload = {
-            id: details.adder.id,
+            userId: details.adderId,
             notification: `${receiver.firstname} ${receiver.lastname} ${details.reply === 'accept' ? 'accepted' : 'declined'} your friend request`,
-            extraInformation: JSON.stringify({ ...details, ...notificationSubject }),
             seen: false,
             dateOfCreation: new Date()
         }
+
+        await NotificationsDBService.pushNotification(payload);
         
 
         return res.status(200).json({ success: true, message: response.message, id: response.id });
