@@ -13,6 +13,7 @@ export const routes = {
     NUTRITION_HUB: '/screens/main/nutrition-hub',
     TRAINING_HUB: '/screens/main/training-hub',
     NOTIFICATIONS: '/screens/main/notifications',
+    FRIENDS: '/screens/main/friends',
 
     /* HOMEPAGE CHILDREN */
     LEAN_BODY_MASS: '/screens/main/homepage/lean-body-mass',

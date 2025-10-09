@@ -51,6 +51,18 @@
           "sets": []
         }
       ]
+    },
+    {
+      "sessionId": "6fda94ee-5f61-41a6-86d3-f215303b33d7",
+      "userId": "204EFF41-FF71-4636-9425-14DBB383E2BA",
+      "exercises": [
+        {
+          "exerciseId": "575b52ca-392b-4c5a-be25-e386e35c5932",
+          "name": "Pull Up",
+          "isTimerOnly": false,
+          "sets": []
+        }
+      ]
     }
   ]
 }

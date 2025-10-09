@@ -76,6 +76,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.USER_PROFILE]: "User Profile",
         [routes.USDA_PROFILE]: "USDA Profile",
         [routes.NOTIFICATIONS]: "Notifications",
+        [routes.FRIENDS]: "Friends",
     };
 
     const styles = StyleSheet.create({
@@ -216,7 +217,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                     {inMain && (
                         <>
                             <View style={styles.bellWrapper}>
-                                <TouchableOpacity onPress={() => router.push(routes.PROFILE)}>
+                                <TouchableOpacity onPress={() => router.push(routes.FRIENDS)}>
                                     <Image style={styles.bellImage} source={Images.noMessage} />
                                 </TouchableOpacity>
                                 {user?.unreadMessages > 0 && (

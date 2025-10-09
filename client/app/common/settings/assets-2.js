@@ -97,4 +97,6 @@ export const Images_2 = {
     externalLink: require('../../../assets/images/external-link.png'),
     research: require('../../../assets/images/research.png'),
     friend: require('../../../assets/images/friend.png'),
+    sad: require('../../../assets/images/sad.png'),
+    sadOutline: require('../../../assets/images/sad-outline.png'),
 };

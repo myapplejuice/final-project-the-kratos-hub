@@ -153,26 +153,36 @@ export default function Notifications() {
     }
 
     return (
-        <View style={styles.main}>
+        <View style={[styles.main]}>
             {!pageLoading ? (
-                <AppScroll extraBottom={20} extraTop={30}>
-                    <TouchableOpacity
-                        onPress={() => setSelectedList(selectedList === 'notifications' ? 'friendRequests' : 'notifications')}
-                        style={{ flexDirection: 'row', height: 50, borderRadius: 15, overflow: 'hidden', margin: 15, backgroundColor: colors.cardBackground }}
-                    >
-                        <View style={{ justifyContent: 'center', alignItems: 'center', width: '50%', backgroundColor: selectedList === 'notifications' ? colors.main : colors.cardBackground, margin:5,  borderRadius: 12 }}>
+                <AppScroll extraBottom={20} extraTop={30} contentStyle={{ padding: 15 }}>
+                    <View style={{ flexDirection: 'row', height: 50, borderRadius: 15, justifyContent: 'space-between', marginTop: 15, }}  >
+                        <TouchableOpacity onPress={() => setSelectedList('notifications')}
+                            style={{
+                                justifyContent: 'center', alignItems: 'center', width: '48%',
+                                backgroundColor: selectedList === 'notifications' ? colors.main : 'transparent',
+                                borderColor: selectedList === 'notifications' ? colors.main : colors.mutedText,
+                                borderWidth: 1, marginVertical: 5, marginStart: 5, borderRadius: 15
+                            }}>
                             <AppText style={{ color: 'white', fontWeight: 'bold' }}>
                                 Notifications
                             </AppText>
-                        </View>
-                        <View style={{ justifyContent: 'center', alignItems: 'center', width: '50%', backgroundColor: selectedList === 'friendRequests' ? colors.main : colors.cardBackground, margin:5, borderRadius: 12 }}>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setSelectedList('friendRequests')}
+                            style={{
+                                justifyContent: 'center', alignItems: 'center', width: '48%',
+                                backgroundColor: selectedList === 'friendRequests' ? colors.main : 'transparent',
+                                borderColor: selectedList === 'friendRequests' ? colors.main : colors.mutedText,
+                                borderWidth: 1, marginVertical: 5, marginStart: 5, borderRadius: 15
+                            }}>
                             <AppText style={{ color: 'white', fontWeight: 'bold' }}>
                                 Friend Requests
                             </AppText>
-                        </View>
-                    </TouchableOpacity>
+                        </TouchableOpacity>
+                    </View>
+                    <Divider orientation='horizontal' style={{ marginVertical: 25 }} />
                     {selectedList === 'friendRequests' &&
-                        <View style={[styles.card]}>
+                        <View>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 }}>
                                 <AppText style={styles.label}>Friend Requests</AppText>
                                 {requests.filter(r => r.status === 'pending').length > 0 &&
@@ -192,7 +202,7 @@ export default function Notifications() {
                                         >
                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                                 <View style={{ flexDirection: 'row', width: '70%' }}>
-                                                    <View style={{marginEnd: 15}}>
+                                                    <View style={{ marginEnd: 15 }}>
                                                         <Image
                                                             source={profile.image || Images.profilePic}
                                                             style={{ width: 50, height: 50, borderRadius: 25 }}
@@ -206,22 +216,22 @@ export default function Notifications() {
                                                     </View>
                                                 </View>
                                                 <View style={{ width: '30%', justifyContent: 'center', alignItems: 'flex-end' }}>
-                                                {request.status === 'pending' ?
-                                                    <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
-                                                        <Invert axis='horizontal' inverted={openRequest === profile.id}>
-                                                            <Image
-                                                                source={Images.arrow}
-                                                                style={{
-                                                                    width: 20,
-                                                                    height: 20,
-                                                                    tintColor: 'white',
-                                                                    transform: [{ rotate: '-90deg' }],
-                                                                }}
-                                                            />
-                                                        </Invert>
-                                                    </View>
-                                                    : <AppText style={{ alignSelf: 'flex-end', color: request.status === 'accepted' ? colors.accentGreen : colors.accentPink }}>{request.status === 'accepted' ? 'Accepted' : 'Declined'}</AppText>}
-                                                     </View>
+                                                    {request.status === 'pending' ?
+                                                        <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
+                                                            <Invert axis='horizontal' inverted={openRequest === profile.id}>
+                                                                <Image
+                                                                    source={Images.arrow}
+                                                                    style={{
+                                                                        width: 20,
+                                                                        height: 20,
+                                                                        tintColor: 'white',
+                                                                        transform: [{ rotate: '-90deg' }],
+                                                                    }}
+                                                                />
+                                                            </Invert>
+                                                        </View>
+                                                        : <AppText style={{ alignSelf: 'flex-end', color: request.status === 'accepted' ? colors.accentGreen : colors.accentPink }}>{request.status === 'accepted' ? 'Accepted' : 'Declined'}</AppText>}
+                                                </View>
                                             </View>
                                             {request.status === 'pending' && <ExpandInOut visible={openRequest === profile.id}>
                                                 <AppText
@@ -288,7 +298,7 @@ export default function Notifications() {
                         </View>
                     }
                     {selectedList === 'notifications' &&
-                        <View style={[styles.card]}>
+                        <View>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 }}>
                                 <AppText style={styles.label}>Notifications</AppText>
                                 {notifications.filter(n => !n.seen).length > 0 &&
@@ -326,12 +336,10 @@ export default function Notifications() {
                     }
                 </AppScroll>
             ) : (
-                <>
-                    <AppScroll>
-                        <View style={[styles.card, { height: '40%' }]} />
-                        <View style={[styles.card, { height: '50%', marginTop: 25 }]} />
-                    </AppScroll>
-                </>
+                <AppScroll>
+                    <View style={[styles.card, { height: '40%' }]} />
+                    <View style={[styles.card, { height: '50%', marginTop: 25 }]} />
+                </AppScroll>
             )}
 
         </View>

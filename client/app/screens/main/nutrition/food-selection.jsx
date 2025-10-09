@@ -110,7 +110,7 @@ export default function FoodSelection() {
         } else {
             const query = searchQuery.toLowerCase();
             const filtered = sourceList.filter(food =>
-                food.label.toLowerCase().includes(query)
+                food.label.toLowerCase().startsWith(query)
             );
             setFoodList(filtered);
         }

@@ -10,7 +10,6 @@ import usePopups from "../../../common/hooks/use-popups";
 import { scaleFont } from "../../../common/utils/scale-fonts";
 import APIService from '../../../common/services/api-service';
 import { colors } from "../../../common/settings/styling";
-import Divider from '../../../components/screen-comps/divider';
 import AppScroll from '../../../components/screen-comps/app-scroll'
 import FadeInOut from '../../../components/effects/fade-in-out';
 
@@ -95,6 +94,14 @@ export default function UserProfile() {
         });
     }
 
+    async function handleRemoveFriend() {
+        //TODO REMOVE
+    }
+
+    async function handleToMessages() {
+        //TODO BLOCK
+    }
+
     async function handleUserReport() {
 
     }
@@ -168,7 +175,7 @@ export default function UserProfile() {
                                     </View>
                                 </View>
 
-                                <View style={styles.infoRow}>
+                                <View style={[styles.infoRow, {marginBottom: 0}]}>
                                     <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecond }]}>
                                         <Image source={Images.calendar} style={[styles.detailIcon]} />
                                     </View>
@@ -180,9 +187,12 @@ export default function UserProfile() {
                                     </View>
                                 </View>
                             </View>
+                        </View>
 
-                            <Divider orientation="horizontal" color={colors.divider} style={{ marginTop: 15 }} />
-
+                        <View style={[styles.card, {marginTop: 15}]}>
+                            <AppText style={[styles.cardLabel, {fontSize: scaleFont(15)}]}>
+                                Actions
+                                </AppText>
                             {friend.status !== 'active' && friend.status !== 'pending' && (
                                 <TouchableOpacity onPress={handleAddFriend} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
                                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -198,7 +208,36 @@ export default function UserProfile() {
                                 </TouchableOpacity>
                             )}
 
-                            <TouchableOpacity onPress={handleUserReport} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15  }}>
+                            {friend.status === 'active' && (
+                                <>
+                                    <TouchableOpacity onPress={handleToMessages} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                            <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
+                                                <Image source={Images.noMessage} style={styles.settingIcon} />
+                                            </View>
+                                            <AppText style={styles.label}>To Messages</AppText>
+                                        </View>
+                                        <Image
+                                            source={Images.backArrow}
+                                            style={[styles.arrow, { transform: [{ scaleX: -1 }] }]}
+                                        />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={handleRemoveFriend} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                            <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
+                                                <Image source={Images.xMark} style={styles.settingIcon} />
+                                            </View>
+                                            <AppText style={styles.label}>Remove Friend</AppText>
+                                        </View>
+                                        <Image
+                                            source={Images.backArrow}
+                                            style={[styles.arrow, { transform: [{ scaleX: -1 }] }]}
+                                        />
+                                    </TouchableOpacity>
+                                </>
+                            )}
+
+                            <TouchableOpacity onPress={handleUserReport} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
                                     <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
                                         <Image source={Images.warning} style={styles.settingIcon} />
@@ -283,8 +322,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     infoContainer: {
-        width: '100%',
-        paddingStart: 5
+        width: '100%'
     },
     infoRow: {
         flexDirection: 'row',

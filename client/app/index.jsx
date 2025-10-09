@@ -1,5 +1,5 @@
 import { useEffect, useContext, useState } from 'react';
-import { View, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
 import { Asset } from 'expo-asset';
 import { router } from 'expo-router';
 import { UserContext } from './common/contexts/user-context';
@@ -16,6 +16,8 @@ import BuildFooter from './components/layout-comps/build-footer'
 import FadeInOut from './components/effects/fade-in-out';
 import SlideInOut from './components/effects/slide-in-out';
 import AppText from './components/screen-comps/app-text';
+
+const screenWidth = Dimensions.get('window').width;
 
 export default function Index() {
     const { setUser } = useContext(UserContext);
@@ -119,12 +121,20 @@ export default function Index() {
 
     }, []);
 
-    const slotPositions = [80, 180, 280]; // adjust these numbers as needed
+    const numSlots = 3;
+    const slotWidth = 50; 
+    const gap = 70;       
+
+    const slotPositions = Array.from({ length: numSlots }, (_, i) => {
+        const totalWidth = numSlots * slotWidth + (numSlots - 1) * gap;
+        const startX = (screenWidth - totalWidth) / 2;
+        return startX + i * (slotWidth + gap);
+    });
 
     return (
         <View style={[styles.main, { backgroundColor: colors.background }]}>
             <View style={{ width: '100%', height: '100%', position: 'relative', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Image source={Images.logo} style={{ tintColor: colors.main, width: 300, height: 270, marginTop: 250 }} />
+                <Image source={Images.logo} style={{ tintColor: colors.main, width: 300, height: 270, marginTop: 250 }} />
                 {slots.map((activeIndex, slotIdx) =>
                     images.map((imgSrc, i) => (
                         <SlideInOut inDuration={500}
@@ -135,9 +145,9 @@ export default function Index() {
                             style={{
                                 position: 'absolute',
                                 top: 150,
+                                bottom: 0,
                                 left: slotPositions[slotIdx] || 0,
                                 right: 0,
-                                bottom: 0,
                                 justifyContent: 'center',
 
                             }}>
