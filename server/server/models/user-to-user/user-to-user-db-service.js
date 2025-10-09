@@ -163,9 +163,7 @@ export default class UserToUserDBService {
                     ELSE 'receiver'
                 END AS Role
             FROM FriendRequests
-            WHERE (AdderId = @UserId OR ReceiverId = @UserId)
-            AND Status = 'pending'
-        `;
+            WHERE (AdderId = @UserId OR ReceiverId = @UserId)`;
 
             const result = await request.query(query);
             if (!result.recordset.length) return [];
@@ -189,11 +187,9 @@ export default class UserToUserDBService {
     static async replyToFriendRequest(details) {
         try {
             const request = Database.getRequest();
-            const reply = details.reply === 'accept' ? 'accepted' : 'declined';
-
-            console.log(details.id)
+            
             Database.addInput(request, 'Id', sql.Int, details.id);
-            Database.addInput(request, 'Status', sql.VarChar(20), reply);
+            Database.addInput(request, 'Status', sql.VarChar(20), details.reply);
 
             const updateQuery = `
             UPDATE FriendRequests
@@ -204,7 +200,7 @@ export default class UserToUserDBService {
 
             let newRowId = null;
 
-            if (reply === 'accepted') {
+            if (details.reply === 'accepted') {
                 let userOne = details.adderId;
                 let userTwo = details.receiverId;
 

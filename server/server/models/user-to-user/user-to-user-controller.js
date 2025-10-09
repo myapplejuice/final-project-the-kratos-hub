@@ -19,7 +19,6 @@ export default class UserToUserController {
     static async getMultipleUserProfiles(req, res) {
         const idList = req.body;
 
-        console.log(idList)
         const profiles = await UserToUserDBService.fetchMultipleUserProfiles(idList, false);
         if (!profiles) return res.status(404).json({ message: "User not found." });
 
@@ -28,8 +27,6 @@ export default class UserToUserController {
 
     static async sendFriendRequest(req, res) {
         const details = req.body;
-
-        console.log(details)
 
         const response = await UserToUserDBService.sendFriendRequest(details);
         if (!response.success) return res.status(400).json({ success: false, message: response.message });
@@ -47,7 +44,7 @@ export default class UserToUserController {
 
         const payload = {
             userId: details.adderId,
-            notification: `${receiver.firstname} ${receiver.lastname} ${details.reply === 'accept' ? 'accepted' : 'declined'} your friend request`,
+            notification: `${receiver.firstname} ${receiver.lastname} ${details.reply} your friend request`,
             seen: false,
             dateOfCreation: new Date()
         }
@@ -57,22 +54,4 @@ export default class UserToUserController {
 
         return res.status(200).json({ success: true, message: response.message, id: response.id });
     }
-
-    //static async getFriendsList(req, res) {
-    //    const id = req.params.id;
-    //
-    //    const friends = await UserToUserDBService.fetchUserFriendsList(id);
-    //    if (!friends) return res.status(404).json({ message: "No friends found." });
-    //
-    //    return res.status(200).json({ success: true, friends });
-    //}
-    //
-    //static async getFriendRequests(req, res) {
-    //    const id = req.params.id;
-    //
-    //    const requests = await UserToUserDBService.fetchFriendRequests(id);
-    //    if (!requests) return res.status(404).json({ message: "No friend requests found." });
-    //
-    //    return res.status(200).json({ success: true, requests });
-    //}
 }

@@ -66,7 +66,6 @@ export default class UserController {
         profile.pendingFriends = pendingFriends;
         profile.notifications = notifications;
 
-
         return res.status(200).json({ profile });
     }
 

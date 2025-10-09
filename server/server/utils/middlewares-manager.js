@@ -13,7 +13,6 @@ export default class MiddlewaresManager {
         const tokenId = req.id;
         const callId = req.params.id;
         
-        console.log(tokenId, callId)
         if (!tokenId || tokenId !== callId) {
             return res.status(403).json({ message: 'Forbidden! Invalid user ID.' });
         }

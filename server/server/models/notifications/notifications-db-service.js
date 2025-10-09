@@ -57,10 +57,9 @@ export default class NotificationsDBService {
     }
 
     static async setNotificationsSeen(idList) {
-        try {
-            if (!Array.isArray(idList) || idList.length === 0)
-                throw new Error("idList must be a non-empty array.");
+        if (!idList || !idList.length || idList.length === 0) return { success: true };
 
+        try {
             const request = Database.getRequest();
 
               idList.forEach((id, i) => {

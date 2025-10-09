@@ -72,17 +72,14 @@ export default function Notifications() {
 
         async function confirmSeen() {
             try {
-                const notSeenNotificationsIds = notifications
-                    .filter(n => !n.seen)
-                    .map(n => n.id);
+                const notSeenNotificationsIds = notifications.filter(n => !n.seen).map(n => n.id);
 
-                // Example call:
-                // const result = await APIService.user.setNotificationsSeen(notSeenNotificationsIds);
-                // if (result.success) {
-                //     setNotifications([]);
-                // } else {
-                //     createAlert({ title: 'Failure', text: result.message });
-                // }
+                const result = await APIService.notifications.seen(notSeenNotificationsIds);
+                if (result.success) {
+                    setUser(prev => ({ ...prev, notifications: prev.notifications.map(n => ({ ...n, seen: true })) }));
+                } else {
+                    createAlert({ title: 'Failure', text: result.message });
+                }
             } catch (error) {
                 createAlert({ title: 'Failure', text: error.message });
                 console.error(error);
@@ -91,8 +88,7 @@ export default function Notifications() {
 
         prepareRequests();
         setNotifications(user.notifications);
-
-        return () => { confirmSeen(); };
+        return () => confirmSeen();
     }, []);
 
 
@@ -116,20 +112,22 @@ export default function Notifications() {
                     if (result.success) {
                         const newFriendshipId = result.data.id;
 
-                        createToast({ message: `Friend request ${reply === 'decline' ? 'declined' : 'accepted'}` });
+                        createToast({ message: `Friend request ${reply}` });
 
-                        // Update user state in a single setUser call
                         setUser(prev => ({
                             ...prev,
-                            pendingFriends: prev.pendingFriends.filter(f => f.id !== request.id),
-                            friends: reply === 'accept'
+                            pendingFriends: prev.pendingFriends.map(f =>
+                                f.id === request.id ? { ...f, status: reply } : f
+                            ),
+                            friends: reply === 'accepted'
                                 ? [...prev.friends, { id: newFriendshipId, friendId: request.adderId, status: 'active' }]
                                 : prev.friends
                         }));
 
-                        // Update local requests state for immediate rerender
                         setRequests(prevRequests =>
-                            prevRequests.filter(r => r.id !== request.id)
+                            prevRequests.map(r =>
+                                r.id === request.id ? { ...r, status: reply } : r
+                            )
                         );
 
                     } else {
@@ -144,7 +142,6 @@ export default function Notifications() {
             }
         });
     }
-
 
     function handleProfile(profile) {
         router.push({
@@ -180,7 +177,7 @@ export default function Notifications() {
                                 <AppText style={styles.label}>Friend Requests</AppText>
                                 {requests.length > 0 &&
                                     <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: 'red', borderWidth: 1, borderColor: 'red', justifyContent: 'center', alignItems: 'center' }}>
-                                        <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{requests.length}</AppText>
+                                        <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{requests.filter(r => r.status === 'pending').length}</AppText>
                                     </View>
                                 }
                             </View>
@@ -232,7 +229,7 @@ export default function Notifications() {
                                                 </AppText>
                                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
                                                     <TouchableOpacity
-                                                        onPress={() => handleFriendRequest('decline', request)}
+                                                        onPress={() => handleFriendRequest('declined', request)}
                                                         style={{
                                                             padding: 15,
                                                             borderRadius: 10,
@@ -245,7 +242,7 @@ export default function Notifications() {
                                                         <AppText style={{ color: 'white' }}>Decline</AppText>
                                                     </TouchableOpacity>
                                                     <TouchableOpacity
-                                                        onPress={() => handleFriendRequest('accept', request)}
+                                                        onPress={() => handleFriendRequest('accepted', request)}
                                                         style={{
                                                             padding: 15,
                                                             borderRadius: 10,
@@ -288,9 +285,9 @@ export default function Notifications() {
                         <View style={[styles.card]}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 }}>
                                 <AppText style={styles.label}>Notifications</AppText>
-                                {notifications.length > 0 &&
+                                {notifications.filter(n => !n.seen).length > 0 &&
                                     <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: 'red', borderWidth: 1, borderColor: 'red', justifyContent: 'center', alignItems: 'center' }}>
-                                        <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{notifications.length}</AppText>
+                                        <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{notifications.filter(n => !n.seen).length}</AppText>
                                     </View>
                                 }
                             </View>
@@ -301,7 +298,7 @@ export default function Notifications() {
                                         const seenNotificationsExist = notifications.some(n => n.seen);
                                         return (
                                             <View key={notification.id}>
-                                                <View style={{ borderStartColor: 'white', borderStartWidth: 2, paddingHorizontal: 15 }}>
+                                                <View style={{ borderStartColor: notification.seen ? colors.mutedText : 'white', borderStartWidth: 2, paddingHorizontal: 15 }}>
                                                     <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: notification.seen ? colors.mutedText : 'white' }}>
                                                         {notification.notification}
                                                     </AppText>
@@ -309,7 +306,7 @@ export default function Notifications() {
                                                         {formatDate(notification.dateOfCreation, { format: user.preferences.dateFormat.key })}, {formatTime(notification.dateOfCreation, { format: user.preferences.timeFormat.key })}
                                                     </AppText>
                                                 </View>
-                                                {isLastUnseen && seenNotificationsExist &&  <Divider orientation='horizontal' style={{marginTop: 25}}/>}
+                                                {isLastUnseen && seenNotificationsExist && <Divider orientation='horizontal' style={{ marginTop: 25 }} />}
                                             </View>
                                         );
                                     })}
