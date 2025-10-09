@@ -21,7 +21,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
     useEffect(() => {
         const friendRequestsCount = user?.pendingFriends?.filter(f => f.adderId !== user.id && f.status === 'pending').length || 0;
         const notificationsCount = user?.notifications?.filter(n => !n.seen).length || 0;
-        
+
         setNotificationsCount(friendRequestsCount + notificationsCount);
     }, [user?.pendingFriends, user?.notifications]);
 
@@ -178,8 +178,8 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
 
         badge: {
             position: 'absolute',
-            bottom: 0,
-            right: 2,
+            bottom: -2,
+            right: -5,
             backgroundColor: 'red',
             borderRadius: 8,
             minWidth: 16,
@@ -216,7 +216,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                     {inMain && (
                         <>
                             <View style={styles.bellWrapper}>
-                                <TouchableOpacity onPress={() => router.push(routes.PROFILE)} style={{ marginRight: 10 }}>
+                                <TouchableOpacity onPress={() => router.push(routes.PROFILE)}>
                                     <Image style={styles.bellImage} source={Images.noMessage} />
                                 </TouchableOpacity>
                                 {user?.unreadMessages > 0 && (
@@ -229,8 +229,8 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                             </View>
 
                             {/* Notifications Bell */}
-                            <View style={[styles.bellWrapper, { marginEnd: notificationsCount > 0 ? 5 : 0 }]}>
-                                <TouchableOpacity onPress={() => router.push(routes.NOTIFICATIONS)} style={{ marginRight: 10 }}>
+                            <View style={[styles.bellWrapper, { marginHorizontal: 10 }]}>
+                                <TouchableOpacity onPress={() => router.push(routes.NOTIFICATIONS)}>
                                     <Image style={styles.bellImage} source={notificationsCount > 0 ? Images.notification : Images.noNotification} />
                                 </TouchableOpacity>
                                 {notificationsCount > 0 && (
