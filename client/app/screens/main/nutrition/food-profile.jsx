@@ -528,9 +528,9 @@ export default function FoodProfile() {
                     <AppText style={styles.foodLabel}>{selectedFood.label}</AppText>
                     <AppText style={styles.foodCategory}>{selectedFood.category}</AppText>
                     <Divider orientation="horizontal" style={{ marginVertical: 10 }} />
-                    <TouchableOpacity onPress={handleCreatorPress}>
+                    <TouchableOpacity onPress={()=> selectedFood.creatorId !== user.id && handleCreatorPress()}>
                         <AppText style={styles.creator}>
-                            {selectedFood.isUSDA ? 'United States Department of Agriculture' : selectedFood.creatorName}
+                            {selectedFood.isUSDA ? 'United States Department of Agriculture' : selectedFood.creatorId === user.id ? 'Food added by you' : selectedFood.creatorName}
                         </AppText>
                     </TouchableOpacity>
                     <AppText style={[styles.creator, { fontSize: scaleFont(10) }]}>{selectedFood.isUSDA ? 'Public' : selectedFood.isPublic ? 'Public' : 'Private'}</AppText>

@@ -159,7 +159,7 @@ export default class UserToUserDBService {
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
 
             const query = `
-            SELECT Id, AdderId, ReceiverId, Status, Description, Seen, DateOfCreation,
+            SELECT Id, AdderId, ReceiverId, Status, Description, DateOfCreation,
                 CASE 
                     WHEN AdderId = @UserId THEN 'adder'
                     ELSE 'receiver'
@@ -176,7 +176,6 @@ export default class UserToUserDBService {
                 receiverId: r.ReceiverId,
                 status: r.Status,
                 description: r.Description,
-                seen: r.Seen,
                 dateOfCreation: r.DateOfCreation,
                 role: r.Role
             }));

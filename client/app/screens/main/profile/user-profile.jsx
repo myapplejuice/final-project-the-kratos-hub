@@ -19,9 +19,14 @@ export default function UserProfile() {
     const { user, setUser } = useContext(UserContext);
     const [profile, setProfile] = useState({});
     const [viewImage, setViewImage] = useState(false);
-    let friend = user.friends?.find(f => f.friendId === profile.id);
-    if (!friend)
-        friend = user.pendingFriends?.find(f => (f.adderId === profile.id || f.receiverId === profile.id) && f.status !== 'declined');
+    const [friend, setFriend] = useState({});
+
+    useEffect(() => {
+        const friend = user.friends?.find(f => f.friendId === profile.id);
+        if (!friend)
+            user.pendingFriends?.find(f => (f.adderId === profile.id || f.receiverId === profile.id) && f.status !== 'declined')
+        setFriend(friend);
+    }, [user.friends, profile])
 
     useEffect(() => {
         async function fetchUserProfile() {
@@ -94,12 +99,44 @@ export default function UserProfile() {
         });
     }
 
-    async function handleRemoveFriend() {
+    async function handleTerminateFriend() {
+        createDialog({
+            title: 'Terminate Friendship',
+            text: 'Are you sure you want to terminate this friendship?',
+            confirmText: 'Terminate',
+            confirmButtonStyle: { backgroundColor: 'rgb(255,59,48)', borderColor: 'rgb(255,59,48)' },
+            onConfirm: async () => {
+                showSpinner();
 
+                const payload = {
+                    id: friend.id, //FRIENDSHIP ID in that sense
+                    terminatorId: user.id,
+                }
+
+                try {
+                    const result = await APIService.userToUser.terminateFriendship(payload);
+
+                    if (result.success) {
+                        setUser(prev => ({
+                            ...prev,
+                            friends: prev.friends.map(f => f.id === friend.id ? { ...f, status: 'inactive' } : f)
+                        }));
+                        createToast({ message: "Friendship terminated" });
+                    } else {
+                        createAlert({ title: 'Failure', text: result.message });
+                    }
+                    hideSpinner();
+                } catch (error) {
+                    createAlert({ title: 'Failure', text: error });
+                } finally {
+                    hideSpinner();
+                }
+            }
+        })
     }
 
     async function handleToMessages() {
-        
+
     }
 
     async function handleUserReport() {
@@ -222,12 +259,12 @@ export default function UserProfile() {
                                             style={[styles.arrow, { transform: [{ scaleX: -1 }] }]}
                                         />
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={handleRemoveFriend} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
+                                    <TouchableOpacity onPress={handleTerminateFriend} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                             <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
                                                 <Image source={Images.xMark} style={styles.settingIcon} />
                                             </View>
-                                            <AppText style={styles.label}>Remove Friend</AppText>
+                                            <AppText style={styles.label}>Terminate Friendship</AppText>
                                         </View>
                                         <Image
                                             source={Images.backArrow}

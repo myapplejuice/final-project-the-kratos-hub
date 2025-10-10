@@ -15,8 +15,8 @@ export default class UserToUserRouter {
         this.userToUserRouter.post('/multiple-another-profile/:id', tokenAuthorization, userAuthorization, asyncHandler(UserToUserController.getMultipleUserProfiles));
         this.userToUserRouter.post('/friend-request/:id', tokenAuthorization, userAuthorization, asyncHandler(UserToUserController.sendFriendRequest));
         this.userToUserRouter.post('/reply-request/:id', tokenAuthorization, userAuthorization, asyncHandler(UserToUserController.replyToFriendRequest));
-        //this.userToUserRouter.get('/friends-list/:id', tokenAuthorization, userAuthorization, asyncHandler(UserToUserController.getFriendsList));
-        //this.userToUserRouter.get('/friend-requests/:id', tokenAuthorization, userAuthorization, asyncHandler(UserToUserController.getFriendRequests));
+        this.userToUserRouter.delete('/terminate-friendship/:id', tokenAuthorization, userAuthorization, asyncHandler(UserToUserController.disableFriendship));
+        
 
 
         return this.userToUserRouter;
