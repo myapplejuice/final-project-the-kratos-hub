@@ -57,133 +57,97 @@ export default function Chat() {
         console.log(message)
     }
 
+    async function handleImportPlan(){
+        console.log('importing some plan')
+    }
+
     return (
         <>
             <StaticIcons color={colors.mutedText} />
-            <FadeInOut visible={messengerVisible} style={{ position: 'absolute', bottom: 0, paddingBottom: insets.bottom + 10 + keyboardHeight, paddingTop: 10, zIndex: 9999, flexDirection: 'row', paddingHorizontal: 15, backgroundColor: 'rgba(0, 0, 0, 0.81)' }}>
-                <View style={{ width: '85%', minHeight: 50, maxHeight: 120, backgroundColor: colors.cardBackground, borderRadius: 20 }}>
+            <FadeInOut visible={messengerVisible} style={{ position: 'absolute', bottom: 0, paddingBottom: insets.bottom + 10 + keyboardHeight, paddingTop: 10, zIndex: 9999, flexDirection: 'row', paddingHorizontal: 15, backgroundColor: 'rgba(0, 0, 0, 0.95)', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' }}>
+                <View style={{ width: '85%', minHeight: 50, maxHeight: 120, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 25, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingEnd: 15 }}>
                     <AppTextInput
                         multiline
                         onChangeText={setMessage}
                         value={message}
-                        placeholder="Message..."
-                        placeholderTextColor={"rgba(255, 255, 255, 0.5)"}
-                        style={[styles.inputStripped, { height: Math.min(120, Math.max(50, messageHeight)) }]}
+                        placeholder="Type a message..."
+                        placeholderTextColor={"rgba(255, 255, 255, 0.4)"}
+                        style={[styles.inputStripped, { height: Math.min(120, Math.max(50, messageHeight)), width: '90%' }]}
                         onContentSizeChange={(e) =>
                             setMessageHeight(e.nativeEvent.contentSize.height)
                         } />
+                    <TouchableOpacity style={{width: '10%'}}  onPress={handleImportPlan}>
+                        <Image source={Images.book1} style={{ width: 28, height: 28, tintColor: colors.mutedText }} />
+                    </TouchableOpacity>
                 </View>
-                <View style={{ width: '15%', alignSelf: 'flex-end', }}>
+                <View style={{ width: '15%', alignSelf: 'flex-end' }}>
                     <TouchableOpacity onPress={handleMessageSend} style={{ padding: 15, height: 50, backgroundColor: colors.main, width: 50, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-end', borderRadius: 25 }}>
-                        <Image source={Images.arrow} style={{ width: 25, height: 30, tintColor: 'white', margin: 0 }} resizeMode="center" />
+                        <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white' }} resizeMode="contain" />
                     </TouchableOpacity>
                 </View>
             </FadeInOut>
             <View style={styles.main}>
-                <AppScroll onScrollSetStates={setMessengerVisible}>
+                <AppScroll onScrollSetStates={setMessengerVisible} extraBottom={150 + keyboardHeight}>
                     {/* User side */}
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', paddingHorizontal: 15, marginBottom: 20 }}>
                         <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
-                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
+                            <View style={styles.avatarContainer}>
+                                <Image source={profile?.image} style={styles.avatar} />
+                            </View>
                         </View>
-                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.mainOpacied }}>
-                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                        <View style={{ width: '90%', padding: 16, borderRadius: 20, backgroundColor: colors.mainOpacied, borderBottomLeftRadius: 5, marginLeft: 10 }}>
+                            <AppText style={{ color: 'white', lineHeight: 20 }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
                         </View>
                     </View>
 
                     {/* Their side */}
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
-                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.backgroundTop }}>
-                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', paddingHorizontal: 15, marginBottom: 20 }}>
+                        <View style={{ width: '90%', padding: 16, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.08)', borderBottomRightRadius: 5, marginRight: 10 }}>
+                            <AppText style={{ color: 'white', lineHeight: 20 }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
                         </View>
                         <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
-                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
+                            <View style={[styles.avatarContainer, { backgroundColor: '#FF6B6B' }]}>
+                                <Image source={profile?.image} style={styles.avatar} />
+                            </View>
                         </View>
                     </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
-                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.backgroundTop }}>
-                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
-                        </View>
-                        <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
-                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
-                        </View>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
-                        <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
-                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
-                        </View>
-                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.mainOpacied }}>
-                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
-                        </View>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
-                        <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
-                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
-                        </View>
-                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.mainOpacied }}>
-                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
-                        </View>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
-                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.backgroundTop }}>
-                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
-                        </View>
-                        <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
-                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
-                        </View>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
-                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.backgroundTop }}>
-                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
-                        </View>
-                        <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
-                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
-                        </View>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
-                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.backgroundTop }}>
-                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
-                        </View>
-                        <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
-                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
-                        </View>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
-                        <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
-                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
-                        </View>
-                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.mainOpacied }}>
-                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
-                        </View>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
-                        <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
-                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
-                        </View>
-                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.mainOpacied }}>
-                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
-                        </View>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
-                        <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
-                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
-                        </View>
-                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.mainOpacied }}>
-                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
-                        </View>
-                    </View>
-
                 </AppScroll>
             </View >
         </>
     );
 }
-
 const styles = StyleSheet.create({
+    // Updated input styles
+    inputStripped: {
+        color: "white",
+        paddingHorizontal: 15,
+        fontSize: 16,
+    },
+
+    // New avatar styles
+    avatarContainer: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: colors.main,
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+    },
+    avatar: {
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+    },
+
+    // Keep existing styles but update main for better spacing
+    main: {
+        flex: 1,
+        backgroundColor: colors.background,
+        paddingTop: 10,
+    },
+
+    // ... keep all your existing other styles exactly the same
     imageOverlay: {
         position: 'absolute',
         top: 0,
@@ -195,12 +159,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         zIndex: 9999,
     },
-    inputStripped: {
-        height: 50,
-        color: "white",
-        width: '100%',
-        paddingHorizontal: 15
-    },
     fullscreenImage: {
         width: 250,
         height: 250,
@@ -210,11 +168,6 @@ const styles = StyleSheet.create({
         fontSize: scaleFont(12),
         color: 'white',
         fontWeight: '600',
-    },
-    main: {
-        flex: 1,
-        backgroundColor: colors.background,
-        paddingTop: 15,
     },
     imageWrapper: {
         borderRadius: 50,
@@ -314,7 +267,6 @@ const styles = StyleSheet.create({
     deleteButtonContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
     deleteIcon: { width: 23, height: 23, tintColor: 'white', marginRight: 5 },
     deleteText: { fontSize: scaleFont(15), color: 'white', fontWeight: 'bold' },
-
     arrow: {
         width: 20,
         height: 20,
