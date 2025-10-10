@@ -39,22 +39,25 @@ export default function Friends() {
         async function fetchFriendsProfiles() {
             try {
                 showSpinner();
-                const idList = user.friends.map(friend => friend.friendId);
-                const result = await APIService.userToUser.multipleAnotherProfile(idList);
+                const idList = user.friends.filter(friend => friend.status === 'active').map(friend => friend.friendId);
+                let profiles = [];
+                
+                if (idList.length > 0) {
+                    const result = await APIService.userToUser.multipleAnotherProfile(idList);
 
-                if (result.success) {
-                    const profiles = result.data.profiles;
-                    for (let i = 0; i < profiles.length; i++) {
-                        if (profiles[i].imageBase64) {
-                            profiles[i].image = { uri: `data:image/jpeg;base64,${profiles[i].imageBase64}` };
-                            delete profiles[i].imageBase64;
+                    if (result.success) {
+                        profiles = result.data.profiles;
+                        for (let i = 0; i < profiles.length; i++) {
+                            if (profiles[i].imageBase64) {
+                                profiles[i].image = { uri: `data:image/jpeg;base64,${profiles[i].imageBase64}` };
+                                delete profiles[i].imageBase64;
+                            }
                         }
                     }
-                    
-                    //TODO sort by message timing later
-                    setFriendsList(profiles);
-                    setVisibleList(profiles);
                 }
+
+                setFriendsList(profiles);
+                setVisibleList(profiles);
             } catch (error) {
                 console.log(error);
             } finally {
@@ -110,14 +113,11 @@ export default function Friends() {
                             </View>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
-                            <TouchableOpacity onPress={() => setSelectedList('all')} style={{ padding: 10, borderWidth: 1, borderColor: selectedList === 'all' ? colors.main : colors.mutedText, backgroundColor: selectedList === 'all' ? colors.main : 'transparent', borderRadius: 15, width: '31%', alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => setSelectedList('all')} style={{ padding: 10, borderWidth: 1, borderColor: selectedList === 'all' ? colors.main : colors.mutedText, backgroundColor: selectedList === 'all' ? colors.main : 'transparent', borderRadius: 15, width: '48%', alignItems: 'center' }}>
                                 <AppText style={{ color: 'white', fontWeight: 'bold' }}>All</AppText>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => setSelectedList('unread')} style={{ padding: 10, borderWidth: 1, borderColor: selectedList === 'unread' ? colors.main : colors.mutedText, backgroundColor: selectedList === 'unread' ? colors.main : 'transparent', borderRadius: 15, width: '31%', alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => setSelectedList('unread')} style={{ padding: 10, borderWidth: 1, borderColor: selectedList === 'unread' ? colors.main : colors.mutedText, backgroundColor: selectedList === 'unread' ? colors.main : 'transparent', borderRadius: 15, width: '48%', alignItems: 'center' }}>
                                 <AppText style={{ color: 'white', fontWeight: 'bold' }}>Unread</AppText>
-                            </TouchableOpacity>
-                             <TouchableOpacity onPress={() => setSelectedList('inactive')} style={{ padding: 10, borderWidth: 1, borderColor: selectedList === 'inactive' ? colors.main : colors.mutedText, backgroundColor: selectedList === 'inactive' ? colors.main : 'transparent', borderRadius: 15, width: '31%', alignItems: 'center' }}>
-                                <AppText style={{ color: 'white', fontWeight: 'bold' }}>Inactive</AppText>
                             </TouchableOpacity>
                         </View>
                     </View>

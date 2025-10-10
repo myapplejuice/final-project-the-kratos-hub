@@ -118,7 +118,7 @@ export default function UserProfile() {
                     if (result.success) {
                         setUser(prev => ({
                             ...prev,
-                            friends: prev.friends.map(f => f.id === friend.id ? { ...f, status: 'inactive' } : f)
+                            friends: prev.friends.map(f => f.id === friend.id ? { ...f, status: 'inactive', terminatedBy: user.id } : f)
                         }));
                         createToast({ message: "Friendship terminated" });
                     } else {
@@ -196,7 +196,7 @@ export default function UserProfile() {
                 {Object.keys(profile).length > 0 && (
                     <AppScroll extraBottom={20}>
                         {friend && friend.status === 'inactive' &&
-                            <View style={[styles.card, { backgroundColor: '#FF3B30', marginBottom: 15 }]}>
+                            <View style={[styles.card, { backgroundColor: '#FF3B30' }]}>
                                 <AppText style={[styles.cardLabel, { marginBottom: 10 }]}>Friendship Terminated Status</AppText>
                                 <AppText style={{ color: 'white' }}>{
                                     friend.terminatedBy !== user.id ?
@@ -205,7 +205,7 @@ export default function UserProfile() {
                             </View>
                         }
                         {friend && friend.status === 'pending' &&
-                            <View style={[styles.card, { backgroundColor: colors.accentYellow, marginBottom: 15 }]}>
+                            <View style={[styles.card, { backgroundColor: colors.accentYellow }]}>
                                 <AppText style={[styles.cardLabel, { marginBottom: 10 }]}>Friendship Pending Status</AppText>
                                 <AppText style={{ color: 'white' }}>{
                                     friend.adderId === user.id ?
@@ -215,7 +215,7 @@ export default function UserProfile() {
                                 </AppText>
                             </View>
                         }
-                        <View style={[styles.card, { alignItems: 'center', marginTop: friend ? friend.status === 'inactive' || friend.status === 'pending' ? 0 : 15 : 0 }]}>
+                        <View style={[styles.card, { alignItems: 'center', marginTop: friend?.status && friend.status !== 'active' ? 15 : 0 }]}>
                             <TouchableOpacity onPress={() => setViewImage(true)} style={styles.imageWrapper}>
                                 <Image
                                     source={profile.image}
