@@ -15,6 +15,7 @@ import FadeInOut from '../../../components/effects/fade-in-out';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import StaticIcons from "../../../components/screen-comps/static-icons";
 import AppTextInput from "../../../components/screen-comps/app-text-input";
+import SlideInOut from "../../../components/effects/slide-in-out";
 
 export default function Chat() {
     const { createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
@@ -25,6 +26,7 @@ export default function Chat() {
     const [profile, setProfile] = useState({});
     const [messagesList, setMessagesList] = useState([]);
 
+    const [messengerVisible, setMessengerVisible] = useState(true);
     const [message, setMessage] = useState('');
     const [messageHeight, setMessageHeight] = useState(50);
 
@@ -58,11 +60,11 @@ export default function Chat() {
     return (
         <>
             <StaticIcons color={colors.mutedText} />
-            <View style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 20 + keyboardHeight, zIndex: 9999, flexDirection: 'row', marginHorizontal: 15 }}>
+            <FadeInOut visible={messengerVisible} style={{ position: 'absolute', bottom: 0, paddingBottom: insets.bottom + 10 + keyboardHeight, paddingTop: 10, zIndex: 9999, flexDirection: 'row', paddingHorizontal: 15, backgroundColor: 'rgba(0, 0, 0, 0.81)' }}>
                 <View style={{ width: '85%', minHeight: 50, maxHeight: 120, backgroundColor: colors.cardBackground, borderRadius: 20 }}>
                     <AppTextInput
                         multiline
-                        onChangeText={setMessagesList}
+                        onChangeText={setMessage}
                         value={message}
                         placeholder="Message..."
                         placeholderTextColor={"rgba(255, 255, 255, 0.5)"}
@@ -76,9 +78,10 @@ export default function Chat() {
                         <Image source={Images.arrow} style={{ width: 25, height: 30, tintColor: 'white', margin: 0 }} resizeMode="center" />
                     </TouchableOpacity>
                 </View>
-            </View>
+            </FadeInOut>
             <View style={styles.main}>
-                <AppScroll>
+                <AppScroll onScrollSetStates={setMessengerVisible}>
+                    {/* User side */}
                     <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
                         <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
                             <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
@@ -87,14 +90,93 @@ export default function Chat() {
                             <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
                         </View>
                     </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15 }}>
-                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.mainOpacied }}>
+
+                    {/* Their side */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
+                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.backgroundTop }}>
                             <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
                         </View>
                         <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
                             <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
                         </View>
                     </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
+                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.backgroundTop }}>
+                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                        </View>
+                        <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
+                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
+                        </View>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
+                        <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
+                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
+                        </View>
+                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.mainOpacied }}>
+                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                        </View>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
+                        <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
+                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
+                        </View>
+                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.mainOpacied }}>
+                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                        </View>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
+                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.backgroundTop }}>
+                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                        </View>
+                        <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
+                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
+                        </View>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
+                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.backgroundTop }}>
+                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                        </View>
+                        <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
+                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
+                        </View>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
+                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.backgroundTop }}>
+                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                        </View>
+                        <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
+                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
+                        </View>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
+                        <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
+                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
+                        </View>
+                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.mainOpacied }}>
+                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                        </View>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
+                        <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
+                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
+                        </View>
+                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.mainOpacied }}>
+                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                        </View>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
+                        <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
+                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
+                        </View>
+                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.mainOpacied }}>
+                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                        </View>
+                    </View>
+
                 </AppScroll>
             </View >
         </>
