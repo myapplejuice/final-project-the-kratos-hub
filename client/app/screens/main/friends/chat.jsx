@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import { Button, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Button, StyleSheet, TouchableOpacity, View, Platform, Keyboard } from "react-native";
 import AppText from "../../../components/screen-comps/app-text";
 import { Images } from '../../../common/settings/assets';
 import { UserContext } from "../../../common/contexts/user-context";
@@ -14,14 +14,19 @@ import AppScroll from '../../../components/screen-comps/app-scroll'
 import FadeInOut from '../../../components/effects/fade-in-out';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import StaticIcons from "../../../components/screen-comps/static-icons";
+import AppTextInput from "../../../components/screen-comps/app-text-input";
 
 export default function Chat() {
     const { createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
     const { user, setUser, additionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
+    const [keyboardHeight, setKeyboardHeight] = useState(0);
+
     const [profile, setProfile] = useState({});
     const [messages, setMessages] = useState([]);
     const [viewImage, setViewImage] = useState(false);
+
+    const [message, setMessage] = useState('');
 
     useEffect(() => {
         const profile = additionalContexts.chattingFriendProfile;
@@ -29,21 +34,47 @@ export default function Chat() {
 
         setMessages(friendMessages);
         setProfile(profile);
+
+        const showListener = Keyboard.addListener(
+            Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+            (e) => setKeyboardHeight(e.endCoordinates.height)
+        );
+        const hideListener = Keyboard.addListener(
+            Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+            () => setKeyboardHeight(0)
+        );
+
+        return () => {
+            showListener.remove();
+            hideListener.remove();
+        };
     }, []);
+
+    async function handleMessageSend() {
+        console.log('sending message')
+    }
 
     return (
         <>
-            <StaticIcons color={colors.mutedText}/>
-            <View style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 20, zIndex: 9999, flexDirection: 'row', marginHorizontal: 15 }}>
-                <View style={{ width: '80%', height: 50, backgroundColor: colors.cardBackground }}>
-
+            <StaticIcons color={colors.mutedText} />
+            <View style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 20 + keyboardHeight, zIndex: 9999, flexDirection: 'row', marginHorizontal: 15 }}>
+                <View style={{ width: '85%', height: 50, backgroundColor: colors.cardBackground, borderTopLeftRadius: 20, borderBottomLeftRadius: 20 }}>
+                    <AppTextInput
+                        onChangeText={setMessage}
+                        value={message}
+                        placeholder="Message..."
+                        placeholderTextColor={"rgba(255, 255, 255, 0.5)"}
+                        style={styles.inputStripped} />
                 </View>
-                <View style={{ padding: 15, height: 50, backgroundColor: 'red', width: '20%' }}>
-                    <Image source={Images.arrow} style={{ width: 30, height: 30, borderRadius: 15 }} />
-                </View>
+                <TouchableOpacity onPress={handleMessageSend} style={{ padding: 15, height: 50, backgroundColor: colors.accentGreen, width: '15%', justifyContent: 'center', alignItems: 'center', borderTopRightRadius: 20, borderBottomRightRadius: 20 }}>
+                    <Image source={Images.arrow} style={{ width: 30, height: 30, tintColor: 'white' }} />
+                </TouchableOpacity>
             </View>
             <View style={styles.main}>
-                <AppScroll extraBottom={20}>
+                <AppScroll>
+                    {/* Message Bar */}
+
+
 
                 </AppScroll>
             </View >
@@ -62,6 +93,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 9999,
+    },
+    inputStripped: {
+        height: 50,
+        color: "white",
+        width: '100%',
     },
     fullscreenImage: {
         width: 250,
