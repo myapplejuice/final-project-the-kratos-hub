@@ -40,11 +40,12 @@ export default class NotificationsDBService {
             Database.addInput(request, "UserId", sql.UniqueIdentifier, details.userId);
             Database.addInput(request, "Notification", sql.VarChar(500), details.notification);
             Database.addInput(request, "Seen", sql.Bit, details.seen);
+            Database.addInput(request, 'Sentiment', sql.Int, details.sentiment);
             Database.addInput(request, "DateOfCreation", sql.DateTime2, details.dateOfCreation || new Date());
 
             const query = `
-                INSERT INTO UserNotifications (UserId, Notification, Seen, DateOfCreation)
-                VALUES (@UserId, @Notification, @Seen, @DateOfCreation)
+                INSERT INTO UserNotifications (UserId, Notification, Seen, DateOfCreation, Sentiment)
+                VALUES (@UserId, @Notification, @Seen, @DateOfCreation, @Sentiment)
             `;
 
             const result = await request.query(query);

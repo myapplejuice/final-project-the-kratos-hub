@@ -46,6 +46,7 @@ export default class UserToUserController {
             userId: details.adderId,
             notification: `${receiver.firstname} ${receiver.lastname} ${details.reply} your friend request`,
             seen: false,
+            sentiment: "normal",
             dateOfCreation: new Date()
         }
 
@@ -60,14 +61,38 @@ export default class UserToUserController {
         const response = await UserToUserDBService.disableFriendship(details.id, details.terminatorId);
         if (!response.success) return res.status(400).json({ message: response.message });
 
+        const terminatorProfile = await UserToUserDBService.fetchUserProfile(details.terminatorId, false);
+
+        const payload = {
+            userId: details.friendId,
+            notification: `${terminatorProfile.firstname} ${terminatorProfile.lastname} terminated their friendship with you, if they revert this action, you will be notified`,
+            seen: false,
+            sentiment: "negative",
+            dateOfCreation: new Date()
+        }
+
+        await NotificationsDBService.pushNotification(payload);
+
         return res.status(200).json({ success: true, message: response.message });
     }
 
     static async restoreFriendship(req, res) {
-        const id = req.body;
+        const details = req.body;
 
-        const response = await UserToUserDBService.restoreFriendship(id);
+        const response = await UserToUserDBService.restoreFriendship(details.id);
         if (!response.success) return res.status(400).json({ message: response.message });
+
+        const restorerId = await UserToUserDBService.fetchUserProfile(details.restorer, false);
+
+        const payload = {
+            userId: details.friendId,
+            notification: `${restorerId.firstname} ${restorerId.lastname} restored their friendship with you, you can contact them again`,
+            seen: false,
+            sentiment: "positive",
+            dateOfCreation: new Date()
+        }
+
+        await NotificationsDBService.pushNotification(payload);
 
         return res.status(200).json({ success: true, message: response.message });
     }

@@ -99,4 +99,6 @@ export const Images_2 = {
     friend: require('../../../assets/images/friend.png'),
     sad: require('../../../assets/images/sad.png'),
     sadOutline: require('../../../assets/images/sad-outline.png'),
+    restore: require('../../../assets/images/restore.png'),
+    restoreOutline: require('../../../assets/images/restore-outline.png'),
 };

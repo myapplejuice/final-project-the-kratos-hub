@@ -15,7 +15,7 @@ import FadeInOut from '../../../components/effects/fade-in-out';
 
 export default function UserProfile() {
     const context = useLocalSearchParams();
-    const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
+    const { createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
     const { user, setUser } = useContext(UserContext);
     const [profile, setProfile] = useState({});
     const [viewImage, setViewImage] = useState(false);
@@ -107,9 +107,9 @@ export default function UserProfile() {
             confirmButtonStyle: { backgroundColor: 'rgb(255,59,48)', borderColor: 'rgb(255,59,48)' },
             onConfirm: async () => {
                 showSpinner();
-
                 const payload = {
-                    id: friend.id, //FRIENDSHIP ID in that sense
+                    id: friend.id,
+                    friendId: friend.friendId,
                     terminatorId: user.id,
                 }
 
@@ -122,6 +122,41 @@ export default function UserProfile() {
                             friends: prev.friends.map(f => f.id === friend.id ? { ...f, status: 'inactive' } : f)
                         }));
                         createToast({ message: "Friendship terminated" });
+                    } else {
+                        createAlert({ title: 'Failure', text: result.message });
+                    }
+                    hideSpinner();
+                } catch (error) {
+                    createAlert({ title: 'Failure', text: error });
+                } finally {
+                    hideSpinner();
+                }
+            }
+        })
+    }
+
+    async function handleRestoreFriend() {
+        createDialog({
+            title: 'Restore Friendship',
+            text: 'Are you sure you want to restore this friendship?',
+            confirmText: 'Restore',
+            onConfirm: async () => {
+                showSpinner();
+                const payload = {
+                    id: friend.id,
+                    friendId: friend.friendId,
+                    restorerId: user.id
+                }
+
+                try {
+                    const result = await APIService.userToUser.restoreFriendship(payload);
+
+                    if (result.success) {
+                        setUser(prev => ({
+                            ...prev,
+                            friends: prev.friends.map(f => f.id === friend.id ? { ...f, status: 'active' } : f)
+                        }));
+                        createToast({ message: "Friendship restored" });
                     } else {
                         createAlert({ title: 'Failure', text: result.message });
                     }
@@ -161,7 +196,16 @@ export default function UserProfile() {
             <View style={styles.main}>
                 {Object.keys(profile).length > 0 && (
                     <AppScroll extraBottom={20}>
-                        <View style={[styles.card, { alignItems: 'center' }]}>
+                        {friend && friend.status === 'inactive' &&
+                            <View style={[styles.card, { backgroundColor: '#FF3B30' }]}>
+                                <AppText style={[styles.cardLabel, { marginBottom: 10 }]}>Friendship Status Terminated</AppText>
+                                <AppText style={{ color: 'white' }}>{
+                                    friend.terminatedBy !== user.id ?
+                                        'This user has terminated their friendship with you, only they can restore it. Incase of restoration you will be notified.' :
+                                        'You have terminated your friendship with this user, you can restore it below if you wish.'}</AppText>
+                            </View>
+                        }
+                        <View style={[styles.card, { alignItems: 'center', marginTop: friend && friend.status === 'active' ? 0 : 15 }]}>
                             <TouchableOpacity onPress={() => setViewImage(true)} style={styles.imageWrapper}>
                                 <Image
                                     source={profile.image}
@@ -175,7 +219,7 @@ export default function UserProfile() {
 
                             <View style={{ marginTop: 5, marginBottom: 15 }}>
                                 {friend && (
-                                    <View style={{ padding: 9, borderRadius: 20, backgroundColor: friend.status === 'active' ? colors.accentGreen : colors.accentYellow }}>
+                                    <View style={{ padding: 9, borderRadius: 20, backgroundColor: friend.status === 'active' ? colors.accentGreen : '#FF3B30' }}>
                                         <AppText style={{ color: 'white', fontSize: scaleFont(11) }}>
                                             {friend.status === 'pending'
                                                 ? 'Pending Friend'
@@ -245,33 +289,49 @@ export default function UserProfile() {
                                 </TouchableOpacity>
                             )}
 
-                            {friend && friend.status === 'active' && (
-                                <>
-                                    <TouchableOpacity onPress={handleToMessages} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
+                            {friend && (
+                                friend.status === 'active' ? (
+                                    <>
+                                        <TouchableOpacity onPress={handleToMessages} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                                <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
+                                                    <Image source={Images.noMessage} style={styles.settingIcon} />
+                                                </View>
+                                                <AppText style={styles.label}>To Messages</AppText>
+                                            </View>
+                                            <Image
+                                                source={Images.backArrow}
+                                                style={[styles.arrow, { transform: [{ scaleX: -1 }] }]}
+                                            />
+                                        </TouchableOpacity>
+
+                                        <TouchableOpacity onPress={handleTerminateFriend} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                                <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
+                                                    <Image source={Images.xMark} style={styles.settingIcon} />
+                                                </View>
+                                                <AppText style={styles.label}>Terminate Friendship</AppText>
+                                            </View>
+                                            <Image
+                                                source={Images.backArrow}
+                                                style={[styles.arrow, { transform: [{ scaleX: -1 }] }]}
+                                            />
+                                        </TouchableOpacity>
+                                    </>
+                                ) : friend.status === 'inactive' && friend.terminatedBy === user.id && (
+                                    <TouchableOpacity onPress={handleRestoreFriend} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                             <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
-                                                <Image source={Images.noMessage} style={styles.settingIcon} />
+                                                <Image source={Images.restore} style={styles.settingIcon} />
                                             </View>
-                                            <AppText style={styles.label}>To Messages</AppText>
+                                            <AppText style={styles.label}>Restore Friendship</AppText>
                                         </View>
                                         <Image
                                             source={Images.backArrow}
                                             style={[styles.arrow, { transform: [{ scaleX: -1 }] }]}
                                         />
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={handleTerminateFriend} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
-                                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                            <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
-                                                <Image source={Images.xMark} style={styles.settingIcon} />
-                                            </View>
-                                            <AppText style={styles.label}>Terminate Friendship</AppText>
-                                        </View>
-                                        <Image
-                                            source={Images.backArrow}
-                                            style={[styles.arrow, { transform: [{ scaleX: -1 }] }]}
-                                        />
-                                    </TouchableOpacity>
-                                </>
+                                )
                             )}
 
                             <TouchableOpacity onPress={handleUserReport} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>

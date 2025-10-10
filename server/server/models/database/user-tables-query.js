@@ -23,6 +23,7 @@ export function userTablesQuery() {
                     UserId UNIQUEIDENTIFIER NOT NULL,
                     Notification VARCHAR(500) NOT NULL,
                     Seen BIT NOT NULL DEFAULT 0,
+                    Sentiment VARCHAR(20) NULL,
                     DateOfCreation DATETIME2 NOT NULL,
                     CONSTRAINT FK_UserNotifications_Users FOREIGN KEY (UserId)
                         REFERENCES dbo.Users(Id)

@@ -89,8 +89,9 @@ export default class ObjectMapper {
             Notification: 'notification',
             Seen: 'seen',
             ExtraInformation: 'extraInformation',
-               TerminatedBy: 'terminatedBy',
-               Role: 'role'
+            TerminatedBy: 'terminatedBy',
+            Role: 'role',
+            Sentiment: 'sentiment'
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -185,6 +186,7 @@ export default class ObjectMapper {
             extraInformation: 'ExtraInformation',
             role: 'Role',
             terminatedBy: 'TerminatedBy',
+            sentiment: 'Sentiment'
         };
         return map[key] || key;
     }
@@ -247,7 +249,7 @@ export default class ObjectMapper {
             MealLogId: sql.Int,
             Name: sql.VarChar(100),
             Creator: sql.VarChar(50),
-            Type: sql.VarChar(20),        
+            Type: sql.VarChar(20),
             ServingAmount: sql.Decimal(7, 2),
             EnergyKcal: sql.Decimal(7, 2),
             Carbs: sql.Decimal(7, 2),

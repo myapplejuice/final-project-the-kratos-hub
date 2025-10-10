@@ -315,7 +315,7 @@ export default function Notifications() {
                                         return (
                                             <View key={notification.id}>
                                                 <View style={{ borderStartColor: notification.seen ? colors.mutedText : 'white', borderStartWidth: 2, paddingHorizontal: 15 }}>
-                                                    <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: notification.seen ? colors.mutedText : 'white' }}>
+                                                    <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.accentRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white' }}>
                                                         {notification.notification}
                                                     </AppText>
                                                     <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: colors.mutedText }}>
