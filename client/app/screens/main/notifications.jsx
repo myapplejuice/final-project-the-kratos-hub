@@ -146,6 +146,18 @@ export default function Notifications() {
         });
     }
 
+    function handleNotificationPress(notification) {
+        if (notification.clickableDestination === 'profile'){
+            router.push({
+                pathname: routes.USER_PROFILE,
+                params: {
+                    userId: notification.clickableInfo.userId
+                }
+            })
+        }
+            
+    }
+
     function handleProfile(profile) {
         router.push({
             pathname: routes.USER_PROFILE,
@@ -316,7 +328,7 @@ export default function Notifications() {
                                         const isLastUnseen = !notification.seen && (index === notifications.findIndex(n => n.seen) - 1 || index === notifications.filter(n => !n.seen).length - 1);
                                         const seenNotificationsExist = notifications.some(n => n.seen);
                                         return (
-                                            <View key={notification.id}>
+                                            <TouchableOpacity onPress={() => notification.clickable && handleNotificationPress(notification)} key={notification.id}>
                                                 <View style={{ borderStartColor: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white', borderStartWidth: 2, paddingHorizontal: 15, marginBottom: 10 }}>
                                                     <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white' }}>
                                                         {notification.notification}
@@ -326,7 +338,7 @@ export default function Notifications() {
                                                     </AppText>
                                                 </View>
                                                 {isLastUnseen && seenNotificationsExist && <Divider orientation='horizontal' style={{ marginVertical: 15 }} />}
-                                            </View>
+                                            </TouchableOpacity>
                                         );
                                     })}
                                 </>

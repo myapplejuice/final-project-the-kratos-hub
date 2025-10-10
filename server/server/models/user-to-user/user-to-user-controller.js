@@ -47,7 +47,7 @@ export default class UserToUserController {
             notification: `${receiver.firstname} ${receiver.lastname} ${details.reply} your friend request`,
             seen: false,
             clickable: true,
-            clickableInfo: JSON.stringify({userId: details.receiverId}),
+            clickableInfo: JSON.stringify({ userId: details.receiverId }),
             clickableDestination: 'profile',
             sentiment: "normal",
             dateOfCreation: new Date()
@@ -70,6 +70,9 @@ export default class UserToUserController {
             userId: details.friendId,
             notification: `${terminatorProfile.firstname} ${terminatorProfile.lastname} terminated their friendship with you, if they revert this action, you will be notified`,
             seen: false,
+            clickable: true,
+            clickableInfo: JSON.stringify({ userId: details.terminatorId }),
+            clickableDestination: 'profile',
             sentiment: "negative",
             dateOfCreation: new Date()
         }
@@ -92,6 +95,9 @@ export default class UserToUserController {
             notification: `${restorerId.firstname} ${restorerId.lastname} restored their friendship with you, you can contact them again`,
             seen: false,
             sentiment: "positive",
+            clickable: true,
+            clickableInfo: JSON.stringify({ userId: details.restorerId }),
+            clickableDestination: 'profile',
             dateOfCreation: new Date()
         }
 
