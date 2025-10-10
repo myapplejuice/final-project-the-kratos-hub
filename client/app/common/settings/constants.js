@@ -15,6 +15,9 @@ export const routes = {
     NOTIFICATIONS: '/screens/main/notifications',
     FRIENDS: '/screens/main/friends',
 
+    /* FRIENDS */
+    CHAT: '/screens/main/friends/chat',
+
     /* HOMEPAGE CHILDREN */
     LEAN_BODY_MASS: '/screens/main/homepage/lean-body-mass',
     BODY_MASS_INDEX: '/screens/main/homepage/body-mass-index',

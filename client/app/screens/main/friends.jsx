@@ -27,7 +27,7 @@ import AppTextInput from '../../components/screen-comps/app-text-input';
 
 export default function Friends() {
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
-    const { user, setUser } = useContext(UserContext);
+    const { user, setUser, setAdditionalContexts } = useContext(UserContext);
     const [friendsList, setFriendsList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -41,7 +41,7 @@ export default function Friends() {
                 showSpinner();
                 const idList = user.friends.filter(friend => friend.status === 'active').map(friend => friend.friendId);
                 let profiles = [];
-                
+
                 if (idList.length > 0) {
                     const result = await APIService.userToUser.multipleAnotherProfile(idList);
 
@@ -92,6 +92,11 @@ export default function Friends() {
         })
     }
 
+    function handleFriendClick(chattingFriendProfile) {
+        setAdditionalContexts({ chattingFriendProfile });
+        router.push(routes.CHAT)
+    }
+
     return (
         <AppScroll extraBottom={loading ? 0 : 150} avoidKeyboard={false}>
             {!loading ? (
@@ -102,10 +107,6 @@ export default function Friends() {
                                 <Image source={Images.magnifier} style={{ tintColor: colors.mutedText, width: 20, height: 20, marginHorizontal: 15 }} />
                                 <AppTextInput
                                     onChangeText={setSearchQuery}
-                                    onSubmitEditing={async () => {
-                                        Keyboard.dismiss();
-                                        //DO friend search
-                                    }}
                                     value={searchQuery}
                                     placeholder="Search"
                                     placeholderTextColor={"rgba(255, 255, 255, 0.5)"}
@@ -126,7 +127,7 @@ export default function Friends() {
                         <View>
                             {visibleList.map((friend, i) => (
                                 <TouchableOpacity
-                                    onPress={() => console.log('go to messaging')}
+                                    onPress={() => handleFriendClick(friend)}
                                     style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}
                                     key={i}
                                 >
