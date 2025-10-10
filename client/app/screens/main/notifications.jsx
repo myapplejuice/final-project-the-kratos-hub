@@ -330,11 +330,11 @@ export default function Notifications() {
                                         return (
                                             <TouchableOpacity onPress={() => notification.clickable && handleNotificationPress(notification)} key={notification.id}>
                                                 <View style={{ borderStartColor: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white', borderStartWidth: 2, paddingHorizontal: 15, marginBottom: 10 }}>
+                                                    <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: colors.mutedText, marginBottom: 5 }}>
+                                                        {formatDate(notification.dateOfCreation, { format: user.preferences.dateFormat.key })}, {formatTime(notification.dateOfCreation, { format: user.preferences.timeFormat.key })}
+                                                    </AppText>
                                                     <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white' }}>
                                                         {notification.notification}
-                                                    </AppText>
-                                                    <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: colors.mutedText }}>
-                                                        {formatDate(notification.dateOfCreation, { format: user.preferences.dateFormat.key })}, {formatTime(notification.dateOfCreation, { format: user.preferences.timeFormat.key })}
                                                     </AppText>
                                                 </View>
                                                 {isLastUnseen && seenNotificationsExist && <Divider orientation='horizontal' style={{ marginVertical: 15 }} />}

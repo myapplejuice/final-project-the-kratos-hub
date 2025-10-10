@@ -10,7 +10,7 @@ export const colors = {
     mutedText: '#666666', // metricLabel, rowInfoLabel, statLabel
     lightMutedText: '#66666633', // 20% opacity
     accentPink: '#FF536A',
-    accentYellow: '#FFCD61',
+    accentYellow: '#fdc344ff',
     accentBlue: '#61ABFF',
     accentGreen: '#44c54f',
     statImageBackground: '#FFC9644D', 

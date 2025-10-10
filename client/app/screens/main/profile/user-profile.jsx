@@ -22,9 +22,9 @@ export default function UserProfile() {
     const [friend, setFriend] = useState({});
 
     useEffect(() => {
-        const friend = user.friends?.find(f => f.friendId === profile.id);
+        let friend = user.friends?.find(f => f.friendId === profile.id);
         if (!friend)
-            user.pendingFriends?.find(f => (f.adderId === profile.id || f.receiverId === profile.id) && f.status !== 'declined')
+            friend = user.pendingFriends?.find(f => (f.adderId === profile.id || f.receiverId === profile.id) && f.status !== 'declined')
         setFriend(friend);
     }, [user.friends, profile])
 
@@ -72,7 +72,6 @@ export default function UserProfile() {
                     adderId: user.id,
                     receiverId: profile.id,
                     status: 'pending',
-                    seen: false,
                     description: vals[0],
                     dateOfCreation: new Date(),
                 }
@@ -83,7 +82,7 @@ export default function UserProfile() {
                     if (result.success) {
                         setUser(prev => ({
                             ...prev,
-                            friends: [...prev.friends, payload]
+                            pendingFriends: [...prev.pendingFriends, payload]
                         }));
                         createToast({ message: "Friend request sent" });
                     } else {
@@ -197,15 +196,26 @@ export default function UserProfile() {
                 {Object.keys(profile).length > 0 && (
                     <AppScroll extraBottom={20}>
                         {friend && friend.status === 'inactive' &&
-                            <View style={[styles.card, { backgroundColor: '#FF3B30' }]}>
-                                <AppText style={[styles.cardLabel, { marginBottom: 10 }]}>Friendship Status Terminated</AppText>
+                            <View style={[styles.card, { backgroundColor: '#FF3B30', marginBottom: 15 }]}>
+                                <AppText style={[styles.cardLabel, { marginBottom: 10 }]}>Friendship Terminated Status</AppText>
                                 <AppText style={{ color: 'white' }}>{
                                     friend.terminatedBy !== user.id ?
                                         'This user has terminated their friendship with you, only they can restore it. Incase of restoration you will be notified.' :
                                         'You have terminated your friendship with this user, you can restore it below if you wish.'}</AppText>
                             </View>
                         }
-                        <View style={[styles.card, { alignItems: 'center', marginTop: friend && friend.status === 'active' ? 0 : 15 }]}>
+                        {friend && friend.status === 'pending' &&
+                            <View style={[styles.card, { backgroundColor: colors.accentYellow, marginBottom: 15 }]}>
+                                <AppText style={[styles.cardLabel, { marginBottom: 10 }]}>Friendship Pending Status</AppText>
+                                <AppText style={{ color: 'white' }}>{
+                                    friend.adderId === user.id ?
+                                        'Friend requests sent to user, you will be notified when they reply.' :
+                                        'This user has sent you a friend request, you can accept it in the notifications section.'
+                                }
+                                </AppText>
+                            </View>
+                        }
+                        <View style={[styles.card, { alignItems: 'center', marginTop: friend ? friend.status === 'inactive' || friend.status === 'pending' ? 0 : 15 : 0 }]}>
                             <TouchableOpacity onPress={() => setViewImage(true)} style={styles.imageWrapper}>
                                 <Image
                                     source={profile.image}
@@ -219,7 +229,7 @@ export default function UserProfile() {
 
                             <View style={{ marginTop: 5, marginBottom: 15 }}>
                                 {friend && (
-                                    <View style={{ padding: 9, borderRadius: 20, backgroundColor: friend.status === 'active' ? colors.accentGreen : '#FF3B30' }}>
+                                    <View style={{ padding: 9, borderRadius: 20, backgroundColor: friend.status === 'active' ? colors.accentGreen : friend.status === 'pending' ? colors.accentYellow : '#FF3B30' }}>
                                         <AppText style={{ color: 'white', fontSize: scaleFont(11) }}>
                                             {friend.status === 'pending'
                                                 ? 'Pending Friend'
