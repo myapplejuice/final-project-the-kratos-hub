@@ -170,11 +170,11 @@ export default function UserProfile() {
     }
 
     async function handleToMessages() {
-
+        //TODO WHEN MESSAGES READY
     }
 
     async function handleUserReport() {
-
+        //TODO WHEN REPORTING AND ADMING PAGE READY
     }
 
     return (

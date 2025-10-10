@@ -34,6 +34,7 @@ export default function Friends() {
     const [selectedList, setSelectedList] = useState('all');
     const [visibleList, setVisibleList] = useState([]);
 
+    //GET FRIENDS
     useEffect(() => {
         async function fetchFriendsProfiles() {
             try {
@@ -49,7 +50,8 @@ export default function Friends() {
                             delete profiles[i].imageBase64;
                         }
                     }
-
+                    
+                    //TODO sort by message timing later
                     setFriendsList(profiles);
                     setVisibleList(profiles);
                 }
@@ -64,6 +66,7 @@ export default function Friends() {
         fetchFriendsProfiles();
     }, []);
 
+    //SEARCH ENGINE
     useEffect(() => {
         if (searchQuery === '') {
             setVisibleList(friendsList);
@@ -71,10 +74,10 @@ export default function Friends() {
         }
 
         const query = searchQuery.trim().toLowerCase();
-const filtered = friendsList.filter(profile =>
-    (profile.firstname + ' ' + profile.lastname).toLowerCase().startsWith(query)
-);
-setVisibleList(filtered);
+        const filtered = friendsList.filter(profile =>
+            (profile.firstname + ' ' + profile.lastname).toLowerCase().startsWith(query)
+        );
+        setVisibleList(filtered);
     }, [searchQuery]);
 
     function handleProfilePress(profile) {
@@ -107,11 +110,14 @@ setVisibleList(filtered);
                             </View>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
-                            <TouchableOpacity onPress={() => setSelectedList('all')} style={{ padding: 10, borderWidth: 1, borderColor: selectedList === 'all' ? colors.main : colors.mutedText, backgroundColor: selectedList === 'all' ? colors.main : 'transparent', borderRadius: 15, width: '48%', alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => setSelectedList('all')} style={{ padding: 10, borderWidth: 1, borderColor: selectedList === 'all' ? colors.main : colors.mutedText, backgroundColor: selectedList === 'all' ? colors.main : 'transparent', borderRadius: 15, width: '31%', alignItems: 'center' }}>
                                 <AppText style={{ color: 'white', fontWeight: 'bold' }}>All</AppText>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => setSelectedList('unread')} style={{ padding: 10, borderWidth: 1, borderColor: selectedList === 'unread' ? colors.main : colors.mutedText, backgroundColor: selectedList === 'unread' ? colors.main : 'transparent', borderRadius: 15, width: '48%', alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => setSelectedList('unread')} style={{ padding: 10, borderWidth: 1, borderColor: selectedList === 'unread' ? colors.main : colors.mutedText, backgroundColor: selectedList === 'unread' ? colors.main : 'transparent', borderRadius: 15, width: '31%', alignItems: 'center' }}>
                                 <AppText style={{ color: 'white', fontWeight: 'bold' }}>Unread</AppText>
+                            </TouchableOpacity>
+                             <TouchableOpacity onPress={() => setSelectedList('inactive')} style={{ padding: 10, borderWidth: 1, borderColor: selectedList === 'inactive' ? colors.main : colors.mutedText, backgroundColor: selectedList === 'inactive' ? colors.main : 'transparent', borderRadius: 15, width: '31%', alignItems: 'center' }}>
+                                <AppText style={{ color: 'white', fontWeight: 'bold' }}>Inactive</AppText>
                             </TouchableOpacity>
                         </View>
                     </View>
