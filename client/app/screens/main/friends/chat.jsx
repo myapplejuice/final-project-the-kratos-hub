@@ -23,16 +23,16 @@ export default function Chat() {
     const [keyboardHeight, setKeyboardHeight] = useState(0);
 
     const [profile, setProfile] = useState({});
-    const [messages, setMessages] = useState([]);
-    const [viewImage, setViewImage] = useState(false);
+    const [messagesList, setMessagesList] = useState([]);
 
     const [message, setMessage] = useState('');
+    const [messageHeight, setMessageHeight] = useState(50);
 
     useEffect(() => {
         const profile = additionalContexts.chattingFriendProfile;
-        const friendMessages = user.friends.find(f => f.friendId === profile.id)?.messages || [];
+        const friendMessages = user.friends.find(f => f.friendId === profile?.id)?.messages || [];
 
-        setMessages(friendMessages);
+        setMessagesList(friendMessages);
         setProfile(profile);
 
         const showListener = Keyboard.addListener(
@@ -47,7 +47,7 @@ export default function Chat() {
         return () => {
             showListener.remove();
             hideListener.remove();
-            setAdditionalContexts({...additionalContexts, chattingFriendProfile: null});  
+            setAdditionalContexts({ ...additionalContexts, chattingFriendProfile: null });
         };
     }, []);
 
@@ -59,25 +59,42 @@ export default function Chat() {
         <>
             <StaticIcons color={colors.mutedText} />
             <View style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 20 + keyboardHeight, zIndex: 9999, flexDirection: 'row', marginHorizontal: 15 }}>
-                <View style={{ width: '85%', height: 50, backgroundColor: colors.cardBackground, borderTopLeftRadius: 20, borderBottomLeftRadius: 20 }}>
+                <View style={{ width: '85%', minHeight: 50, maxHeight: 120, backgroundColor: colors.cardBackground, borderRadius: 20 }}>
                     <AppTextInput
-                        onChangeText={setMessage}
+                        multiline
+                        onChangeText={setMessagesList}
                         value={message}
                         placeholder="Message..."
                         placeholderTextColor={"rgba(255, 255, 255, 0.5)"}
-                        style={styles.inputStripped} />
+                        style={[styles.inputStripped, { height: Math.min(120, Math.max(50, messageHeight)) }]}
+                        onContentSizeChange={(e) =>
+                            setMessageHeight(e.nativeEvent.contentSize.height)
+                        } />
                 </View>
-                <TouchableOpacity onPress={handleMessageSend} style={{ padding: 15, height: 50, backgroundColor: colors.main, width: '15%', justifyContent: 'center', alignItems: 'center', borderTopRightRadius: 20, borderBottomRightRadius: 20 }}>
-                    <Image source={Images.arrow} style={{ width: 30, height: 30, tintColor: 'white' }} />
-                </TouchableOpacity>
+                <View style={{ width: '15%', alignSelf: 'flex-end', }}>
+                    <TouchableOpacity onPress={handleMessageSend} style={{ padding: 15, height: 50, backgroundColor: colors.main, width: 50, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-end', borderRadius: 25 }}>
+                        <Image source={Images.arrow} style={{ width: 25, height: 30, tintColor: 'white', margin: 0 }} resizeMode="center" />
+                    </TouchableOpacity>
+                </View>
             </View>
             <View style={styles.main}>
-               
                 <AppScroll>
-                 
-
-
-
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, marginBottom: 15 }}>
+                        <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
+                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
+                        </View>
+                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.mainOpacied }}>
+                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                        </View>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15 }}>
+                        <View style={{ width: '90%', padding: 15, borderRadius: 15, backgroundColor: colors.mainOpacied }}>
+                            <AppText style={{ color: 'white' }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                        </View>
+                        <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
+                            <Image source={profile?.image} style={{ width: 26, height: 26, borderRadius: 13 }} />
+                        </View>
+                    </View>
                 </AppScroll>
             </View >
         </>
@@ -100,7 +117,7 @@ const styles = StyleSheet.create({
         height: 50,
         color: "white",
         width: '100%',
-        paddingStart: 15
+        paddingHorizontal: 15
     },
     fullscreenImage: {
         width: 250,
