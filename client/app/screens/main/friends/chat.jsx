@@ -18,7 +18,7 @@ import AppTextInput from "../../../components/screen-comps/app-text-input";
 
 export default function Chat() {
     const { createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
-    const { user, setUser, additionalContexts } = useContext(UserContext);
+    const { user, setUser, setAdditionalContexts, additionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const [keyboardHeight, setKeyboardHeight] = useState(0);
 
@@ -47,11 +47,12 @@ export default function Chat() {
         return () => {
             showListener.remove();
             hideListener.remove();
+            setAdditionalContexts({...additionalContexts, chattingFriendProfile: null});  
         };
     }, []);
 
     async function handleMessageSend() {
-        console.log('sending message')
+        console.log(message)
     }
 
     return (
@@ -66,13 +67,14 @@ export default function Chat() {
                         placeholderTextColor={"rgba(255, 255, 255, 0.5)"}
                         style={styles.inputStripped} />
                 </View>
-                <TouchableOpacity onPress={handleMessageSend} style={{ padding: 15, height: 50, backgroundColor: colors.accentGreen, width: '15%', justifyContent: 'center', alignItems: 'center', borderTopRightRadius: 20, borderBottomRightRadius: 20 }}>
+                <TouchableOpacity onPress={handleMessageSend} style={{ padding: 15, height: 50, backgroundColor: colors.main, width: '15%', justifyContent: 'center', alignItems: 'center', borderTopRightRadius: 20, borderBottomRightRadius: 20 }}>
                     <Image source={Images.arrow} style={{ width: 30, height: 30, tintColor: 'white' }} />
                 </TouchableOpacity>
             </View>
             <View style={styles.main}>
+               
                 <AppScroll>
-                    {/* Message Bar */}
+                 
 
 
 
@@ -98,6 +100,7 @@ const styles = StyleSheet.create({
         height: 50,
         color: "white",
         width: '100%',
+        paddingStart: 15
     },
     fullscreenImage: {
         width: 250,

@@ -11,13 +11,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Animated } from "react-native";
 
 export default function TopBar({ visible, hideInsetOnScroll = false }) {
-    const { user } = useContext(UserContext);
+    const { user, additionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const screen = usePathname();
     const topBarPosition = useRef(new Animated.Value(0)).current;
     const topBarOpacity = useRef(new Animated.Value(0)).current;
     const [notificationsCount, setNotificationsCount] = useState(0);
     const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+    const [chattedUser, setChattedUser] = useState({});
 
     useEffect(() => {
         const friendRequestsCount = user?.pendingFriends?.filter(f => f.adderId !== user.id && f.status === 'pending').length || 0;
@@ -43,6 +44,12 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
             useNativeDriver: true,
         }).start();
     }, [visible]);
+
+    useEffect(() => {
+        if (screen === routes.CHAT) {
+            setChattedUser(additionalContexts.chattingFriendProfile);
+        }
+    }, [screen]);
 
     const inMain = (
         screen === routes.HOMEPAGE ||
@@ -83,8 +90,83 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.USDA_PROFILE]: "USDA Profile",
         [routes.NOTIFICATIONS]: "Notifications",
         [routes.FRIENDS]: "Friends",
-        [routes.CHAT]: "Chat",
+        [routes.CHAT]: `${chattedUser ? chattedUser.firstname + ' ' + chattedUser.lastname : 'Chat'}`,
     };
+
+    function handleUserProfilePress() {
+        router.push({
+            pathname: routes.USER_PROFILE,
+            params: {
+                userId: chattedUser.id
+            }
+        });
+    }
+
+    return (
+        <View style={styles.wrapper}>
+            {!hideInsetOnScroll && <View style={[styles.inset, {height: insets.top}]} />}
+
+            <Animated.View style={[styles.header, { transform: [{ translateY: topBarPosition }], opacity: topBarOpacity }]}>
+                {hideInsetOnScroll && <View style={[styles.inset, {height: insets.top}]} />}
+                <View style={styles.left}>
+                    {!inMain && (
+                        <TouchableOpacity onPress={() => router.back()}>
+                            <Image style={styles.arrow} source={Images.backArrow} />
+                        </TouchableOpacity>
+                    )}
+                    {screen === routes.CHAT && (
+                        <>
+                            <TouchableOpacity onPress={handleUserProfilePress}>
+                                <Image source={chattedUser.image} style={styles.chattedUserImage} />
+                            </TouchableOpacity>
+                        </>
+                    )}
+                    <AppText style={styles.title}>{screenNames[screen]}</AppText>
+                </View>
+
+                <View style={styles.right}>
+                    {inMain && (
+                        <>
+                            <View style={styles.bellWrapper}>
+                                <TouchableOpacity onPress={() => router.push(routes.FRIENDS)}>
+                                    <Image style={styles.bellImage} source={unreadMessagesCount > 0 ? Images.message : Images.noMessage} />
+                                </TouchableOpacity>
+                                {unreadMessagesCount > 0 && (
+                                    <View style={styles.badge}>
+                                        <AppText style={styles.badgeText}>
+                                            {unreadMessagesCount > 99 ? '99+' : unreadMessagesCount}
+                                        </AppText>
+                                    </View>
+                                )}
+                            </View>
+
+                            {/* Notifications Bell */}
+                            <View style={[styles.bellWrapper, { marginHorizontal: 10 }]}>
+                                <TouchableOpacity onPress={() => router.push(routes.NOTIFICATIONS)}>
+                                    <Image style={styles.bellImage} source={notificationsCount > 0 ? Images.notification : Images.noNotification} />
+                                </TouchableOpacity>
+                                {notificationsCount > 0 && (
+                                    <View style={styles.badge}>
+                                        <AppText style={styles.badgeText}>
+                                            {notificationsCount > 99 ? '99+' : notificationsCount}
+                                        </AppText>
+                                    </View>
+                                )}
+                            </View>
+
+                            <TouchableOpacity onPress={() => router.push(routes.PROFILE)}>
+                                <Image
+                                    style={styles.profileImage}
+                                    source={user?.image ? user.image : Images.profilePic}
+                                />
+                            </TouchableOpacity>
+                        </>
+                    )}
+                </View>
+            </Animated.View>
+        </View>
+    );
+}
 
     const styles = StyleSheet.create({
         wrapper: {
@@ -94,8 +176,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
             top: 0,
             zIndex: 10,
         },
-        inset: {
-            height: insets.top, // always reserve safe area
+        inset: { 
             backgroundColor: colors.main,
         },
         header: {
@@ -148,9 +229,17 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         profileImage: {
             width: 28,
             height: 28,
+            borderRadius: 17.5,
+            borderWidth: 2,
+            borderColor: colors.mainSecond,
+        },
+        chattedUserImage: {
+            width: 28,
+            height: 28,
             borderRadius: 14,
             borderWidth: 2,
-            borderColor: colors.mainSecond
+            borderColor: colors.mainSecond,
+            marginEnd: 10
         },
         bellImage: {
             width: 24,
@@ -204,63 +293,3 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         },
 
     });
-
-    return (
-        <View style={styles.wrapper}>
-            {!hideInsetOnScroll && <View style={styles.inset} />}
-
-            <Animated.View style={[styles.header, { transform: [{ translateY: topBarPosition }], opacity: topBarOpacity }]}>
-                {hideInsetOnScroll && <View style={styles.inset} />}
-                <View style={styles.left}>
-                    {!inMain && (
-                        <TouchableOpacity onPress={() => router.back()}>
-                            <Image style={styles.arrow} source={Images.backArrow} />
-                        </TouchableOpacity>
-                    )}
-                    <AppText style={styles.title}>{screenNames[screen]}</AppText>
-                </View>
-
-                <View style={styles.right}>
-                    {inMain && (
-                        <>
-                            <View style={styles.bellWrapper}>
-                                <TouchableOpacity onPress={() => router.push(routes.FRIENDS)}>
-                                    <Image style={styles.bellImage} source={unreadMessagesCount > 0 ? Images.message : Images.noMessage} />
-                                </TouchableOpacity>
-                                {unreadMessagesCount > 0 && (
-                                    <View style={styles.badge}>
-                                        <AppText style={styles.badgeText}>
-                                            {unreadMessagesCount > 99 ? '99+' : unreadMessagesCount}
-                                        </AppText>
-                                    </View>
-                                )}
-                            </View>
-
-                            {/* Notifications Bell */}
-                            <View style={[styles.bellWrapper, { marginHorizontal: 10 }]}>
-                                <TouchableOpacity onPress={() => router.push(routes.NOTIFICATIONS)}>
-                                    <Image style={styles.bellImage} source={notificationsCount > 0 ? Images.notification : Images.noNotification} />
-                                </TouchableOpacity>
-                                {notificationsCount > 0 && (
-                                    <View style={styles.badge}>
-                                        <AppText style={styles.badgeText}>
-                                            {notificationsCount > 99 ? '99+' : notificationsCount}
-                                        </AppText>
-                                    </View>
-                                )}
-                            </View>
-
-                            <TouchableOpacity onPress={() => router.push(routes.PROFILE)}>
-                                <Image
-                                    style={styles.profileImage}
-                                    source={user?.image ? user.image : Images.profilePic}
-                                />
-                            </TouchableOpacity>
-                        </>
-                    )}
-                </View>
-            </Animated.View>
-        </View>
-    );
-}
-
