@@ -72,12 +72,10 @@ export default function Notifications() {
 
         async function confirmSeen() {
             try {
-                const notSeenNotificationsIds = notifications.filter(n => !n.seen).map(n => n.id);
+                const notSeenNotificationsIds = user.notifications.filter(n => !n.seen).map(n => n.id);
 
                 const result = await APIService.notifications.seen(notSeenNotificationsIds);
-                if (result.success) {
-                    setUser(prev => ({ ...prev, notifications: prev.notifications.map(n => ({ ...n, seen: true })) }));
-                } else {
+                if (!result.success) {
                     createAlert({ title: 'Failure', text: result.message });
                 }
             } catch (error) {
@@ -86,9 +84,14 @@ export default function Notifications() {
             }
         }
 
+        function setUserNotificationsSeen() {
+            setUser(prev => ({ ...prev, notifications: prev.notifications.map(n => ({ ...n, seen: true })) }));
+        }
+
         prepareRequests();
         setNotifications(user.notifications);
-        return () => confirmSeen();
+        confirmSeen();
+        return () => setUserNotificationsSeen();
     }, []);
 
 
@@ -314,15 +317,15 @@ export default function Notifications() {
                                         const seenNotificationsExist = notifications.some(n => n.seen);
                                         return (
                                             <View key={notification.id}>
-                                                <View style={{ borderStartColor: notification.seen ? colors.mutedText : 'white', borderStartWidth: 2, paddingHorizontal: 15 }}>
-                                                    <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.accentRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white' }}>
+                                                <View style={{ borderStartColor: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white', borderStartWidth: 2, paddingHorizontal: 15, marginBottom: 10 }}>
+                                                    <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white' }}>
                                                         {notification.notification}
                                                     </AppText>
                                                     <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: colors.mutedText }}>
                                                         {formatDate(notification.dateOfCreation, { format: user.preferences.dateFormat.key })}, {formatTime(notification.dateOfCreation, { format: user.preferences.timeFormat.key })}
                                                     </AppText>
                                                 </View>
-                                                {isLastUnseen && seenNotificationsExist && <Divider orientation='horizontal' style={{ marginTop: 25 }} />}
+                                                {isLastUnseen && seenNotificationsExist && <Divider orientation='horizontal' style={{ marginVertical: 15 }} />}
                                             </View>
                                         );
                                     })}

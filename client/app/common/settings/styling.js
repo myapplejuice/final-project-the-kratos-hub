@@ -20,6 +20,7 @@ export const colors = {
     inputBackground: 'rgba(255,255,255,0.08)',
     inputBorderColor: 'rgba(255,255,255,0.15)',
     divider: "rgba(102,102,102,0.2)",
+    negativeRed: '#FF3B30',
 };
 
 export const metricsColors = {

@@ -46,6 +46,9 @@ export default class UserToUserController {
             userId: details.adderId,
             notification: `${receiver.firstname} ${receiver.lastname} ${details.reply} your friend request`,
             seen: false,
+            clickable: true,
+            clickableInfo: JSON.stringify({userId: details.receiverId}),
+            clickableDestination: 'profile',
             sentiment: "normal",
             dateOfCreation: new Date()
         }
@@ -82,7 +85,7 @@ export default class UserToUserController {
         const response = await UserToUserDBService.restoreFriendship(details.id);
         if (!response.success) return res.status(400).json({ message: response.message });
 
-        const restorerId = await UserToUserDBService.fetchUserProfile(details.restorer, false);
+        const restorerId = await UserToUserDBService.fetchUserProfile(details.restorerId, false);
 
         const payload = {
             userId: details.friendId,

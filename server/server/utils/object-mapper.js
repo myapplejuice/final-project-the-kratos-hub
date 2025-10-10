@@ -91,7 +91,10 @@ export default class ObjectMapper {
             ExtraInformation: 'extraInformation',
             TerminatedBy: 'terminatedBy',
             Role: 'role',
-            Sentiment: 'sentiment'
+            Sentiment: 'sentiment',
+            Clickable: 'clickable',
+            ClickableInfo: 'clickableInfo',
+            ClickableDestination: 'clickableDestination'
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -186,7 +189,10 @@ export default class ObjectMapper {
             extraInformation: 'ExtraInformation',
             role: 'Role',
             terminatedBy: 'TerminatedBy',
-            sentiment: 'Sentiment'
+            sentiment: 'Sentiment',
+            clickable: 'Clickable',
+            clickableInfo: 'ClickableInfo',
+            clickableDestination: 'ClickableDestination'
         };
         return map[key] || key;
     }

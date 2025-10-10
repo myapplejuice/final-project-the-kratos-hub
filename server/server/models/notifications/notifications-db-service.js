@@ -23,6 +23,10 @@ export default class NotificationsDBService {
                 const notification = {};
                 for (const key in row) {
                     let value = row[key];
+                    if (key === 'ClickableInfo') {
+                        if (value !== null)
+                            value = JSON.parse(value);
+                    }
                     notification[ObjectMapper.toCamelCase(key)] = value;
                 }
                 return notification;
@@ -35,17 +39,21 @@ export default class NotificationsDBService {
 
 
     static async pushNotification(details) {
+        console.log(details)
         try {
             const request = Database.getRequest();
             Database.addInput(request, "UserId", sql.UniqueIdentifier, details.userId);
             Database.addInput(request, "Notification", sql.VarChar(500), details.notification);
             Database.addInput(request, "Seen", sql.Bit, details.seen);
-            Database.addInput(request, 'Sentiment', sql.Int, details.sentiment);
+            Database.addInput(request, "Clickable", sql.Bit, details.clickable);
+            Database.addInput(request, "ClickableInfo", sql.VarChar(300), details.clickableInfo);
+            Database.addInput(request, "ClickableDestination", sql.VarChar(20), details.clickableDestination);
+            Database.addInput(request, 'Sentiment', sql.VarChar(20), details.sentiment);
             Database.addInput(request, "DateOfCreation", sql.DateTime2, details.dateOfCreation || new Date());
 
             const query = `
-                INSERT INTO UserNotifications (UserId, Notification, Seen, DateOfCreation, Sentiment)
-                VALUES (@UserId, @Notification, @Seen, @DateOfCreation, @Sentiment)
+                INSERT INTO UserNotifications (UserId, Notification, Seen, Clickable, ClickableInfo, ClickableDestination, Sentiment, DateOfCreation)
+                VALUES (@UserId, @Notification, @Seen, @Clickable, @ClickableInfo, @ClickableDestination, @Sentiment, @DateOfCreation)
             `;
 
             const result = await request.query(query);
@@ -63,11 +71,11 @@ export default class NotificationsDBService {
         try {
             const request = Database.getRequest();
 
-              idList.forEach((id, i) => {
-            Database.addInput(request, `Id${i}`, sql.Int, parseInt(id, 10));
-        });
+            idList.forEach((id, i) => {
+                Database.addInput(request, `Id${i}`, sql.Int, parseInt(id, 10));
+            });
 
-        const idParams = idList.map((_, i) => `@Id${i}`).join(', ');
+            const idParams = idList.map((_, i) => `@Id${i}`).join(', ');
 
             const query = `
             UPDATE UserNotifications

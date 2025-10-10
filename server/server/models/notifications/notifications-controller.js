@@ -23,7 +23,7 @@ export default class NotificationsController {
 
     static async setNotificationsSeen(req, res) {
         const details = req.body;
-
+        
         const success = await NotificationsDBService.setNotificationsSeen(details);
         if (!success) return res.status(500).json({ success: false, error: "Failed to set notification seen" });
 
