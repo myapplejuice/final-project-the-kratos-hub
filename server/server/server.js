@@ -63,7 +63,6 @@ export default class Server {
                 socket.join(chatId);
                 console.log(`Socket ${socket.id} joined chat ${chatId}`);
 
-                socket.on('send-message', (payload) => ChatController.sendMessage(this.io, payload));
             });
 
             socket.on('leave-room', (chatId) => {
@@ -73,6 +72,11 @@ export default class Server {
 
             socket.on('disconnect', () => {
                 console.log('Socket disconnected:', socket.id);
+            });
+
+            socket.on('send-message', async (payload, callback) => {
+                const savedMessageId = await ChatController.sendMessage(this.io, payload);
+                if (callback) callback(savedMessageId);
             });
         });
     }

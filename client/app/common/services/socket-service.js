@@ -21,7 +21,7 @@ export default class SocketService {
         });
 
         this.socket.on("disconnect", () => {
-            console.log("Socket disconnected");
+            console.log("Socket disconnected: ", this.socket.id);
         });
 
         return this.socket;
@@ -36,7 +36,7 @@ export default class SocketService {
         if (!this.socket) return;
         this.socket.emit("leave-room", chatId);
     }
-    
+
     static disconnect() {
         if (!this.socket) return;
         this.socket.disconnect();

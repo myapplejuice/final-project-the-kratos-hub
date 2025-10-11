@@ -84,6 +84,7 @@ export default function Chat() {
 
         SocketService.joinRoom(chatRoomId);
         SocketService.on("new-message", (msg) => {
+            console.log(msg)
             if (msg.chatRoomId === chatRoomId) {
                 setMessages((prev) => [...prev, msg]);
             }
@@ -92,22 +93,24 @@ export default function Chat() {
         return () => { SocketService.emit("leave-room", chatRoomId); };
     }, [additionalContexts.chattingFriendProfile]);
 
-
-
     async function handleMessageSend() {
         if (!message.trim()) return;
 
         const payload = {
             senderId: user.id,
-            chatRoomId: profile.chatRoomId,
+            chatRoomId: roomId,
             message,
             extraInformation: {},
             dateTimeSent: new Date()
         };
 
-        SocketService.emit("send-message", payload);
-        setMessages(prev => [...prev, payload]);
-        setMessage('');
+        console.log(payload)
+        SocketService.emit("send-message", payload, (newMessageId) => {
+            payload.id = newMessageId;
+            console.log(payload);
+            setMessages(prev => [...prev, payload]);
+            setMessage('');
+        });
     }
 
     async function handleImportPlan() {
@@ -117,7 +120,6 @@ export default function Chat() {
 
     return (
         <>
-
             <FadeInOut visible={messengerVisible} style={{ position: 'absolute', bottom: 0, paddingBottom: insets.bottom + 10 + keyboardHeight, paddingTop: 10, zIndex: 9999, flexDirection: 'row', paddingHorizontal: 15, backgroundColor: 'rgba(0, 0, 0, 0.95)', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' }}>
                 <View style={{ width: '85%', minHeight: 50, maxHeight: 120, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                     <AppTextInput
@@ -152,20 +154,20 @@ export default function Chat() {
                                         key={index}
                                         style={{
                                             flexDirection: 'row',
-                                            justifyContent: 'space-around',
+                                            justifyContent: 'flex-start',
                                             alignItems: 'flex-start',
                                             paddingHorizontal: 15,
                                         }}
                                     >
                                         {isUser ? (
                                             <>
-                                                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', marginEnd: 15, marginBottom: 20 }}>
-                                                    <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
+                                                <View style={{ maxWidth: '90%', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start', marginEnd: 15, marginBottom: 20 }}>
+                                                    <View style={{ alignItems: 'flex-start', height: '100%' }}>
                                                         <View style={styles.avatarContainer}>
                                                             <Image source={user?.image} style={styles.avatar} />
                                                         </View>
                                                     </View>
-                                                    <View style={{ width: '90%', padding: 15, borderRadius: 20, backgroundColor: colors.main, borderTopLeftRadius: 5, marginLeft: 10 }}>
+                                                    <View style={{ padding: 15, borderRadius: 20, backgroundColor: colors.main, borderTopLeftRadius: 5, marginLeft: 10 }}>
                                                         <AppText style={{ color: 'white', lineHeight: 20 }}>{message.message}</AppText>
                                                         <AppText style={{ color: 'rgba(255, 255, 255, 0.65)', alignSelf: 'flex-end', marginTop: 5 }}>{formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })}</AppText>
                                                     </View>
@@ -173,12 +175,12 @@ export default function Chat() {
                                             </>
                                         ) : (
                                             <>
-                                                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', marginStart: 15, marginBottom: 20 }}>
-                                                    <View style={{ width: '90%', padding: 16, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.08)', borderTopRightRadius: 5, marginRight: 10 }}>
+                                                <View style={{ maxWidth: '90%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', marginStart: 15, marginBottom: 20 }}>
+                                                    <View style={{ padding: 16, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.08)', borderTopRightRadius: 5, marginRight: 10 }}>
                                                         <AppText style={{ color: 'white', lineHeight: 20 }}>{message.message}</AppText>
                                                         <AppText style={{ color: colors.mutedText, alignSelf: 'flex-end', marginTop: 5 }}>{formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })}</AppText>
                                                     </View>
-                                                    <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
+                                                    <View style={{ alignItems: 'flex-end', height: '100%' }}>
                                                         <View style={[styles.avatarContainer, { backgroundColor: 'rgb(255,255,255)' }]}>
                                                             <Image source={profile?.image} style={styles.avatar} />
                                                         </View>

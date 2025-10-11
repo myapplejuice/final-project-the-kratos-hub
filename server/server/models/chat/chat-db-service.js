@@ -85,14 +85,14 @@ export default class ChatDBService {
         }
     }
 
-    static async insertMessage(senderId, chatRoomId, message, extraInformation = null) {
+    static async insertMessage(details) {
         try {
             const request = Database.getRequest();
-            Database.addInput(request, 'SenderId', sql.UniqueIdentifier, senderId);
-            Database.addInput(request, 'ChatRoomId', sql.Int, chatRoomId);
-            Database.addInput(request, 'Message', sql.NVarChar(sql.MAX), message);
-            Database.addInput(request, 'ExtraInformation', sql.VarChar(300), extraInformation ? JSON.stringify(extraInformation) : null);
-            Database.addInput(request, 'DateTimeSent', sql.DateTime2, new Date());
+            Database.addInput(request, 'SenderId', sql.UniqueIdentifier, details.senderId);
+            Database.addInput(request, 'ChatRoomId', sql.Int, details.chatRoomId);
+            Database.addInput(request, 'Message', sql.NVarChar(sql.MAX), details.message);
+            Database.addInput(request, 'ExtraInformation', sql.VarChar(300), details.extraInformation ? JSON.stringify(details.extraInformation) : {});
+            Database.addInput(request, 'DateTimeSent', sql.DateTime2, details.dateTimeSent || new Date());
 
             const insertQuery = `
                 INSERT INTO Messages (SenderId, ChatRoomId, Message, ExtraInformation, DateTimeSent)
