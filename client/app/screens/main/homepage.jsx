@@ -15,9 +15,10 @@ import { homeGreetingText, homeIntroText } from "../../common/utils/text-generat
 import Divider from "../../components/screen-comps/divider";
 import AppScroll from "../../components/screen-comps/app-scroll";
 import FadeInOut from "../../components/effects/fade-in-out";
+import SocketService from "../../common/services/socket-service";
 
 export default function Homepage() {
-    const { user } = useContext(UserContext);
+    const { setUser, user } = useContext(UserContext);
     const [currentTime, setCurrentTime] = useState();
     const [introText, setIntroText] = useState('');
     const [greeting, setGreeting] = useState('');
@@ -51,6 +52,23 @@ export default function Homepage() {
 
         return () => clearInterval(interval);
     }, [user.preferences]);
+
+    useEffect(() => {
+        function handleMessage(msg) {
+            setUser(prev => ({
+                ...prev,
+                friends: prev.friends.map(f =>
+                    f.friendId === msg.senderId
+                        ? { ...f, unreadCount: (f.unreadCount || 0) + 1, lastMessage: msg.message, lastMessageTime: msg.time, lastMessageSenderId: msg.senderId }
+                        : f
+                )
+            }));
+        };
+
+        SocketService.on("new-message", handleMessage);
+
+        return () => { SocketService.off("new-message", handleMessage) };
+    }, []);
 
     return (
         <AppScroll paddingColor={colors.background} topPadding={false} extraBottom={100} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>

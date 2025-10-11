@@ -90,7 +90,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.USDA_PROFILE]: "USDA Profile",
         [routes.NOTIFICATIONS]: "Notifications",
         [routes.FRIENDS]: "Friends",
-        [routes.CHAT]: `${chattedUser ? chattedUser.firstname + ' ' + chattedUser.lastname : 'Chat'}`,
+        [routes.CHAT]: `${chattedUser ? chattedUser.firstname + " " + chattedUser.lastname : 'Chat'}`,
     };
 
     function handleUserProfilePress() {

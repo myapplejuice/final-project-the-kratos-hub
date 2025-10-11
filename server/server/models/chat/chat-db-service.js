@@ -131,35 +131,35 @@ export default class ChatDBService {
         }
     }
 
-   static async markMessagesSeen(userIds = [], messageIds = []) {
-    if (!userIds.length || !messageIds.length) return;
+  static async markMessagesSeen(userId, messageIds = []) {
+    if (!userId || !messageIds.length) return;
 
     try {
         const request = Database.getRequest();
         const idsStr = messageIds.join(',');
 
-        Database.addInput(request, 'UserIdsJson', sql.NVarChar(sql.MAX), JSON.stringify(userIds));
         Database.addInput(request, 'MessageIds', sql.VarChar(sql.MAX), idsStr);
+        Database.addInput(request, 'UserId', sql.NVarChar(50), userId);
 
         const query = `
-            DECLARE @Messages TABLE (Id INT);
-            INSERT INTO @Messages (Id)
-            SELECT value FROM STRING_SPLIT(@MessageIds, ',');
+        -- Convert comma-separated message IDs to table
+        DECLARE @Messages TABLE (Id INT);
+        INSERT INTO @Messages (Id)
+        SELECT value FROM STRING_SPLIT(@MessageIds, ',');
 
-            UPDATE Messages
-            SET SeenBy = 
-                CASE 
-                    WHEN SeenBy IS NULL OR SeenBy = '' THEN @UserIdsJson
-                    ELSE JSON_QUERY(
-                        CONCAT(
-                            LEFT(SeenBy, LEN(SeenBy) - 1),
-                            ',',
-                            STUFF(@UserIdsJson, 1, 1, ''),
-                            ']'
-                        )
-                    )
-                END
-            WHERE Id IN (SELECT Id FROM @Messages);
+        -- Update SeenBy JSON for current user
+        UPDATE Messages
+        SET SeenBy = 
+            CASE 
+                WHEN SeenBy IS NULL OR SeenBy = '' THEN JSON_QUERY('["' + @UserId + '"]')
+                WHEN NOT EXISTS (
+                    SELECT 1 
+                    FROM OPENJSON(SeenBy) 
+                    WHERE value = @UserId
+                ) THEN JSON_MODIFY(SeenBy, 'append $', @UserId)
+                ELSE SeenBy
+            END
+        WHERE Id IN (SELECT Id FROM @Messages);
         `;
 
         await request.query(query);

@@ -2,10 +2,17 @@ import ChatDBService from "./chat-db-service.js";
 
 export default class ChatController {
     static async sendMessage(io, payload) {
-        const details = payload;
+        const savedMessageId = await ChatDBService.insertMessage(payload);
+        payload.id = savedMessageId;
 
-        const savedMessageId = await ChatDBService.insertMessage(details);
-        io.to(details.chatRoomId).emit('new-message', { id: savedMessageId, ...details });
+        io.to(payload.chatRoomId).emit('new-message', payload);
+
+        const receiverSockets = Array.from(io.sockets.sockets.values());
+        const receiverInChat = receiverSockets.some(s => s.userId === payload.receiverId && s.rooms.has(payload.chatRoomId));
+
+        if (!receiverInChat) {
+            io.to(payload.receiverId).emit('new-message', payload);
+        }
 
         return savedMessageId;
     }

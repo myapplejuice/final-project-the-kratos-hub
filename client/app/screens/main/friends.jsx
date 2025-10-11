@@ -7,7 +7,7 @@ import BuildFooter from "../../components/layout-comps/build-footer";
 import AppText from "../../components/screen-comps/app-text";
 import { Images } from '../../common/settings/assets';
 import { UserContext } from "../../common/contexts/user-context";
-import { formatDate, formatTime, getDayComparisons } from '../../common/utils/date-time';
+import { formatDate, formatTime, getDayComparisons, getHoursComparisons } from '../../common/utils/date-time';
 import usePopups from "../../common/hooks/use-popups";
 import { scaleFont } from "../../common/utils/scale-fonts";
 import DeviceStorageService from '../../common/services/device-storage-service';
@@ -132,18 +132,30 @@ export default function Friends() {
 
                                 const messageTimeDetails = new Date(messagingDetails.lastMessageTime);
                                 const timeComparisons = getDayComparisons(messageTimeDetails);
+                                const hoursComparisons = getHoursComparisons(messageTimeDetails);
                                 const isToday = timeComparisons.isToday;
                                 const isYesterday = timeComparisons.isYesterday;
-
+                                const isLastMinute = hoursComparisons.isLastMinute;
+                                const isLastHour = hoursComparisons.isLastHour;
+                                const minutes = new Date().getMinutes() - messageTimeDetails.getMinutes();
+                              
                                 const displayTime =
-                                    isToday ? formatTime(messageTimeDetails, { format: user.preferences.timeFormat.key }) :
-                                        isYesterday ? 'Yesterday' :
-                                            formatDate(messageTimeDetails, { format: user.preferences.dateFormat.key });
+                                    messagingDetails.lastMessage ?
+                                    isLastMinute ? 'Just now' :
+                                    isLastHour ? `${minutes} minutes ago` :
+                                        isToday ? formatTime(messageTimeDetails, { format: user.preferences.timeFormat.key }) :
+                                            isYesterday ? 'Yesterday' :
+                                                formatDate(messageTimeDetails, { format: user.preferences.dateFormat.key }) : '';
 
+                                const isUnread = messagingDetails.unreadCount > 0;
+                                console.log(isUnread)
                                 return (
                                     <TouchableOpacity
                                         onPress={() => handleFriendClick(friend)}
-                                        style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, backgroundColor: colors.cardBackground + '80', padding: 10, borderRadius: 15 }}
+                                        style={{
+                                            flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, backgroundColor: colors.cardBackground + '80', padding: 10, borderRadius: 15,
+                                            borderWidth: isUnread ? 2 : 0, borderColor: isUnread ? colors.mutedText : 'transparent'
+                                        }}
                                         key={i}
                                     >
                                         <View style={{ flexDirection: 'row' }}>
@@ -154,13 +166,13 @@ export default function Friends() {
                                                 <AppText style={[styles.cardLabel, { fontWeight: 'bold', fontSize: scaleFont(15) }]}>
                                                     {friend.firstname} {friend.lastname}
                                                 </AppText>
-                                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12) }}>
+                                                <AppText style={{ color: isUnread ? 'white' :colors.mutedText, fontSize: scaleFont(12) }}>
                                                     {sender + displayMessage}
                                                 </AppText>
                                             </View>
                                         </View>
                                         <View style={{ justifyContent: 'center' }}>
-                                            <AppText style={{ color: colors.mutedText }}>
+                                            <AppText style={{ color: isUnread ? 'white' : colors.mutedText }}>
                                                 {displayTime}
                                             </AppText>
                                         </View>

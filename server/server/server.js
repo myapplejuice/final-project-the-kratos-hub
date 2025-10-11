@@ -59,6 +59,8 @@ export default class Server {
 
         this.io.on('connection', (socket) => {
             console.log('Socket connected:', socket.id);
+            const userId = socket.userId;
+            socket.join(userId);
 
             socket.on('join-room', (chatId) => {
                 socket.join(chatId);

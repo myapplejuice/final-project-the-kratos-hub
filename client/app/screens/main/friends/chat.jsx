@@ -95,10 +95,7 @@ export default function Chat() {
         SocketService.joinRoom(chatRoomId);
         SocketService.on("new-message", (msg) => {
             if (msg.chatRoomId === chatRoomId) {
-                if (!msg.seenBy.includes(user.id)) {
-                    msg.seenBy.push(user.id);
-                    console.log(msg)
-                }
+                msg.seenBy.push(user.id);
                 setMessages((prev) => [...prev, msg]);
             }
         });
@@ -119,12 +116,13 @@ export default function Chat() {
 
             const lastMessage = lastMessageDetails.message;
             const lastMessageTime = lastMessageDetails.dateTimeSent;
+            const lastMessageSenderId = lastMessageDetails.senderId;
 
             setUser(prev => ({
                 ...prev,
                 friends: prev.friends.map(f =>
                     f.chatRoomId === chatRoomId
-                        ? { ...f, lastMessage, lastMessageTime, unreadCount: 0 }
+                        ? { ...f, lastMessage, lastMessageTime, unreadCount: 0, lastMessageSenderId }
                         : f
                 )
             }));
@@ -136,6 +134,7 @@ export default function Chat() {
 
         const payload = {
             senderId: user.id,
+            receiverId: additionalContexts.chattingFriendProfile.id,
             chatRoomId: roomId,
             message,
             seenBy: [user.id],
@@ -209,11 +208,13 @@ export default function Chat() {
 
                                 const prevMessage = messages[index - 1];
                                 const prevDate = prevMessage ? new Date(prevMessage.dateTimeSent) : null;
-
                                 const currentDateStr = messageTimeDetails.toDateString();
                                 const prevDateStr = prevDate ? prevDate.toDateString() : null;
-
                                 const showDateDivider = currentDateStr !== prevDateStr;
+
+                                // --- NEW: show unread divider ---
+                                const isUnread = !message.seenBy?.includes(user.id);
+                                const showUnreadDivider = isUnread && (!prevMessage || prevMessage.seenBy?.includes(user.id));
 
                                 let dayLabel = formatDate(message.dateTimeSent, { format: 'MMM d' });
                                 if (isToday) dayLabel = 'Today';
@@ -222,16 +223,8 @@ export default function Chat() {
                                 return (
                                     <View key={index}>
                                         {showDateDivider && (
-                                            <View style={{
-                                                alignItems: 'center',
-                                                marginVertical: 15,
-                                            }}>
-                                                <View style={{
-                                                    flexDirection: 'row',
-                                                    alignItems: 'center',
-                                                    width: '100%',
-                                                    justifyContent: 'center',
-                                                }}>
+                                            <View style={{ alignItems: 'center', marginVertical: 15 }}>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
                                                     <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.1)' }} />
                                                     <AppText style={{ color: 'rgba(255,255,255,0.6)', marginHorizontal: 10 }}>{dayLabel}</AppText>
                                                     <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.1)' }} />
@@ -239,22 +232,14 @@ export default function Chat() {
                                             </View>
                                         )}
 
-                                        <View
-                                            style={{
-                                                flexDirection: 'row',
-                                                justifyContent: isUser ? 'flex-start' : 'flex-end',
-                                                paddingHorizontal: 5,
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    maxWidth: '90%',
-                                                    flexDirection: 'row',
-                                                    alignItems: 'flex-start',
-                                                    marginBottom: 10,
-                                                    ...(isUser ? { marginEnd: 15 } : { marginStart: 15 }),
-                                                }}
-                                            >
+                                        {showUnreadDivider && (
+                                            <View style={{ alignItems: 'center', marginVertical: 10 }}>
+                                                <AppText style={{ color: 'rgba(255, 255, 255, 0.8)', fontWeight: '600' }}>Unread Messages</AppText>
+                                            </View>
+                                        )}
+
+                                        <View style={{ flexDirection: 'row', justifyContent: isUser ? 'flex-start' : 'flex-end', paddingHorizontal: 5 }}>
+                                            <View style={{ maxWidth: '90%', flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10, ...(isUser ? { marginEnd: 15 } : { marginStart: 15 }) }}>
                                                 <View style={[{ paddingHorizontal: 15, paddingVertical: 10, borderRadius: 20 }, bubbleStyle]}>
                                                     <AppText style={{ color: 'white', lineHeight: 20, flexShrink: 1 }}>{message.message}</AppText>
                                                     <AppText style={{ color: 'rgba(255, 255, 255, 0.4)', alignSelf: 'flex-end', marginTop: 5 }}>

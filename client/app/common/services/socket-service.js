@@ -48,9 +48,13 @@ export default class SocketService {
         this.socket.on(event, callback);
     }
 
+    static off(event, callback) {
+        if (!this.socket) return;
+        this.socket.off(event, callback);
+    }
+
     static emit(event, payload) {
         if (!this.socket) return;
         this.socket.emit(event, payload);
     }
-
 }
