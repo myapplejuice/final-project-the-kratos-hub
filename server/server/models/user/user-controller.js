@@ -73,6 +73,7 @@ export default class UserController {
 
             return {
                 ...friend,
+                lastMessageSenderId: summary?.lastMessageSenderId || null,
                 lastMessage: summary?.lastMessage || null,
                 lastMessageTime: summary?.lastMessageTime || null,
                 unreadCount: summary?.unreadCount || 0,

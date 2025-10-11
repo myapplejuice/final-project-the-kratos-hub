@@ -23,7 +23,9 @@ export default function AppScroll({
     hideNavBarOnScroll = false,
     onScrollSetStates = [],
     scrollToTop = false,
-    avoidKeyboard = true,  
+    scrollToBottom = false,
+    startAtBottom = false,
+    avoidKeyboard = true,
     ...props
 }) {
     const insets = useSafeAreaInsets();
@@ -43,6 +45,15 @@ export default function AppScroll({
             scrollRef.current.scrollToPosition(0, 0, true);
         }
     }, [scrollToTop]);
+
+    useEffect(() => {
+        if (scrollToBottom) {
+            if (scrollRef.current) {
+                scrollRef.current.scrollToEnd({ animated: false });
+            }
+        }
+    }, [scrollToBottom]);
+
 
     function handleScroll(event) {
         if (keyboardActive) return;
@@ -92,13 +103,19 @@ export default function AppScroll({
             overScrollMode="never"
             onLayout={(e) => (scrollViewHeight.current = e.nativeEvent.layout.height)}
             enableOnAndroid={avoidKeyboard}
-             extraScrollHeight={avoidKeyboard ? (Platform.OS === "ios" ? 20 : 100) : 0} 
-               keyboardOpeningTime={avoidKeyboard ? 0 : undefined}
+            extraScrollHeight={avoidKeyboard ? (Platform.OS === "ios" ? 20 : 100) : 0}
+            keyboardOpeningTime={avoidKeyboard ? 0 : undefined}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps={keyboardShouldPersistTaps}
             onScroll={handleScroll}
             scrollEventThrottle={16}
-            onContentSizeChange={(w, h) => (contentHeight.current = h)}
+            onContentSizeChange={(w, h) => {
+                contentHeight.current = h
+
+                if (startAtBottom && scrollRef.current) {
+                    scrollRef.current.scrollToEnd({ animated: false }); // scroll to bottom
+                }
+            }}
             {...props}
         >
             <View style={{ flex: 1 }}>

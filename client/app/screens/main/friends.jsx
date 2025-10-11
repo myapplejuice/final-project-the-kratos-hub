@@ -7,7 +7,7 @@ import BuildFooter from "../../components/layout-comps/build-footer";
 import AppText from "../../components/screen-comps/app-text";
 import { Images } from '../../common/settings/assets';
 import { UserContext } from "../../common/contexts/user-context";
-import { formatDate, formatTime } from '../../common/utils/date-time';
+import { formatDate, formatTime, getDayComparisons } from '../../common/utils/date-time';
 import usePopups from "../../common/hooks/use-popups";
 import { scaleFont } from "../../common/utils/scale-fonts";
 import DeviceStorageService from '../../common/services/device-storage-service';
@@ -125,32 +125,48 @@ export default function Friends() {
                     <Divider orientation='horizontal' style={{ marginVertical: 25 }} />
                     {visibleList.length > 0 ? (
                         <View>
-                            {visibleList.map((friend, i) => (
-                                <TouchableOpacity
-                                    onPress={() => handleFriendClick(friend)}
-                                    style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}
-                                    key={i}
-                                >
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <TouchableOpacity onPress={() => handleProfilePress(friend)} style={styles.imageWrapper}>
-                                            <Image source={friend.image} style={{ width: 50, height: 50, borderRadius: 25 }} />
-                                        </TouchableOpacity>
-                                        <View style={{ marginStart: 15, justifyContent: 'center' }}>
-                                            <AppText style={[styles.cardLabel, { fontWeight: 'bold', fontSize: scaleFont(15) }]}>
-                                                {friend.firstname} {friend.lastname}
-                                            </AppText>
-                                            <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12) }}>
-                                                {friend.lastMessage ? friend.lastMessage : 'No messages yet'}
+                            {visibleList.map((friend, i) => {
+                                const messagingDetails = user.friends.find(f => f.friendId === friend.id) || {};
+                                const sender = messagingDetails.lastMessageSenderId === user.id ? 'You: ' : '';
+                                const displayMessage = messagingDetails.lastMessage || 'No messages yet';
+
+                                const messageTimeDetails = new Date(messagingDetails.lastMessageTime);
+                                const timeComparisons = getDayComparisons(messageTimeDetails);
+                                const isToday = timeComparisons.isToday;
+                                const isYesterday = timeComparisons.isYesterday;
+
+                                const displayTime =
+                                    isToday ? formatTime(messageTimeDetails, { format: user.preferences.timeFormat.key }) :
+                                        isYesterday ? 'Yesterday ' + formatTime(messageTimeDetails, { format: user.preferences.timeFormat.key }) :
+                                            formatDate(messageTimeDetails, { format: user.preferences.dateFormat.key });
+
+                                return (
+                                    <TouchableOpacity
+                                        onPress={() => handleFriendClick(friend)}
+                                        style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, backgroundColor: colors.cardBackground + '80', padding: 10, borderRadius: 15 }}
+                                        key={i}
+                                    >
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <TouchableOpacity onPress={() => handleProfilePress(friend)} style={styles.imageWrapper}>
+                                                <Image source={friend.image} style={{ width: 50, height: 50, borderRadius: 25 }} />
+                                            </TouchableOpacity>
+                                            <View style={{ marginStart: 15, justifyContent: 'center' }}>
+                                                <AppText style={[styles.cardLabel, { fontWeight: 'bold', fontSize: scaleFont(15) }]}>
+                                                    {friend.firstname} {friend.lastname}
+                                                </AppText>
+                                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12) }}>
+                                                    {sender + displayMessage}
+                                                </AppText>
+                                            </View>
+                                        </View>
+                                        <View style={{ justifyContent: 'center' }}>
+                                            <AppText style={{ color: colors.mutedText }}>
+                                                {displayTime}
                                             </AppText>
                                         </View>
-                                    </View>
-                                    <View style={{ justifyContent: 'center' }}>
-                                        <AppText style={{ color: colors.mutedText }}>
-                                            {friend.lastMessage ? `${formatDate(friend.lastMessageTime, { format:  user.preferences.dateFormat.key })} ${formatTime(friend.lastMessageTime, { format: user.preferences.timeFormat.key })}` : ''}
-                                         </AppText>
-                                    </View>
-                                </TouchableOpacity>
-                            ))}
+                                    </TouchableOpacity>
+                                );
+                            })}
                         </View>
 
                     ) : (

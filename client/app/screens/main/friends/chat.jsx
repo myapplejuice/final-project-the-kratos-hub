@@ -23,35 +23,40 @@ export default function Chat() {
     const { user, setUser, setAdditionalContexts, additionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const [keyboardHeight, setKeyboardHeight] = useState(0);
+    const [keyboardOpen, setKeyboardOpen] = useState(false);
+    const [scrollToBottom, setScrollToBottom] = useState(false);
 
     const [profile, setProfile] = useState({});
     const [roomId, setRoomId] = useState(null);
     const [messages, setMessages] = useState([]);
 
-    const [messengerVisible, setMessengerVisible] = useState(true);
     const [message, setMessage] = useState('');
     const [messageHeight, setMessageHeight] = useState(50);
 
     useEffect(() => {
         const showListener = Keyboard.addListener(
             Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-            (e) => setKeyboardHeight(e.endCoordinates.height)
+            (e) => {
+                setKeyboardHeight(e.endCoordinates.height);
+                setKeyboardOpen(true);
+            }
         );
         const hideListener = Keyboard.addListener(
             Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-            () => setKeyboardHeight(0)
+            () => {
+                setKeyboardHeight(0);
+                setKeyboardOpen(false);
+            }
         );
 
         return () => {
             showListener.remove();
             hideListener.remove();
-            //setAdditionalContexts({ ...additionalContexts, chattingFriendProfile: null });
         };
     }, []);
 
     useEffect(() => {
         async function fetchMessages() {
-            showSpinner();
             const friendId = additionalContexts.chattingFriendProfile.id;
             const payload = {
                 userId: user.id,
@@ -60,18 +65,17 @@ export default function Chat() {
 
             try {
                 const result = await APIService.userToUser.chat.messages(payload);
-                const messages = result.data.messages;
+                const messages = result.data?.messages;
 
                 setMessages(messages);
             } catch (error) {
                 console.log(error);
             } finally {
-                hideSpinner();
             }
         }
 
         fetchMessages();
-    }, [])
+    }, []);
 
     useEffect(() => {
         const profile = additionalContexts.chattingFriendProfile;
@@ -84,13 +88,27 @@ export default function Chat() {
 
         SocketService.joinRoom(chatRoomId);
         SocketService.on("new-message", (msg) => {
-            console.log(msg)
             if (msg.chatRoomId === chatRoomId) {
                 setMessages((prev) => [...prev, msg]);
             }
         });
 
-        return () => { SocketService.emit("leave-room", chatRoomId); };
+        return () => {
+            //const lastMessageDetails = messages[messages.length - 1];
+            //console.log(messages)
+            //const lastMessage = lastMessageDetails.message;
+            //const lastMessageTime = lastMessageDetails.dateTimeSent;
+            //
+            //setUser(prev => ({
+            //    ...prev,
+            //    friends: prev.friends.map(f =>
+            //        f.chatRoomId === chatRoomId
+            //            ? { ...f, lastMessage, lastMessageTime, unreadCount: 0 }
+            //            : f
+            //    )
+            //}));
+            SocketService.emit("leave-room", chatRoomId);
+        };
     }, [additionalContexts.chattingFriendProfile]);
 
     async function handleMessageSend() {
@@ -104,12 +122,11 @@ export default function Chat() {
             dateTimeSent: new Date()
         };
 
-        console.log(payload)
+        setMessage('');
         SocketService.emit("send-message", payload, (newMessageId) => {
             payload.id = newMessageId;
             console.log(payload);
             setMessages(prev => [...prev, payload]);
-            setMessage('');
         });
     }
 
@@ -120,7 +137,7 @@ export default function Chat() {
 
     return (
         <>
-            <FadeInOut visible={messengerVisible} style={{ position: 'absolute', bottom: 0, paddingBottom: insets.bottom + 10 + keyboardHeight, paddingTop: 10, zIndex: 9999, flexDirection: 'row', paddingHorizontal: 15, backgroundColor: 'rgba(0, 0, 0, 0.95)', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' }}>
+            <FadeInOut visible={true} style={{ position: 'absolute', bottom: 0, paddingBottom: insets.bottom + 10 + keyboardHeight, paddingTop: 10, zIndex: 9999, flexDirection: 'row', paddingHorizontal: 15, backgroundColor: 'rgba(0, 0, 0, 0.95)', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' }}>
                 <View style={{ width: '85%', minHeight: 50, maxHeight: 120, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                     <AppTextInput
                         multiline
@@ -144,7 +161,7 @@ export default function Chat() {
             </FadeInOut>
             <View style={styles.main}>
                 <View>
-                    <AppScroll onScrollSetStates={setMessengerVisible} extraBottom={150 + keyboardHeight}>
+                    <AppScroll startAtBottom={true} scrollToBottom={scrollToBottom} extraBottom={keyboardOpen ? keyboardHeight - 65 : 65}>
                         {messages && messages.length > 0 &&
                             messages.map((message, index) => {
                                 const isUser = message.senderId === user.id;
@@ -154,36 +171,25 @@ export default function Chat() {
                                         key={index}
                                         style={{
                                             flexDirection: 'row',
-                                            justifyContent: 'flex-start',
-                                            alignItems: 'flex-start',
+                                            justifyContent: isUser ? 'flex-start' : 'flex-end',
                                             paddingHorizontal: 15,
                                         }}
                                     >
                                         {isUser ? (
                                             <>
                                                 <View style={{ maxWidth: '90%', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start', marginEnd: 15, marginBottom: 20 }}>
-                                                    <View style={{ alignItems: 'flex-start', height: '100%' }}>
-                                                        <View style={styles.avatarContainer}>
-                                                            <Image source={user?.image} style={styles.avatar} />
-                                                        </View>
-                                                    </View>
                                                     <View style={{ padding: 15, borderRadius: 20, backgroundColor: colors.main, borderTopLeftRadius: 5, marginLeft: 10 }}>
-                                                        <AppText style={{ color: 'white', lineHeight: 20 }}>{message.message}</AppText>
-                                                        <AppText style={{ color: 'rgba(255, 255, 255, 0.65)', alignSelf: 'flex-end', marginTop: 5 }}>{formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })}</AppText>
+                                                        <AppText style={{ color: 'white', lineHeight: 20 }}>{message?.message}</AppText>
+                                                        <AppText style={{ color: 'rgba(255, 255, 255, 0.65)', alignSelf: 'flex-end', marginTop: 5 }}>{formatTime(message?.dateTimeSent, { format: user.preferences.timeFormat.key })}</AppText>
                                                     </View>
                                                 </View>
                                             </>
                                         ) : (
                                             <>
                                                 <View style={{ maxWidth: '90%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', marginStart: 15, marginBottom: 20 }}>
-                                                    <View style={{ padding: 16, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.08)', borderTopRightRadius: 5, marginRight: 10 }}>
-                                                        <AppText style={{ color: 'white', lineHeight: 20 }}>{message.message}</AppText>
-                                                        <AppText style={{ color: colors.mutedText, alignSelf: 'flex-end', marginTop: 5 }}>{formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })}</AppText>
-                                                    </View>
-                                                    <View style={{ alignItems: 'flex-end', height: '100%' }}>
-                                                        <View style={[styles.avatarContainer, { backgroundColor: 'rgb(255,255,255)' }]}>
-                                                            <Image source={profile?.image} style={styles.avatar} />
-                                                        </View>
+                                                    <View style={{ padding: 15, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.08)', borderTopRightRadius: 5, marginRight: 10 }}>
+                                                        <AppText style={{ color: 'white', lineHeight: 20 }}>{message?.message}</AppText>
+                                                        <AppText style={{ color: colors.mutedText, alignSelf: 'flex-end', marginTop: 5 }}>{formatTime(message?.dateTimeSent, { format: user.preferences.timeFormat.key })}</AppText>
                                                     </View>
                                                 </View>
                                             </>
