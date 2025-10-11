@@ -29,6 +29,7 @@ export function chatTablesQuery() {
                     ChatRoomId INT NOT NULL,
                     Message NVARCHAR(MAX) NOT NULL,
                     ExtraInformation VARCHAR(300) NULL, --JSON, a json listing things like image references and app stuff like meal plans ids to reference to the chat
+                    SeenBy VARCHAR(300) NULL, --JSON, a json listing who saw it 
                     DateTimeSent DATETIME2 NOT NULL,
                     CONSTRAINT FK_Messages_Users FOREIGN KEY (SenderId)
                         REFERENCES dbo.Users(Id),
@@ -38,23 +39,8 @@ export function chatTablesQuery() {
                 );
             END;`
 
-    const messageSeenQuery = `IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='MessageSeen' AND xtype='U')
-        BEGIN
-            CREATE TABLE dbo.MessageSeen (
-                MessageId INT NOT NULL,
-                UserId UNIQUEIDENTIFIER NOT NULL,
-                SeenAt DATETIME2 NOT NULL DEFAULT GETDATE(),
-                PRIMARY KEY (MessageId, UserId),
-                CONSTRAINT FK_MessageSeen_Message FOREIGN KEY (MessageId)
-                    REFERENCES dbo.Messages(Id)
-                    ON DELETE CASCADE,
-                CONSTRAINT FK_MessageSeen_User FOREIGN KEY (UserId)
-                    REFERENCES dbo.Users(Id)
-            );
-        END;`;
-
     const query = [
-        chatRoomsQuery, userChatRoomsQuery, messagesQuery, messageSeenQuery
+        chatRoomsQuery, userChatRoomsQuery, messagesQuery
     ].map(q => q.trim()).join('\n\n');
 
     return query;

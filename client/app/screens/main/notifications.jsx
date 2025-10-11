@@ -7,7 +7,7 @@ import BuildFooter from "../../components/layout-comps/build-footer";
 import AppText from "../../components/screen-comps/app-text";
 import { Images } from '../../common/settings/assets';
 import { UserContext } from "../../common/contexts/user-context";
-import { formatDate, formatTime } from '../../common/utils/date-time';
+import { formatDate, formatTime, getDayComparisons } from '../../common/utils/date-time';
 import usePopups from "../../common/hooks/use-popups";
 import { scaleFont } from "../../common/utils/scale-fonts";
 import DeviceStorageService from '../../common/services/device-storage-service';
@@ -214,7 +214,7 @@ export default function Notifications() {
                                         <TouchableOpacity
                                             key={index}
                                             onPress={() => request.status === 'pending' ? setOpenRequest(prev => (prev === profile.id ? null : profile.id)) : handleProfile(profile)}
-                                            style={{ marginBottom: index === requests.length - 1 ? 0 : 25 }}
+                                            style={{ marginBottom: index === requests.length - 1 ? 0 : 25, backgroundColor: colors.cardBackground + '60', padding: 15, borderRadius: 15 }}
                                         >
                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                                 <View style={{ flexDirection: 'row', width: '70%' }}>
@@ -228,7 +228,20 @@ export default function Notifications() {
                                                         <AppText style={{ color: 'white', fontSize: scaleFont(14), fontWeight: 'bold' }}>
                                                             {profile.firstname || 'Unknown'} {profile.lastname || ''}
                                                         </AppText>
-                                                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12) }}>{formatDate(request.dateOfCreation, { format: user.preferences.dateFormat.key }) || ''}, {formatTime(request.dateOfCreation, { format: user.preferences.timeFormat.key }) || ''}</AppText>
+                                                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12) }}>
+                                                            {(() => {
+                                                                const messageTimeDetails = new Date(request.dateOfCreation);
+                                                                const timeComparisons = getDayComparisons(messageTimeDetails);
+                                                                const isToday = timeComparisons.isToday;
+                                                                const isYesterday = timeComparisons.isYesterday;
+
+                                                                return isToday
+                                                                    ? formatTime(messageTimeDetails, { format: user.preferences.timeFormat.key })
+                                                                    : isYesterday
+                                                                        ? 'Yesterday'
+                                                                        : formatDate(messageTimeDetails, { format: user.preferences.dateFormat.key });
+                                                            })()}
+                                                        </AppText>
                                                     </View>
                                                 </View>
                                                 <View style={{ width: '30%', justifyContent: 'center', alignItems: 'flex-end' }}>
@@ -329,15 +342,26 @@ export default function Notifications() {
                                     {notifications.map((notification, index) => {
                                         const isLastUnseen = !notification.seen && (index === notifications.findIndex(n => n.seen) - 1 || index === notifications.filter(n => !n.seen).length - 1);
                                         const seenNotificationsExist = notifications.some(n => n.seen);
+
+                                        const messageTimeDetails = new Date(notification.dateOfCreation);
+                                        const timeComparisons = getDayComparisons(messageTimeDetails);
+                                        const isToday = timeComparisons.isToday;
+                                        const isYesterday = timeComparisons.isYesterday;
+
+                                        const displayTime =
+                                            isToday ? formatTime(messageTimeDetails, { format: user.preferences.timeFormat.key }) :
+                                                isYesterday ? 'Yesterday' :
+                                                    formatDate(messageTimeDetails, { format: user.preferences.dateFormat.key });
+
                                         return (
                                             <View key={notification.id}>
-                                                <TouchableOpacity style={{marginBottom: 25}} onPress={() => notification.clickable && handleNotificationPress(notification)}>
-                                                    <View style={{ borderStartColor: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white', borderStartWidth: 2, paddingHorizontal: 15}}>
+                                                <TouchableOpacity style={{ marginBottom: 25 }} onPress={() => notification.clickable && handleNotificationPress(notification)}>
+                                                    <View style={{ borderStartColor: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white', borderStartWidth: 2, paddingHorizontal: 15 }}>
                                                         <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white' }}>
                                                             {notification.notification}
                                                         </AppText>
                                                         <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: colors.mutedText, marginTop: 5, alignSelf: 'flex-end' }}>
-                                                            {formatDate(notification.dateOfCreation, { format: user.preferences.dateFormat.key })}, {formatTime(notification.dateOfCreation, { format: user.preferences.timeFormat.key })}
+                                                            {displayTime}
                                                         </AppText>
                                                     </View>
                                                 </TouchableOpacity>

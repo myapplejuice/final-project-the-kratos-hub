@@ -12,6 +12,7 @@ import APIService from '../../../common/services/api-service';
 import { colors } from "../../../common/settings/styling";
 import AppScroll from '../../../components/screen-comps/app-scroll'
 import FadeInOut from '../../../components/effects/fade-in-out';
+import { routes } from "../../../common/settings/constants";
 
 export default function UserProfile() {
     const context = useLocalSearchParams();
@@ -169,10 +170,6 @@ export default function UserProfile() {
         })
     }
 
-    async function handleToMessages() {
-        //TODO WHEN MESSAGES READY
-    }
-
     async function handleUserReport() {
         //TODO WHEN REPORTING AND ADMING PAGE READY
     }
@@ -302,7 +299,7 @@ export default function UserProfile() {
                             {friend && (
                                 friend.status === 'active' ? (
                                     <>
-                                        <TouchableOpacity onPress={handleToMessages} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
+                                        <TouchableOpacity onPress={() => router.push(routes.FRIENDS)} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
                                             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                                 <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
                                                     <Image source={Images.noMessage} style={styles.settingIcon} />

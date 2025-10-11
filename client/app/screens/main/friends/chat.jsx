@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Button, StyleSheet, TouchableOpacity, View, Platform, Keyboard } from "react-native";
 import AppText from "../../../components/screen-comps/app-text";
 import { Images } from '../../../common/settings/assets';
@@ -22,16 +22,22 @@ export default function Chat() {
     const { createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
     const { user, setUser, setAdditionalContexts, additionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
+
+    const [scrollToBottom, setScrollToBottom] = useState(true);
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [keyboardOpen, setKeyboardOpen] = useState(false);
-    const [scrollToBottom, setScrollToBottom] = useState(false);
 
-    const [profile, setProfile] = useState({});
     const [roomId, setRoomId] = useState(null);
     const [messages, setMessages] = useState([]);
 
     const [message, setMessage] = useState('');
     const [messageHeight, setMessageHeight] = useState(50);
+    const messagesRef = useRef(messages);
+
+    useEffect(() => {
+        messagesRef.current = messages;
+        setScrollToBottom(true);
+    }, [messages]);
 
     useEffect(() => {
         const showListener = Keyboard.addListener(
@@ -68,6 +74,7 @@ export default function Chat() {
                 const messages = result.data?.messages;
 
                 setMessages(messages);
+                setScrollToBottom(true);
             } catch (error) {
                 console.log(error);
             } finally {
@@ -79,7 +86,6 @@ export default function Chat() {
 
     useEffect(() => {
         const profile = additionalContexts.chattingFriendProfile;
-        setProfile(profile);
         if (!profile || !user?.id) return;
 
         const friendId = profile.id;
@@ -94,20 +100,22 @@ export default function Chat() {
         });
 
         return () => {
-            //const lastMessageDetails = messages[messages.length - 1];
-            //console.log(messages)
-            //const lastMessage = lastMessageDetails.message;
-            //const lastMessageTime = lastMessageDetails.dateTimeSent;
-            //
-            //setUser(prev => ({
-            //    ...prev,
-            //    friends: prev.friends.map(f =>
-            //        f.chatRoomId === chatRoomId
-            //            ? { ...f, lastMessage, lastMessageTime, unreadCount: 0 }
-            //            : f
-            //    )
-            //}));
             SocketService.emit("leave-room", chatRoomId);
+
+            const lastMessageDetails = messagesRef.current[messagesRef.current.length - 1];
+            if (!lastMessageDetails) return;
+
+            const lastMessage = lastMessageDetails.message;
+            const lastMessageTime = lastMessageDetails.dateTimeSent;
+
+            setUser(prev => ({
+                ...prev,
+                friends: prev.friends.map(f =>
+                    f.chatRoomId === chatRoomId
+                        ? { ...f, lastMessage, lastMessageTime, unreadCount: 0 }
+                        : f
+                )
+            }));
         };
     }, [additionalContexts.chattingFriendProfile]);
 
@@ -118,6 +126,7 @@ export default function Chat() {
             senderId: user.id,
             chatRoomId: roomId,
             message,
+            seenBy: [user.id],
             extraInformation: {},
             dateTimeSent: new Date()
         };

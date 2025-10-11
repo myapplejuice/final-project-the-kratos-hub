@@ -131,12 +131,12 @@ export default class ChatDBService {
         }
     }
 
-    static async fetchFriendMessageSummaries(userId) {
-    try {
-        const request = Database.getRequest();
-        Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
+    static async fetchFriendMessageSummaries(currentUserId) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'CurrentUserId', sql.UniqueIdentifier, currentUserId);
 
-        const query = `
+            const query = `
         WITH LastMessages AS (
             SELECT 
                 m.ChatRoomId,
@@ -144,8 +144,22 @@ export default class ChatDBService {
                 m.Message,
                 m.SenderId,
                 m.DateTimeSent,
+                m.SeenBy,
                 ROW_NUMBER() OVER (PARTITION BY m.ChatRoomId ORDER BY m.DateTimeSent DESC) AS rn
             FROM Messages m
+        ),
+        UnreadCounts AS (
+            SELECT 
+                m.ChatRoomId,
+                COUNT(*) AS UnreadCount
+            FROM Messages m
+            WHERE m.SenderId != @CurrentUserId
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM OPENJSON(ISNULL(m.SeenBy, '[]')) AS s
+                  WHERE s.value = CAST(@CurrentUserId AS NVARCHAR(50))
+              )
+            GROUP BY m.ChatRoomId
         )
         SELECT 
             ucr.ChatRoomId,
@@ -153,32 +167,33 @@ export default class ChatDBService {
             lm.Message AS LastMessage,
             lm.SenderId AS LastMessageSenderId,
             lm.DateTimeSent AS LastMessageTime,
-            CASE WHEN ms.UserId IS NULL THEN 1 ELSE 0 END AS UnreadCount
+            ISNULL(uc.UnreadCount, 0) AS UnreadCount
         FROM UserChatRooms ucr
         INNER JOIN UserChatRooms ucr2 
             ON ucr.ChatRoomId = ucr2.ChatRoomId AND ucr2.UserId != ucr.UserId
-        LEFT JOIN LastMessages lm 
+        LEFT JOIN LastMessages lm
             ON ucr.ChatRoomId = lm.ChatRoomId AND lm.rn = 1
-        LEFT JOIN MessageSeen ms 
-            ON lm.MessageId = ms.MessageId AND ms.UserId = @UserId
-        WHERE ucr.UserId = @UserId
+        LEFT JOIN UnreadCounts uc
+            ON ucr.ChatRoomId = uc.ChatRoomId
+        WHERE ucr.UserId = @CurrentUserId
         ORDER BY lm.DateTimeSent DESC
         `;
 
-        const result = await request.query(query);
+            const result = await request.query(query);
 
-        return result.recordset.map(raw => {
-            const mapped = {};
-            for (const key in raw) {
-                mapped[ObjectMapper.toCamelCase(key)] = raw[key];
-            }
-            return mapped;
-        });
-    } catch (err) {
-        console.error('fetchFriendMessageSummaries error:', err);
-        return [];
+            return result.recordset.map(raw => {
+                const mapped = {};
+                for (const key in raw) {
+                    mapped[ObjectMapper.toCamelCase(key)] = raw[key];
+                }
+                return mapped;
+            });
+        } catch (err) {
+            console.error('fetchFriendMessageSummaries error:', err);
+            return [];
+        }
     }
-}
+
 
     static async fetchChatRoomId(userId1, userId2) {
         try {

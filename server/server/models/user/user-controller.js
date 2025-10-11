@@ -71,6 +71,7 @@ export default class UserController {
         profile.friends = profile.friends.map(friend => {
             const summary = friendMessageSummaries.find(s => s.friendId === friend.friendId);
 
+            console.log(summary)
             return {
                 ...friend,
                 lastMessageSenderId: summary?.lastMessageSenderId || null,

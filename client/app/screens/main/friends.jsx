@@ -137,7 +137,7 @@ export default function Friends() {
 
                                 const displayTime =
                                     isToday ? formatTime(messageTimeDetails, { format: user.preferences.timeFormat.key }) :
-                                        isYesterday ? 'Yesterday ' + formatTime(messageTimeDetails, { format: user.preferences.timeFormat.key }) :
+                                        isYesterday ? 'Yesterday' :
                                             formatDate(messageTimeDetails, { format: user.preferences.dateFormat.key });
 
                                 return (

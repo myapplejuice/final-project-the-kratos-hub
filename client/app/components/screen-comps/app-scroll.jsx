@@ -49,7 +49,7 @@ export default function AppScroll({
     useEffect(() => {
         if (scrollToBottom) {
             if (scrollRef.current) {
-                scrollRef.current.scrollToEnd({ animated: false });
+                scrollRef.current.scrollToEnd({ animated: true });
             }
         }
     }, [scrollToBottom]);
