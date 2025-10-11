@@ -5,7 +5,7 @@ import { Button, StyleSheet, TouchableOpacity, View, Platform, Keyboard } from "
 import AppText from "../../../components/screen-comps/app-text";
 import { Images } from '../../../common/settings/assets';
 import { UserContext } from "../../../common/contexts/user-context";
-import { formatDate, formatTime } from '../../../common/utils/date-time';
+import { formatDate, formatTime, getDayComparisons, getHoursComparisons } from '../../../common/utils/date-time';
 import usePopups from "../../../common/hooks/use-popups";
 import { scaleFont } from "../../../common/utils/scale-fonts";
 import APIService from '../../../common/services/api-service';
@@ -141,7 +141,7 @@ export default function Chat() {
 
     async function handleImportPlan() {
         //TODO IMPORT PLANS, can work both ways 
-        console.log('importing some plan')
+        console.log('importing some plans')
     }
 
     return (
@@ -170,40 +170,87 @@ export default function Chat() {
             </FadeInOut>
             <View style={styles.main}>
                 <View>
-                    <AppScroll startAtBottom={true} scrollToBottom={scrollToBottom} extraBottom={keyboardOpen ? keyboardHeight - 65 : 65}>
+                    <AppScroll startAtBottom={true} scrollToBottom={scrollToBottom} extraBottom={keyboardOpen ? keyboardHeight - 65 : 75}>
                         {messages && messages.length > 0 &&
                             messages.map((message, index) => {
                                 const isUser = message.senderId === user.id;
+                                const messageTimeDetails = new Date(message.dateTimeSent);
+                                const { isToday, isYesterday } = getDayComparisons(messageTimeDetails);
+
+                                const timeDisplay = isToday
+                                    ? formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })
+                                    : isYesterday
+                                        ? `Yesterday, ${formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })}`
+                                        : `${formatDate(message.dateTimeSent, { format: 'MMM d' })}, ${formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })}`;
+
+                                const bubbleStyle = isUser
+                                    ? {
+                                        backgroundColor: 'rgba(0, 35, 65, 1)',
+                                        borderTopLeftRadius: 5,
+                                        marginLeft: 10,
+                                    }
+                                    : {
+                                        backgroundColor: 'rgba(255,255,255,0.08)',
+                                        borderTopRightRadius: 5,
+                                        marginRight: 10,
+                                    };
+
+                                const prevMessage = messages[index - 1];
+                                const prevDate = prevMessage ? new Date(prevMessage.dateTimeSent) : null;
+
+                                const currentDateStr = messageTimeDetails.toDateString();
+                                const prevDateStr = prevDate ? prevDate.toDateString() : null;
+
+                                const showDateDivider = currentDateStr !== prevDateStr;
+
+                                let dayLabel = formatDate(message.dateTimeSent, { format: 'MMM d' });
+                                if (isToday) dayLabel = 'Today';
+                                else if (isYesterday) dayLabel = 'Yesterday';
 
                                 return (
-                                    <View
-                                        key={index}
-                                        style={{
-                                            flexDirection: 'row',
-                                            justifyContent: isUser ? 'flex-start' : 'flex-end',
-                                            paddingHorizontal: 15,
-                                        }}
-                                    >
-                                        {isUser ? (
-                                            <>
-                                                <View style={{ maxWidth: '90%', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start', marginEnd: 15, marginBottom: 20 }}>
-                                                    <View style={{ padding: 15, borderRadius: 20, backgroundColor: colors.main, borderTopLeftRadius: 5, marginLeft: 10 }}>
-                                                        <AppText style={{ color: 'white', lineHeight: 20 }}>{message?.message}</AppText>
-                                                        <AppText style={{ color: 'rgba(255, 255, 255, 0.65)', alignSelf: 'flex-end', marginTop: 5 }}>{formatTime(message?.dateTimeSent, { format: user.preferences.timeFormat.key })}</AppText>
-                                                    </View>
+                                    <View key={index}>
+                                        {showDateDivider && (
+                                            <View style={{
+                                                alignItems: 'center',
+                                                marginVertical: 15,
+                                            }}>
+                                                <View style={{
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                    width: '100%',
+                                                    justifyContent: 'center',
+                                                }}>
+                                                    <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                                                    <AppText style={{ color: 'rgba(255,255,255,0.6)', marginHorizontal: 10 }}>{dayLabel}</AppText>
+                                                    <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.1)' }} />
                                                 </View>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <View style={{ maxWidth: '90%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', marginStart: 15, marginBottom: 20 }}>
-                                                    <View style={{ padding: 15, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.08)', borderTopRightRadius: 5, marginRight: 10 }}>
-                                                        <AppText style={{ color: 'white', lineHeight: 20 }}>{message?.message}</AppText>
-                                                        <AppText style={{ color: colors.mutedText, alignSelf: 'flex-end', marginTop: 5 }}>{formatTime(message?.dateTimeSent, { format: user.preferences.timeFormat.key })}</AppText>
-                                                    </View>
+                                            </View>
+                                        )}
+
+                                        <View
+                                            style={{
+                                                flexDirection: 'row',
+                                                justifyContent: isUser ? 'flex-start' : 'flex-end',
+                                                paddingHorizontal: 15,
+                                            }}
+                                        >
+                                            <View
+                                                style={{
+                                                    maxWidth: '90%',
+                                                    flexDirection: 'row',
+                                                    alignItems: 'flex-start',
+                                                    marginBottom: 10,
+                                                    ...(isUser ? { marginEnd: 15 } : { marginStart: 15 }),
+                                                }}
+                                            >
+                                                <View style={[{ paddingHorizontal: 15, paddingVertical: 10, borderRadius: 20 }, bubbleStyle]}>
+                                                    <AppText style={{ color: 'white', lineHeight: 20, flexShrink: 1 }}>{message.message}</AppText>
+                                                    <AppText style={{ color: 'rgba(255, 255, 255, 0.4)', alignSelf: 'flex-end', marginTop: 5 }}>
+                                                        {timeDisplay}
+                                                    </AppText>
                                                 </View>
-                                            </>
-                                        )
-                                        }
+                                            </View>
+                                        </View>
                                     </View>
                                 );
                             })

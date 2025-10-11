@@ -46,37 +46,59 @@ export default class ChatDBService {
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
 
             let query = `
-                SELECT m.Id, m.ChatRoomId, m.SenderId, m.Message, m.ExtraInformation, m.DateTimeSent,
-                       s.UserId AS SeenByUserId, s.SeenAt
-                FROM UserChatRooms ucr
-                INNER JOIN Messages m ON ucr.ChatRoomId = m.ChatRoomId
-                LEFT JOIN MessageSeen s ON m.Id = s.MessageId
-                WHERE ucr.UserId = @UserId
-            `;
+            SELECT m.Id,
+                   m.ChatRoomId,
+                   m.SenderId,
+                   m.Message,
+                   m.ExtraInformation,
+                   m.SeenBy,
+                   m.DateTimeSent
+            FROM UserChatRooms ucr
+            INNER JOIN Messages m ON ucr.ChatRoomId = m.ChatRoomId
+            WHERE ucr.UserId = @UserId
+        `;
 
             if (friendId) {
-                // Only messages in the chat room shared with this friend
                 Database.addInput(request, 'FriendId', sql.UniqueIdentifier, friendId);
                 query += `
-                    AND m.ChatRoomId IN (
-                        SELECT ChatRoomId 
-                        FROM UserChatRooms 
-                        WHERE UserId = @FriendId
-                    )
-                `;
+                AND m.ChatRoomId IN (
+                    SELECT ChatRoomId
+                    FROM UserChatRooms
+                    WHERE UserId = @FriendId
+                )
+            `;
             }
 
             query += ` ORDER BY m.DateTimeSent ASC`;
 
             const result = await request.query(query);
+
             return result.recordset.map(raw => {
                 const mapped = {};
                 for (const key in raw) {
                     mapped[ObjectMapper.toCamelCase(key)] = raw[key];
                 }
+
+                // Parse ExtraInformation JSON if present
                 if (mapped.extraInformation) {
-                    mapped.extraInformation = JSON.parse(mapped.extraInformation);
+                    try {
+                        mapped.extraInformation = JSON.parse(mapped.extraInformation);
+                    } catch {
+                        mapped.extraInformation = null;
+                    }
                 }
+
+                // Parse SeenBy JSON into an array
+                if (mapped.seenBy) {
+                    try {
+                        mapped.seenBy = JSON.parse(mapped.seenBy);
+                    } catch {
+                        mapped.seenBy = [];
+                    }
+                } else {
+                    mapped.seenBy = [];
+                }
+
                 return mapped;
             });
         } catch (err) {
@@ -84,6 +106,7 @@ export default class ChatDBService {
             return [];
         }
     }
+
 
     static async insertMessage(details) {
         try {

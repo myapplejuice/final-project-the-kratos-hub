@@ -1,22 +1,4 @@
 export function formatDate(dateInput, options = {}) {
-    // formatDate('2025-09-01') 
-    // => "01/09/2025"
-
-    // formatDate('2025-09-01', { format: 'MM/DD/YYYY' })
-    // => "09/01/2025"
-
-    // formatDate('2025-09-01', { includeDayName: true })
-    // => "Monday, 01/09/2025"
-
-    // formatDate('2025-09-01', { includeMonthName: true })
-    // => "01 September 2025"
-
-    // formatDate('2025-09-01', { includeDayName: true, includeMonthName: true })
-    // => "Monday, 1 September 2025"
-
-    // formatDate('2025-09-01', { includeYear: false })
-    // => "01/09"  (year excluded)
-
     try {
         const date = new Date(dateInput);
         const pad = (num) => String(num).padStart(2, '0');
@@ -39,7 +21,7 @@ export function formatDate(dateInput, options = {}) {
                 month: includeMonthName ? 'long' : '2-digit',
                 year: includeYear ? 'numeric' : undefined,
             };
-            return date.toLocaleDateString(options.language, localeOptions);
+            return date.toLocaleDateString(options.language || 'en-US', localeOptions);
         }
 
         let result = '';
@@ -54,8 +36,16 @@ export function formatDate(dateInput, options = {}) {
                 return result;
             case 'YYYY-MM-DD':
                 result = `${year}-${month}-${day}`;
-                if (!includeYear) result = `${month}-${day}`; // exclude year
+                if (!includeYear) result = `${month}-${day}`;
                 return result;
+            case 'MMM d': {
+                const monthName = date.toLocaleString('en-US', { month: 'short' }); // Oct
+                return `${monthName} ${date.getDate()}`;
+            }
+            case 'MMMM d': {
+                const monthName = date.toLocaleString('en-US', { month: 'long' }); // October
+                return `${monthName} ${date.getDate()}`;
+            }
             default:
                 return date.toLocaleDateString();
         }
@@ -64,6 +54,7 @@ export function formatDate(dateInput, options = {}) {
         return new Date(dateInput).toLocaleDateString();
     }
 }
+
 
 export function formatTime(dateInput, options = {}) {
     try {
@@ -117,6 +108,30 @@ export function getDayComparisons(compareDate, now = new Date()) {
         isYesterday: pageDay.getTime() === currentDay.getTime() - 86400000,
     };
 }
+
+export function getHoursComparisons(compareDate, now = new Date()) {
+    const diffMs = now.getTime() - compareDate.getTime(); // difference in milliseconds
+    const diffMinutes = diffMs / (1000 * 60);
+    const diffHours = diffMs / (1000 * 60 * 60);
+
+    const compareDay = new Date(compareDate);
+    compareDay.setHours(0, 0, 0, 0);
+
+    const currentDay = new Date(now);
+    currentDay.setHours(0, 0, 0, 0);
+
+    return {
+        isToday:
+            compareDate.getFullYear() === now.getFullYear() &&
+            compareDate.getMonth() === now.getMonth() &&
+            compareDate.getDate() === now.getDate(),
+        isLastHour: diffHours >= 0 && diffHours < 1,
+        isLastMinute: diffMinutes >= 0 && diffMinutes < 1,
+        diffMinutes,
+        diffHours,
+    };
+}
+
 
 export function isValidTime(timeStr) {
     // Check pattern HH:mm (both parts must be 2 digits)
