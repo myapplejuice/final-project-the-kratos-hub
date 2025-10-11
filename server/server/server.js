@@ -7,6 +7,7 @@ import EmailService from './models/email/email-service.js';
 import { Server as SocketIOServer } from 'socket.io';
 import { createServer } from 'http';
 import MiddlewaresManager from './utils/middlewares-manager.js';
+import ChatController from './models/chat/chat-controller.js';
 
 export default class Server {
     static instance;
@@ -27,7 +28,7 @@ export default class Server {
             // database & email service initialization
             const database = await Database.init();
             const email = EmailService.init();
-            const routes = ServerRouter.init(this.io);
+            const routes = ServerRouter.init();
 
             // enabling json and urlencoded body parsing 
             this.app.use(express.json({ limit: '20mb' }));
@@ -61,6 +62,8 @@ export default class Server {
             socket.on('join-room', (chatId) => {
                 socket.join(chatId);
                 console.log(`Socket ${socket.id} joined chat ${chatId}`);
+
+                socket.on('send-message', (payload) => ChatController.sendMessage(this.io, payload));
             });
 
             socket.on('leave-room', (chatId) => {

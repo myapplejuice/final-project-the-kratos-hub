@@ -114,6 +114,7 @@ export default function Notifications() {
 
                     if (result.success) {
                         const newFriendshipId = result.data.id;
+                        const chatRoomId = result.data.chatRoomId;
 
                         createToast({ message: `Friend request ${reply}` });
 
@@ -123,7 +124,7 @@ export default function Notifications() {
                                 f.id === request.id ? { ...f, status: reply } : f
                             ),
                             friends: reply === 'accepted'
-                                ? [...prev.friends, { id: newFriendshipId, friendId: request.adderId, status: 'active', lastMessage: null, lastMessageTime: null, unreadCount: 0 }]
+                                ? [...prev.friends, { id: newFriendshipId, friendId: request.adderId, status: 'active', lastMessage: null, lastMessageTime: null, unreadCount: 0, chatRoomId }]
                                 : prev.friends
                         }));
 

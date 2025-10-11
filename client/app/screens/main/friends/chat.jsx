@@ -5,7 +5,7 @@ import { Button, StyleSheet, TouchableOpacity, View, Platform, Keyboard } from "
 import AppText from "../../../components/screen-comps/app-text";
 import { Images } from '../../../common/settings/assets';
 import { UserContext } from "../../../common/contexts/user-context";
-import { formatDate } from '../../../common/utils/date-time';
+import { formatDate, formatTime } from '../../../common/utils/date-time';
 import usePopups from "../../../common/hooks/use-popups";
 import { scaleFont } from "../../../common/utils/scale-fonts";
 import APIService from '../../../common/services/api-service';
@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import StaticIcons from "../../../components/screen-comps/static-icons";
 import AppTextInput from "../../../components/screen-comps/app-text-input";
 import SlideInOut from "../../../components/effects/slide-in-out";
+import SocketService from "../../../common/services/socket-service";
 
 export default function Chat() {
     const { createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
@@ -24,16 +25,14 @@ export default function Chat() {
     const [keyboardHeight, setKeyboardHeight] = useState(0);
 
     const [profile, setProfile] = useState({});
-    const [messagesList, setMessagesList] = useState([]);
+    const [roomId, setRoomId] = useState(null);
+    const [messages, setMessages] = useState([]);
 
     const [messengerVisible, setMessengerVisible] = useState(true);
     const [message, setMessage] = useState('');
     const [messageHeight, setMessageHeight] = useState(50);
 
     useEffect(() => {
-        const profile = additionalContexts.chattingFriendProfile;
-        setProfile(profile);
-
         const showListener = Keyboard.addListener(
             Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
             (e) => setKeyboardHeight(e.endCoordinates.height)
@@ -46,15 +45,73 @@ export default function Chat() {
         return () => {
             showListener.remove();
             hideListener.remove();
-            setAdditionalContexts({ ...additionalContexts, chattingFriendProfile: null });
+            //setAdditionalContexts({ ...additionalContexts, chattingFriendProfile: null });
         };
     }, []);
 
+    useEffect(() => {
+        async function fetchMessages() {
+            showSpinner();
+            const friendId = additionalContexts.chattingFriendProfile.id;
+            const payload = {
+                userId: user.id,
+                friendId
+            }
+
+            try {
+                const result = await APIService.userToUser.chat.messages(payload);
+                const messages = result.data.messages;
+
+                setMessages(messages);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                hideSpinner();
+            }
+        }
+
+        fetchMessages();
+    }, [])
+
+    useEffect(() => {
+        const profile = additionalContexts.chattingFriendProfile;
+        setProfile(profile);
+        if (!profile || !user?.id) return;
+
+        const friendId = profile.id;
+        const chatRoomId = user.friends.find(f => f.friendId === friendId).chatRoomId;
+        setRoomId(chatRoomId);
+
+        SocketService.joinRoom(chatRoomId);
+        SocketService.on("new-message", (msg) => {
+            if (msg.chatRoomId === chatRoomId) {
+                setMessages((prev) => [...prev, msg]);
+            }
+        });
+
+        return () => { SocketService.emit("leave-room", chatRoomId); };
+    }, [additionalContexts.chattingFriendProfile]);
+
+
+
     async function handleMessageSend() {
-        console.log(message)
+        if (!message.trim()) return;
+
+        const payload = {
+            senderId: user.id,
+            chatRoomId: profile.chatRoomId,
+            message,
+            extraInformation: {},
+            dateTimeSent: new Date()
+        };
+
+        SocketService.emit("send-message", payload);
+        setMessages(prev => [...prev, payload]);
+        setMessage('');
     }
 
     async function handleImportPlan() {
+        //TODO IMPORT PLANS, can work both ways 
         console.log('importing some plan')
     }
 
@@ -86,34 +143,56 @@ export default function Chat() {
             <View style={styles.main}>
                 <View>
                     <AppScroll onScrollSetStates={setMessengerVisible} extraBottom={150 + keyboardHeight}>
-                        {/* User side */}
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', paddingHorizontal: 15, marginBottom: 20 }}>
-                            <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
-                                <View style={styles.avatarContainer}>
-                                    <Image source={user?.image} style={styles.avatar} />
-                                </View>
-                            </View>
-                            <View style={{ width: '90%', padding: 15, borderRadius: 20, backgroundColor: colors.main, borderTopLeftRadius: 5, marginLeft: 10 }}>
-                                <AppText style={{ color: 'white', lineHeight: 20 }}>Hey i wanted to show you a new program i built for your needs, make sure to try it for a week, and send feedback.</AppText>
-                                <AppText style={{ color: 'rgba(255, 255, 255, 0.65)', alignSelf: 'flex-end', marginTop: 5 }}>4:00 PM</AppText>
-                            </View>
-                        </View>
+                        {messages && messages.length > 0 &&
+                            messages.map((message, index) => {
+                                const isUser = message.senderId === user.id;
 
-                        {/* Their side */}
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', paddingHorizontal: 15, marginBottom: 20 }}>
-                            <View style={{ width: '90%', padding: 16, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.08)', borderTopRightRadius: 5, marginRight: 10 }}>
-                                <AppText style={{ color: 'white', lineHeight: 20 }}>Thanks, i'll get back you to you soon!</AppText>
-                                <AppText style={{ color: colors.mutedText, alignSelf: 'flex-end', marginTop: 5 }}>4:00 PM</AppText>
-                            </View>
-                            <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
-                                <View style={[styles.avatarContainer, { backgroundColor: 'rgb(255,255,255)' }]}>
-                                    <Image source={profile?.image} style={styles.avatar} />
-                                </View>
-                            </View>
-                        </View>
-
+                                return (
+                                    <View
+                                        key={index}
+                                        style={{
+                                            flexDirection: 'row',
+                                            justifyContent: 'space-around',
+                                            alignItems: 'flex-start',
+                                            paddingHorizontal: 15,
+                                        }}
+                                    >
+                                        {isUser ? (
+                                            <>
+                                                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', marginEnd: 15, marginBottom: 20 }}>
+                                                    <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
+                                                        <View style={styles.avatarContainer}>
+                                                            <Image source={user?.image} style={styles.avatar} />
+                                                        </View>
+                                                    </View>
+                                                    <View style={{ width: '90%', padding: 15, borderRadius: 20, backgroundColor: colors.main, borderTopLeftRadius: 5, marginLeft: 10 }}>
+                                                        <AppText style={{ color: 'white', lineHeight: 20 }}>{message.message}</AppText>
+                                                        <AppText style={{ color: 'rgba(255, 255, 255, 0.65)', alignSelf: 'flex-end', marginTop: 5 }}>{formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })}</AppText>
+                                                    </View>
+                                                </View>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', marginStart: 15, marginBottom: 20 }}>
+                                                    <View style={{ width: '90%', padding: 16, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.08)', borderTopRightRadius: 5, marginRight: 10 }}>
+                                                        <AppText style={{ color: 'white', lineHeight: 20 }}>{message.message}</AppText>
+                                                        <AppText style={{ color: colors.mutedText, alignSelf: 'flex-end', marginTop: 5 }}>{formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })}</AppText>
+                                                    </View>
+                                                    <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
+                                                        <View style={[styles.avatarContainer, { backgroundColor: 'rgb(255,255,255)' }]}>
+                                                            <Image source={profile?.image} style={styles.avatar} />
+                                                        </View>
+                                                    </View>
+                                                </View>
+                                            </>
+                                        )
+                                        }
+                                    </View>
+                                );
+                            })
+                        }
                     </AppScroll>
-                </View>
+                </View >
             </View >
         </>
     );

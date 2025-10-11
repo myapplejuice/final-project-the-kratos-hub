@@ -70,11 +70,13 @@ export default class UserController {
 
         profile.friends = profile.friends.map(friend => {
             const summary = friendMessageSummaries.find(s => s.friendId === friend.friendId);
+
             return {
                 ...friend,
                 lastMessage: summary?.lastMessage || null,
                 lastMessageTime: summary?.lastMessageTime || null,
-                unreadCount: summary?.unreadCount || 0
+                unreadCount: summary?.unreadCount || 0,
+                chatRoomId: summary?.chatRoomId
             };
         });
 

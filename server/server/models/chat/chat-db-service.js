@@ -14,7 +14,7 @@ export default class ChatDBService {
                 OUTPUT INSERTED.Id
                 VALUES (GETDATE())
             `;
-            
+
             const roomResult = await request.query(insertRoomQuery);
             const chatRoomId = roomResult.recordset[0]?.Id;
 
@@ -151,7 +151,7 @@ export default class ChatDBService {
                 ucr2.UserId AS FriendId,
                 lm.Message AS LastMessage,
                 lm.DateTimeSent AS LastMessageTime,
-                COUNT(CASE WHEN ms.UserId IS NULL THEN 1 END) AS UnreadCount
+                SUM(CASE WHEN lm.MessageId IS NOT NULL AND ms.UserId IS NULL THEN 1  ELSE 0  END) AS UnreadCount
             FROM UserChatRooms ucr
             INNER JOIN UserChatRooms ucr2 
                 ON ucr.ChatRoomId = ucr2.ChatRoomId AND ucr2.UserId != ucr.UserId
@@ -176,6 +176,28 @@ export default class ChatDBService {
         } catch (err) {
             console.error('fetchFriendMessageSummaries error:', err);
             return [];
+        }
+    }
+
+    static async fetchChatRoomId(userId1, userId2) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'UserId1', sql.UniqueIdentifier, userId1);
+            Database.addInput(request, 'UserId2', sql.UniqueIdentifier, userId2);
+
+            const query = `
+            SELECT ChatRoomId
+            FROM UserChatRooms
+            WHERE UserId IN (@UserId1, @UserId2)
+            GROUP BY ChatRoomId
+            HAVING COUNT(DISTINCT UserId) = 2
+        `;
+
+            const result = await request.query(query);
+            return result.recordset[0]?.ChatRoomId || null;
+        } catch (err) {
+            console.error('fetchChatRoomId error:', err);
+            return null;
         }
     }
 }

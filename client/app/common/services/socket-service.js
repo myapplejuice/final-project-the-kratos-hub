@@ -36,6 +36,12 @@ export default class SocketService {
         if (!this.socket) return;
         this.socket.emit("leave-room", chatId);
     }
+    
+    static disconnect() {
+        if (!this.socket) return;
+        this.socket.disconnect();
+        this.socket = null;
+    }
 
     static on(event, callback) {
         if (!this.socket) return;
@@ -47,9 +53,4 @@ export default class SocketService {
         this.socket.emit(event, payload);
     }
 
-    static disconnect() {
-        if (!this.socket) return;
-        this.socket.disconnect();
-        this.socket = null;
-    }
 }

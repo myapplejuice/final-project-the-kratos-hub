@@ -107,11 +107,11 @@ export default class UserToUserController {
         return res.status(200).json({ success: true, message: response.message });
     }
 
-    static async getChatMessages(req,res){
+    static async getChatMessages(req, res) {
         const details = req.body;
-console.log(details)
+        
         const response = await ChatDBService.fetchUserMessages(details.userId, details.friendId);
-    
+
         return res.status(200).json({ success: true, messages: response });
     }
 }
