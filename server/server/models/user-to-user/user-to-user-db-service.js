@@ -3,6 +3,7 @@ import UserEncryption from "../../utils/password-hasher.js";
 import HistoryDBService from '../history/history-db-service.js';
 import Database from '../database/database.js';
 import ObjectMapper from '../../utils/object-mapper.js';
+import ChatDBService from '../chat/chat-db-service.js';
 
 export default class UserToUserDBService {
     static async fetchUserProfile(id, withAdditionalInfo = true) {
@@ -200,6 +201,7 @@ export default class UserToUserDBService {
             await request.query(updateQuery);
 
             let newRowId = null;
+            let newChatId = null;
 
             if (details.reply === 'accepted') {
                 let userOne = details.adderId;
@@ -221,12 +223,15 @@ export default class UserToUserDBService {
 
                 const result = await request.query(insertQuery);
                 newRowId = result.recordset[0]?.Id || null;
+
+                newChatId = await ChatDBService.createNewChat(userOne, userTwo);
             }
 
             return {
                 success: true,
                 message: "Friend request updated successfully",
-                id: newRowId
+                id: newRowId,
+                newChatId,
             };
 
         } catch (err) {

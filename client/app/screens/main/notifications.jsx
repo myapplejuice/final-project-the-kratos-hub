@@ -123,7 +123,7 @@ export default function Notifications() {
                                 f.id === request.id ? { ...f, status: reply } : f
                             ),
                             friends: reply === 'accepted'
-                                ? [...prev.friends, { id: newFriendshipId, friendId: request.adderId, status: 'active' }]
+                                ? [...prev.friends, { id: newFriendshipId, friendId: request.adderId, status: 'active', lastMessage: null, lastMessageTime: null, unreadCount: 0 }]
                                 : prev.friends
                         }));
 
@@ -147,7 +147,7 @@ export default function Notifications() {
     }
 
     function handleNotificationPress(notification) {
-        if (notification.clickableDestination === 'profile'){
+        if (notification.clickableDestination === 'profile') {
             router.push({
                 pathname: routes.USER_PROFILE,
                 params: {
@@ -155,7 +155,7 @@ export default function Notifications() {
                 }
             })
         }
-            
+
     }
 
     function handleProfile(profile) {
@@ -248,60 +248,61 @@ export default function Notifications() {
                                                         : <AppText style={{ alignSelf: 'flex-end', color: request.status === 'accepted' ? colors.accentGreen : colors.accentPink }}>{request.status === 'accepted' ? 'Accepted' : 'Declined'}</AppText>}
                                                 </View>
                                             </View>
-                                            {request.status === 'pending' && <ExpandInOut visible={openRequest === profile.id}>
-                                                <AppText
-                                                    style={{
-                                                        color: colors.mutedText,
-                                                        textAlign: request.description ? 'left' : 'center',
-                                                        marginVertical: 15,
-                                                    }}
-                                                >
-                                                    {request.description || 'No introduction provided'}
-                                                </AppText>
-                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
-                                                    <TouchableOpacity
-                                                        onPress={() => handleFriendRequest('declined', request)}
+                                            {request.status === 'pending' &&
+                                                <ExpandInOut visible={openRequest === profile.id}>
+                                                    <AppText
+                                                        style={{
+                                                            color: colors.mutedText,
+                                                            textAlign: request.description ? 'left' : 'center',
+                                                            marginVertical: 15,
+                                                        }}
+                                                    >
+                                                        {request.description || 'No introduction provided'}
+                                                    </AppText>
+                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
+                                                        <TouchableOpacity
+                                                            onPress={() => handleFriendRequest('declined', request)}
+                                                            style={{
+                                                                padding: 15,
+                                                                borderRadius: 10,
+                                                                backgroundColor: colors.accentPink,
+                                                                width: '48%',
+                                                                justifyContent: 'center',
+                                                                alignItems: 'center',
+                                                            }}
+                                                        >
+                                                            <AppText style={{ color: 'white' }}>Decline</AppText>
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity
+                                                            onPress={() => handleFriendRequest('accepted', request)}
+                                                            style={{
+                                                                padding: 15,
+                                                                borderRadius: 10,
+                                                                backgroundColor: colors.accentGreen,
+                                                                width: '48%',
+                                                                justifyContent: 'center',
+                                                                alignItems: 'center',
+                                                            }}
+                                                        >
+                                                            <AppText style={{ color: 'white' }}>Accept</AppText>
+                                                        </TouchableOpacity>
+                                                    </View>
+                                                    <AnimatedButton
+                                                        onPress={() => handleProfile(request.profile)}
                                                         style={{
                                                             padding: 15,
                                                             borderRadius: 10,
-                                                            backgroundColor: colors.accentPink,
-                                                            width: '48%',
+                                                            backgroundColor: colors.main,
                                                             justifyContent: 'center',
                                                             alignItems: 'center',
+                                                            marginTop: 15
                                                         }}
-                                                    >
-                                                        <AppText style={{ color: 'white' }}>Decline</AppText>
-                                                    </TouchableOpacity>
-                                                    <TouchableOpacity
-                                                        onPress={() => handleFriendRequest('accepted', request)}
-                                                        style={{
-                                                            padding: 15,
-                                                            borderRadius: 10,
-                                                            backgroundColor: colors.accentGreen,
-                                                            width: '48%',
-                                                            justifyContent: 'center',
-                                                            alignItems: 'center',
-                                                        }}
-                                                    >
-                                                        <AppText style={{ color: 'white' }}>Accept</AppText>
-                                                    </TouchableOpacity>
-                                                </View>
-                                                <AnimatedButton
-                                                    onPress={() => handleProfile(request.profile)}
-                                                    style={{
-                                                        padding: 15,
-                                                        borderRadius: 10,
-                                                        backgroundColor: colors.main,
-                                                        justifyContent: 'center',
-                                                        alignItems: 'center',
-                                                        marginTop: 15
-                                                    }}
-                                                    rightImage={Images.arrow}
-                                                    rightImageStyle={{ width: 15, height: 15, tintColor: 'white', marginStart: 5 }}
-                                                    textStyle={{ color: 'white', fontSize: scaleFont(12) }}
-                                                    title={'View Profile'}
-                                                />
-                                            </ExpandInOut>}
+                                                        rightImage={Images.arrow}
+                                                        rightImageStyle={{ width: 15, height: 15, tintColor: 'white', marginStart: 5 }}
+                                                        textStyle={{ color: 'white', fontSize: scaleFont(12) }}
+                                                        title={'View Profile'}
+                                                    />
+                                                </ExpandInOut>}
                                         </TouchableOpacity>
                                     );
                                 })
@@ -328,17 +329,19 @@ export default function Notifications() {
                                         const isLastUnseen = !notification.seen && (index === notifications.findIndex(n => n.seen) - 1 || index === notifications.filter(n => !n.seen).length - 1);
                                         const seenNotificationsExist = notifications.some(n => n.seen);
                                         return (
-                                            <TouchableOpacity onPress={() => notification.clickable && handleNotificationPress(notification)} key={notification.id}>
-                                                <View style={{ borderStartColor: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white', borderStartWidth: 2, paddingHorizontal: 15, marginBottom: 10 }}>
-                                                    <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: colors.mutedText, marginBottom: 5 }}>
-                                                        {formatDate(notification.dateOfCreation, { format: user.preferences.dateFormat.key })}, {formatTime(notification.dateOfCreation, { format: user.preferences.timeFormat.key })}
-                                                    </AppText>
-                                                    <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white' }}>
-                                                        {notification.notification}
-                                                    </AppText>
-                                                </View>
+                                            <View key={notification.id}>
+                                                <TouchableOpacity style={{marginBottom: 25}} onPress={() => notification.clickable && handleNotificationPress(notification)}>
+                                                    <View style={{ borderStartColor: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white', borderStartWidth: 2, paddingHorizontal: 15}}>
+                                                        <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white' }}>
+                                                            {notification.notification}
+                                                        </AppText>
+                                                        <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: colors.mutedText, marginTop: 5, alignSelf: 'flex-end' }}>
+                                                            {formatDate(notification.dateOfCreation, { format: user.preferences.dateFormat.key })}, {formatTime(notification.dateOfCreation, { format: user.preferences.timeFormat.key })}
+                                                        </AppText>
+                                                    </View>
+                                                </TouchableOpacity>
                                                 {isLastUnseen && seenNotificationsExist && <Divider orientation='horizontal' style={{ marginVertical: 15 }} />}
-                                            </TouchableOpacity>
+                                            </View>
                                         );
                                     })}
                                 </>

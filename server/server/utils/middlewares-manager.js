@@ -12,11 +12,11 @@ export default class MiddlewaresManager {
     static userAuthorization(req, res, next) {
         const tokenId = req.id;
         const callId = req.params.id;
-        
+
         if (!tokenId || tokenId !== callId) {
             return res.status(403).json({ message: 'Forbidden! Invalid user ID.' });
         }
-        
+
         next();
     }
 
@@ -35,6 +35,21 @@ export default class MiddlewaresManager {
             next();
         } catch (err) {
             return res.status(401).json({ message: 'Invalid or expired token.' });
+        }
+    }
+
+    static socketAuthorization(socket, next) {
+        const token = socket.handshake.auth.token;
+        if (!token) {
+            return next(new Error("Authentication error"));
+        }
+
+        try {
+            const decoded = jwt.verify(token, MiddlewaresManager.SECRET_KEY);
+            socket.userId = decoded.id;
+            next();
+        } catch (err) {
+            next(new Error("Authentication error"));
         }
     }
 

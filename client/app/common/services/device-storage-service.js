@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import APIService from './api-service';
+import SocketService from './socket-service';
 import { routes } from '../settings/constants';
 import { defaultPreferences } from '../utils/global-options';
 
@@ -38,6 +39,8 @@ export default class DeviceStorageService {
 
             profile.preferences = await this.getUserPreferences();
 
+            await SocketService.connect();
+
             return profile;
         } catch (error) {
             console.error("Error initializing user session:", error);
@@ -48,6 +51,7 @@ export default class DeviceStorageService {
     static async clearUserSession() {
         await SecureStore.deleteItemAsync("token");
         APIService.setUserId(null);
+        SocketService.disconnect();
         router.replace(routes.INTRODUCTION);
     }
 

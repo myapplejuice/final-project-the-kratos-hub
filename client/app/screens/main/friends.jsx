@@ -140,14 +140,14 @@ export default function Friends() {
                                                 {friend.firstname} {friend.lastname}
                                             </AppText>
                                             <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12) }}>
-                                                I have news for you
+                                                {friend.lastMessage ? friend.lastMessage : 'No messages yet'}
                                             </AppText>
                                         </View>
                                     </View>
                                     <View style={{ justifyContent: 'center' }}>
                                         <AppText style={{ color: colors.mutedText }}>
-                                            10/6/25{/* day or hour depending when message was sent */}
-                                        </AppText>
+                                            {friend.lastMessage ? `${formatDate(friend.lastMessageTime, { format:  user.preferences.dateFormat.key })} ${formatTime(friend.lastMessageTime, { format: user.preferences.timeFormat.key })}` : ''}
+                                         </AppText>
                                     </View>
                                 </TouchableOpacity>
                             ))}

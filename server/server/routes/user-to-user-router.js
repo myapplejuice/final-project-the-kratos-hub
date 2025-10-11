@@ -17,6 +17,7 @@ export default class UserToUserRouter {
         this.userToUserRouter.post('/reply-request/:id', tokenAuthorization, userAuthorization, asyncHandler(UserToUserController.replyToFriendRequest));
         this.userToUserRouter.delete('/terminate-friendship/:id', tokenAuthorization, userAuthorization, asyncHandler(UserToUserController.disableFriendship));
         this.userToUserRouter.put('/restore-friendship/:id', tokenAuthorization, userAuthorization, asyncHandler(UserToUserController.restoreFriendship));
+        this.userToUserRouter.post('/messages/:id', tokenAuthorization, userAuthorization, asyncHandler(UserToUserController.getChatMessages));
 
         return this.userToUserRouter;
     }

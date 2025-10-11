@@ -28,9 +28,9 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
     }, [user?.pendingFriends, user?.notifications]);
 
     useEffect(() => {
-        const unreadMessagesCount = user.friends?.reduce((acc, f) => acc + (f.messages?.filter(m => !m.seen).length || 0), 0);
+        const unreadMessagesCount = user.friends?.reduce((total, friend) => total + friend.unreadCount, 0) || 0;
         setUnreadMessagesCount(unreadMessagesCount);
-    }, [user.friends])
+    }, [user.friends]);
 
     useEffect(() => {
         Animated.timing(topBarPosition, {
@@ -94,6 +94,8 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
     };
 
     function handleUserProfilePress() {
+        if (!chattedUser.id) return;
+
         router.push({
             pathname: routes.USER_PROFILE,
             params: {
@@ -104,10 +106,10 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
 
     return (
         <View style={styles.wrapper}>
-            {!hideInsetOnScroll && <View style={[styles.inset, {height: insets.top}]} />}
+            {!hideInsetOnScroll && <View style={[styles.inset, { height: insets.top }]} />}
 
             <Animated.View style={[styles.header, { transform: [{ translateY: topBarPosition }], opacity: topBarOpacity }]}>
-                {hideInsetOnScroll && <View style={[styles.inset, {height: insets.top}]} />}
+                {hideInsetOnScroll && <View style={[styles.inset, { height: insets.top }]} />}
                 <View style={styles.left}>
                     {!inMain && (
                         <TouchableOpacity onPress={() => router.back()}>
@@ -121,7 +123,9 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                             </TouchableOpacity>
                         </>
                     )}
-                    <AppText style={styles.title}>{screenNames[screen]}</AppText>
+                    <TouchableOpacity onPress={handleUserProfilePress} >
+                        <AppText style={styles.title}>{screenNames[screen]}</AppText>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.right}>
@@ -168,128 +172,128 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
     );
 }
 
-    const styles = StyleSheet.create({
-        wrapper: {
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            zIndex: 10,
-        },
-        inset: { 
-            backgroundColor: colors.main,
-        },
-        header: {
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            alignContent: 'center',
-            paddingHorizontal: 20,
-            backgroundColor: colors.main,
-            height: 45,
-        },
-        title: {
-            fontSize: scaleFont(16),
-            color: 'white',
-        },
-        left: {
-            justifyContent: "center",
-            flexDirection: "row",
-            alignItems: "center",
-        },
-        right: {
-            flexDirection: 'row',
-            alignItems: "center",
-            alignContent: 'center'
-        },
-        burger: {
-            width: 20,
-            justifyContent: "space-between",
-            height: 16,
-        },
-        burgerLine: {
-            height: 2,
-            backgroundColor: 'white',
-            borderRadius: 2,
-        },
-        backButton: {
-            justifyContent: "center",
-            alignItems: "center",
-        },
-        icon: {
-            width: 20,
-            height: 20,
-            resizeMode: "contain"
-        },
-        arrow: {
-            width: 18,
-            height: 18,
-            marginRight: 8,
-        },
-        profileImage: {
-            width: 28,
-            height: 28,
-            borderRadius: 17.5,
-            borderWidth: 2,
-            borderColor: colors.mainSecond,
-        },
-        chattedUserImage: {
-            width: 28,
-            height: 28,
-            borderRadius: 14,
-            borderWidth: 2,
-            borderColor: colors.mainSecond,
-            marginEnd: 10
-        },
-        bellImage: {
-            width: 24,
-            height: 24,
-            tintColor: 'white'
-        },
+const styles = StyleSheet.create({
+    wrapper: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        zIndex: 10,
+    },
+    inset: {
+        backgroundColor: colors.main,
+    },
+    header: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        alignContent: 'center',
+        paddingHorizontal: 20,
+        backgroundColor: colors.main,
+        height: 45,
+    },
+    title: {
+        fontSize: scaleFont(16),
+        color: 'white',
+    },
+    left: {
+        justifyContent: "center",
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    right: {
+        flexDirection: 'row',
+        alignItems: "center",
+        alignContent: 'center'
+    },
+    burger: {
+        width: 20,
+        justifyContent: "space-between",
+        height: 16,
+    },
+    burgerLine: {
+        height: 2,
+        backgroundColor: 'white',
+        borderRadius: 2,
+    },
+    backButton: {
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    icon: {
+        width: 20,
+        height: 20,
+        resizeMode: "contain"
+    },
+    arrow: {
+        width: 18,
+        height: 18,
+        marginRight: 8,
+    },
+    profileImage: {
+        width: 28,
+        height: 28,
+        borderRadius: 17.5,
+        borderWidth: 2,
+        borderColor: colors.mainSecond,
+    },
+    chattedUserImage: {
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        borderWidth: 2,
+        borderColor: colors.mainSecond,
+        marginEnd: 10
+    },
+    bellImage: {
+        width: 24,
+        height: 24,
+        tintColor: 'white'
+    },
 
-        sidebarContainer: {
-            flex: 1
-        },
-        closeButton: {
-            width: 35,
-            height: 35,
-            justifyContent: "center",
-            alignItems: "center",
-        },
+    sidebarContainer: {
+        flex: 1
+    },
+    closeButton: {
+        width: 35,
+        height: 35,
+        justifyContent: "center",
+        alignItems: "center",
+    },
 
-        section: { marginTop: 20, marginBottom: 10 },
-        sectionTitle: { fontSize: scaleFont(12), color: "rgba(161,161,161,1)", marginBottom: 10 },
-        sidebarItem: { flexDirection: "row", alignItems: "center", paddingVertical: 10 },
-        sidebarText: { fontSize: scaleFont(15), marginLeft: 10, color: "#000" },
-        logoutButton: { backgroundColor: "#ffe6e6", borderRadius: 10, paddingHorizontal: 10, marginBottom: 15, },
+    section: { marginTop: 20, marginBottom: 10 },
+    sectionTitle: { fontSize: scaleFont(12), color: "rgba(161,161,161,1)", marginBottom: 10 },
+    sidebarItem: { flexDirection: "row", alignItems: "center", paddingVertical: 10 },
+    sidebarText: { fontSize: scaleFont(15), marginLeft: 10, color: "#000" },
+    logoutButton: { backgroundColor: "#ffe6e6", borderRadius: 10, paddingHorizontal: 10, marginBottom: 15, },
 
-        // Sidebar Footer
-        sidebarFooter: { marginTop: "auto", marginBottom: 20 },
-        socialRow: { flexDirection: "row", marginBottom: 15 },
-        socialButton: { marginRight: 6 },
-        addressRow: { flexDirection: "row", alignItems: "center" },
-        addressText: { marginLeft: 8, color: "rgba(161,161,161,1)", fontSize: 15 },
-        bellWrapper: {
-            position: 'relative',
-        },
+    // Sidebar Footer
+    sidebarFooter: { marginTop: "auto", marginBottom: 20 },
+    socialRow: { flexDirection: "row", marginBottom: 15 },
+    socialButton: { marginRight: 6 },
+    addressRow: { flexDirection: "row", alignItems: "center" },
+    addressText: { marginLeft: 8, color: "rgba(161,161,161,1)", fontSize: 15 },
+    bellWrapper: {
+        position: 'relative',
+    },
 
-        badge: {
-            position: 'absolute',
-            bottom: -2,
-            right: -5,
-            backgroundColor: 'red',
-            borderRadius: 8,
-            minWidth: 16,
-            height: 16,
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingHorizontal: 3,
-        },
+    badge: {
+        position: 'absolute',
+        bottom: -2,
+        right: -5,
+        backgroundColor: 'red',
+        borderRadius: 8,
+        minWidth: 16,
+        height: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 3,
+    },
 
-        badgeText: {
-            color: 'white',
-            fontSize: scaleFont(10),
-            fontWeight: 'bold',
-        },
+    badgeText: {
+        color: 'white',
+        fontSize: scaleFont(10),
+        fontWeight: 'bold',
+    },
 
-    });
+});

@@ -32,9 +32,6 @@ export default function Chat() {
 
     useEffect(() => {
         const profile = additionalContexts.chattingFriendProfile;
-        const friendMessages = user.friends.find(f => f.friendId === profile?.id)?.messages || [];
-
-        setMessagesList(friendMessages);
         setProfile(profile);
 
         const showListener = Keyboard.addListener(

@@ -4,6 +4,9 @@ import morgan from 'morgan';
 import Database from './models/database/database.js';
 import ServerRouter from './routes/server-router.js';
 import EmailService from './models/email/email-service.js';
+import { Server as SocketIOServer } from 'socket.io';
+import { createServer } from 'http';
+import MiddlewaresManager from './utils/middlewares-manager.js';
 
 export default class Server {
     static instance;
@@ -14,7 +17,8 @@ export default class Server {
         }
 
         this.port = port;
-        this.server = express();
+        this.app = express();
+        this.initSocketServer();
         Server.instance = this;
     }
 
@@ -23,18 +27,18 @@ export default class Server {
             // database & email service initialization
             const database = await Database.init();
             const email = EmailService.init();
-            const routes = ServerRouter.init();
+            const routes = ServerRouter.init(this.io);
 
             // enabling json and urlencoded body parsing 
-            this.server.use(express.json({ limit: '20mb' }));
-            this.server.use(express.urlencoded({ limit: '20mb', extended: true }));
+            this.app.use(express.json({ limit: '20mb' }));
+            this.app.use(express.urlencoded({ limit: '20mb', extended: true }));
 
             // middlewares
-            this.server.use(cors());
-            this.server.use(morgan('dev'));
+            this.app.use(cors());
+            this.app.use(morgan('dev'));
 
             // routers
-            this.server.use('/api', routes);
+            this.app.use('/api', routes);
 
             return { ...email, ...database };
         } catch (error) {
@@ -43,11 +47,39 @@ export default class Server {
         }
     }
 
+    initSocketServer() {
+        this.httpServer = createServer(this.app);
+        this.io = new SocketIOServer(this.httpServer, {
+            cors: { origin: '*' }
+        });
+
+        this.io.use(MiddlewaresManager.socketAuthorization);
+
+        this.io.on('connection', (socket) => {
+            console.log('Socket connected:', socket.id);
+
+            socket.on('join-room', (chatId) => {
+                socket.join(chatId);
+                console.log(`Socket ${socket.id} joined chat ${chatId}`);
+            });
+
+            socket.on('leave-room', (chatId) => {
+                socket.leave(chatId);
+                console.log(`Socket ${socket.id} left chat ${chatId}`);
+            });
+
+            socket.on('disconnect', () => {
+                console.log('Socket disconnected:', socket.id);
+            });
+        });
+    }
+
+
     start(info) {
-        const startup = this.server.listen(this.port, () => {
+        const startup = this.httpServer.listen(this.port, () => {
             console.log(`
                 -- SERVER --
-                Server running on: http://localhost:${this.port ?? "unknown"}
+                Server running on: http://localhost:${this.port}/
                 
                 -- DATABASE SERVICE--
                 Server: ${info?.server ?? "unknown"}

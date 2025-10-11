@@ -6,6 +6,7 @@ import NutritionFoodsDBService from "../nutrition/foods/nutrition-foods-db-servi
 import NutritionMealPlansDBService from "../nutrition/meal-plans/nutrition-meal-plans-db-service.js";
 import UserToUserDBService from "../user-to-user/user-to-user-db-service.js";
 import NotificationsDBService from "../notifications/notifications-db-service.js";
+import ChatDBService from "../chat/chat-db-service.js";
 
 export default class UserController {
     constructor() { }
@@ -49,13 +50,14 @@ export default class UserController {
         }
 
         const [nutritionLogs, foods, plans,
-            friends, pendingFriends, notifications
+            friends, pendingFriends, friendMessageSummaries, notifications
         ] = await Promise.all([
             NutritionDaysDBService.fetchAllDays(id),
             NutritionFoodsDBService.fetchFoods(id),
             NutritionMealPlansDBService.fetchPlansByUserId(id),
             UserToUserDBService.fetchUserFriendsList(id),
             UserToUserDBService.fetchUserPendingFriendsList(id),
+            ChatDBService.fetchFriendMessageSummaries(id),
             NotificationsDBService.fetchNotifications(id)
         ]);
 
@@ -65,6 +67,16 @@ export default class UserController {
         profile.friends = friends;
         profile.pendingFriends = pendingFriends;
         profile.notifications = notifications;
+
+        profile.friends = profile.friends.map(friend => {
+            const summary = friendMessageSummaries.find(s => s.friendId === friend.friendId);
+            return {
+                ...friend,
+                lastMessage: summary?.lastMessage || null,
+                lastMessageTime: summary?.lastMessageTime || null,
+                unreadCount: summary?.unreadCount || 0
+            };
+        });
 
         return res.status(200).json({ profile });
     }

@@ -1,4 +1,5 @@
 import { signJwt } from "../../utils/jwt-utils.js";
+import ChatDBService from "../chat/chat-db-service.js";
 import EmailService from "../email/email-service.js";
 import NotificationsDBService from "../notifications/notifications-db-service.js";
 import NutritionDaysDBService from "../nutrition/days/nutrition-days-db-service.js";
@@ -55,7 +56,7 @@ export default class UserToUserController {
 
         await NotificationsDBService.pushNotification(adderPayload);
 
-        return res.status(200).json({ success: true, message: response.message, id: response.id });
+        return res.status(200).json({ success: true, message: response.message, id: response.id, newChatId: response.newChatId });
     }
 
     static async disableFriendship(req, res) {
@@ -104,5 +105,13 @@ export default class UserToUserController {
         await NotificationsDBService.pushNotification(payload);
 
         return res.status(200).json({ success: true, message: response.message });
+    }
+
+    static async getChatMessages(req,res){
+        const details = req.body;
+console.log(details)
+        const response = await ChatDBService.fetchUserMessages(details.userId, details.friendId);
+    
+        return res.status(200).json({ success: true, messages: response });
     }
 }

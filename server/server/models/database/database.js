@@ -2,6 +2,7 @@ import sql from 'mssql/msnodesqlv8.js';
 import dotenv from 'dotenv';
 import { userTablesQuery } from './user-tables-query.js';
 import { nutritionTablesQuery } from './nutrition-tables-query.js';
+import { chatTablesQuery } from './chat-tables-query.js';
 
 dotenv.config();
 
@@ -34,7 +35,7 @@ export default class Database {
             }
 
             // Ensuring The_Kratos_Hub tables exist
-            const queryString = userTablesQuery() + "\n" + nutritionTablesQuery();
+            const queryString = userTablesQuery() + "\n" + nutritionTablesQuery() + "\n" + chatTablesQuery();
             await Database.pool.request().query(queryString);
 
             // Return connection info

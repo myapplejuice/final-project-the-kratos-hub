@@ -94,7 +94,12 @@ export default class ObjectMapper {
             Sentiment: 'sentiment',
             Clickable: 'clickable',
             ClickableInfo: 'clickableInfo',
-            ClickableDestination: 'clickableDestination'
+            ClickableDestination: 'clickableDestination',
+            ChatRoomId: 'chatRoomId',
+            Message: 'message',
+            SenderId: 'senderId',
+            DateTimeSent: 'dateTimeSent',
+            SeenAt: 'seenAt'
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -192,7 +197,13 @@ export default class ObjectMapper {
             sentiment: 'Sentiment',
             clickable: 'Clickable',
             clickableInfo: 'ClickableInfo',
-            clickableDestination: 'ClickableDestination'
+            clickableDestination: 'ClickableDestination',
+            chatRoomId: 'ChatRoomId',
+            senderId: 'SenderId',
+            message: 'Message',
+            messageId: 'MessageId',
+            seenAt: 'SeenAt',
+            dateTimeSent: 'DateTimeSent'
         };
         return map[key] || key;
     }
