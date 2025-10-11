@@ -131,28 +131,44 @@ export default class ChatDBService {
         }
     }
 
-    static async markMessagesSeen(userId, messageIds = []) {
-        if (!messageIds.length) return 0;
+   static async markMessagesSeen(userIds = [], messageIds = []) {
+    if (!userIds.length || !messageIds.length) return;
 
-        try {
-            const request = Database.getRequest();
-            Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
+    try {
+        const request = Database.getRequest();
+        const idsStr = messageIds.join(',');
 
-            // Convert array to table-valued parameter or just build query dynamically
-            const values = messageIds.map(id => `(${id}, @UserId, GETDATE())`).join(',');
-            const query = `
-                INSERT INTO MessageSeen (MessageId, UserId, SeenAt)
-                VALUES ${values}
-                ON DUPLICATE KEY UPDATE SeenAt = GETDATE() -- optional for MSSQL
-            `;
+        Database.addInput(request, 'UserIdsJson', sql.NVarChar(sql.MAX), JSON.stringify(userIds));
+        Database.addInput(request, 'MessageIds', sql.VarChar(sql.MAX), idsStr);
 
-            await request.query(query);
-            return messageIds.length;
-        } catch (err) {
-            console.error('markMessagesSeen error:', err);
-            return 0;
-        }
+        const query = `
+            DECLARE @Messages TABLE (Id INT);
+            INSERT INTO @Messages (Id)
+            SELECT value FROM STRING_SPLIT(@MessageIds, ',');
+
+            UPDATE Messages
+            SET SeenBy = 
+                CASE 
+                    WHEN SeenBy IS NULL OR SeenBy = '' THEN @UserIdsJson
+                    ELSE JSON_QUERY(
+                        CONCAT(
+                            LEFT(SeenBy, LEN(SeenBy) - 1),
+                            ',',
+                            STUFF(@UserIdsJson, 1, 1, ''),
+                            ']'
+                        )
+                    )
+                END
+            WHERE Id IN (SELECT Id FROM @Messages);
+        `;
+
+        await request.query(query);
+        return true;
+    } catch (err) {
+        console.error('markMessagesSeen error:', err);
+        return false;
     }
+}
 
     static async fetchFriendMessageSummaries(currentUserId) {
         try {

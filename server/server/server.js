@@ -8,6 +8,7 @@ import { Server as SocketIOServer } from 'socket.io';
 import { createServer } from 'http';
 import MiddlewaresManager from './utils/middlewares-manager.js';
 import ChatController from './models/chat/chat-controller.js';
+import ChatDBService from './models/chat/chat-db-service.js';
 
 export default class Server {
     static instance;
@@ -77,6 +78,15 @@ export default class Server {
             socket.on('send-message', async (payload, callback) => {
                 const savedMessageId = await ChatController.sendMessage(this.io, payload);
                 if (callback) callback(savedMessageId);
+            });
+
+            socket.on('mark-seen', async ({ userId, messageIds }) => {
+                try {
+                    await ChatDBService.markMessagesSeen([userId], messageIds);
+                    console.log(`User ${userId} marked messages ${messageIds.join(', ')} as seen`);
+                } catch (err) {
+                    console.error('Error marking messages as seen:', err);
+                }
             });
         });
     }

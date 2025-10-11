@@ -95,11 +95,23 @@ export default function Chat() {
         SocketService.joinRoom(chatRoomId);
         SocketService.on("new-message", (msg) => {
             if (msg.chatRoomId === chatRoomId) {
+                if (!msg.seenBy.includes(user.id)) {
+                    msg.seenBy.push(user.id);
+                    console.log(msg)
+                }
                 setMessages((prev) => [...prev, msg]);
             }
         });
 
         return () => {
+            const messageIds = messagesRef.current.map(m => m.id);
+            if (messageIds.length > 0) {
+                SocketService.emit("mark-seen", {
+                    userId: user.id,
+                    messageIds,
+                });
+            }
+
             SocketService.emit("leave-room", chatRoomId);
 
             const lastMessageDetails = messagesRef.current[messagesRef.current.length - 1];
@@ -231,7 +243,7 @@ export default function Chat() {
                                             style={{
                                                 flexDirection: 'row',
                                                 justifyContent: isUser ? 'flex-start' : 'flex-end',
-                                                paddingHorizontal: 15,
+                                                paddingHorizontal: 5,
                                             }}
                                         >
                                             <View
