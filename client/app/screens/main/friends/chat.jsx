@@ -63,9 +63,9 @@ export default function Chat() {
 
     return (
         <>
-            <StaticIcons color={colors.mutedText} />
+
             <FadeInOut visible={messengerVisible} style={{ position: 'absolute', bottom: 0, paddingBottom: insets.bottom + 10 + keyboardHeight, paddingTop: 10, zIndex: 9999, flexDirection: 'row', paddingHorizontal: 15, backgroundColor: 'rgba(0, 0, 0, 0.95)', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' }}>
-                <View style={{ width: '85%', minHeight: 50, maxHeight: 120, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 25, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                <View style={{ width: '85%', minHeight: 50, maxHeight: 120, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                     <AppTextInput
                         multiline
                         onChangeText={setMessage}
@@ -76,8 +76,8 @@ export default function Chat() {
                         onContentSizeChange={(e) =>
                             setMessageHeight(e.nativeEvent.contentSize.height)
                         } />
-                    <TouchableOpacity style={{ width: '18%', height: 50, justifyContent: 'center', alignItems: 'center'}} onPress={handleImportPlan}>
-                        <Image source={Images.plus} style={{ width: 22, height: 22, tintColor: 'white' }} />
+                    <TouchableOpacity style={{ width: '18%', height: 50, justifyContent: 'center', alignItems: 'center' }} onPress={handleImportPlan}>
+                        <Image source={Images.plus} style={{ width: 22, height: 22, tintColor: colors.mutedText }} />
                     </TouchableOpacity>
                 </View>
                 <View style={{ width: '15%', alignSelf: 'flex-end' }}>
@@ -87,33 +87,36 @@ export default function Chat() {
                 </View>
             </FadeInOut>
             <View style={styles.main}>
-                <AppScroll onScrollSetStates={setMessengerVisible} extraBottom={150 + keyboardHeight}>
-                    {/* User side */}
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', paddingHorizontal: 15, marginBottom: 20 }}>
-                        <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
-                            <View style={styles.avatarContainer}>
-                                <Image source={user?.image} style={styles.avatar} />
+                <View>
+                    <AppScroll onScrollSetStates={setMessengerVisible} extraBottom={150 + keyboardHeight}>
+                        {/* User side */}
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', paddingHorizontal: 15, marginBottom: 20 }}>
+                            <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
+                                <View style={styles.avatarContainer}>
+                                    <Image source={user?.image} style={styles.avatar} />
+                                </View>
+                            </View>
+                            <View style={{ width: '90%', padding: 15, borderRadius: 20, backgroundColor: colors.main, borderTopLeftRadius: 5, marginLeft: 10 }}>
+                                <AppText style={{ color: 'white', lineHeight: 20 }}>Hey i wanted to show you a new program i built for your needs, make sure to try it for a week, and send feedback.</AppText>
+                                <AppText style={{ color: 'rgba(255, 255, 255, 0.65)', alignSelf: 'flex-end', marginTop: 5 }}>4:00 PM</AppText>
                             </View>
                         </View>
-                        <View style={{ width: '90%', padding: 15, borderRadius: 20, backgroundColor: colors.main, borderTopLeftRadius: 5, marginLeft: 10 }}>
-                            <AppText style={{ color: 'white', lineHeight: 20 }}>Hey i wanted to show you a new program i built for your needs, make sure to try it for a week, and send feedback.</AppText>
-                            <AppText  style={{ color: colors.mutedText,alignSelf: 'flex-end', marginTop: 5 }}>4:00 PM</AppText>
-                        </View>
-                    </View>
 
-                    {/* Their side */}
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', paddingHorizontal: 15, marginBottom: 20 }}>
-                        <View style={{ width: '90%', padding: 16, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.08)', borderTopRightRadius: 5, marginRight: 10 }}>
-                            <AppText style={{ color: 'white', lineHeight: 20 }}>Thanks, i'll get back you to you soon!</AppText>
-                                    <AppText  style={{ color: colors.mutedText,alignSelf: 'flex-end', marginTop: 5 }}>4:00 PM</AppText>
-                        </View>
-                        <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
-                            <View style={[styles.avatarContainer, { backgroundColor: 'rgb(255,255,255)' }]}>
-                                <Image source={profile?.image} style={styles.avatar} />
+                        {/* Their side */}
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', paddingHorizontal: 15, marginBottom: 20 }}>
+                            <View style={{ width: '90%', padding: 16, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.08)', borderTopRightRadius: 5, marginRight: 10 }}>
+                                <AppText style={{ color: 'white', lineHeight: 20 }}>Thanks, i'll get back you to you soon!</AppText>
+                                <AppText style={{ color: colors.mutedText, alignSelf: 'flex-end', marginTop: 5 }}>4:00 PM</AppText>
+                            </View>
+                            <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
+                                <View style={[styles.avatarContainer, { backgroundColor: 'rgb(255,255,255)' }]}>
+                                    <Image source={profile?.image} style={styles.avatar} />
+                                </View>
                             </View>
                         </View>
-                    </View>
-                </AppScroll>
+
+                    </AppScroll>
+                </View>
             </View >
         </>
     );
