@@ -57,7 +57,7 @@ export default function Chat() {
         console.log(message)
     }
 
-    async function handleImportPlan(){
+    async function handleImportPlan() {
         console.log('importing some plan')
     }
 
@@ -65,19 +65,19 @@ export default function Chat() {
         <>
             <StaticIcons color={colors.mutedText} />
             <FadeInOut visible={messengerVisible} style={{ position: 'absolute', bottom: 0, paddingBottom: insets.bottom + 10 + keyboardHeight, paddingTop: 10, zIndex: 9999, flexDirection: 'row', paddingHorizontal: 15, backgroundColor: 'rgba(0, 0, 0, 0.95)', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' }}>
-                <View style={{ width: '85%', minHeight: 50, maxHeight: 120, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 25, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingEnd: 15 }}>
+                <View style={{ width: '85%', minHeight: 50, maxHeight: 120, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 25, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                     <AppTextInput
                         multiline
                         onChangeText={setMessage}
                         value={message}
                         placeholder="Type a message..."
                         placeholderTextColor={"rgba(255, 255, 255, 0.4)"}
-                        style={[styles.inputStripped, { height: Math.min(120, Math.max(50, messageHeight)), width: '90%' }]}
+                        style={[styles.inputStripped, { height: Math.min(120, Math.max(50, messageHeight)), width: '82%' }]}
                         onContentSizeChange={(e) =>
                             setMessageHeight(e.nativeEvent.contentSize.height)
                         } />
-                    <TouchableOpacity style={{width: '10%'}}  onPress={handleImportPlan}>
-                        <Image source={Images.book1} style={{ width: 28, height: 28, tintColor: colors.mutedText }} />
+                    <TouchableOpacity style={{ width: '18%', height: 50, justifyContent: 'center', alignItems: 'center'}} onPress={handleImportPlan}>
+                        <Image source={Images.plus} style={{ width: 22, height: 22, tintColor: 'white' }} />
                     </TouchableOpacity>
                 </View>
                 <View style={{ width: '15%', alignSelf: 'flex-end' }}>
@@ -92,21 +92,23 @@ export default function Chat() {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', paddingHorizontal: 15, marginBottom: 20 }}>
                         <View style={{ width: '10%', alignItems: 'flex-start', height: '100%' }}>
                             <View style={styles.avatarContainer}>
-                                <Image source={profile?.image} style={styles.avatar} />
+                                <Image source={user?.image} style={styles.avatar} />
                             </View>
                         </View>
-                        <View style={{ width: '90%', padding: 16, borderRadius: 20, backgroundColor: colors.mainOpacied, borderBottomLeftRadius: 5, marginLeft: 10 }}>
-                            <AppText style={{ color: 'white', lineHeight: 20 }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                        <View style={{ width: '90%', padding: 15, borderRadius: 20, backgroundColor: colors.main, borderTopLeftRadius: 5, marginLeft: 10 }}>
+                            <AppText style={{ color: 'white', lineHeight: 20 }}>Hey i wanted to show you a new program i built for your needs, make sure to try it for a week, and send feedback.</AppText>
+                            <AppText  style={{ color: colors.mutedText,alignSelf: 'flex-end', marginTop: 5 }}>4:00 PM</AppText>
                         </View>
                     </View>
 
                     {/* Their side */}
                     <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', paddingHorizontal: 15, marginBottom: 20 }}>
-                        <View style={{ width: '90%', padding: 16, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.08)', borderBottomRightRadius: 5, marginRight: 10 }}>
-                            <AppText style={{ color: 'white', lineHeight: 20 }}>lIRUMdwal,pd opiwrjim warowna ruiwa nriwdwakdmnwaiofdrnwauirnwairnawuriawiunrwainrasuirniaurnwiaunriawunruiwanriawnruiwnriaiwnuranriwanrwaurnwairawnrawnia</AppText>
+                        <View style={{ width: '90%', padding: 16, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.08)', borderTopRightRadius: 5, marginRight: 10 }}>
+                            <AppText style={{ color: 'white', lineHeight: 20 }}>Thanks, i'll get back you to you soon!</AppText>
+                                    <AppText  style={{ color: colors.mutedText,alignSelf: 'flex-end', marginTop: 5 }}>4:00 PM</AppText>
                         </View>
                         <View style={{ width: '10%', alignItems: 'flex-end', height: '100%' }}>
-                            <View style={[styles.avatarContainer, { backgroundColor: '#FF6B6B' }]}>
+                            <View style={[styles.avatarContainer, { backgroundColor: 'rgb(255,255,255)' }]}>
                                 <Image source={profile?.image} style={styles.avatar} />
                             </View>
                         </View>
