@@ -59,7 +59,7 @@ export default function Homepage() {
                 ...prev,
                 friends: prev.friends.map(f =>
                     f.friendId === msg.senderId
-                        ? { ...f, unreadCount: (f.unreadCount || 0) + 1, lastMessage: msg.message, lastMessageTime: msg.time, lastMessageSenderId: msg.senderId }
+                        ? { ...f, unreadCount: (f.unreadCount || 0) + 1, lastMessage: msg.message, lastMessageTime: msg.dateTimeSent, lastMessageSenderId: msg.senderId }
                         : f
                 )
             }));
