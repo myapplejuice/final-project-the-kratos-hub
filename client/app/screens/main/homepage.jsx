@@ -69,23 +69,21 @@ export default function Homepage() {
             setUser(prev => ({
                 ...prev,
                 notifications: [
-                    ...prev.notifications,
-                    notification
+                    notification, 
+                    ...prev.notifications
                 ]
-
             }));
-        };
+        }
 
         function handleNewFriendRequest(request) {
             setUser(prev => ({
                 ...prev,
                 pendingFriends: [
-                    ...prev.pendingFriends,
-                    request
+                    request,       
+                    ...prev.pendingFriends
                 ]
             }));
-        };
-
+        }
 
         SocketService.on("new-message", handleMessage);
         SocketService.on("new-notification", handleNotification);

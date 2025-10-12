@@ -60,6 +60,7 @@ export default class UserToUserController {
 
         const id = await NotificationsDBService.pushNotification(adderPayload);
         adderPayload.id = id;
+        adderPayload.clickableInfo = JSON.parse(adderPayload.clickableInfo);
         SocketController.emitNotification(details.adderId, adderPayload);
 
         return res.status(200).json({ success: true, message: response.message, id: response.id, newChatId: response.newChatId });
@@ -86,6 +87,7 @@ export default class UserToUserController {
 
         const id = await NotificationsDBService.pushNotification(payload);
         payload.id = id;
+        payload.clickableInfo = JSON.parse(payload.clickableInfo);
         SocketController.emitNotification(details.friendId, payload);
 
         return res.status(200).json({ success: true, message: response.message });
@@ -112,6 +114,7 @@ export default class UserToUserController {
 
         const id = await NotificationsDBService.pushNotification(payload);
         payload.id = id;
+        payload.clickableInfo = JSON.parse(payload.clickableInfo);
         SocketController.emitNotification(details.friendId, payload);
 
         return res.status(200).json({ success: true, message: response.message });

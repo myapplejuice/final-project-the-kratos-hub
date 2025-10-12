@@ -94,6 +94,9 @@ export default function Notifications() {
         return () => setUserNotificationsSeen();
     }, []);
 
+    useEffect(() => {
+        setNotifications(user.notifications);
+    }, [user.notifications]);
 
     async function handleFriendRequest(reply, request) {
         createDialog({
@@ -156,7 +159,6 @@ export default function Notifications() {
                 }
             })
         }
-
     }
 
     function handleProfile(profile) {
