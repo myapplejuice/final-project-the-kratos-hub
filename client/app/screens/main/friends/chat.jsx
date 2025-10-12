@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Button, StyleSheet, TouchableOpacity, View, Platform, Keyboard, Dimensions } from "react-native";
+import { Button, StyleSheet, TouchableOpacity, View, Platform, Keyboard, Dimensions, Animated } from "react-native";
 import AppText from "../../../components/screen-comps/app-text";
 import { Images } from '../../../common/settings/assets';
 import { UserContext } from "../../../common/contexts/user-context";
@@ -18,14 +18,25 @@ import AppTextInput from "../../../components/screen-comps/app-text-input";
 import SlideInOut from "../../../components/effects/slide-in-out";
 import SocketService from "../../../common/services/socket-service";
 import FloatingActionButton from "../../../components/screen-comps/floating-action-button";
+import { Easing } from "react-native";
 
 export default function Chat() {
+    const { createOptions } = usePopups();
     const { user, setUser, additionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const scrollRef = useRef(null);
     const initialScrollDone = useRef(false);
+    const apiFetchDebounce = useRef(null);
+    const currentPage = useRef(1);
+    const morePages = useRef(true);
 
     const [fabVisible, setFabVisible] = useState(false);
+    const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+    const rotate = useRef(new Animated.Value(0)).current;
+    const spin = rotate.interpolate({
+        inputRange: [0, 1],
+        outputRange: ["0deg", "360deg"],
+    });
 
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [keyboardOpen, setKeyboardOpen] = useState(false);
@@ -42,17 +53,11 @@ export default function Chat() {
         if (!initialScrollDone.current && messages.length > 0) {
             initialScrollDone.current = true;
 
-            // Wait for rendering
             setTimeout(() => {
                 scrollRef.current?.scrollToBottom({ animated: false });
             }, 0);
         }
 
-        if (messages[messages.length - 1]?.senderId === user.id) {
-            setTimeout(() => {
-                scrollRef.current?.scrollToBottom({ animated: false });
-            }, 0);
-        }
         messagesRef.current = messages;
     }, [messages]);
 
@@ -98,6 +103,15 @@ export default function Chat() {
         }
 
         fetchMessages();
+
+        Animated.loop(
+            Animated.timing(rotate, {
+                toValue: 1,
+                duration: 800,
+                easing: Easing.linear,
+                useNativeDriver: true,
+            })
+        ).start();
     }, []);
 
     useEffect(() => {
@@ -110,7 +124,6 @@ export default function Chat() {
 
         SocketService.joinRoom(chatRoomId);
         SocketService.on("new-message", (msg) => {
-            console.log('crashes here?')
             if (msg.chatRoomId === chatRoomId) {
                 if (!msg.seenBy.includes(user.id))
                     msg.seenBy.push(user.id);
@@ -156,6 +169,47 @@ export default function Chat() {
         };
     }, [additionalContexts.chattingFriendProfile]);
 
+
+    async function fetchMoreMessages() {
+        if (morePages.current === false) return;
+
+        const friendId = additionalContexts.chattingFriendProfile.id;
+        const payload = {
+            userId: user.id,
+            friendId,
+            page: currentPage.current + 1
+        }
+
+        try {
+            setIsLoadingMessages(true);
+            const result = await APIService.userToUser.chat.messages(payload);
+            const newMessages = result.data?.messages || [];
+
+            setMessages(prev => [...newMessages, ...prev]); // prepend older messages
+            currentPage.current += 1;
+            morePages.current = result.data?.hasMore;
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoadingMessages(false);
+        }
+    }
+
+    async function safeTrigger(callback) {
+        if (apiFetchDebounce.current) return; // prevent multiple triggers
+        apiFetchDebounce.current = true;
+
+        try {
+            await callback();
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setTimeout(() => {
+                apiFetchDebounce.current = false;
+            }, 500);
+        }
+    }
+
     async function handleMessageSend() {
         if (!message.trim()) return;
 
@@ -174,11 +228,24 @@ export default function Chat() {
             payload.id = newMessageId;
             setMessages(prev => [...prev, payload]);
         });
+        setTimeout(() => {
+            scrollRef.current?.scrollToBottom({ animated: false });
+        }, 0);
     }
 
     async function handleImportPlan() {
-        //TODO IMPORT PLANS, can work both ways 
-        console.log('importing some plans')
+        const userPlans = user.plans;
+        console.log(userPlans)
+     
+    }
+
+    async function handleAdvancedMessageDisplay(message) {
+        if (message.extraInformation.context === 'mealplan') {
+            const result = await APIService.nutrition.mealPlans.otherUserPlans(message.senderId)
+            const plans = result.data.plans;
+
+            console.log(plans)
+        }
     }
 
     return (
@@ -221,9 +288,12 @@ export default function Chat() {
                     </TouchableOpacity>
                 </View>
             </FadeInOut>
+            <FadeInOut visible={isLoadingMessages} style={{ position: 'absolute', top: 100, alignSelf: 'center', zIndex: 9999 }}>
+                <Animated.View style={[styles.spinner, { transform: [{ rotate: spin }] }]} />
+            </FadeInOut>
             <View style={styles.main}>
                 <View>
-                    <AppScroll ref={scrollRef} extraBottom={keyboardOpen ? keyboardHeight - 65 : 75}>
+                    <AppScroll onScrollToTop={() => safeTrigger(fetchMoreMessages)} ref={scrollRef} extraBottom={keyboardOpen ? keyboardHeight - 65 : 75}>
                         {messages && messages.length > 0 &&
                             messages.map((message, index) => {
                                 const isUser = message.senderId === user.id;
@@ -254,7 +324,6 @@ export default function Chat() {
                                 const prevDateStr = prevDate ? prevDate.toDateString() : null;
                                 const showDateDivider = currentDateStr !== prevDateStr;
 
-                                // --- NEW: show unread divider ---
                                 const isUnread = !message.seenBy?.includes(user.id);
                                 const showUnreadDivider = isUnread && (!prevMessage || prevMessage.seenBy?.includes(user.id));
 
@@ -283,7 +352,10 @@ export default function Chat() {
                                         <View style={{ flexDirection: 'row', justifyContent: isUser ? 'flex-start' : 'flex-end', paddingHorizontal: 5 }}>
                                             <View style={{ maxWidth: '90%', flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10, ...(isUser ? { marginEnd: 15 } : { marginStart: 15 }) }}>
                                                 <View style={[{ paddingHorizontal: 15, paddingVertical: 10, borderRadius: 20 }, bubbleStyle]}>
-                                                    <AppText style={{ color: 'white', lineHeight: 20, flexShrink: 1 }}>{message.message}</AppText>
+                                                    {Object.keys(message.extraInformation).length > 0 ?
+                                                        handleAdvancedMessageDisplay(message)
+                                                        :
+                                                        <AppText style={{ color: 'white', lineHeight: 20, flexShrink: 1 }}>{message.message}</AppText>}
                                                     <AppText style={{ color: 'rgba(255, 255, 255, 0.4)', alignSelf: 'flex-end', marginTop: 5 }}>
                                                         {timeDisplay}
                                                     </AppText>
@@ -414,6 +486,15 @@ const styles = StyleSheet.create({
     },
     infoText: {
         flex: 1,
+    },
+    spinner: {
+        width: 40,
+        height: 40,
+        borderRadius: 30,
+        borderWidth: 4,
+        borderTopColor: colors.main,
+        borderRightColor: colors.main,
+        borderBottomColor: colors.main,
     },
     detailLabel: {
         fontSize: scaleFont(11),

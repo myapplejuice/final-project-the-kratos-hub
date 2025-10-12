@@ -125,6 +125,7 @@ export default class APIService {
             create: (payload) => APIService.request(`/nutrition/meal-plans/${APIService.USER_ID}`, 'POST', payload),
             update: (payload) => APIService.request(`/nutrition/meal-plans/${APIService.USER_ID}`, 'PUT', payload),
             delete: (payload) => APIService.request(`/nutrition/meal-plans/${APIService.USER_ID}`, 'DELETE', payload),
+            otherUserPlans: (id) => APIService.request(`/nutrition/meal-plans/${APIService.USER_ID}`, 'GET', {id}),
             meals: {
                 add: (payload) => APIService.request(`/nutrition/meal-plans/meal/${APIService.USER_ID}`, 'POST', payload),
                 update: (payload) => APIService.request(`/nutrition/meal-plans/meal/${APIService.USER_ID}`, 'PUT', payload),

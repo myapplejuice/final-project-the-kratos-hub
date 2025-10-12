@@ -139,7 +139,6 @@ export default function FoodSelection() {
     }
 
     async function handleUSDASearch(searchQuery, source) {
-        c0js
         try {
             showSpinner();
             let requestBody = {

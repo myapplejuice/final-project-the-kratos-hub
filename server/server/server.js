@@ -7,8 +7,8 @@ import EmailService from './models/email/email-service.js';
 import { Server as SocketIOServer } from 'socket.io';
 import { createServer } from 'http';
 import MiddlewaresManager from './utils/middlewares-manager.js';
-import ChatController from './models/chat/chat-controller.js';
-import ChatDBService from './models/chat/chat-db-service.js';
+import ChatController from './models/socket/socket-controller.js';
+import ChatDBService from './models/socket/chat-db-service.js';
 
 export default class Server {
     static instance;

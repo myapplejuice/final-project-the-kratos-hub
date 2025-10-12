@@ -1,6 +1,6 @@
 import ChatDBService from "./chat-db-service.js";
 
-export default class ChatController {
+export default class SocketController {
     static async sendMessage(io, payload) {
         const savedMessageId = await ChatDBService.insertMessage(payload);
         payload.id = savedMessageId;

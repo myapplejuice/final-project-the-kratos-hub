@@ -6,7 +6,7 @@ import NutritionFoodsDBService from "../nutrition/foods/nutrition-foods-db-servi
 import NutritionMealPlansDBService from "../nutrition/meal-plans/nutrition-meal-plans-db-service.js";
 import UserToUserDBService from "../user-to-user/user-to-user-db-service.js";
 import NotificationsDBService from "../notifications/notifications-db-service.js";
-import ChatDBService from "../chat/chat-db-service.js";
+import ChatDBService from "../socket/chat-db-service.js";
 
 export default class UserController {
     constructor() { }

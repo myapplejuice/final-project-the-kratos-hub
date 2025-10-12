@@ -3,7 +3,7 @@ import UserEncryption from "../../utils/password-hasher.js";
 import HistoryDBService from '../history/history-db-service.js';
 import Database from '../database/database.js';
 import ObjectMapper from '../../utils/object-mapper.js';
-import ChatDBService from '../chat/chat-db-service.js';
+import ChatDBService from '../socket/chat-db-service.js';
 
 export default class UserToUserDBService {
     static async fetchUserProfile(id, withAdditionalInfo = true) {

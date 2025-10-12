@@ -129,52 +129,97 @@ export default function Friends() {
                                 const displayMessage = messagingDetails.lastMessage || 'No messages yet';
 
                                 const messageTimeDetails = new Date(messagingDetails.lastMessageTime);
-                                const timeComparisons = getDayComparisons(messageTimeDetails);
-                                const hoursComparisons = getHoursComparisons(messageTimeDetails);
-                                const isToday = timeComparisons.isToday;
-                                const isYesterday = timeComparisons.isYesterday;
-                                const isLastMinute = hoursComparisons.isLastMinute;
-                                const isLastHour = hoursComparisons.isLastHour;
-                                const minutes = new Date().getMinutes() - messageTimeDetails.getMinutes();
-                              
-                                const displayTime =
-                                    messagingDetails.lastMessage ?
-                                    isLastMinute ? 'Just now' :
-                                    isLastHour ? `${minutes} minutes ago` :
-                                        isToday ? formatTime(messageTimeDetails, { format: user.preferences.timeFormat.key }) :
-                                            isYesterday ? 'Yesterday' :
-                                                formatDate(messageTimeDetails, { format: user.preferences.dateFormat.key }) : '';
+                                const displayTime = (() => {
+                                    if (!messagingDetails.lastMessage) return '';
+
+                                    const now = new Date();
+                                    const diffMs = now - messageTimeDetails;
+                                    const diffMinutes = Math.floor(diffMs / 60000);
+
+                                    if (diffMinutes < 1) return 'Just now';
+                                    if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''} ago`;
+
+                                    // Only check day comparisons if not recent
+                                    const { isToday, isYesterday } = getDayComparisons(messageTimeDetails);
+
+                                    if (isToday) {
+                                        return formatTime(messageTimeDetails, { format: user.preferences.timeFormat.key });
+                                    } else if (isYesterday) {
+                                        return 'Yesterday';
+                                    } else {
+                                        return formatDate(messageTimeDetails, { format: user.preferences.dateFormat.key });
+                                    }
+                                })();
 
                                 const isUnread = messagingDetails.unreadCount > 0;
-                               
+
                                 return (
                                     <TouchableOpacity
                                         onPress={() => handleFriendClick(friend)}
                                         style={{
-                                            flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, backgroundColor: colors.cardBackground + '80', padding: 10, borderRadius: 15,
-                                            borderWidth: isUnread ? 2 : 0, borderColor: isUnread ? colors.mutedText : 'transparent'
+                                            flexDirection: 'row',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            marginBottom: 15,
+                                            backgroundColor: colors.cardBackground + '80',
+                                            padding: 10,
+                                            borderRadius: 15,
+                                            borderWidth: isUnread ? 2 : 0,
+                                            borderColor: isUnread ? colors.mutedText : 'transparent',
                                         }}
                                         key={i}
                                     >
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <TouchableOpacity onPress={() => handleProfilePress(friend)} style={styles.imageWrapper}>
-                                                <Image source={friend.image} style={{ width: 50, height: 50, borderRadius: 25 }} />
+                                        {/* LEFT SIDE: Avatar + Name + Message */}
+                                        <View style={{ flexDirection: 'row', flex: 1, marginRight: 10 }}>
+                                            <TouchableOpacity
+                                                onPress={() => handleProfilePress(friend)}
+                                                style={styles.imageWrapper}
+                                            >
+                                                <Image
+                                                    source={friend.image}
+                                                    style={{ width: 50, height: 50, borderRadius: 25 }}
+                                                />
                                             </TouchableOpacity>
-                                            <View style={{ marginStart: 15, justifyContent: 'center' }}>
-                                                <AppText style={[styles.cardLabel, { fontWeight: 'bold', fontSize: scaleFont(15) }]}>
+
+                                            <View style={{ marginStart: 15, justifyContent: 'center', flex: 1 }}>
+                                                <AppText
+                                                    style={[
+                                                        styles.cardLabel,
+                                                        { fontWeight: 'bold', fontSize: scaleFont(15) },
+                                                    ]}
+                                                    numberOfLines={1}
+                                                    ellipsizeMode="tail"
+                                                >
                                                     {friend.firstname} {friend.lastname}
                                                 </AppText>
-                                                <AppText style={{ color: isUnread ? 'white' :colors.mutedText, fontSize: scaleFont(12) }}>
+
+                                                <AppText
+                                                    numberOfLines={1}
+                                                    ellipsizeMode="tail"
+                                                    style={{
+                                                        color: isUnread ? 'white' : colors.mutedText,
+                                                        fontSize: scaleFont(12),
+                                                    }}
+                                                >
                                                     {sender + displayMessage}
                                                 </AppText>
                                             </View>
                                         </View>
-                                        <View style={{ justifyContent: 'center' }}>
-                                            <AppText style={{ color: isUnread ? 'white' : colors.mutedText }}>
+
+                                        {/* RIGHT SIDE: Timestamp */}
+                                        <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
+                                            <AppText
+                                                style={{
+                                                    color: isUnread ? 'white' : colors.mutedText,
+                                                    fontSize: scaleFont(11),
+                                                }}
+                                                numberOfLines={1}
+                                            >
                                                 {displayTime}
                                             </AppText>
                                         </View>
                                     </TouchableOpacity>
+
                                 );
                             })}
                         </View>

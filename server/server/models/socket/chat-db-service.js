@@ -40,12 +40,15 @@ export default class ChatDBService {
         }
     }
 
-    static async fetchUserMessages(userId, friendId = null) {
-        try {
-            const request = Database.getRequest();
-            Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
+    static async fetchUserMessages(userId, friendId = null, page = 1, pageSize = 20) {
+    try {
+        const request = Database.getRequest();
+        Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
+        // Offset for pages where page=1 => offset 0 (newest page)
+        Database.addInput(request, 'Offset', sql.Int, (page - 1) * pageSize);
+        Database.addInput(request, 'PageSize', sql.Int, pageSize);
 
-            let query = `
+        let query = `
             SELECT m.Id,
                    m.ChatRoomId,
                    m.SenderId,
@@ -58,55 +61,68 @@ export default class ChatDBService {
             WHERE ucr.UserId = @UserId
         `;
 
-            if (friendId) {
-                Database.addInput(request, 'FriendId', sql.UniqueIdentifier, friendId);
-                query += `
-                AND m.ChatRoomId IN (
-                    SELECT ChatRoomId
-                    FROM UserChatRooms
-                    WHERE UserId = @FriendId
-                )
+        if (friendId) {
+            Database.addInput(request, 'FriendId', sql.UniqueIdentifier, friendId);
+            query += `
+              AND m.ChatRoomId IN (
+                  SELECT ChatRoomId
+                  FROM UserChatRooms
+                  WHERE UserId = @FriendId
+              )
             `;
+        }
+
+        /* 
+         * IMPORTANT:
+         * ORDER BY DateTimeSent DESC so the OFFSET pages start
+         * from the newest messages.
+         * Then we will reverse the returned rows in JS so that
+         * messages are chronological (oldest->newest) within the returned chunk.
+         */
+        query += `
+            ORDER BY m.DateTimeSent DESC
+            OFFSET @Offset ROWS
+            FETCH NEXT @PageSize ROWS ONLY;
+        `;
+
+        const result = await request.query(query);
+
+        const mapped = result.recordset.map(raw => {
+            const msg = {};
+            for (const key in raw) {
+                msg[ObjectMapper.toCamelCase(key)] = raw[key];
             }
 
-            query += ` ORDER BY m.DateTimeSent ASC`;
+            // Parse ExtraInformation JSON
+            if (msg.extraInformation) {
+                try { msg.extraInformation = JSON.parse(msg.extraInformation); }
+                catch { msg.extraInformation = null; }
+            }
 
-            const result = await request.query(query);
+            // Parse SeenBy JSON
+            if (msg.seenBy) {
+                try { msg.seenBy = JSON.parse(msg.seenBy); }
+                catch { msg.seenBy = []; }
+            } else {
+                msg.seenBy = [];
+            }
 
-            return result.recordset.map(raw => {
-                const mapped = {};
-                for (const key in raw) {
-                    mapped[ObjectMapper.toCamelCase(key)] = raw[key];
-                }
+            return msg;
+        });
 
-                // Parse ExtraInformation JSON if present
-                if (mapped.extraInformation) {
-                    try {
-                        mapped.extraInformation = JSON.parse(mapped.extraInformation);
-                    } catch {
-                        mapped.extraInformation = null;
-                    }
-                }
+        // reverse so within the page messages go oldest -> newest (so prepend works nicely)
+        const chunk = mapped.reverse();
 
-                // Parse SeenBy JSON into an array
-                if (mapped.seenBy) {
-                    try {
-                        mapped.seenBy = JSON.parse(mapped.seenBy);
-                    } catch {
-                        mapped.seenBy = [];
-                    }
-                } else {
-                    mapped.seenBy = [];
-                }
-
-                return mapped;
-            });
-        } catch (err) {
-            console.error('fetchUserMessages error:', err);
-            return [];
-        }
+        return {
+            messages: chunk,
+            page,
+            hasMore: mapped.length === pageSize
+        };
+    } catch (err) {
+        console.error('fetchUserMessages error:', err);
+        return { messages: [], page, hasMore: false };
     }
-
+}
 
     static async insertMessage(details) {
         try {
@@ -131,17 +147,17 @@ export default class ChatDBService {
         }
     }
 
-  static async markMessagesSeen(userId, messageIds = []) {
-    if (!userId || !messageIds.length) return;
+    static async markMessagesSeen(userId, messageIds = []) {
+        if (!userId || !messageIds.length) return;
 
-    try {
-        const request = Database.getRequest();
-        const idsStr = messageIds.join(',');
+        try {
+            const request = Database.getRequest();
+            const idsStr = messageIds.join(',');
 
-        Database.addInput(request, 'MessageIds', sql.VarChar(sql.MAX), idsStr);
-        Database.addInput(request, 'UserId', sql.NVarChar(50), userId);
+            Database.addInput(request, 'MessageIds', sql.VarChar(sql.MAX), idsStr);
+            Database.addInput(request, 'UserId', sql.NVarChar(50), userId);
 
-        const query = `
+            const query = `
         -- Convert comma-separated message IDs to table
         DECLARE @Messages TABLE (Id INT);
         INSERT INTO @Messages (Id)
@@ -162,13 +178,13 @@ export default class ChatDBService {
         WHERE Id IN (SELECT Id FROM @Messages);
         `;
 
-        await request.query(query);
-        return true;
-    } catch (err) {
-        console.error('markMessagesSeen error:', err);
-        return false;
+            await request.query(query);
+            return true;
+        } catch (err) {
+            console.error('markMessagesSeen error:', err);
+            return false;
+        }
     }
-}
 
     static async fetchFriendMessageSummaries(currentUserId) {
         try {

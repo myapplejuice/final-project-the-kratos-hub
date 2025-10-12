@@ -30,4 +30,13 @@ export default class NutritionMealPlansController {
 
         return res.status(200).json({ success: true, plan });
     }
+
+    static async fetchPlans(req, res) {
+        const userId = req.id;
+
+        const plans = await NutritionMealPlansDBService.fetchPlansByUserId(userId);
+        if (!plans) return res.status(404).json({ success: false, error: "Plans not found" });
+
+        return res.status(200).json({ success: true, plans });
+    }
 }

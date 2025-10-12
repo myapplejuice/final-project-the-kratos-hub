@@ -72,7 +72,7 @@ export default function Homepage() {
 
     return (
         <AppScroll paddingColor={colors.background} topPadding={false} extraBottom={100} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>
-            <View style={{ paddingHorizontal: 20, paddingTop: 100, paddingBottom: 30, margin: 0, backgroundColor: colors.main, borderBottomEndRadius: 30, borderBottomStartRadius: 30, overflow: 'hidden' }}>
+            <View style={{ paddingHorizontal: 20, paddingTop: 100, paddingBottom: 30, margin: 0, backgroundColor: colors.main, borderBottomEndRadius: 30, borderBottomStartRadius: 30, overflow: 'hidden', marginBottom: 60 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignContent: 'center' }}>
                     <DateDisplay styles={{ textAlign: 'center' }} dateStyle={{ color: 'white' }} dayStyle={{ color: 'white' }} />
                     <View style={{ flexDirection: 'row', backgroundColor: '#ffffff48', padding: 12, borderRadius: 15, alignItems: 'center', justifyContent: 'center', alignContent: 'center' }}>
@@ -92,9 +92,21 @@ export default function Homepage() {
                 </FadeInOut>
             </View>
 
-            <View style={{ backgroundColor: colors.background, marginTop: 20 }}>
+            {user.friends.some(f => f.unreadCount) > 0 && (
+                <TouchableOpacity onPress={() => router.push(routes.FRIENDS)} style={[{ flexDirection: 'row', backgroundColor: colors.cardBackground, alignItems: 'center', margin: 15, padding: 15, borderRadius: 20, }]}>
+                    <View style={{ marginEnd: 15 }}>
+                        <Image source={Images.message} style={{ width: 25, height: 25, tintColor: 'white' }} />
+                    </View>
+                    <View>
+                        <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(16) }}>You have unread messages!</AppText>
+                        <AppText style={{ color: colors.mutedText, fontWeight: 'bold', fontSize: scaleFont(12) }}>Tap here to view</AppText>
+                    </View>
+                </TouchableOpacity>
+            )}
+
+            <View style={{ backgroundColor: colors.background }}>
                 <View style={{ marginBottom: 15 }}>
-                    <AppText style={{ marginTop: 15, color: 'white', paddingHorizontal: 25, fontSize: scaleFont(20), fontWeight: 'bold' }}>
+                    <AppText style={{ color: 'white', paddingHorizontal: 25, fontSize: scaleFont(20), fontWeight: 'bold' }}>
                         Today's Overview
                     </AppText>
                 </View>

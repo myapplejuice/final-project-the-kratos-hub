@@ -24,6 +24,7 @@ export default function AppScroll({
     hideNavBarOnScroll = false,
     onScrollSetStates = [],
     scrollToTop = false,
+    onScrollToTop = () => { },
     startAtBottom = false,
     avoidKeyboard = true,
     ...props
@@ -61,10 +62,14 @@ export default function AppScroll({
         isScrolledToBottom: (threshold = 50) => {
             if (!scrollRef.current) return true;
 
-              const distanceFromBottom = contentHeight.current - scrollViewHeight.current - scrollOffset.current;
+            const distanceFromBottom = contentHeight.current - scrollViewHeight.current - scrollOffset.current;
             return distanceFromBottom > threshold;
-        }, 
-        currentOffset: () => scrollOffset.current
+        },
+        scrollTo: (offsetY) => {
+            if (scrollRef.current) {
+                scrollRef.current.scrollToPosition(0, offsetY, true);
+            }
+        },
     }));
 
     function handleScroll(event) {
@@ -77,6 +82,10 @@ export default function AppScroll({
         if (!isScrollable) {
             scrollOffset.current = currentOffset;
             return;
+        }
+
+        if (typeof onScrollToTop === 'function' && currentOffset <= 10) {
+            onScrollToTop();
         }
 
         const setStates = (value) => {

@@ -1,5 +1,5 @@
 import { signJwt } from "../../utils/jwt-utils.js";
-import ChatDBService from "../chat/chat-db-service.js";
+import ChatDBService from "../socket/chat-db-service.js";
 import EmailService from "../email/email-service.js";
 import NotificationsDBService from "../notifications/notifications-db-service.js";
 import NutritionDaysDBService from "../nutrition/days/nutrition-days-db-service.js";
@@ -110,8 +110,8 @@ export default class UserToUserController {
     static async getChatMessages(req, res) {
         const details = req.body;
         
-        const response = await ChatDBService.fetchUserMessages(details.userId, details.friendId);
+        const response = await ChatDBService.fetchUserMessages(details.userId, details.friendId, details.page);
 
-        return res.status(200).json({ success: true, messages: response });
+        return res.status(200).json({ success: true, messages: response.messages, page: response.page, hasMore: response.hasMore });
     }
 }
