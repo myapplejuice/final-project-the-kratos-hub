@@ -249,6 +249,72 @@ export default class ChatDBService {
         }
     }
 
+static async fetchSingleFriendMessageSummary(currentUserId, friendId) {
+    try {
+        const request = Database.getRequest();
+        Database.addInput(request, 'CurrentUserId', sql.UniqueIdentifier, currentUserId);
+        Database.addInput(request, 'FriendId', sql.UniqueIdentifier, friendId);
+
+        const query = `
+        WITH LastMessages AS (
+            SELECT 
+                m.ChatRoomId,
+                m.Id AS MessageId,
+                m.Message,
+                m.SenderId,
+                m.DateTimeSent,
+                m.SeenBy,
+                ROW_NUMBER() OVER (PARTITION BY m.ChatRoomId ORDER BY m.DateTimeSent DESC) AS rn
+            FROM Messages m
+        ),
+        UnreadCounts AS (
+            SELECT 
+                m.ChatRoomId,
+                COUNT(*) AS UnreadCount
+            FROM Messages m
+            WHERE m.SenderId != @CurrentUserId
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM OPENJSON(ISNULL(m.SeenBy, '[]')) AS s
+                  WHERE s.value = CAST(@CurrentUserId AS NVARCHAR(50))
+              )
+            GROUP BY m.ChatRoomId
+        )
+        SELECT 
+            ucr.ChatRoomId,
+            ucr2.UserId AS FriendId,
+            lm.Message AS LastMessage,
+            lm.SenderId AS LastMessageSenderId,
+            lm.DateTimeSent AS LastMessageTime,
+            ISNULL(uc.UnreadCount, 0) AS UnreadCount
+        FROM UserChatRooms ucr
+        INNER JOIN UserChatRooms ucr2 
+            ON ucr.ChatRoomId = ucr2.ChatRoomId 
+           AND ucr2.UserId != ucr.UserId
+        LEFT JOIN LastMessages lm
+            ON ucr.ChatRoomId = lm.ChatRoomId AND lm.rn = 1
+        LEFT JOIN UnreadCounts uc
+            ON ucr.ChatRoomId = uc.ChatRoomId
+        WHERE ucr.UserId = @CurrentUserId
+          AND ucr2.UserId = @FriendId
+        `;
+
+        const result = await request.query(query);
+
+        if (result.recordset.length === 0) return null;
+
+        const raw = result.recordset[0];
+        const mapped = {};
+        for (const key in raw) {
+            mapped[ObjectMapper.toCamelCase(key)] = raw[key];
+        }
+
+        return mapped;
+    } catch (err) {
+        console.error('fetchSingleFriendMessageSummary error:', err);
+        return null;
+    }
+}
 
     static async fetchChatRoomId(userId1, userId2) {
         try {

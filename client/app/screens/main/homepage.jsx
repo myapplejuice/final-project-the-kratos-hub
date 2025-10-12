@@ -69,7 +69,7 @@ export default function Homepage() {
             setUser(prev => ({
                 ...prev,
                 notifications: [
-                    notification, 
+                    notification,
                     ...prev.notifications
                 ]
             }));
@@ -79,15 +79,55 @@ export default function Homepage() {
             setUser(prev => ({
                 ...prev,
                 pendingFriends: [
-                    request,       
+                    request,
                     ...prev.pendingFriends
                 ]
+            }));
+        }
+
+        function handleNewFriendResponse(payload) {
+            if (payload.status === 'accepted') {
+                const friendSummary = payload.friendSummary;
+                console.log(friendSummary)
+                setUser(prev => ({
+                    ...prev,
+                    friends: [
+                        ...prev.friends,
+                        friendSummary
+                    ]
+                }));
+            } else {
+                const friendId = payload.friendId;
+                setUser(prev => ({
+                    ...prev,
+                    pendingFriends: prev.pendingFriends.map(friend =>
+                        friend.id === friendId
+                            ? { ...friend, status: 'declined' }
+                            : friend
+                    )
+                }));
+            }
+        }
+
+        function handleNewFriendStatus(payload) {
+            const friendId = payload.friendId;
+            const newStatus = payload.status;
+            console.log(user.friends[0].status)
+            setUser(prev => ({
+                ...prev,
+                friends: prev.friends.map(friend =>
+                    friend.friendId === friendId
+                        ? { ...friend, status: newStatus }
+                        : friend
+                )
             }));
         }
 
         SocketService.on("new-message", handleMessage);
         SocketService.on("new-notification", handleNotification);
         SocketService.on("new-friend-request", handleNewFriendRequest);
+        SocketService.on("new-friend-response", handleNewFriendResponse);
+        SocketService.on("new-friend-status", handleNewFriendStatus);
 
         return () => { SocketService.off("new-message", handleMessage) };
     }, []);

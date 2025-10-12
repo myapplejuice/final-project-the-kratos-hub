@@ -155,6 +155,45 @@ export default class UserToUserDBService {
         }
     }
 
+    static async fetchUserFriend(userId, friendId) {
+    try {
+        const request = Database.getRequest();
+        Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
+        Database.addInput(request, 'FriendId', sql.UniqueIdentifier, friendId);
+
+        const query = `
+        SELECT 
+            Id,
+            CASE 
+                WHEN UserOne = @UserId THEN UserTwo
+                ELSE UserOne
+            END AS FriendId,
+            Status,
+            TerminatedBy
+        FROM UserFriendList
+        WHERE 
+            (UserOne = @UserId AND UserTwo = @FriendId)
+            OR (UserOne = @FriendId AND UserTwo = @UserId)
+        `;
+
+        const result = await request.query(query);
+
+        if (!result.recordset.length) return null;
+
+        const r = result.recordset[0];
+        return {
+            id: r.Id,
+            friendId: r.FriendId,
+            terminatedBy: r.TerminatedBy,
+            status: r.Status
+        };
+    } catch (err) {
+        console.error('fetchUserFriend error:', err);
+        return null;
+    }
+}
+
+
     static async fetchUserPendingFriendsList(userId) {
         try {
             const request = Database.getRequest();

@@ -62,6 +62,7 @@ export default class UserToUserController {
         adderPayload.id = id;
         adderPayload.clickableInfo = JSON.parse(adderPayload.clickableInfo);
         SocketController.emitNotification(details.adderId, adderPayload);
+        await SocketController.emitFriendRequestResponse(details.reply, details.adderId, details.receiverId);
 
         return res.status(200).json({ success: true, message: response.message, id: response.id, newChatId: response.newChatId });
     }
@@ -89,6 +90,7 @@ export default class UserToUserController {
         payload.id = id;
         payload.clickableInfo = JSON.parse(payload.clickableInfo);
         SocketController.emitNotification(details.friendId, payload);
+        SocketController.emitNewFriendStatus('inactive', details.friendId, details.terminatorId);
 
         return res.status(200).json({ success: true, message: response.message });
     }
@@ -116,6 +118,7 @@ export default class UserToUserController {
         payload.id = id;
         payload.clickableInfo = JSON.parse(payload.clickableInfo);
         SocketController.emitNotification(details.friendId, payload);
+        SocketController.emitNewFriendStatus('active', details.friendId, details.restorerId);
 
         return res.status(200).json({ success: true, message: response.message });
     }
