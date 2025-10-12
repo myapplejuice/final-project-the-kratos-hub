@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Button, StyleSheet, TouchableOpacity, View, Platform, Keyboard } from "react-native";
+import { Button, StyleSheet, TouchableOpacity, View, Platform, Keyboard, Dimensions } from "react-native";
 import AppText from "../../../components/screen-comps/app-text";
 import { Images } from '../../../common/settings/assets';
 import { UserContext } from "../../../common/contexts/user-context";
@@ -17,26 +17,43 @@ import StaticIcons from "../../../components/screen-comps/static-icons";
 import AppTextInput from "../../../components/screen-comps/app-text-input";
 import SlideInOut from "../../../components/effects/slide-in-out";
 import SocketService from "../../../common/services/socket-service";
+import FloatingActionButton from "../../../components/screen-comps/floating-action-button";
 
 export default function Chat() {
-    const { createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
-    const { user, setUser, setAdditionalContexts, additionalContexts } = useContext(UserContext);
+    const { user, setUser, additionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
+    const scrollRef = useRef(null);
+    const initialScrollDone = useRef(false);
 
-    const [scrollToBottom, setScrollToBottom] = useState(true);
+    const [fabVisible, setFabVisible] = useState(false);
+
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [keyboardOpen, setKeyboardOpen] = useState(false);
 
     const [roomId, setRoomId] = useState(null);
     const [messages, setMessages] = useState([]);
+    const [newMessageText, setNewMessageText] = useState(false);
 
     const [message, setMessage] = useState('');
     const [messageHeight, setMessageHeight] = useState(50);
     const messagesRef = useRef(messages);
 
     useEffect(() => {
+        if (!initialScrollDone.current && messages.length > 0) {
+            initialScrollDone.current = true;
+
+            // Wait for rendering
+            setTimeout(() => {
+                scrollRef.current?.scrollToBottom({ animated: false });
+            }, 0);
+        }
+
+        if (messages[messages.length - 1]?.senderId === user.id) {
+            setTimeout(() => {
+                scrollRef.current?.scrollToBottom({ animated: false });
+            }, 0);
+        }
         messagesRef.current = messages;
-        setScrollToBottom(true);
     }, [messages]);
 
     useEffect(() => {
@@ -74,7 +91,6 @@ export default function Chat() {
                 const messages = result.data?.messages;
 
                 setMessages(messages);
-                setScrollToBottom(true);
             } catch (error) {
                 console.log(error);
             } finally {
@@ -94,9 +110,20 @@ export default function Chat() {
 
         SocketService.joinRoom(chatRoomId);
         SocketService.on("new-message", (msg) => {
+            console.log('crashes here?')
             if (msg.chatRoomId === chatRoomId) {
-                msg.seenBy.push(user.id);
+                if (!msg.seenBy.includes(user.id))
+                    msg.seenBy.push(user.id);
                 setMessages((prev) => [...prev, msg]);
+
+                if (msg.senderId !== user.id) {
+                    const isScrolledUp = scrollRef.current?.isScrolledToBottom(1000);
+                    if (isScrolledUp) {
+                        setNewMessageText(true);
+                        setTimeout(() => setNewMessageText(false), 2000);
+                        setFabVisible(true);
+                    }
+                }
             }
         });
 
@@ -145,7 +172,6 @@ export default function Chat() {
         setMessage('');
         SocketService.emit("send-message", payload, (newMessageId) => {
             payload.id = newMessageId;
-            console.log(payload);
             setMessages(prev => [...prev, payload]);
         });
     }
@@ -157,6 +183,22 @@ export default function Chat() {
 
     return (
         <>
+            <FadeInOut visible={newMessageText} style={{ position: 'absolute', bottom: insets.bottom + 150 + keyboardHeight, backgroundColor: colors.cardBackground, padding: 15, borderRadius: 20, alignItems: 'center', alignSelf: 'center', zIndex: 9999 }}>
+                <AppText style={{ color: 'white', fontWeight: 'bold' }}>New unread message</AppText>
+            </FadeInOut>
+            <FloatingActionButton
+                onPress={() => {
+                    scrollRef.current.scrollToBottom()
+                    setFabVisible(false);
+                    setNewMessageText(false);
+                }}
+                visible={fabVisible}
+                position={{ bottom: insets.bottom + 100 + keyboardHeight, left: Dimensions.get('window').width / 2 - 20 }}
+                icon={Images.arrow}
+                iconStyle={{ transform: [{ rotate: '90deg' }], marginTop: 3 }}
+                iconSize={20}
+                size={40}
+            />
             <FadeInOut visible={true} style={{ position: 'absolute', bottom: 0, paddingBottom: insets.bottom + 10 + keyboardHeight, paddingTop: 10, zIndex: 9999, flexDirection: 'row', paddingHorizontal: 15, backgroundColor: 'rgba(0, 0, 0, 0.95)', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' }}>
                 <View style={{ width: '85%', minHeight: 50, maxHeight: 120, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                     <AppTextInput
@@ -181,7 +223,7 @@ export default function Chat() {
             </FadeInOut>
             <View style={styles.main}>
                 <View>
-                    <AppScroll startAtBottom={true} scrollToBottom={scrollToBottom} extraBottom={keyboardOpen ? keyboardHeight - 65 : 75}>
+                    <AppScroll ref={scrollRef} extraBottom={keyboardOpen ? keyboardHeight - 65 : 75}>
                         {messages && messages.length > 0 &&
                             messages.map((message, index) => {
                                 const isUser = message.senderId === user.id;

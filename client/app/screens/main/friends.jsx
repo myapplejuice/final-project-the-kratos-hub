@@ -38,7 +38,6 @@ export default function Friends() {
     useEffect(() => {
         async function fetchFriendsProfiles() {
             try {
-                showSpinner();
                 const idList = user.friends.filter(friend => friend.status === 'active').map(friend => friend.friendId);
                 let profiles = [];
 
@@ -61,7 +60,6 @@ export default function Friends() {
             } catch (error) {
                 console.log(error);
             } finally {
-                hideSpinner();
                 setLoading(false);
             }
         }
@@ -148,7 +146,7 @@ export default function Friends() {
                                                 formatDate(messageTimeDetails, { format: user.preferences.dateFormat.key }) : '';
 
                                 const isUnread = messagingDetails.unreadCount > 0;
-                                console.log(isUnread)
+                               
                                 return (
                                     <TouchableOpacity
                                         onPress={() => handleFriendClick(friend)}

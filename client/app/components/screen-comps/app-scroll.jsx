@@ -1,4 +1,4 @@
-import React, { useRef, useContext, useEffect } from "react";
+import React, { useRef, useContext, useEffect, useImperativeHandle } from "react";
 import { Platform, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -11,6 +11,7 @@ import { KeyboardContext } from "../../common/contexts/keyboard-context";
 
 export default function AppScroll({
     children,
+    ref,
     contentStyle,
     extraBottom = 0,
     extraTop = 45,
@@ -23,7 +24,6 @@ export default function AppScroll({
     hideNavBarOnScroll = false,
     onScrollSetStates = [],
     scrollToTop = false,
-    scrollToBottom = false,
     startAtBottom = false,
     avoidKeyboard = true,
     ...props
@@ -46,14 +46,26 @@ export default function AppScroll({
         }
     }, [scrollToTop]);
 
-    useEffect(() => {
-        if (scrollToBottom) {
+    useImperativeHandle(ref, () => ({
+        scrollToBottom: () => {
+            console.log('gets to bottom here')
             if (scrollRef.current) {
                 scrollRef.current.scrollToEnd({ animated: true });
             }
-        }
-    }, [scrollToBottom]);
+        },
+        scrollToTop: () => {
+            if (scrollRef.current) {
+                scrollRef.current.scrollToPosition(0, 0, true);
+            }
+        },
+        isScrolledToBottom: (threshold = 50) => {
+            if (!scrollRef.current) return true;
 
+              const distanceFromBottom = contentHeight.current - scrollViewHeight.current - scrollOffset.current;
+            return distanceFromBottom > threshold;
+        }, 
+        currentOffset: () => scrollOffset.current
+    }));
 
     function handleScroll(event) {
         if (keyboardActive) return;
@@ -109,13 +121,7 @@ export default function AppScroll({
             keyboardShouldPersistTaps={keyboardShouldPersistTaps}
             onScroll={handleScroll}
             scrollEventThrottle={16}
-            onContentSizeChange={(w, h) => {
-                contentHeight.current = h
-
-                if (startAtBottom && scrollRef.current) {
-                    scrollRef.current.scrollToEnd({ animated: false }); // scroll to bottom
-                }
-            }}
+            onContentSizeChange={(w, h) => { contentHeight.current = h }}
             {...props}
         >
             <View style={{ flex: 1 }}>
