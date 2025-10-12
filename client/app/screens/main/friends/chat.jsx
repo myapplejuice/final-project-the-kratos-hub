@@ -19,6 +19,7 @@ import SlideInOut from "../../../components/effects/slide-in-out";
 import SocketService from "../../../common/services/socket-service";
 import FloatingActionButton from "../../../components/screen-comps/floating-action-button";
 import { Easing } from "react-native";
+import AnimatedButton from "../../../components/screen-comps/animated-button";
 
 export default function Chat() {
     const { createOptions } = usePopups();
@@ -185,7 +186,7 @@ export default function Chat() {
             const result = await APIService.userToUser.chat.messages(payload);
             const newMessages = result.data?.messages || [];
 
-            setMessages(prev => [...newMessages, ...prev]); // prepend older messages
+            setMessages(prev => [...newMessages, ...prev]);
             currentPage.current += 1;
             morePages.current = result.data?.hasMore;
         } catch (error) {
@@ -196,7 +197,7 @@ export default function Chat() {
     }
 
     async function safeTrigger(callback) {
-        if (apiFetchDebounce.current) return; // prevent multiple triggers
+        if (apiFetchDebounce.current) return;
         apiFetchDebounce.current = true;
 
         try {
@@ -210,16 +211,18 @@ export default function Chat() {
         }
     }
 
-    async function handleMessageSend() {
-        if (!message.trim()) return;
+    function handleMessageSend(extraInformation = {}) {
+        if (Object.keys(extraInformation).length === 0) {
+            if (!message.trim()) return;
+        }
 
         const payload = {
             senderId: user.id,
             receiverId: additionalContexts.chattingFriendProfile.id,
             chatRoomId: roomId,
-            message,
+            message: extraInformation?.context === 'mealplan' ? 'Imported plan' : message,
             seenBy: [user.id],
-            extraInformation: {},
+            extraInformation: extraInformation,
             dateTimeSent: new Date()
         };
 
@@ -235,17 +238,40 @@ export default function Chat() {
 
     async function handleImportPlan() {
         const userPlans = user.plans;
-        console.log(userPlans)
-     
+
+        createOptions({
+            title: 'Select a plan',
+            options: userPlans.map(p => p.label),
+            values: userPlans.map(p => p.id),
+            onConfirm: (selected, value) => {
+                console.log(selected, value);
+                if (!selected || !value) return;
+
+                const plan = userPlans.find(p => p.id === value);
+
+                console.log(plan.id)
+                const extraInformation = {
+                    context: 'mealplan',
+                    planId: plan.id,
+                    planLabel: plan.label,
+                    planDescription: plan.description,
+                };
+
+                handleMessageSend(extraInformation);
+            }
+        })
     }
 
-    async function handleAdvancedMessageDisplay(message) {
-        if (message.extraInformation.context === 'mealplan') {
-            const result = await APIService.nutrition.mealPlans.otherUserPlans(message.senderId)
-            const plans = result.data.plans;
+    async function handleMealPlanSave(mealPlanId, senderId) {
+        const result = await APIService.nutrition.mealPlans.otherUserPlans({userId: senderId});
+        const plans = result.data?.plans;
+        const plan = plans?.find(p => p.id === mealPlanId);
 
-            console.log(plans)
-        }
+        plan.userId = user.id;
+        plan.id = null;
+        plan.meal.forEach(m => m.id = null);
+        plan.meal.forEach(m => m.foods.forEach(f => f.id = null));
+        //! doesnt work, needs alot of configuration
     }
 
     return (
@@ -352,10 +378,26 @@ export default function Chat() {
                                         <View style={{ flexDirection: 'row', justifyContent: isUser ? 'flex-start' : 'flex-end', paddingHorizontal: 5 }}>
                                             <View style={{ maxWidth: '90%', flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10, ...(isUser ? { marginEnd: 15 } : { marginStart: 15 }) }}>
                                                 <View style={[{ paddingHorizontal: 15, paddingVertical: 10, borderRadius: 20 }, bubbleStyle]}>
-                                                    {Object.keys(message.extraInformation).length > 0 ?
-                                                        handleAdvancedMessageDisplay(message)
-                                                        :
-                                                        <AppText style={{ color: 'white', lineHeight: 20, flexShrink: 1 }}>{message.message}</AppText>}
+                                                    {Object.keys(message?.extraInformation)?.length > 0 &&
+                                                        message.extraInformation?.context === 'mealplan' && (
+                                                            <View style={{}}>
+                                                                <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(15) }}>
+                                                                    {message.extraInformation.planLabel}
+                                                                </AppText>
+                                                                <AppText style={{ color: colors.mutedText, fontWeight: 'bold' }}>
+                                                                    {message.extraInformation.planDescription}
+                                                                </AppText>
+                                                                {message.senderId !== user.id && <AnimatedButton
+                                                                    onPress={() => handleMealPlanSave(message.extraInformation.planId, message.senderId)}
+                                                                    title={'Save Plan'}
+                                                                    style={{ backgroundColor: colors.main, marginTop: 15, padding: 10 }}
+                                                                    textStyle={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12) }}
+
+                                                                />
+                                                                }
+                                                            </View>
+                                                        )}
+                                                    {message.message && <AppText style={{ color: 'white', lineHeight: 20, flexShrink: 1, marginTop: message.extraInformation?.context === 'mealplan' ? 10 : 0 }}>{message.message}</AppText>}
                                                     <AppText style={{ color: 'rgba(255, 255, 255, 0.4)', alignSelf: 'flex-end', marginTop: 5 }}>
                                                         {timeDisplay}
                                                     </AppText>

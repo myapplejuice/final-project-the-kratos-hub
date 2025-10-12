@@ -65,7 +65,31 @@ export default function Homepage() {
             }));
         };
 
+        function handleNotification(notification) {
+            setUser(prev => ({
+                ...prev,
+                notifications: [
+                    ...prev.notifications,
+                    notification
+                ]
+
+            }));
+        };
+
+        function handleNewFriendRequest(request) {
+            setUser(prev => ({
+                ...prev,
+                pendingFriends: [
+                    ...prev.pendingFriends,
+                    request
+                ]
+            }));
+        };
+
+
         SocketService.on("new-message", handleMessage);
+        SocketService.on("new-notification", handleNotification);
+        SocketService.on("new-friend-request", handleNewFriendRequest);
 
         return () => { SocketService.off("new-message", handleMessage) };
     }, []);

@@ -108,11 +108,12 @@ export default class UserToUserDBService {
 
             const insertQuery = `
                 INSERT INTO FriendRequests (AdderId, ReceiverId, Status, Description, DateOfCreation)
+               OUTPUT inserted.Id
                 VALUES (@AdderId, @ReceiverId, @Status, @Description, @DateOfCreation)
             `;
             await request.query(insertQuery);
 
-            return { success: true, message: "Friend request sent successfully" };
+            return { success: true, message: "Friend request sent successfully", newFriendRequestId: request.rowsAffected[0] };
 
         } catch (err) {
             console.error('sendFriendRequest error:', err);

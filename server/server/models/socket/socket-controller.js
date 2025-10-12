@@ -1,3 +1,4 @@
+import Server from "../../server.js";
 import ChatDBService from "./chat-db-service.js";
 
 export default class SocketController {
@@ -15,5 +16,15 @@ export default class SocketController {
         }
 
         return savedMessageId;
+    }
+
+    static emitNotification(userId, payload) {
+        const io = Server.getIoSocket();
+        io.to(userId).emit('new-notification', payload);
+    }
+
+    static emitFriendRequest(userId, payload) {
+        const io = Server.getIoSocket();
+        io.to(userId).emit('new-friend-request', payload);
     }
 }

@@ -9,6 +9,7 @@ export default function Options({
     title = "",
     current = "",
     options = [],
+    values = [],
     onAbort = () => {},
     onConfirm = () => {},
     abortText = "Cancel",
@@ -16,6 +17,7 @@ export default function Options({
 }) {
     const { opacity, translateY } = usePopupAnimation();
     const [selected, setSelected] = useState(current);
+    const [selectedValue, setSelectedValue] = useState(undefined);
 
     return (
         <Animated.View style={[styles.overlay, { opacity }]}>
@@ -37,7 +39,7 @@ export default function Options({
                                 styles.optionCard,
                                 selected === opt && styles.optionSelected,
                             ]}
-                            onPress={() => setSelected(opt)}
+                            onPress={() => {setSelected(opt), setSelectedValue(values[idx])}}
                             activeOpacity={0.8}
                         >
                             <AppText style={styles.optionText}>{opt}</AppText>
@@ -49,7 +51,7 @@ export default function Options({
                 <View style={styles.buttonRow}>
                     <TouchableOpacity
                         style={[styles.buttonContainer, styles.confirmButton]}
-                        onPress={() => onConfirm(selected)}
+                        onPress={() => onConfirm(selected, selectedValue)}
                     >
                         <AppText style={[styles.buttonText, styles.confirmButtonText]}>
                             {confirmText}

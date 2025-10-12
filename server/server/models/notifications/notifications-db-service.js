@@ -53,13 +53,14 @@ export default class NotificationsDBService {
 
             const query = `
                 INSERT INTO UserNotifications (UserId, Notification, Seen, Clickable, ClickableInfo, ClickableDestination, Sentiment, DateOfCreation)
+                OUTPUT INSERTED.Id
                 VALUES (@UserId, @Notification, @Seen, @Clickable, @ClickableInfo, @ClickableDestination, @Sentiment, @DateOfCreation)
             `;
 
             const result = await request.query(query);
             if (result.rowsAffected[0] === 0) return false;
 
-            return true;
+            return result.recordset[0].Id;
         } catch (err) {
             console.error('pushNotification error:', err);
         }

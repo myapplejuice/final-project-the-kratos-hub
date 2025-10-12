@@ -12,6 +12,7 @@ import ChatDBService from './models/socket/chat-db-service.js';
 
 export default class Server {
     static instance;
+static io;
 
     constructor(port = process.env.SERVER_PORT) {
         if (Server.instance) {
@@ -51,13 +52,13 @@ export default class Server {
 
     initSocketServer() {
         this.httpServer = createServer(this.app);
-        this.io = new SocketIOServer(this.httpServer, {
+        Server.io = new SocketIOServer(this.httpServer, {
             cors: { origin: '*' }
         });
 
-        this.io.use(MiddlewaresManager.socketAuthorization);
+        Server.io.use(MiddlewaresManager.socketAuthorization);
 
-        this.io.on('connection', (socket) => {
+        Server.io.on('connection', (socket) => {
             console.log('Socket connected:', socket.id);
             const userId = socket.userId;
             socket.join(userId);
@@ -93,6 +94,9 @@ export default class Server {
         });
     }
 
+    static getIoSocket() {
+        return Server.io;
+    }
 
     start(info) {
         const startup = this.httpServer.listen(this.port, () => {

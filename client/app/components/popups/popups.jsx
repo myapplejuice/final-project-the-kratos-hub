@@ -144,10 +144,11 @@ export default function Popups({
           title={optionsParams.title}
           options={optionsParams.options}
           current={optionsParams.current}
-          onConfirm={(val) => {
+          values={optionsParams.values}
+          onConfirm={(selected, values) => {
             setOptions(false);
             if (optionsParams.onConfirm) {
-              optionsParams.onConfirm(val);
+              optionsParams.onConfirm(selected, values);
             }
           }}
         />

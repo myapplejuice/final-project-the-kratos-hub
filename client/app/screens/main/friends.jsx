@@ -130,7 +130,7 @@ export default function Friends() {
 
                                 const messageTimeDetails = new Date(messagingDetails.lastMessageTime);
                                 const displayTime = (() => {
-                                    if (!messagingDetails.lastMessage) return '';
+                                    if (!messagingDetails.lastMessageTime) return '';
 
                                     const now = new Date();
                                     const diffMs = now - messageTimeDetails;

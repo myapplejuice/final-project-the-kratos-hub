@@ -6,6 +6,7 @@ import NutritionDaysDBService from "../nutrition/days/nutrition-days-db-service.
 import NutritionFoodsDBService from "../nutrition/foods/nutrition-foods-db-service.js";
 import NutritionMealPlansDBService from "../nutrition/meal-plans/nutrition-meal-plans-db-service.js";
 import UserToUserDBService from "./user-to-user-db-service.js";
+import SocketController from "../socket/socket-controller.js";
 
 export default class UserToUserController {
     static async getAnotherUserProfile(req, res) {
@@ -32,6 +33,9 @@ export default class UserToUserController {
         const response = await UserToUserDBService.sendFriendRequest(details);
         if (!response.success) return res.status(400).json({ success: false, message: response.message });
 
+        details.id = response.newFriendRequestId;
+        SocketController.emitFriendRequest(details.receiverId, details);
+
         return res.status(200).json({ success: true, message: "Friend request sent" });
     }
 
@@ -54,7 +58,9 @@ export default class UserToUserController {
             dateOfCreation: new Date()
         }
 
-        await NotificationsDBService.pushNotification(adderPayload);
+        const id = await NotificationsDBService.pushNotification(adderPayload);
+        adderPayload.id = id;
+        SocketController.emitNotification(details.adderId, adderPayload);
 
         return res.status(200).json({ success: true, message: response.message, id: response.id, newChatId: response.newChatId });
     }
@@ -78,7 +84,9 @@ export default class UserToUserController {
             dateOfCreation: new Date()
         }
 
-        await NotificationsDBService.pushNotification(payload);
+        const id = await NotificationsDBService.pushNotification(payload);
+        payload.id = id;
+        SocketController.emitNotification(details.friendId, payload);
 
         return res.status(200).json({ success: true, message: response.message });
     }
@@ -102,14 +110,16 @@ export default class UserToUserController {
             dateOfCreation: new Date()
         }
 
-        await NotificationsDBService.pushNotification(payload);
+        const id = await NotificationsDBService.pushNotification(payload);
+        payload.id = id;
+        SocketController.emitNotification(details.friendId, payload);
 
         return res.status(200).json({ success: true, message: response.message });
     }
 
     static async getChatMessages(req, res) {
         const details = req.body;
-        
+
         const response = await ChatDBService.fetchUserMessages(details.userId, details.friendId, details.page);
 
         return res.status(200).json({ success: true, messages: response.messages, page: response.page, hasMore: response.hasMore });
