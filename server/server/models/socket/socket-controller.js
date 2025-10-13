@@ -36,6 +36,7 @@ export default class SocketController {
         if (reply === 'accepted') {
             const userFriend = await UserToUserDBService.fetchUserFriend(userId, friendId);
             const newFriendSummary = await ChatDBService.fetchSingleFriendMessageSummary(userId, friendId);
+            console.log(newFriendSummary)
             const friendSummary = {
                 ...userFriend,
                 lastMessageSenderId: newFriendSummary?.lastMessageSenderId || null,

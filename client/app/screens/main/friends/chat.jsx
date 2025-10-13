@@ -652,7 +652,7 @@ export default function Chat() {
                                                         <Image
                                                             source={{ uri: message.extraInformation.imageUrl }}
                                                             style={[{
-                                                                width: 300, height: 300, borderTopLeftRadius: 20, borderTopRightRadius: 20,
+                                                                width: 300, height: 300, borderTopLeftRadius: 20, borderTopRightRadius: 20, marginTop: 5,
                                                                 borderBottomLeftRadius: message.senderId === user.id ? 20 : 0, borderBottomLeftRadius: message.senderId === user.id ? 20 : 0, backgroundColor: 'transparent'
                                                             }]}
                                                             resizeMode="cover"

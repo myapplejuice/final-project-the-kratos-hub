@@ -15,7 +15,7 @@ import { convertHeight, convertWeight, convertFluid, convertEnergy } from "../..
 import { scaleFont } from "../../common/utils/scale-fonts";
 import { routes } from "../../common/settings/constants";
 import { colors, nutritionColors } from "../../common/settings/styling";
-import { goalOptions, activityOptions, fluidUnits, dietOptions, weightUnits, energyUnits, heightUnits, defaultPreferences } from "../../common/utils/global-options"
+import { goalOptions, activityOptions, fluidUnits, dietOptions, weightUnits, energyUnits, heightUnits, defaultPreferences, countryCodes } from "../../common/utils/global-options"
 import { Images } from "../../common/settings/assets";
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system/legacy";
@@ -84,6 +84,7 @@ export default function Register() {
     const [gender, setGender] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
+    const [phonePrefix, setPhonePrefix] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPass, setConfirmPass] = useState("");
 
@@ -344,7 +345,7 @@ export default function Register() {
                 return createToast({ message: "Enter a valid email address!" });
             }
 
-            const phoneRegex = /^[0-9+\-\s()]+$/;
+            const phoneRegex = /^(\+?\d{1,3})?[\s\-()]?\d{1,4}[\d\s\-()]{5,10}$/;
             if (!phoneRegex.test(phone)) {
                 return createToast({ message: "Please enter a valid phone number!" });
 
@@ -412,7 +413,7 @@ export default function Register() {
             age,
             gender,
             email,
-            phone,
+            phone: phonePrefix + phone,
             password,
             imageBase64,
             metrics: {
@@ -460,6 +461,19 @@ export default function Register() {
             theme: defaultPreferences.theme,
         }
         return pref;
+    }
+
+    async function handleCountryCode() {
+        createOptions({
+            title: 'Select a country',
+            options: countryCodes.map(c => c.code + ' ' + c.dial_code),
+            values: countryCodes.map(c => c),
+            onConfirm: (selected, value) => {
+                if (!selected || !value) return;
+                setPhonePrefix(value.dial_code);
+            }
+        })
+
     }
 
     return (
@@ -878,7 +892,7 @@ export default function Register() {
                             placeholder="Lastname"
                             placeholderTextColor={"rgba(255, 255, 255, 0.5)"}
                             style={[styles.input, { width: '48%' }]}
-                                    keyboardType="default"
+                            keyboardType="default"
                         />
                     </View>
                     <AppTextInput
@@ -889,15 +903,25 @@ export default function Register() {
                         style={styles.input}
                         keyboardType="email-address"
                     />
-                    <AppTextInput
-                        onChangeText={(value) => setPhone(value)}
-                        value={phone}
-                        placeholder="Phone"
-                        placeholderTextColor={"rgba(255, 255, 255, 0.5)"}
-                        style={styles.input}
-                        inputMode="tel"
-                        keyboardType="phone-pad"
-                    />
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '90%' }}>
+                        <TouchableOpacity
+                            onPress={handleCountryCode}
+                            style={[styles.input, { width: '20%', justifyContent: 'center' }]}
+                            inputMode="tel"
+                            keyboardType="phone-pad"
+                        >
+                            <AppText style={{ color: phonePrefix ? 'white' : "rgba(255, 255, 255, 0.5)" }}>{phonePrefix || '+XX'}</AppText>
+                        </TouchableOpacity>
+                        <AppTextInput
+                            onChangeText={(value) => setPhone(value)}
+                            value={phone}
+                            placeholder="Phone (e.g. XX-XXX-XXXX)"
+                            placeholderTextColor={"rgba(255, 255, 255, 0.5)"}
+                            style={[styles.input, { width: '76%' }]}
+                            inputMode="tel"
+                            keyboardType="phone-pad"
+                        />
+                    </View>
                     <AppTextInput
                         secureTextEntry={true}
                         onChangeText={(value) => setPassword(value)}

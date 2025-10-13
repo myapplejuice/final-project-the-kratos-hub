@@ -64,7 +64,7 @@ export default class UserToUserController {
         SocketController.emitNotification(details.adderId, adderPayload);
         await SocketController.emitFriendRequestResponse(details.reply, details.adderId, details.receiverId);
 
-        return res.status(200).json({ success: true, message: response.message, id: response.id, newChatId: response.newChatId });
+        return res.status(200).json({ success: true, message: response.message, id: response.id, chatRoomId: response.newChatId });
     }
 
     static async disableFriendship(req, res) {

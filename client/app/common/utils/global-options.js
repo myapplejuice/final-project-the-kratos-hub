@@ -1,6 +1,28 @@
 import { Images } from "../settings/assets";
 import { convertWeight } from "./unit-converter";
 
+export const countryCodes = [
+    { name: "United States", code: "US", dial_code: "+1" },
+    { name: "Canada", code: "CA", dial_code: "+1" },
+    { name: "United Kingdom", code: "GB", dial_code: "+44" },
+    { name: "Australia", code: "AU", dial_code: "+61" },
+    { name: "Germany", code: "DE", dial_code: "+49" },
+    { name: "France", code: "FR", dial_code: "+33" },
+    { name: "Italy", code: "IT", dial_code: "+39" },
+    { name: "Spain", code: "ES", dial_code: "+34" },
+    { name: "Israel", code: "IL", dial_code: "+972" },
+    { name: "India", code: "IN", dial_code: "+91" },
+    { name: "China", code: "CN", dial_code: "+86" },
+    { name: "Japan", code: "JP", dial_code: "+81" },
+    { name: "Brazil", code: "BR", dial_code: "+55" },
+    { name: "Mexico", code: "MX", dial_code: "+52" },
+    { name: "Russia", code: "RU", dial_code: "+7" },
+    { name: "South Africa", code: "ZA", dial_code: "+27" },
+    { name: "New Zealand", code: "NZ", dial_code: "+64" },
+    { name: "Singapore", code: "SG", dial_code: "+65" },
+    { name: "South Korea", code: "KR", dial_code: "+82" }
+];
+
 export const defaultPreferences = {
     heightUnit: { key: "cm", label: "Metric (cm)", labelShort: "Metric", field: "cm", placeholderLabel: "(cm)" },
     weightUnit: { key: "kg", label: "Kilogram (kg)", labelShort: "Kilogram", field: "kg", placeholderLabel: "(kg)" },

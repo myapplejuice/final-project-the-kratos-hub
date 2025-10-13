@@ -137,7 +137,7 @@ export default function EditProfile() {
                     return;
                 }
 
-                const phoneRegex = /^[0-9+\-\s()]+$/;
+                const phoneRegex = /^(\+?\d{1,3})?[\s\-()]?\d{1,4}[\d\s\-()]{5,10}$/;
                 if (!phoneRegex.test(phone)) {
                     createToast({ message: "Please enter a valid phone number!" });
                     return;
@@ -177,9 +177,9 @@ export default function EditProfile() {
                     { icon: Images.phoneTwo, label: "Change Phone", onPress: handlePhone },
                 ].map((item, i) => (
                     <View key={i}>
-                        <TouchableOpacity key={i} style={[styles.optionRow, {padding: 5, borderRadius: 12}]} onPress={item.onPress}>
+                        <TouchableOpacity key={i} style={[styles.optionRow, { padding: 5, borderRadius: 12 }]} onPress={item.onPress}>
                             <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
-                                <View style={{ backgroundColor: colors.backgroundSecond,padding: 13, borderRadius: 12 }}>
+                                <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
                                     <Image source={item.icon} style={styles.modeIcon} />
                                 </View>
                                 <AppText style={styles.label}>
