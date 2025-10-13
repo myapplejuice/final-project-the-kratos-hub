@@ -1,7 +1,6 @@
-import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Button, StyleSheet, TouchableOpacity, View, Platform, Keyboard, Dimensions, Animated, Linking } from "react-native";
+import { Button, StyleSheet, TouchableOpacity, View, Platform, Keyboard, Dimensions, Animated, Linking, Image } from "react-native";
 import * as DocumentPicker from 'expo-document-picker';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system/legacy';
@@ -390,28 +389,45 @@ export default function Chat() {
             createToast({ message: 'Document saved' });
         } catch (err) {
             console.error('Document download failed:', err);
-        }finally{
+        } finally {
             hideSpinner();
         }
     }
 
     async function downloadImage(url, fileName) {
-        showSpinner();
-        console.log(url)
         try {
-            const fileUri = FileSystem.documentDirectory + fileName;
+            if (Platform.OS === 'android') {
+                const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+                if (!permissions.granted) {
+                    Alert.alert('Permission denied', 'Cannot save without storage permission.');
+                    return;
+                }
 
-            const { uri } = await FileSystem.downloadAsync(url, fileUri);
+                const tmp = await FileSystem.downloadAsync(url, FileSystem.cacheDirectory + fileName);
+                const base64 = await FileSystem.readAsStringAsync(tmp.uri, { encoding: FileSystem.EncodingType.Base64 });
 
-            if (Platform.OS === 'ios') {
-                await Sharing.shareAsync(uri);
+                const mimeType = fileName.endsWith('.png') ? 'image/png' : 'image/jpeg';
+                const uri = await FileSystem.StorageAccessFramework.createFileAsync(
+                    permissions.directoryUri,
+                    fileName,
+                    mimeType
+                );
+
+                await FileSystem.writeAsStringAsync(uri, base64, { encoding: FileSystem.EncodingType.Base64 });
             }
 
-            createToast({ message: 'Image saved' });
-        } catch (err) {
-            console.error('Image download failed:', err);
-        }finally{
-            hideSpinner();
+            else if (Platform.OS === 'ios') {
+                const fileUri = FileSystem.documentDirectory + fileName;
+                const { uri } = await FileSystem.downloadAsync(url, fileUri);
+                await Sharing.shareAsync(uri);
+            }
+            else {
+                console.warn('Unsupported platform');
+            }
+        } catch (error) {
+            console.error('Failed to save image:', error);
+        } finally {
+            createToast({ message: 'Image saved in device' });
         }
     }
 
@@ -646,12 +662,38 @@ export default function Chat() {
                                                         }
                                                     </View>
                                                 ) : message.extraInformation?.context === 'image' ? (
-                                                    <TouchableOpacity onPress={() => downloadImage(message.extraInformation.imageUrl, `The_Kratos_Hub_Chat_${roomId}_image_${Date.now()}.jpg`)} style={styles.imageContainer}>
+                                                    <View style={{ borderRadius: 5, overflow: 'hidden' }}>
                                                         <Image
                                                             source={{ uri: message.extraInformation.imageUrl }}
-                                                            style={[styles.messageImage, isUser ? { borderBottomRightRadius: 5 } : { borderBottomLeftRadius: 5 }]}
+                                                            style={[{
+                                                                width: 300, height: 300, borderTopLeftRadius: 20, borderTopRightRadius: 20,
+                                                                borderBottomLeftRadius: message.senderId === user.id ? 20 : 0, borderBottomLeftRadius: message.senderId === user.id ? 20 : 0, backgroundColor: 'transparent'
+                                                            }]}
+                                                            resizeMode="cover"
                                                         />
-                                                    </TouchableOpacity>
+
+                                                        <TouchableOpacity
+                                                            onPress={() => downloadImage(message.extraInformation.imageUrl, `The_Kratos_Hub_Chat_${roomId}_image_${Date.now()}.jpg`)}
+                                                            style={{
+                                                                position: 'absolute',
+                                                                bottom: 0,
+                                                                right: 0,
+                                                                left: 0,
+                                                                paddingVertical: 15,
+                                                                borderBottomLeftRadius: message.senderId === user.id ? 20 : 0,
+                                                                borderBottomLeftRadius: message.senderId === user.id ? 20 : 0,
+                                                                backgroundColor: 'rgba(0,0,0,0.5)',
+                                                                justifyContent: 'center',
+                                                                alignItems: 'center'
+                                                            }}
+                                                        >
+                                                            <Image
+                                                                source={Images.arrow}
+                                                                style={{ width: 18, height: 18, tintColor: 'white', transform: [{ rotate: '90deg' }], marginTop: 3 }}
+                                                            />
+                                                        </TouchableOpacity>
+                                                    </View>
+
                                                 ) :
                                                     message.extraInformation?.context === 'document' && (
                                                         <TouchableOpacity
@@ -766,7 +808,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     messageBubble: {
-        maxWidth: '80%',
         paddingHorizontal: 16,
         paddingVertical: 12,
         borderRadius: 20,
