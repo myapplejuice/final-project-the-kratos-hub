@@ -1,0 +1,27 @@
+{
+    "coachId": null,
+    "dateOfCreation": "2025-10-07T18:02:04.168Z",
+    "description": "No description provided",
+    "id": 6,
+    "isCreatedByCoach": false,
+    "label": "Meal Plan 2",
+    "meals": [
+        {
+            "foods": [Array
+            ],
+            "id": 8,
+            "label": "3ber",
+            "mealPlanId": 6,
+            "time": "1970-01-01T12:33:00.000Z"
+        },
+        {
+            "foods": [Array
+            ],
+            "id": 9,
+            "label": "Meal 2",
+            "mealPlanId": 6,
+            "time": null
+        }
+    ],
+    "userId": "9660511F-B551-4970-9160-D193B735723B"
+}

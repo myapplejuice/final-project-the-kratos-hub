@@ -46,24 +46,12 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
             <View style={styles.card}>
                 <TouchableOpacity onPress={() => { setExpanded(prev => !prev) }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <View>
+                        <View style={{ maxWidth: '50%' }}>
                             <AppText style={{ fontSize: scaleFont(15), color: 'white', fontWeight: 'bold' }}>{label}</AppText>
                             <AppText style={{ fontSize: scaleFont(9), color: colors.mutedText, fontWeight: 'bold' }}>{formattedDate}</AppText>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                             <View style={{ flexDirection: 'row' }}>
-                                <View style={{ alignItems: 'center', alignSelf: 'center' }}>
-                                    <AppText style={{ color: 'white', fontSize: scaleFont(13) }}>
-                                        {foodCount}
-                                    </AppText>
-                                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>Foods</AppText>
-                                </View>
-                                <View style={{ alignItems: 'center', marginHorizontal: 10, alignSelf: 'center' }}>
-                                    <AppText style={{ color: 'white', fontSize: scaleFont(13) }}>
-                                        {mealCount}
-                                    </AppText>
-                                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>Meals</AppText>
-                                </View>
                                 <TouchableOpacity
                                     style={{ backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 10, alignItems: 'center', justifyContent: 'center', paddingVertical: 8, marginEnd: 10, paddingHorizontal: 10 }}
                                     onPress={onDeletePress}
@@ -136,6 +124,21 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
                                 <AppText style={{ color: nutritionColors.fat1, fontSize: scaleFont(10) }}>{totals.fat}g</AppText>
                                 <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>Fat</AppText>
                             </View>
+                        </View>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
+                        <View style={{ alignItems: 'center', backgroundColor: 'rgba(58,58,58,0.49)', width: '48%', padding: 10, borderRadius: 15 }}>
+                            <AppText style={{ color: 'white', fontSize: scaleFont(13) }}>
+                                {mealCount}
+                            </AppText>
+                            <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>Meals</AppText>
+                        </View>
+                        <View style={{ alignItems: 'center', backgroundColor: 'rgba(58,58,58,0.49)', width: '48%', padding: 10, borderRadius: 15 }}>
+                            <AppText style={{ color: 'white', fontSize: scaleFont(13) }}>
+                                {foodCount}
+                            </AppText>
+                            <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>Foods</AppText>
                         </View>
                     </View>
 

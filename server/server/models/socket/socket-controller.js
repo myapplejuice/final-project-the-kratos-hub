@@ -58,7 +58,6 @@ export default class SocketController {
     }
 
     static emitNewFriendStatus(status, userId, friendId) {
-        console.log(status, userId, friendId)
         const io = Server.getIoSocket();
         io.to(userId).emit('new-friend-status', { status, friendId });
     }

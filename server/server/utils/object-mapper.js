@@ -99,7 +99,8 @@ export default class ObjectMapper {
             Message: 'message',
             SenderId: 'senderId',
             DateTimeSent: 'dateTimeSent',
-            SeenAt: 'seenAt'
+            SeenAt: 'seenAt',
+            SourcePlanId: 'sourcePlanId',
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -203,7 +204,8 @@ export default class ObjectMapper {
             message: 'Message',
             messageId: 'MessageId',
             seenAt: 'SeenAt',
-            dateTimeSent: 'DateTimeSent'
+            dateTimeSent: 'DateTimeSent',
+            sourcePlanId: 'SourcePlanId'
         };
         return map[key] || key;
     }

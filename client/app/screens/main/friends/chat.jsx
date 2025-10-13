@@ -22,7 +22,7 @@ import { Easing } from "react-native";
 import AnimatedButton from "../../../components/screen-comps/animated-button";
 
 export default function Chat() {
-    const { createOptions } = usePopups();
+    const { createOptions, createDialog, createToast } = usePopups();
     const { user, setUser, additionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const scrollRef = useRef(null);
@@ -263,15 +263,33 @@ export default function Chat() {
     }
 
     async function handleMealPlanSave(mealPlanId, senderId) {
-        const result = await APIService.nutrition.mealPlans.otherUserPlans({userId: senderId});
+        const result = await APIService.nutrition.mealPlans.otherUserPlans({ userId: senderId });
         const plans = result.data?.plans;
         const plan = plans?.find(p => p.id === mealPlanId);
 
-        plan.userId = user.id;
-        plan.id = null;
-        plan.meal.forEach(m => m.id = null);
-        plan.meal.forEach(m => m.foods.forEach(f => f.id = null));
-        //! doesnt work, needs alot of configuration
+        createDialog({
+            title: 'Save meal plan',
+            text: 'Do you want to clone and save this meal plan?',
+            onConfirm: async () => {
+                const payload = {
+                    plan,
+                    newUserId: user.id,
+                    sourcePlanUsername: additionalContexts.chattingFriendProfile.firstname + ' ' + additionalContexts.chattingFriendProfile.lastname
+                }
+
+                const result = await APIService.nutrition.mealPlans.clone(payload);
+                if (result.success) {
+                    const plan = result.data?.plan;
+                    setUser(prev => ({
+                        ...prev,
+                        plans: [plan, ...prev.plans]
+                    }));
+                    createToast({ message: 'Meal plan saved, you can find it in your nutrition section' });
+                } else {
+                    createToast({ message: 'Failed to save meal plan' });
+                }
+            }
+        })
     }
 
     return (
@@ -380,24 +398,39 @@ export default function Chat() {
                                                 <View style={[{ paddingHorizontal: 15, paddingVertical: 10, borderRadius: 20 }, bubbleStyle]}>
                                                     {Object.keys(message?.extraInformation)?.length > 0 &&
                                                         message.extraInformation?.context === 'mealplan' && (
-                                                            <View style={{}}>
+                                                            <View style={{ minWidth: 200 }}>
                                                                 <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(15) }}>
                                                                     {message.extraInformation.planLabel}
                                                                 </AppText>
                                                                 <AppText style={{ color: colors.mutedText, fontWeight: 'bold' }}>
                                                                     {message.extraInformation.planDescription}
                                                                 </AppText>
-                                                                {message.senderId !== user.id && <AnimatedButton
-                                                                    onPress={() => handleMealPlanSave(message.extraInformation.planId, message.senderId)}
-                                                                    title={'Save Plan'}
-                                                                    style={{ backgroundColor: colors.main, marginTop: 15, padding: 10 }}
-                                                                    textStyle={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12) }}
-
-                                                                />
+                                                                {message.senderId !== user.id &&
+                                                                    user.plans.find(p => p.sourcePlanId === message.extraInformation.planId) === undefined ?
+                                                                    <AnimatedButton
+                                                                        onPress={() => handleMealPlanSave(message.extraInformation.planId, message.senderId)}
+                                                                        title={'Save Plan'}
+                                                                        style={{ backgroundColor: colors.main, marginTop: 15, padding: 10 }}
+                                                                        textStyle={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12) }} />
+                                                                    :
+                                                                    user.id !== message.senderId &&
+                                                                    <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10, justifyContent: 'center' }}>
+                                                                        <View>
+                                                                            <Image source={Images.checkMark} style={{ width: 20, height: 20, tintColor: 'green' }} />
+                                                                        </View>
+                                                                        <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12), marginStart: 5 }}>
+                                                                            Plan Saved
+                                                                        </AppText>
+                                                                    </View>
                                                                 }
                                                             </View>
                                                         )}
-                                                    {message.message && <AppText style={{ color: 'white', lineHeight: 20, flexShrink: 1, marginTop: message.extraInformation?.context === 'mealplan' ? 10 : 0 }}>{message.message}</AppText>}
+                                                    {message.extraInformation?.context !== 'mealplan' &&
+                                                        message.message &&
+                                                        <AppText style={{ color: 'white', lineHeight: 20, flexShrink: 1, marginTop: message.extraInformation?.context === 'mealplan' ? 10 : 0 }}>
+                                                            {message.message}
+                                                        </AppText>
+                                                    }
                                                     <AppText style={{ color: 'rgba(255, 255, 255, 0.4)', alignSelf: 'flex-end', marginTop: 5 }}>
                                                         {timeDisplay}
                                                     </AppText>

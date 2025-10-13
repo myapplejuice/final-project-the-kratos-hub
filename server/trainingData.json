@@ -63,6 +63,24 @@
           "sets": []
         }
       ]
+    },
+    {
+      "sessionId": "b24f5875-1218-4e13-9daf-b5d5d918f0f4",
+      "userId": "204EFF41-FF71-4636-9425-14DBB383E2BA",
+      "exercises": [
+        {
+          "exerciseId": "e660bc38-6fdd-4ab7-a24d-33687eb44b4c",
+          "name": "Bench Press",
+          "isTimerOnly": false,
+          "sets": [
+            {
+              "weight": "20",
+              "reps": "10",
+              "note": "Rheheb"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

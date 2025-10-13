@@ -39,4 +39,15 @@ export default class NutritionMealPlansController {
 
         return res.status(200).json({ success: true, plans });
     }
+
+    static async clonePlan(req, res) {
+        const { plan, newUserId, sourcePlanUsername } = req.body;
+
+        const clonedPlan = await NutritionMealPlansDBService.clonePlan(plan, newUserId, sourcePlanUsername);
+
+        if (!clonedPlan)
+            return res.status(500).json({ success: false, error: "Failed to clone plan" });
+
+        return res.status(200).json({ success: true, plan: clonedPlan });
+    }
 }

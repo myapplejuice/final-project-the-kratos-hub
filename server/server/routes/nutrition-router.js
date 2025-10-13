@@ -42,6 +42,7 @@ export default class NutritionRouter {
         this.nutritionRouter.post("/meal-plans/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansController.createPlan));
         this.nutritionRouter.delete("/meal-plans/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansController.deletePlan));
         this.nutritionRouter.put("/meal-plans/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansController.updatePlan));
+        this.nutritionRouter.post("/meal-plans/clone/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansController.clonePlan));
 
         this.nutritionRouter.post("/meal-plans/meal/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansMealsController.createMeal));
         this.nutritionRouter.delete("/meal-plans/meal/:id", tokenAuthorization, userAuthorization, asyncHandler(NutritionMealPlansMealsController.deleteMeal));
