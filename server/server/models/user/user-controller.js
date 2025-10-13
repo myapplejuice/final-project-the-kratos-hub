@@ -75,6 +75,11 @@ export default class UserController {
                 ...friend,
                 lastMessageSenderId: summary?.lastMessageSenderId || null,
                 lastMessage: summary?.lastMessage || null,
+                lastMessageExtraInfoUrl: summary?.extraInformation
+                    ? summary.extraInformation.inviteUrl
+                    || summary.extraInformation.imageUrl
+                    || summary.extraInformation.documentName
+                    : null,
                 lastMessageTime: summary?.lastMessageTime || null,
                 unreadCount: summary?.unreadCount || 0,
                 chatRoomId: summary?.chatRoomId

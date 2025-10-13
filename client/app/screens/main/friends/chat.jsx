@@ -709,7 +709,7 @@ export default function Chat() {
                                                                 </TouchableOpacity>
                                                             </>
                                                         )}
-                                                {message.extraInformation?.context !== 'mealplan' &&
+                                                {Object.keys(message?.extraInformation)?.length === 0 &&
                                                     message.message &&
                                                     <AppText style={[
                                                         styles.messageText,

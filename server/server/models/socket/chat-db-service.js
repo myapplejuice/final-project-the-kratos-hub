@@ -187,11 +187,11 @@ export default class ChatDBService {
     }
 
     static async fetchFriendMessageSummaries(currentUserId) {
-        try {
-            const request = Database.getRequest();
-            Database.addInput(request, 'CurrentUserId', sql.UniqueIdentifier, currentUserId);
+    try {
+        const request = Database.getRequest();
+        Database.addInput(request, 'CurrentUserId', sql.UniqueIdentifier, currentUserId);
 
-            const query = `
+        const query = `
         WITH LastMessages AS (
             SELECT 
                 m.ChatRoomId,
@@ -200,6 +200,7 @@ export default class ChatDBService {
                 m.SenderId,
                 m.DateTimeSent,
                 m.SeenBy,
+                m.ExtraInformation,
                 ROW_NUMBER() OVER (PARTITION BY m.ChatRoomId ORDER BY m.DateTimeSent DESC) AS rn
             FROM Messages m
         ),
@@ -222,7 +223,8 @@ export default class ChatDBService {
             lm.Message AS LastMessage,
             lm.SenderId AS LastMessageSenderId,
             lm.DateTimeSent AS LastMessageTime,
-            ISNULL(uc.UnreadCount, 0) AS UnreadCount
+            ISNULL(uc.UnreadCount, 0) AS UnreadCount,
+            lm.ExtraInformation
         FROM UserChatRooms ucr
         INNER JOIN UserChatRooms ucr2 
             ON ucr.ChatRoomId = ucr2.ChatRoomId AND ucr2.UserId != ucr.UserId
@@ -234,20 +236,33 @@ export default class ChatDBService {
         ORDER BY lm.DateTimeSent DESC
         `;
 
-            const result = await request.query(query);
+        const result = await request.query(query);
 
-            return result.recordset.map(raw => {
-                const mapped = {};
-                for (const key in raw) {
-                    mapped[ObjectMapper.toCamelCase(key)] = raw[key];
+        return result.recordset.map(raw => {
+            const mapped = {};
+            for (const key in raw) {
+                mapped[ObjectMapper.toCamelCase(key)] = raw[key];
+            }
+
+            // Parse ExtraInformation JSON if exists
+            if (mapped.extraInformation) {
+                try {
+                    mapped.extraInformation = JSON.parse(mapped.extraInformation);
+                } catch (err) {
+                    mapped.extraInformation = null;
                 }
-                return mapped;
-            });
-        } catch (err) {
-            console.error('fetchFriendMessageSummaries error:', err);
-            return [];
-        }
+            } else {
+                mapped.extraInformation = null;
+            }
+
+            return mapped;
+        });
+    } catch (err) {
+        console.error('fetchFriendMessageSummaries error:', err);
+        return [];
     }
+}
+
 
 static async fetchSingleFriendMessageSummary(currentUserId, friendId) {
     try {
@@ -264,6 +279,7 @@ static async fetchSingleFriendMessageSummary(currentUserId, friendId) {
                 m.SenderId,
                 m.DateTimeSent,
                 m.SeenBy,
+                m.ExtraInformation,
                 ROW_NUMBER() OVER (PARTITION BY m.ChatRoomId ORDER BY m.DateTimeSent DESC) AS rn
             FROM Messages m
         ),
@@ -286,11 +302,11 @@ static async fetchSingleFriendMessageSummary(currentUserId, friendId) {
             lm.Message AS LastMessage,
             lm.SenderId AS LastMessageSenderId,
             lm.DateTimeSent AS LastMessageTime,
-            ISNULL(uc.UnreadCount, 0) AS UnreadCount
+            ISNULL(uc.UnreadCount, 0) AS UnreadCount,
+            lm.ExtraInformation
         FROM UserChatRooms ucr
         INNER JOIN UserChatRooms ucr2 
-            ON ucr.ChatRoomId = ucr2.ChatRoomId 
-           AND ucr2.UserId != ucr.UserId
+            ON ucr.ChatRoomId = ucr2.ChatRoomId AND ucr2.UserId != ucr.UserId
         LEFT JOIN LastMessages lm
             ON ucr.ChatRoomId = lm.ChatRoomId AND lm.rn = 1
         LEFT JOIN UnreadCounts uc
@@ -307,6 +323,17 @@ static async fetchSingleFriendMessageSummary(currentUserId, friendId) {
         const mapped = {};
         for (const key in raw) {
             mapped[ObjectMapper.toCamelCase(key)] = raw[key];
+        }
+
+        // Parse ExtraInformation JSON
+        if (mapped.extraInformation) {
+            try {
+                mapped.extraInformation = JSON.parse(mapped.extraInformation);
+            } catch (err) {
+                mapped.extraInformation = null;
+            }
+        } else {
+            mapped.extraInformation = null;
         }
 
         return mapped;
