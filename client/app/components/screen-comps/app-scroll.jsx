@@ -1,5 +1,5 @@
 import React, { useRef, useContext, useEffect, useImperativeHandle } from "react";
-import { Platform, View } from "react-native";
+import { Keyboard, Platform, View,TouchableWithoutFeedback } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NavBarContext } from "../../common/contexts/nav-bar-context";
@@ -27,6 +27,7 @@ export default function AppScroll({
     onScrollToTop = () => { },
     startAtBottom = false,
     avoidKeyboard = true,
+    dismissKeyboardOnTap = false,
     ...props
 }) {
     const insets = useSafeAreaInsets();
@@ -133,9 +134,15 @@ export default function AppScroll({
             onContentSizeChange={(w, h) => { contentHeight.current = h }}
             {...props}
         >
-            <View style={{ flex: 1 }}>
-                {children}
-            </View>
+            <TouchableWithoutFeedback onPress={() => {
+                console.log(dismissKeyboardOnTap),
+                    dismissKeyboardOnTap && Keyboard.dismiss()
+            }
+            } accessible={false}>
+                <View style={{ flex: 1 }}>
+                    {children}
+                </View>
+            </TouchableWithoutFeedback>
             <View style={{ height: bottomPadding ? insets.bottom + extraBottom : 0, backgroundColor: paddingColor }} />
         </KeyboardAwareScrollView>
     );

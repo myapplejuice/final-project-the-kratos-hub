@@ -79,28 +79,6 @@ export default function Chat() {
     }, [messages]);
 
     useEffect(() => {
-        const showListener = Keyboard.addListener(
-            Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-            (e) => {
-                setKeyboardHeight(e.endCoordinates.height);
-                setKeyboardOpen(true);
-            }
-        );
-        const hideListener = Keyboard.addListener(
-            Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-            () => {
-                setKeyboardHeight(0);
-                setKeyboardOpen(false);
-            }
-        );
-
-        return () => {
-            showListener.remove();
-            hideListener.remove();
-        };
-    }, []);
-
-    useEffect(() => {
         async function fetchMessages() {
             const friendId = additionalContexts.chattingFriendProfile.id;
             const payload = {
@@ -129,6 +107,26 @@ export default function Chat() {
                 useNativeDriver: true,
             })
         ).start();
+
+        const showListener = Keyboard.addListener(
+            Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+            (e) => {
+                setKeyboardHeight(e.endCoordinates.height);
+                setKeyboardOpen(true);
+            }
+        );
+        const hideListener = Keyboard.addListener(
+            Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+            () => {
+                setKeyboardHeight(0);
+                setKeyboardOpen(false);
+            }
+        );
+
+        return () => {
+            showListener.remove();
+            hideListener.remove();
+        };
     }, []);
 
     useEffect(() => {
@@ -373,7 +371,7 @@ export default function Chat() {
             />
 
             {/* Upload Options */}
-            <FadeInOut visible={uploadOptionsVisible} style={{
+            <FadeInOut visible={uploadOptionsVisible && message.length === 0} style={{
                 position: 'absolute',
                 bottom: insets.bottom + 80 + keyboardHeight,
                 left: 20,
@@ -467,7 +465,7 @@ export default function Chat() {
                         </View>
                     </TouchableOpacity>
                 </View>
-                <View style={{ width: '15%', alignSelf: 'flex-end', marginLeft: 10 }}>
+                <View style={{ width: '15%', alignSelf: 'flex-end' }}>
                     <TouchableOpacity onPress={handleMessageSend} style={styles.sendButton}>
                         <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} resizeMode="contain" />
                     </TouchableOpacity>
@@ -482,7 +480,7 @@ export default function Chat() {
             {/* Messages Container */}
             <View style={styles.main}>
                 <View style={{ flex: 1 }}>
-                    <AppScroll onScrollToTop={() => safeTrigger(fetchMoreMessages)} ref={scrollRef} extraBottom={keyboardOpen ? keyboardHeight - 65 : 75}>
+                    <AppScroll dismissKeyboardOnTap={Platform.OS === 'ios'} onScrollToTop={() => safeTrigger(fetchMoreMessages)} ref={scrollRef} extraBottom={Platform.OS === 'android' && keyboardOpen ? keyboardHeight - 65 : 75}>
                         {messages && messages.length > 0 &&
                             messages.map((message, index) => {
                                 const isUser = message.senderId === user.id;
@@ -567,7 +565,7 @@ export default function Chat() {
                                                     <View style={styles.imageContainer}>
                                                         <Image
                                                             source={{ uri: message.extraInformation.imageUrl }}
-                                                            style={[styles.messageImage, isUser ? {borderBottomRightRadius: 5} : {borderBottomLeftRadius: 5}]}
+                                                            style={[styles.messageImage, isUser ? { borderBottomRightRadius: 5 } : { borderBottomLeftRadius: 5 }]}
                                                         />
                                                     </View>
                                                 )}
