@@ -67,7 +67,12 @@ export default function Friends() {
         fetchFriendsProfiles();
     }, []);
 
-    //SEARCH ENGINE
+    useEffect(() => {
+        const idList = user.friends.filter(friend => friend.status === 'active').map(friend => friend.friendId);
+        const filtered = friendsList.filter(profile => idList.includes(profile.id));
+        setVisibleList(filtered);
+    }, [user.friends]);
+
     useEffect(() => {
         if (searchQuery === '') {
             setVisibleList(friendsList);
