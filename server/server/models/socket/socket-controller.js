@@ -3,7 +3,8 @@ import UserToUserDBService from "../user-to-user/user-to-user-db-service.js";
 import ChatDBService from "./chat-db-service.js";
 
 export default class SocketController {
-    static async sendMessage(io, payload) {
+    static async sendMessage(payload) {
+        const io = Server.getIoSocket();
         const savedMessageId = await ChatDBService.insertMessage(payload);
         payload.id = savedMessageId;
 

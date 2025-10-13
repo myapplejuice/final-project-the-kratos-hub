@@ -20,10 +20,15 @@ import SocketService from "../../../common/services/socket-service";
 import FloatingActionButton from "../../../components/screen-comps/floating-action-button";
 import { Easing } from "react-native";
 import AnimatedButton from "../../../components/screen-comps/animated-button";
+import ImageCapture from "../../../components/screen-comps/image-capture";
+import { LibraryContext } from "../../../common/contexts/library-context";
+import { CameraContext } from "../../../common/contexts/camera-context";
 
 export default function Chat() {
-    const { createOptions, createDialog, createToast } = usePopups();
+    const { createOptions, createDialog, createToast, showSpinner, hideSpinner } = usePopups();
     const { user, setUser, additionalContexts } = useContext(UserContext);
+    const { libraryActive, setLibraryActive } = useContext(LibraryContext);
+    const { cameraActive, setCameraActive } = useContext(CameraContext);
     const insets = useSafeAreaInsets();
     const scrollRef = useRef(null);
     const initialScrollDone = useRef(false);
@@ -31,6 +36,8 @@ export default function Chat() {
     const currentPage = useRef(1);
     const morePages = useRef(true);
 
+    const [chatBarVisible, setChatBarVisible] = useState(true);
+    const [uploadOptionsVisible, setUploadOptionsVisible] = useState(false);
     const [fabVisible, setFabVisible] = useState(false);
     const [isLoadingMessages, setIsLoadingMessages] = useState(false);
     const rotate = useRef(new Animated.Value(0)).current;
@@ -49,6 +56,15 @@ export default function Chat() {
     const [message, setMessage] = useState('');
     const [messageHeight, setMessageHeight] = useState(50);
     const messagesRef = useRef(messages);
+
+    useEffect(() => {
+        if (cameraActive || libraryActive) {
+            setUploadOptionsVisible(false);
+            setChatBarVisible(false);
+        } else {
+            setChatBarVisible(true);
+        }
+    }, [cameraActive, libraryActive]);
 
     useEffect(() => {
         if (!initialScrollDone.current && messages.length > 0) {
@@ -292,11 +308,56 @@ export default function Chat() {
         })
     }
 
+    async function handleImageUpload(asset) {
+        setLibraryActive(false);
+        setCameraActive(false);
+        showSpinner();
+
+        try {
+            const url = await APIService.uploadImageToCloudinary({
+                uri: asset.uri,
+                folder: "chat_images",
+                fileName: `chat_room${roomId}_user${user.id}_${Date.now()}.jpg`,
+            });
+
+            console.log("Cloudinary URL:", url);
+
+            handleMessageSend({
+                context: "image",
+                imageUrl: url,
+            });
+        } catch (err) {
+            console.error("Image upload failed:", err);
+        } finally {
+            hideSpinner();
+        }
+    }
+
     return (
         <>
-            <FadeInOut visible={newMessageText} style={{ position: 'absolute', bottom: insets.bottom + 150 + keyboardHeight, backgroundColor: colors.cardBackground, padding: 15, borderRadius: 20, alignItems: 'center', alignSelf: 'center', zIndex: 9999 }}>
-                <AppText style={{ color: 'white', fontWeight: 'bold' }}>New unread message</AppText>
+            <ImageCapture onCancel={() => setChatBarVisible(true)} onConfirm={(asset) => handleImageUpload(asset)} />
+
+            {/* New Message Indicator */}
+            <FadeInOut visible={newMessageText} style={{
+                position: 'absolute',
+                bottom: insets.bottom + 150 + keyboardHeight,
+                backgroundColor: colors.main,
+                paddingHorizontal: 20,
+                paddingVertical: 12,
+                borderRadius: 25,
+                alignItems: 'center',
+                alignSelf: 'center',
+                zIndex: 9999,
+                shadowColor: colors.main,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 5
+            }}>
+                <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12) }}>New unread message</AppText>
             </FadeInOut>
+
+            {/* Floating Action Button */}
             <FloatingActionButton
                 onPress={() => {
                     scrollRef.current.scrollToBottom()
@@ -310,33 +371,117 @@ export default function Chat() {
                 iconSize={20}
                 size={40}
             />
-            <FadeInOut visible={true} style={{ position: 'absolute', bottom: 0, paddingBottom: insets.bottom + 10 + keyboardHeight, paddingTop: 10, zIndex: 9999, flexDirection: 'row', paddingHorizontal: 15, backgroundColor: 'rgba(0, 0, 0, 0.95)', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' }}>
-                <View style={{ width: '85%', minHeight: 50, maxHeight: 120, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+
+            {/* Upload Options */}
+            <FadeInOut visible={uploadOptionsVisible} style={{
+                position: 'absolute',
+                bottom: insets.bottom + 80 + keyboardHeight,
+                left: 20,
+                right: 20,
+                zIndex: 9999,
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: 'rgba(40, 40, 40, 0.95)',
+                borderRadius: 20,
+                borderWidth: 1,
+                borderColor: 'rgba(255,255,255,0.1)',
+                paddingHorizontal: 10
+            }}>
+                <TouchableOpacity onPress={handleImportPlan} style={{ padding: 15, alignItems: 'center', flex: 1 }}>
+                    <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(74, 144, 226, 0.2)' }]}>
+                        <Image source={Images.mealPlan} style={{ width: 24, height: 24, tintColor: '#4A90E2' }} />
+                    </View>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5 }}>Meal plan</AppText>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setCameraActive(true)} style={{ padding: 15, alignItems: 'center', flex: 1 }}>
+                    <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(52, 199, 89, 0.2)' }]}>
+                        <Image source={Images.camera} style={{ width: 24, height: 24, tintColor: '#34C759' }} />
+                    </View>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5 }}>Camera</AppText>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setLibraryActive(true)} style={{ padding: 15, alignItems: 'center', flex: 1 }}>
+                    <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(255, 149, 0, 0.2)' }]}>
+                        <Image source={Images.image} style={{ width: 24, height: 24, tintColor: '#FF9500' }} />
+                    </View>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5 }}>Image</AppText>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ padding: 15, alignItems: 'center', flex: 1 }}>
+                    <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(175, 82, 222, 0.2)' }]}>
+                        <Image source={Images.doc} style={{ width: 24, height: 24, tintColor: '#AF52DE' }} />
+                    </View>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5 }}>Document</AppText>
+                </TouchableOpacity>
+            </FadeInOut>
+
+            {/* Chat Input Bar */}
+            <FadeInOut visible={chatBarVisible} style={{
+                position: 'absolute',
+                bottom: 0,
+                paddingBottom: insets.bottom + 10 + keyboardHeight,
+                paddingTop: 10,
+                zIndex: 9999,
+                flexDirection: 'row',
+                paddingHorizontal: 15,
+                backgroundColor: 'rgba(30, 30, 30, 0.98)',
+                borderTopWidth: 1,
+                borderTopColor: 'rgba(255,255,255,0.15)'
+            }}>
+                <View style={{
+                    width: '85%',
+                    minHeight: 50,
+                    maxHeight: 120,
+                    backgroundColor: 'rgba(255,255,255,0.08)',
+                    borderRadius: 25,
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,255,255,0.15)',
+                    flexDirection: 'row',
+                    alignItems: 'flex-end',
+                    justifyContent: 'space-between',
+                    paddingLeft: 15
+                }}>
                     <AppTextInput
                         multiline
                         onChangeText={setMessage}
                         value={message}
                         placeholder="Type a message..."
                         placeholderTextColor={"rgba(255, 255, 255, 0.4)"}
-                        style={[styles.inputStripped, { height: Math.min(120, Math.max(50, messageHeight)), width: '82%' }]}
+                        style={[styles.inputStripped, {
+                            height: Math.min(120, Math.max(50, messageHeight)),
+                            width: '82%',
+                            paddingVertical: 15
+                        }]}
                         onContentSizeChange={(e) =>
                             setMessageHeight(e.nativeEvent.contentSize.height)
                         } />
-                    <TouchableOpacity style={{ width: '18%', height: 50, justifyContent: 'center', alignItems: 'center' }} onPress={handleImportPlan}>
-                        <Image source={Images.plus} style={{ width: 22, height: 22, tintColor: colors.mutedText }} />
+                    <TouchableOpacity
+                        style={{
+                            width: '18%',
+                            height: 50,
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}
+                        onPress={() => setUploadOptionsVisible(!uploadOptionsVisible)}
+                    >
+                        <View style={styles.plusButton}>
+                            <Image source={Images.plus} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                        </View>
                     </TouchableOpacity>
                 </View>
-                <View style={{ width: '15%', alignSelf: 'flex-end' }}>
-                    <TouchableOpacity onPress={handleMessageSend} style={{ padding: 15, height: 50, backgroundColor: colors.main, width: 50, justifyContent: 'center', alignItems: 'center', alignSelf: 'flex-end', borderRadius: 25 }}>
-                        <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white' }} resizeMode="contain" />
+                <View style={{ width: '15%', alignSelf: 'flex-end', marginLeft: 10 }}>
+                    <TouchableOpacity onPress={handleMessageSend} style={styles.sendButton}>
+                        <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} resizeMode="contain" />
                     </TouchableOpacity>
                 </View>
             </FadeInOut>
+
+            {/* Loading Spinner */}
             <FadeInOut visible={isLoadingMessages} style={{ position: 'absolute', top: 100, alignSelf: 'center', zIndex: 9999 }}>
                 <Animated.View style={[styles.spinner, { transform: [{ rotate: spin }] }]} />
             </FadeInOut>
+
+            {/* Messages Container */}
             <View style={styles.main}>
-                <View>
+                <View style={{ flex: 1 }}>
                     <AppScroll onScrollToTop={() => safeTrigger(fetchMoreMessages)} ref={scrollRef} extraBottom={keyboardOpen ? keyboardHeight - 65 : 75}>
                         {messages && messages.length > 0 &&
                             messages.map((message, index) => {
@@ -351,16 +496,8 @@ export default function Chat() {
                                         : `${formatDate(message.dateTimeSent, { format: 'MMM d' })}, ${formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })}`;
 
                                 const bubbleStyle = isUser
-                                    ? {
-                                        backgroundColor: 'rgba(0, 35, 65, 1)',
-                                        borderTopLeftRadius: 5,
-                                        marginLeft: 10,
-                                    }
-                                    : {
-                                        backgroundColor: 'rgba(255,255,255,0.08)',
-                                        borderTopRightRadius: 5,
-                                        marginRight: 10,
-                                    };
+                                    ? styles.userBubble
+                                    : styles.theirBubble;
 
                                 const prevMessage = messages[index - 1];
                                 const prevDate = prevMessage ? new Date(prevMessage.dateTimeSent) : null;
@@ -378,63 +515,74 @@ export default function Chat() {
                                 return (
                                     <View key={index}>
                                         {showDateDivider && (
-                                            <View style={{ alignItems: 'center', marginVertical: 15 }}>
-                                                <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
-                                                    <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.1)' }} />
-                                                    <AppText style={{ color: 'rgba(255,255,255,0.6)', marginHorizontal: 10 }}>{dayLabel}</AppText>
-                                                    <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.1)' }} />
-                                                </View>
+                                            <View style={styles.dateDivider}>
+                                                <View style={styles.dateDividerLine} />
+                                                <AppText style={styles.dateDividerText}>{dayLabel}</AppText>
+                                                <View style={styles.dateDividerLine} />
                                             </View>
                                         )}
 
                                         {showUnreadDivider && (
-                                            <View style={{ alignItems: 'center', marginVertical: 10 }}>
-                                                <AppText style={{ color: 'rgba(255, 255, 255, 0.8)', fontWeight: '600' }}>Unread Messages</AppText>
+                                            <View style={styles.unreadDivider}>
+                                                <AppText style={styles.unreadDividerText}>Unread Messages</AppText>
                                             </View>
                                         )}
 
-                                        <View style={{ flexDirection: 'row', justifyContent: isUser ? 'flex-start' : 'flex-end', paddingHorizontal: 5 }}>
-                                            <View style={{ maxWidth: '90%', flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10, ...(isUser ? { marginEnd: 15 } : { marginStart: 15 }) }}>
-                                                <View style={[{ paddingHorizontal: 15, paddingVertical: 10, borderRadius: 20 }, bubbleStyle]}>
-                                                    {Object.keys(message?.extraInformation)?.length > 0 &&
-                                                        message.extraInformation?.context === 'mealplan' && (
-                                                            <View style={{ minWidth: 200 }}>
-                                                                <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(15) }}>
-                                                                    {message.extraInformation.planLabel}
-                                                                </AppText>
-                                                                <AppText style={{ color: colors.mutedText, fontWeight: 'bold' }}>
-                                                                    {message.extraInformation.planDescription}
-                                                                </AppText>
-                                                                {message.senderId !== user.id &&
-                                                                    user.plans.find(p => p.sourcePlanId === message.extraInformation.planId) === undefined ?
-                                                                    <AnimatedButton
-                                                                        onPress={() => handleMealPlanSave(message.extraInformation.planId, message.senderId)}
-                                                                        title={'Save Plan'}
-                                                                        style={{ backgroundColor: colors.main, marginTop: 15, padding: 10 }}
-                                                                        textStyle={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12) }} />
-                                                                    :
-                                                                    user.id !== message.senderId &&
-                                                                    <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10, justifyContent: 'center' }}>
-                                                                        <View>
-                                                                            <Image source={Images.checkMark} style={{ width: 20, height: 20, tintColor: 'green' }} />
-                                                                        </View>
-                                                                        <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12), marginStart: 5 }}>
-                                                                            Plan Saved
-                                                                        </AppText>
-                                                                    </View>
-                                                                }
-                                                            </View>
-                                                        )}
-                                                    {message.extraInformation?.context !== 'mealplan' &&
-                                                        message.message &&
-                                                        <AppText style={{ color: 'white', lineHeight: 20, flexShrink: 1, marginTop: message.extraInformation?.context === 'mealplan' ? 10 : 0 }}>
-                                                            {message.message}
+                                        <View style={[
+                                            styles.messageContainer,
+                                            isUser ? styles.userMessageContainer : styles.theirMessageContainer
+                                        ]}>
+                                            <View style={[
+                                                styles.messageBubble,
+                                                bubbleStyle,
+                                                isUser ? styles.userMessageBubble : styles.theirMessageBubble
+                                            ]}>
+                                                {Object.keys(message?.extraInformation)?.length > 0 &&
+                                                    message.extraInformation?.context === 'mealplan' ? (
+                                                    <View style={styles.mealPlanContainer}>
+                                                        <AppText style={styles.mealPlanTitle}>
+                                                            {message.extraInformation.planLabel}
                                                         </AppText>
-                                                    }
-                                                    <AppText style={{ color: 'rgba(255, 255, 255, 0.4)', alignSelf: 'flex-end', marginTop: 5 }}>
-                                                        {timeDisplay}
+                                                        <AppText style={styles.mealPlanDescription}>
+                                                            {message.extraInformation.planDescription}
+                                                        </AppText>
+                                                        {message.senderId !== user.id &&
+                                                            user.plans.find(p => p.sourcePlanId === message.extraInformation.planId) === undefined ?
+                                                            <AnimatedButton
+                                                                onPress={() => handleMealPlanSave(message.extraInformation.planId, message.senderId)}
+                                                                title={'Save Plan'}
+                                                                style={styles.savePlanButton}
+                                                                textStyle={styles.savePlanButtonText} />
+                                                            :
+                                                            user.id !== message.senderId &&
+                                                            <View style={styles.savedPlanContainer}>
+                                                                <Image source={Images.checkMark} style={styles.checkMark} />
+                                                                <AppText style={styles.savedPlanText}>
+                                                                    Plan Saved
+                                                                </AppText>
+                                                            </View>
+                                                        }
+                                                    </View>
+                                                ) : message.extraInformation?.context === 'image' && (
+                                                    <View style={styles.imageContainer}>
+                                                        <Image
+                                                            source={{ uri: message.extraInformation.imageUrl }}
+                                                            style={[styles.messageImage, isUser ? {borderBottomRightRadius: 5} : {borderBottomLeftRadius: 5}]}
+                                                        />
+                                                    </View>
+                                                )}
+                                                {message.extraInformation?.context !== 'mealplan' &&
+                                                    message.message &&
+                                                    <AppText style={[
+                                                        styles.messageText,
+                                                        { marginTop: message.extraInformation?.context === 'mealplan' ? 10 : 0 }
+                                                    ]}>
+                                                        {message.message}
                                                     </AppText>
-                                                </View>
+                                                }
+                                                <AppText style={styles.messageTime}>
+                                                    {timeDisplay}
+                                                </AppText>
                                             </View>
                                         </View>
                                     </View>
@@ -442,134 +590,204 @@ export default function Chat() {
                             })
                         }
                     </AppScroll>
-                </View >
-            </View >
+                </View>
+            </View>
         </>
     );
 }
 const styles = StyleSheet.create({
-    // Updated input styles
+    // Input Styles
     inputStripped: {
         color: "white",
-        paddingHorizontal: 15,
+        paddingHorizontal: 0,
         fontSize: 16,
+        backgroundColor: 'transparent',
     },
-
-    // New avatar styles
-    avatarContainer: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        backgroundColor: colors.main,
+    plusButton: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: 'rgba(255,255,255,0.1)',
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden',
     },
-    avatar: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
+    sendButton: {
+        padding: 15,
+        height: 50,
+        backgroundColor: colors.main,
+        width: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'flex-end',
+        borderRadius: 25,
+        shadowColor: colors.main,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 5
     },
 
-    // Keep existing styles but update main for better spacing
+    // Upload Options
+    uploadOptionIcon: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+
+    // Message Styles
     main: {
         flex: 1,
         backgroundColor: colors.background,
-        paddingTop: 10,
+        paddingTop: 5,
+    },
+    messageContainer: {
+        flexDirection: 'row',
+        paddingHorizontal: 15,
+        marginBottom: 8,
+    },
+    userMessageContainer: {
+        justifyContent: 'flex-end',
+    },
+    theirMessageContainer: {
+        justifyContent: 'flex-start',
+    },
+    messageBubble: {
+        maxWidth: '80%',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderRadius: 20,
+    },
+    userBubble: {
+        backgroundColor: 'rgba(0, 35, 65, 1)',
+        borderBottomRightRadius: 5,
+    },
+    theirBubble: {
+        backgroundColor: 'rgba(255,255,255,0.08)',
+        borderBottomLeftRadius: 5,
+    },
+    userMessageBubble: {
+        marginLeft: '20%',
+    },
+    theirMessageBubble: {
+        marginRight: '20%',
+    },
+    messageText: {
+        color: 'white',
+        lineHeight: 20,
+        flexShrink: 1,
+        fontSize: scaleFont(14),
+    },
+    messageTime: {
+        color: 'rgba(255, 255, 255, 0.4)',
+        alignSelf: 'flex-end',
+        marginTop: 4,
+        fontSize: scaleFont(10),
     },
 
-    // ... keep all your existing other styles exactly the same
-    imageOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        justifyContent: 'center',
+    // Date and Unread Dividers
+    dateDivider: {
         alignItems: 'center',
-        zIndex: 9999,
+        marginVertical: 20,
     },
-    fullscreenImage: {
-        width: 250,
-        height: 250,
-        borderRadius: 125
+    dateDividerLine: {
+        flex: 1,
+        height: 1,
+        backgroundColor: 'rgba(255,255,255,0.1)',
     },
-    cardLabel: {
+    dateDividerText: {
+        color: 'rgba(255,255,255,0.6)',
+        marginHorizontal: 12,
         fontSize: scaleFont(12),
-        color: 'white',
-        fontWeight: '600',
+        fontWeight: '500',
     },
-    imageWrapper: {
-        borderRadius: 50,
-        padding: 2,
-        borderWidth: 2,
-        borderColor: colors.main,
-        position: 'relative',
-    },
-    profileImage: {
-        width: 90,
-        height: 90,
-        borderRadius: 45,
-    },
-    editBadge: {
-        position: 'absolute',
-        bottom: 2,
-        right: 2,
-        backgroundColor: colors.main,
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-        justifyContent: 'center',
+    unreadDivider: {
         alignItems: 'center',
-        borderWidth: 2,
-        borderColor: colors.cardBackground,
+        marginVertical: 15,
+        paddingVertical: 5,
     },
-    cameraIcon: {
-        width: 12,
-        height: 12,
-        tintColor: 'white',
+    unreadDividerText: {
+        color: 'rgba(255, 255, 255, 0.8)',
+        fontWeight: '600',
+        fontSize: scaleFont(11),
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        borderRadius: 12,
     },
-    name: {
-        fontSize: scaleFont(22),
-        fontWeight: "700",
-        color: colors.main,
-        marginTop: 15,
-        marginBottom: 20,
-        textAlign: 'center',
+
+    // Meal Plan Styles
+    mealPlanContainer: {
+        minWidth: 200,
     },
-    infoContainer: {
-        width: '100%'
+    mealPlanTitle: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: scaleFont(15),
+        marginBottom: 4,
     },
-    infoRow: {
+    mealPlanDescription: {
+        color: colors.mutedText,
+        fontWeight: '600',
+        fontSize: scaleFont(12),
+        marginBottom: 12,
+    },
+    savePlanButton: {
+        backgroundColor: colors.main,
+        marginTop: 8,
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+    },
+    savePlanButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: scaleFont(12),
+    },
+    savedPlanContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 12,
-        marginBottom: 10,
-    },
-    iconContainer: {
-        padding: 13,
-        borderRadius: 12,
+        marginVertical: 8,
         justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 12,
     },
-    detailIcon: {
-        width: 20,
-        height: 20,
-        tintColor: 'white'
+    checkMark: {
+        width: 16,
+        height: 16,
+        tintColor: '#34C759',
     },
-    infoText: {
-        flex: 1,
+    savedPlanText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: scaleFont(12),
+        marginStart: 6,
     },
+
+    // Image Message Styles
+    imageContainer: {
+        marginTop: 4,
+        marginBottom: 4,
+    },
+    messageImage: {
+        width: 250,
+        height: 250,
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
+        borderBottomRightRadius: 16,
+        borderBottomLeftRadius: 16,
+    },
+
+    // Spinner
     spinner: {
         width: 40,
         height: 40,
-        borderRadius: 30,
-        borderWidth: 4,
+        borderRadius: 20,
+        borderWidth: 3,
         borderTopColor: colors.main,
-        borderRightColor: colors.main,
+        borderRightColor: 'transparent',
         borderBottomColor: colors.main,
+        borderLeftColor: 'transparent',
     },
     detailLabel: {
         fontSize: scaleFont(11),

@@ -3,6 +3,7 @@ import DeviceStorageService from './device-storage-service'
 export default class APIService {
     static BASE_URL = "http://192.168.33.16:8080/api";
     static USDA_API_KEY = 'sSfzXgd2xefbtWbfEqd0hdjadFSQnUC8tFrRxIbE';
+    static CLOUDINARY_CLOUD_NAME = "dkujdjk2d";
     static USER_ID = null;
 
     static setUserId(id) {
@@ -74,6 +75,36 @@ export default class APIService {
         return { success: true, message: json?.message || 'Success!', data: json?.foods || [] };
     }
 
+    static async uploadImageToCloudinary({ uri, folder, fileName, uploadPreset = "The_Kratos_Hub" }) {
+        if (!uri) throw new Error("No file URI provided for upload");
+        if (!folder || !fileName) throw new Error("No folder or file name provided for upload");
+
+        try {
+            const formData = new FormData();
+            formData.append("file", {
+                uri,
+                type: "image/jpeg",
+                name: fileName,
+            });
+            formData.append("upload_preset", uploadPreset);
+            formData.append("folder", folder);
+
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${APIService.CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (!data.secure_url) throw new Error(data.error?.message || "Cloudinary upload failed");
+
+            return data.secure_url;
+        } catch (err) {
+            console.error("Cloudinary upload error:", err);
+            throw err;
+        }
+    }
+
     static notifications = {
         all: () => APIService.request(`/notifications/${APIService.USER_ID}`, 'GET'),
         push: (payload) => APIService.request(`/notifications/${APIService.USER_ID}`, 'POST', payload),
@@ -97,8 +128,8 @@ export default class APIService {
         replyRequest: (payload) => APIService.request(`/user-to-user/reply-request/${APIService.USER_ID}`, 'POST', payload),
         terminateFriendship: (payload) => APIService.request(`/user-to-user/terminate-friendship/${APIService.USER_ID}`, 'DELETE', payload),
         restoreFriendship: (payload) => APIService.request(`/user-to-user/restore-friendship/${APIService.USER_ID}`, 'PUT', payload),
-        chat:{
-            messages:(payload) => APIService.request(`/user-to-user/messages/${APIService.USER_ID}`, 'POST', payload),
+        chat: {
+            messages: (payload) => APIService.request(`/user-to-user/messages/${APIService.USER_ID}`, 'POST', payload),
         }
     }
 

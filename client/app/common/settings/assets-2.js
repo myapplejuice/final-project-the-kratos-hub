@@ -101,4 +101,10 @@ export const Images_2 = {
     sadOutline: require('../../../assets/images/sad-outline.png'),
     restore: require('../../../assets/images/restore.png'),
     restoreOutline: require('../../../assets/images/restore-outline.png'),
+    camera: require('../../../assets/images/camera.png'),
+    cameraOutline: require('../../../assets/images/camera-outline.png'),
+    doc: require('../../../assets/images/doc.png'),
+    docOutline: require('../../../assets/images/doc-outline.png'),
+    image: require('../../../assets/images/image.png'),
+    imageOutline: require('../../../assets/images/image-outline.png'),
 };

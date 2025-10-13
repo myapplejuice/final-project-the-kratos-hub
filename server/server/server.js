@@ -79,7 +79,7 @@ static io;
             });
 
             socket.on('send-message', async (payload, callback) => {
-                const savedMessageId = await ChatController.sendMessage(this.io, payload);
+                const savedMessageId = await ChatController.sendMessage(payload);
                 if (callback) callback(savedMessageId);
             });
 
