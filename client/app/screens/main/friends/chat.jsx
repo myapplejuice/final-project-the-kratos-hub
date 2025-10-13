@@ -245,11 +245,13 @@ export default function Chat() {
         setMessage('');
         SocketService.emit("send-message", payload, (newMessageId) => {
             payload.id = newMessageId;
+            console.log(payload)
             setMessages(prev => [...prev, payload]);
         });
         setTimeout(() => {
             scrollRef.current?.scrollToBottom({ animated: false });
         }, 0);
+        setUploadOptionsVisible(false);
     }
 
     async function handleImportPlan() {
@@ -335,7 +337,6 @@ export default function Chat() {
 
     async function handleDocumentUpload() {
         try {
-            // Pick a single document
             const result = await DocumentPicker.getDocumentAsync({
                 type: '*/*',
                 copyToCacheDirectory: true,
@@ -344,91 +345,52 @@ export default function Chat() {
 
             if (!result.canceled && result.assets.length > 0) {
                 const file = result.assets[0];
-                await uploadDocument(file);
+                showSpinner();
+                const url = await APIService.uploadDocumentToCloudinary({
+                    uri: file.uri,
+                    folder: "chat_docs",
+                    fileName: `chat_room${roomId}_user${user.id}_${Date.now()}_${file.name}`,
+                    type: file.mimeType || 'application/octet-stream'
+                });
+
+                console.log("Document URL:", url);
+
+                handleMessageSend({
+                    context: "document",
+                    documentUrl: url,
+                    documentName: file.name,
+                });
             }
         } catch (err) {
             console.log('Document picking error:', err);
-        }
-    }
-
-    async function uploadDocument(file) {
-        showSpinner();
-        try {
-            const url = await APIService.uploadDocumentToCloudinary({
-                uri: file.uri,
-                folder: "chat_docs",
-                fileName: `chat_room${roomId}_user${user.id}_${Date.now()}_${file.name}`,
-                type: file.mimeType || 'application/octet-stream'
-            });
-
-            console.log("Document URL:", url);
-
-            handleMessageSend({
-                context: "document",
-                documentUrl: url,
-                documentName: file.name,
-            });
-        } catch (err) {
-            console.error("Document upload failed:", err);
         } finally {
             hideSpinner();
         }
     }
 
-    async function downloadDocument(url, fileName) {
+    async function downloadAsset(url, fileName) {
         showSpinner();
         try {
             const fileUri = FileSystem.documentDirectory + fileName;
-
             const { uri } = await FileSystem.downloadAsync(url, fileUri);
 
-            if (Platform.OS === 'ios') {
-                await Sharing.shareAsync(uri);
-            }
-
-            createToast({ message: 'Document saved' });
+            await Sharing.shareAsync(uri);
+            createToast({ message: 'Saved to device' });
         } catch (err) {
-            console.error('Document download failed:', err);
+            console.error('download failed:', err);
         } finally {
             hideSpinner();
         }
     }
 
-    async function downloadImage(url, fileName) {
-        try {
-            if (Platform.OS === 'android') {
-                const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-                if (!permissions.granted) {
-                    Alert.alert('Permission denied', 'Cannot save without storage permission.');
-                    return;
-                }
-
-                const tmp = await FileSystem.downloadAsync(url, FileSystem.cacheDirectory + fileName);
-                const base64 = await FileSystem.readAsStringAsync(tmp.uri, { encoding: FileSystem.EncodingType.Base64 });
-
-                const mimeType = fileName.endsWith('.png') ? 'image/png' : 'image/jpeg';
-                const uri = await FileSystem.StorageAccessFramework.createFileAsync(
-                    permissions.directoryUri,
-                    fileName,
-                    mimeType
-                );
-
-                await FileSystem.writeAsStringAsync(uri, base64, { encoding: FileSystem.EncodingType.Base64 });
-            }
-
-            else if (Platform.OS === 'ios') {
-                const fileUri = FileSystem.documentDirectory + fileName;
-                const { uri } = await FileSystem.downloadAsync(url, fileUri);
-                await Sharing.shareAsync(uri);
-            }
-            else {
-                console.warn('Unsupported platform');
-            }
-        } catch (error) {
-            console.error('Failed to save image:', error);
-        } finally {
-            createToast({ message: 'Image saved in device' });
-        }
+    async function handleWhatsAppInvite() {
+        const url = `https://wa.me/${user.phone}`;
+        handleMessageSend({
+            context: 'invite/whatsapp',
+            senderName: user.firstname,
+            inviteUrl: url,
+            inviteLabel: 'WhatsApp'
+        });
     }
 
     return (
@@ -471,45 +433,69 @@ export default function Chat() {
             />
 
             {/* Upload Options */}
-            <FadeInOut visible={uploadOptionsVisible && message.length === 0} style={{
-                position: 'absolute',
-                bottom: insets.bottom + 80 + keyboardHeight,
-                left: 20,
-                right: 20,
-                zIndex: 9999,
-                flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: 'rgba(40, 40, 40, 0.95)',
-                borderRadius: 20,
-                borderWidth: 1,
-                borderColor: 'rgba(255,255,255,0.1)',
-                paddingHorizontal: 10
-            }}>
-                <TouchableOpacity onPress={handleImportPlan} style={{ padding: 15, alignItems: 'center', flex: 1 }}>
-                    <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(74, 144, 226, 0.2)' }]}>
-                        <Image source={Images.mealPlan} style={{ width: 24, height: 24, tintColor: '#4A90E2' }} />
-                    </View>
-                    <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5 }}>Meal plan</AppText>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setCameraActive(true)} style={{ padding: 15, alignItems: 'center', flex: 1 }}>
-                    <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(52, 199, 89, 0.2)' }]}>
-                        <Image source={Images.camera} style={{ width: 24, height: 24, tintColor: '#34C759' }} />
-                    </View>
-                    <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5 }}>Camera</AppText>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setLibraryActive(true)} style={{ padding: 15, alignItems: 'center', flex: 1 }}>
-                    <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(255, 149, 0, 0.2)' }]}>
-                        <Image source={Images.image} style={{ width: 24, height: 24, tintColor: '#FF9500' }} />
-                    </View>
-                    <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5 }}>Image</AppText>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleDocumentUpload} style={{ padding: 15, alignItems: 'center', flex: 1 }}>
-                    <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(175, 82, 222, 0.2)' }]}>
-                        <Image source={Images.doc} style={{ width: 24, height: 24, tintColor: '#AF52DE' }} />
-                    </View>
-                    <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5 }}>Document</AppText>
-                </TouchableOpacity>
+            <FadeInOut
+                visible={uploadOptionsVisible && message.length === 0}
+                style={{
+                    position: 'absolute',
+                    bottom: insets.bottom + 80 + keyboardHeight,
+                    left: 10,
+                    right: 10,
+                    zIndex: 9999,
+                    backgroundColor: 'rgba(40, 40, 40, 0.95)',
+                    borderRadius: 20,
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,255,255,0.1)',
+                    paddingVertical: 10,
+                    paddingHorizontal: 5,
+                }}
+            >
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                    {/* Top row: 2 icons aligned left */}
+                    <TouchableOpacity onPress={handleImportPlan} style={{ padding: 15, alignItems: 'center', width: '25%' }}>
+                        <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(74, 144, 226, 0.2)' }]}>
+                            <Image source={Images.mealPlan} style={{ width: 24, height: 24, tintColor: '#4A90E2' }} />
+                        </View>
+                        <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5 }}>Meal plan</AppText>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => setCameraActive(true)} style={{ padding: 15, alignItems: 'center', width: '25%' }}>
+                        <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(199, 184, 52, 0.2)' }]}>
+                            <Image source={Images.camera} style={{ width: 24, height: 24, tintColor: '#eef136ff' }} />
+                        </View>
+                        <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5 }}>Camera</AppText>
+                    </TouchableOpacity>
+
+                    {/* Bottom row: 4 icons */}
+                    <TouchableOpacity onPress={() => setLibraryActive(true)} style={{ padding: 15, alignItems: 'center', width: '25%' }}>
+                        <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(255, 149, 0, 0.2)' }]}>
+                            <Image source={Images.image} style={{ width: 24, height: 24, tintColor: '#FF9500' }} />
+                        </View>
+                        <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5 }}>Image</AppText>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={handleDocumentUpload} style={{ padding: 15, alignItems: 'center', width: '25%' }}>
+                        <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(175, 82, 222, 0.2)' }]}>
+                            <Image source={Images.doc} style={{ width: 24, height: 24, tintColor: '#AF52DE' }} />
+                        </View>
+                        <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5 }}>Document</AppText>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={handleWhatsAppInvite} style={{ padding: 15, alignItems: 'center', width: '25%' }}>
+                        <View style={[styles.uploadOptionIcon, { backgroundColor: '#396e3d9c' }]}>
+                            <Image source={Images.whatsappTwo} style={{ width: 24, height: 24, tintColor: '#13c422ff' }} />
+                        </View>
+                        <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5, textAlign: 'center' }}>Whatsapp</AppText>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => console.log('instagram')} style={{ padding: 15, alignItems: 'center', width: '25%' }}>
+                        <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(255, 45, 85, 0.2)' }]}>
+                            <Image source={Images.instagramTwo} style={{ width: 24, height: 24, tintColor: '#FF2D55' }} />
+                        </View>
+                        <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5, textAlign: 'center' }}>Instagram</AppText>
+                    </TouchableOpacity>
+                </View>
             </FadeInOut>
+
 
             {/* Chat Input Bar */}
             <FadeInOut visible={chatBarVisible} style={{
@@ -673,7 +659,7 @@ export default function Chat() {
                                                         />
 
                                                         <TouchableOpacity
-                                                            onPress={() => downloadImage(message.extraInformation.imageUrl, `The_Kratos_Hub_Chat_${roomId}_image_${Date.now()}.jpg`)}
+                                                            onPress={() => downloadAsset(message.extraInformation.imageUrl, `The_Kratos_Hub_Chat_${roomId}_image_${Date.now()}.jpg`)}
                                                             style={{
                                                                 position: 'absolute',
                                                                 bottom: 0,
@@ -695,17 +681,34 @@ export default function Chat() {
                                                     </View>
 
                                                 ) :
-                                                    message.extraInformation?.context === 'document' && (
+                                                    message.extraInformation?.context === 'document' ? (
                                                         <TouchableOpacity
                                                             style={styles.documentContainer}
-                                                            onPress={() => downloadDocument(message.extraInformation.documentUrl, message.extraInformation.documentName)}
+                                                            onPress={() => Linking.openURL(message.extraInformation.documentUrl)}
                                                         >
                                                             <Image source={Images.doc} style={styles.documentIcon} />
                                                             <AppText style={styles.documentName}>
                                                                 {message.extraInformation.documentName || "Document"}
                                                             </AppText>
                                                         </TouchableOpacity>
-                                                    )}
+                                                    ) :
+                                                        message.extraInformation?.context === 'invite/whatsapp' &&
+                                                        (
+                                                            <>
+
+                                                                <TouchableOpacity
+                                                                    style={[styles.documentContainer]}
+                                                                    onPress={() => message.senderId !== user.id && Linking.openURL(message.extraInformation.inviteUrl)}
+                                                                >
+                                                                    <Image source={Images.whatsappTwo} style={[styles.documentIcon, { tintColor: '#25D366' }]} />
+                                                                    <View >
+                                                                        <AppText style={styles.documentName}>
+                                                                            {message.extraInformation.inviteUrl}
+                                                                        </AppText>
+                                                                    </View>
+                                                                </TouchableOpacity>
+                                                            </>
+                                                        )}
                                                 {message.extraInformation?.context !== 'mealplan' &&
                                                     message.message &&
                                                     <AppText style={[

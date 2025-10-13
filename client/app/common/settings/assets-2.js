@@ -107,4 +107,8 @@ export const Images_2 = {
     docOutline: require('../../../assets/images/doc-outline.png'),
     image: require('../../../assets/images/image.png'),
     imageOutline: require('../../../assets/images/image-outline.png'),
+    whatsappTwo: require('../../../assets/images/whatsapp2.png'),
+    whatsappTwoOutline: require('../../../assets/images/whatsapp2-outline.png'),
+    instagramTwo: require('../../../assets/images/instagram2.png'),
+    instagramTwoOutline: require('../../../assets/images/instagram2-outline.png'),
 };
