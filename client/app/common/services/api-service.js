@@ -105,6 +105,36 @@ export default class APIService {
         }
     }
 
+    static async uploadDocumentToCloudinary({ uri, folder, fileName, type, mimeType, uploadPreset = "The_Kratos_Hub" }) {
+        if (!uri) throw new Error("No file URI provided for upload");
+        if (!folder || !fileName) throw new Error("No folder or file name provided");
+
+        try {
+            const formData = new FormData();
+            formData.append("file", {
+                uri,
+                type: type || mimeType || 'application/octet-stream',
+                name: fileName,
+            });
+            formData.append("upload_preset", uploadPreset);
+            formData.append("folder", folder);
+
+            const response = await fetch(
+                `https://api.cloudinary.com/v1_1/${APIService.CLOUDINARY_CLOUD_NAME}/raw/upload`,
+                { method: "POST", body: formData }
+            );
+
+            const data = await response.json();
+
+            if (!data.secure_url) throw new Error(data.error?.message || "Cloudinary upload failed");
+
+            return data.secure_url;
+        } catch (err) {
+            console.error("Cloudinary document upload error:", err);
+            throw err;
+        }
+    }
+
     static notifications = {
         all: () => APIService.request(`/notifications/${APIService.USER_ID}`, 'GET'),
         push: (payload) => APIService.request(`/notifications/${APIService.USER_ID}`, 'POST', payload),

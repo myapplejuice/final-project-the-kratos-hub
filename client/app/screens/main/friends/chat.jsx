@@ -1,7 +1,10 @@
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Button, StyleSheet, TouchableOpacity, View, Platform, Keyboard, Dimensions, Animated } from "react-native";
+import { Button, StyleSheet, TouchableOpacity, View, Platform, Keyboard, Dimensions, Animated, Linking } from "react-native";
+import * as DocumentPicker from 'expo-document-picker';
+import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system/legacy';
 import AppText from "../../../components/screen-comps/app-text";
 import { Images } from '../../../common/settings/assets';
 import { UserContext } from "../../../common/contexts/user-context";
@@ -331,6 +334,87 @@ export default function Chat() {
         }
     }
 
+    async function handleDocumentUpload() {
+        try {
+            // Pick a single document
+            const result = await DocumentPicker.getDocumentAsync({
+                type: '*/*',
+                copyToCacheDirectory: true,
+                multiple: false,
+            });
+
+            if (!result.canceled && result.assets.length > 0) {
+                const file = result.assets[0];
+                await uploadDocument(file);
+            }
+        } catch (err) {
+            console.log('Document picking error:', err);
+        }
+    }
+
+    async function uploadDocument(file) {
+        showSpinner();
+        try {
+            const url = await APIService.uploadDocumentToCloudinary({
+                uri: file.uri,
+                folder: "chat_docs",
+                fileName: `chat_room${roomId}_user${user.id}_${Date.now()}_${file.name}`,
+                type: file.mimeType || 'application/octet-stream'
+            });
+
+            console.log("Document URL:", url);
+
+            handleMessageSend({
+                context: "document",
+                documentUrl: url,
+                documentName: file.name,
+            });
+        } catch (err) {
+            console.error("Document upload failed:", err);
+        } finally {
+            hideSpinner();
+        }
+    }
+
+    async function downloadDocument(url, fileName) {
+        showSpinner();
+        try {
+            const fileUri = FileSystem.documentDirectory + fileName;
+
+            const { uri } = await FileSystem.downloadAsync(url, fileUri);
+
+            if (Platform.OS === 'ios') {
+                await Sharing.shareAsync(uri);
+            }
+
+            createToast({ message: 'Document saved' });
+        } catch (err) {
+            console.error('Document download failed:', err);
+        }finally{
+            hideSpinner();
+        }
+    }
+
+    async function downloadImage(url, fileName) {
+        showSpinner();
+        console.log(url)
+        try {
+            const fileUri = FileSystem.documentDirectory + fileName;
+
+            const { uri } = await FileSystem.downloadAsync(url, fileUri);
+
+            if (Platform.OS === 'ios') {
+                await Sharing.shareAsync(uri);
+            }
+
+            createToast({ message: 'Image saved' });
+        } catch (err) {
+            console.error('Image download failed:', err);
+        }finally{
+            hideSpinner();
+        }
+    }
+
     return (
         <>
             <ImageCapture onCancel={() => setChatBarVisible(true)} onConfirm={(asset) => handleImageUpload(asset)} />
@@ -403,7 +487,7 @@ export default function Chat() {
                     </View>
                     <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5 }}>Image</AppText>
                 </TouchableOpacity>
-                <TouchableOpacity style={{ padding: 15, alignItems: 'center', flex: 1 }}>
+                <TouchableOpacity onPress={handleDocumentUpload} style={{ padding: 15, alignItems: 'center', flex: 1 }}>
                     <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(175, 82, 222, 0.2)' }]}>
                         <Image source={Images.doc} style={{ width: 24, height: 24, tintColor: '#AF52DE' }} />
                     </View>
@@ -561,14 +645,25 @@ export default function Chat() {
                                                             </View>
                                                         }
                                                     </View>
-                                                ) : message.extraInformation?.context === 'image' && (
-                                                    <View style={styles.imageContainer}>
+                                                ) : message.extraInformation?.context === 'image' ? (
+                                                    <TouchableOpacity onPress={() => downloadImage(message.extraInformation.imageUrl, `The_Kratos_Hub_Chat_${roomId}_image_${Date.now()}.jpg`)} style={styles.imageContainer}>
                                                         <Image
                                                             source={{ uri: message.extraInformation.imageUrl }}
                                                             style={[styles.messageImage, isUser ? { borderBottomRightRadius: 5 } : { borderBottomLeftRadius: 5 }]}
                                                         />
-                                                    </View>
-                                                )}
+                                                    </TouchableOpacity>
+                                                ) :
+                                                    message.extraInformation?.context === 'document' && (
+                                                        <TouchableOpacity
+                                                            style={styles.documentContainer}
+                                                            onPress={() => downloadDocument(message.extraInformation.documentUrl, message.extraInformation.documentName)}
+                                                        >
+                                                            <Image source={Images.doc} style={styles.documentIcon} />
+                                                            <AppText style={styles.documentName}>
+                                                                {message.extraInformation.documentName || "Document"}
+                                                            </AppText>
+                                                        </TouchableOpacity>
+                                                    )}
                                                 {message.extraInformation?.context !== 'mealplan' &&
                                                     message.message &&
                                                     <AppText style={[
@@ -593,7 +688,25 @@ export default function Chat() {
         </>
     );
 }
+
 const styles = StyleSheet.create({
+    documentContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: 12,
+        marginVertical: 4,
+    },
+    documentIcon: {
+        width: 24,
+        height: 24,
+        marginRight: 8,
+        tintColor: '#FF9500',
+    },
+    documentName: {
+        color: 'white',
+        fontSize: scaleFont(14),
+        flexShrink: 1,
+    },
     // Input Styles
     inputStripped: {
         color: "white",
