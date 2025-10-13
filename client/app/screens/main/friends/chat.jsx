@@ -384,7 +384,9 @@ export default function Chat() {
     }
 
     async function handleWhatsAppInvite() {
-        const url = `https://wa.me/${user.phone}`;
+        const phoneNumber = user.phone.replace(/\+/g, '');
+        const url = `https://wa.me/${phoneNumber}`;
+        
         handleMessageSend({
             context: 'invite/whatsapp',
             senderName: user.firstname,
