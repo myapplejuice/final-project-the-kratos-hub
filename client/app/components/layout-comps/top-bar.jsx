@@ -91,8 +91,8 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.NOTIFICATIONS]: "Notifications",
         [routes.FRIENDS]: "Friends",
         [routes.CHAT]: `${chattedUser ? chattedUser.firstname + " " + chattedUser.lastname : 'Chat'}`,
-        [routes.PERSONAL_TRAINING_PROFILE]: "Personal Training",
-        [routes.PERSONAL_TRAINING_EXPLANATION]: "Personal Training",
+        [routes.PERSONAL_TRAINING_PROFILE]: "Trainer Profile",
+        [routes.PERSONAL_TRAINING_EXPLANATION]: "Trainer Profile",
     };
 
     function handleUserProfilePress() {
