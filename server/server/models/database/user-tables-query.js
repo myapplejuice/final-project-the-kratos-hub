@@ -15,6 +15,21 @@ export function userTablesQuery() {
                 );
             END;`
 
+    const userTrainerProfile = `IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='UserTrainerProfile' AND xtype='U')
+            BEGIN
+                CREATE TABLE dbo.UserTrainerProfile (
+                    UserId UNIQUEIDENTIFIER PRIMARY KEY,
+                    IsVerified BIT NOT NULL DEFAULT 0,
+                    TrainerStatus VARCHAR(20) NOT NULL DEFAULT 'inactive',
+                    Biography VARCHAR(1000) NULL,
+                    YearsOfExperience VARCHAR(20) NULL DEFAULT 'New Trainer',
+                    Images VARCHAR(MAX) NULL DEFAULT '[]',
+                    CONSTRAINT FK_UserTrainerProfile_Users FOREIGN KEY (UserId)
+                        REFERENCES dbo.Users(Id)
+                        ON DELETE CASCADE
+                );
+            END;`
+
     const userNotificationsQuery = `
             IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='UserNotifications' AND xtype='U')
             BEGIN
@@ -212,6 +227,7 @@ export function userTablesQuery() {
 
     const query = [
         userQuery,
+        userTrainerProfile,
         userNotificationsQuery,
         userFriendListQuery,
         metricsQuery,

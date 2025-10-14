@@ -7,6 +7,7 @@ import NutritionMealPlansDBService from "../nutrition/meal-plans/nutrition-meal-
 import UserToUserDBService from "../user-to-user/user-to-user-db-service.js";
 import NotificationsDBService from "../notifications/notifications-db-service.js";
 import ChatDBService from "../socket/chat-db-service.js";
+import UserTrainerProfileDBService from "./user-trainer-profile/user-trainer-profile-db-service.jsx";
 
 export default class UserController {
     constructor() { }
@@ -49,9 +50,10 @@ export default class UserController {
             return res.status(404).json({ message: "User not found." });
         }
 
-        const [nutritionLogs, foods, plans,
+        const [trainerProfile, nutritionLogs, foods, plans,
             friends, pendingFriends, friendMessageSummaries, notifications
         ] = await Promise.all([
+            UserTrainerProfileDBService.fetchTrainerProfile(id),
             NutritionDaysDBService.fetchAllDays(id),
             NutritionFoodsDBService.fetchFoods(id),
             NutritionMealPlansDBService.fetchPlansByUserId(id),
@@ -61,6 +63,7 @@ export default class UserController {
             NotificationsDBService.fetchNotifications(id)
         ]);
 
+        profile.trainerProfile = trainerProfile;
         profile.nutritionLogs = nutritionLogs;
         profile.foods = foods;
         profile.plans = plans;

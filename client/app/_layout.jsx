@@ -10,7 +10,7 @@ import Popups from "./components/popups/popups";
 import { StatusBar } from 'expo-status-bar';
 import usePopupsHandlers from './common/hooks/use-popups-handlers'
 import { colors } from './common/settings/styling'
-import { exitAppBackScreens, independentBackHandlerScreens } from "./common/settings/constants";
+import { exitAppBackScreens, independentBackHandlerScreens, routes } from "./common/settings/constants";
 import { BackHandler, Keyboard, View } from "react-native";
 import { TopBarContext } from "./common/contexts/top-bar-context";
 import { NavBarContext } from "./common/contexts/nav-bar-context";
@@ -46,11 +46,15 @@ function Layout() {
 
     useEffect(() => {
         const handlers = {
+            // Temporary until i find solution for library asset function
+            replace: () => { router.replace(routes.PROFILE); return true; },
             exit: () => { BackHandler.exitApp(); return true; },
             back: () => { router.back(); return true; },
         };
 
-        if (exitAppBackScreens.includes(screen)) {
+        if (screen === routes.PERSONAL_TRAINING_PROFILE) {
+            setBackHandler(handlers.replace);
+        } else if (exitAppBackScreens.includes(screen)) {
             setBackHandler(handlers.exit);
         } else if (!independentBackHandlerScreens.includes(screen)) {
             setBackHandler(handlers.back);

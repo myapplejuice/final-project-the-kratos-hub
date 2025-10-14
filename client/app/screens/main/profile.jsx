@@ -190,7 +190,7 @@ export default function Profile() {
                 <View style={[styles.card, { marginTop: 15 }]}>
                     <AppText style={styles.cardLabel}>Account & Application</AppText>
                     {[
-                        { icon: Images.personalTrainerOutline, label: 'Personal Training Profile', onPress: () => router.push(routes.PERSONAL_TRAINING_PROFILE) },
+                        { icon: Images.personalTrainerOutline, label: 'Personal Training Profile', onPress: () => router.replace(routes.PERSONAL_TRAINING_PROFILE) },
                         { icon: Images.password, label: 'Change Password', onPress: openPasswordChange },
                         { icon: Images.editTwo, label: 'Edit Profile', onPress: () => router.push(routes.EDIT_PROFILE) },
                         { icon: Images.settingsTwo, label: 'Settings', onPress: () => router.push(routes.SETTINGS) },

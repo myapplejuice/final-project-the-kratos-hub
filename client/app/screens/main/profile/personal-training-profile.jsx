@@ -23,8 +23,11 @@ import AnimatedButton from '../../../components/screen-comps/animated-button';
 import AppTextInput from '../../../components/screen-comps/app-text-input';
 import FloatingActionButton from '../../../components/screen-comps/floating-action-button';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBackHandlerContext } from '../../../common/contexts/back-handler-context';
+import FadeInOut from '../../../components/effects/fade-in-out';
 
 export default function PersonalTrainingProfile() {
+    const { setBackHandler } = useBackHandlerContext();
     const { setLibraryActive } = useContext(LibraryContext);
     const { setCameraActive } = useContext(CameraContext);
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createOptions } = usePopups();
@@ -33,10 +36,13 @@ export default function PersonalTrainingProfile() {
 
     const [fabVisible, setFabVisible] = useState(true);
     const [changes, setChanges] = useState(false);
+    const [selectedImage, setSelectedImage] = useState({});
+    const [imagePreviewVisible, setImagePreviewVisible] = useState(false);
 
     const [trainerStatus, setTrainerStatus] = useState(false);
     const [biography, setBiography] = useState('');
     const [yearsOfExperience, setYearsOfExperience] = useState('New Trainer');
+    const [images, setImages] = useState([]);
 
     useEffect(() => {
         const obj = {
@@ -49,10 +55,7 @@ export default function PersonalTrainingProfile() {
         setChanges(isChanged);
     }, [trainerStatus, biography, yearsOfExperience]);
 
-    async function handleNewUpdates() {
-
-    }
-
+   
     function handleYearsOfExperience() {
         createOptions({
             title: "Experience",
@@ -69,7 +72,16 @@ export default function PersonalTrainingProfile() {
     }
 
     async function handleNewImage(asset) {
-        console.log(asset)
+        const payload = {
+            fileName: asset.fileName || asset.uri.split('/').pop(),
+            uri: asset.uri,
+            type: asset.type || 'image/jpeg'
+        }
+        setImages(prev => [...prev, payload]);
+    }
+
+     async function handleNewUpdates() {
+
     }
 
     return (
@@ -85,8 +97,14 @@ export default function PersonalTrainingProfile() {
                 onPress={() => router.push(routes.FOOD_CREATOR)}
             />
 
+            <FadeInOut visible={imagePreviewVisible} style={{ position: 'absolute', zIndex: 9999, top: 0, left: 0, bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.8)' }}>
+                <TouchableOpacity onPress={() => { setImagePreviewVisible(false), setSelectedImage({}) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Image source={{ uri: selectedImage.uri || selectedImage.url }} style={{ width: 500, height: 500, alignSelf: 'center' }} resizeMode='contain' />
+                </TouchableOpacity>
+            </FadeInOut>
+
             <View style={styles.main}>
-                <ImageCapture onConfirm={async (image) => handleNewImage(image)}  />
+                <ImageCapture onConfirm={async (image) => handleNewImage(image)} />
                 <AppScroll extraBottom={200} onScrollSetStates={setFabVisible}>
                     {/* Explanation Card */}
                     <View style={{ flexDirection: 'row', marginHorizontal: 15, justifyContent: 'space-between' }}>
@@ -117,7 +135,7 @@ export default function PersonalTrainingProfile() {
                         >
                             <View style={styles.explanationContent}>
                                 <Image
-                                    source={Images.personalTrainer}
+                                    source={Images.personalTrainerOutline}
                                     style={styles.explanationIcon}
                                 />
                                 <View style={styles.explanationLeft}>
@@ -212,21 +230,22 @@ export default function PersonalTrainingProfile() {
                             </AppText>
                         </View>
 
-                        {/* Optional: Show uploaded images preview 
-                {uploadedImages.length > 0 && (
-                    <View style={styles.imagesPreview}>
-                        <AppText style={styles.previewTitle}>
-                            Uploaded ({uploadedImages.length})
-                        </AppText>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                            {uploadedImages.map((image, index) => (
-                                <View key={index} style={styles.imagePreview}>
-                                    <Image source={{ uri: image }} style={styles.previewImage} />
-                                </View>
-                            ))}
-                        </ScrollView>
-                    </View>
-                )}*/}
+                        {images.length > 0 && (
+                            <>
+                                {images.map((image, index) => (
+                                    <TouchableOpacity onPress={() => { setSelectedImage(image), setImagePreviewVisible(true) }} key={index}
+                                        style={[{
+                                            flexDirection: 'row', justifyContent: 'space-between', width: '100%', padding: 15, backgroundColor: colors.cardBackground,
+                                            borderRadius: 10, marginBottom: 10
+                                        }]}>
+                                        <AppText numberOfLines={1} ellipsizeMode="tail"  style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12), width: '90%' }}>{image.fileName}</AppText>
+                                        <View style={{width: '10%', alignItems: 'flex-end'}}>
+                                        <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                                        </View>
+                                    </TouchableOpacity>
+                                ))}
+                            </>
+                        )}
 
                         <TouchableOpacity
                             onPress={() => {
@@ -439,10 +458,6 @@ const styles = StyleSheet.create({
         color: colors.mutedText,
         fontSize: scaleFont(12),
         fontWeight: '500',
-    },
-    // Images Preview
-    imagesPreview: {
-        marginTop: 20,
     },
     previewTitle: {
         color: 'white',
