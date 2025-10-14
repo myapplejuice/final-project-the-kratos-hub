@@ -209,7 +209,7 @@ export default function UserProfile() {
                             </View>
                         }
                         <View style={[styles.card, { alignItems: 'center', marginTop: friend?.status && friend.status !== 'active' ? 15 : 0 }]}>
-                            {profile && (!profile.trainerProfile.isVerified || profile.trainerProfile.trainerStatus === 'active') &&
+                            {profile && (profile.trainerProfile.isVerified || profile.trainerProfile.trainerStatus === 'active') &&
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 20 }}>
                                     {profile && profile.trainerProfile.trainerStatus === 'active' && profile.trainerProfile.isVerified &&
                                         <TouchableOpacity onPress={() => router.push(routes.BADGE_OF_TRUST)} style={{ padding: 10, backgroundColor: colors.main, borderRadius: 15, flexDirection: 'row', alignItems: 'center' }}>
