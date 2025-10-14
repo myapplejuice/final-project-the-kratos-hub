@@ -321,14 +321,15 @@ export default function PersonalTrainingProfile() {
                             style={styles.uploadButton}
                         >
                             <View style={styles.uploadContent}>
+                                <Image
+                                    source={Images.arrow}
+                                    style={[styles.uploadIcon, { transform: [{ rotate: '-90deg' }], width: 25, height: 25, marginBottom: 0, marginBottom: 10 }]}
+                                />
                                 <AppText style={styles.uploadText}>Upload Image</AppText>
                                 <AppText style={styles.uploadHint}>
                                     PNG, JPG up to 10MB
                                 </AppText>
-                                <Image
-                                    source={Images.arrow}
-                                    style={[styles.uploadIcon, { transform: [{ rotate: '90deg' }], width: 25, height: 25, marginBottom: 0, marginTop: 10 }]}
-                                />
+                                
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -400,7 +401,7 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontWeight: 'bold',
         color: 'white',
-        fontSize: scaleFont(16),
+        fontSize: scaleFont(14),
     },
     // Toggle Switch
     toggleContainer: {
@@ -408,7 +409,6 @@ const styles = StyleSheet.create({
         backgroundColor: colors.backgroundSecond,
         borderRadius: 12,
         overflow: 'hidden',
-        minWidth: 100,
     },
     toggleOption: {
         paddingVertical: 8,
@@ -417,10 +417,12 @@ const styles = StyleSheet.create({
         minWidth: 50,
     },
     toggleLeft: {
+        width: 50,
         borderTopLeftRadius: 12,
         borderBottomLeftRadius: 12,
     },
     toggleRight: {
+        width: 50,
         borderTopRightRadius: 12,
         borderBottomRightRadius: 12,
     },
@@ -430,7 +432,7 @@ const styles = StyleSheet.create({
     toggleText: {
         color: colors.mutedText,
         fontWeight: '600',
-        fontSize: scaleFont(13),
+        fontSize: scaleFont(12),
     },
     toggleTextActive: {
         color: 'white',
@@ -492,7 +494,7 @@ const styles = StyleSheet.create({
         borderStyle: 'dashed',
         padding: 30,
         marginTop: 8,
-        width: 200,
+        width: '100%',
         height: 100,
         alignSelf: 'center',
         alignItems: 'center',
