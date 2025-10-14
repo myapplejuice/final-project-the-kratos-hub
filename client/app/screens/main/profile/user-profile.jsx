@@ -39,12 +39,6 @@ export default function UserProfile() {
 
                 if (result.success) {
                     const profile = result.data.profile;
-
-                    if (profile.imageBase64) {
-                        profile.image = { uri: `data:image/jpeg;base64,${profile.imageBase64}` };
-                        delete profile.imageBase64;
-                    }
-
                     setProfile(profile);
                 } else {
                     createAlert({ title: 'Failure', text: result.message, onPress: () => router.back() });
@@ -176,14 +170,15 @@ export default function UserProfile() {
 
     return (
         <>
-            <FadeInOut visible={viewImage && profile.image} style={styles.imageOverlay} initialVisible={false}>
+            <FadeInOut visible={viewImage && profile.imageURL} style={styles.imageOverlay} initialVisible={false}>
                 <TouchableOpacity
                     activeOpacity={1}
                     style={styles.imageOverlay}
                     onPress={() => setViewImage(false)}
                 >
                     <Image
-                        source={profile.image}
+                        source={{ uri: profile.imageURL }}
+                          cachePolicy="disk"   
                         style={styles.fullscreenImage}
                     />
                 </TouchableOpacity>
@@ -215,7 +210,8 @@ export default function UserProfile() {
                         <View style={[styles.card, { alignItems: 'center', marginTop: friend?.status && friend.status !== 'active' ? 15 : 0 }]}>
                             <TouchableOpacity onPress={() => setViewImage(true)} style={styles.imageWrapper}>
                                 <Image
-                                    source={profile.image}
+                                    source={{ uri: profile.imageURL }}
+                                      cachePolicy="disk"   
                                     style={styles.profileImage}
                                 />
                             </TouchableOpacity>

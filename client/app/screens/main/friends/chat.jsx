@@ -251,7 +251,6 @@ export default function Chat() {
         setMessage('');
         SocketService.emit("send-message", payload, (newMessageId) => {
             payload.id = newMessageId;
-            console.log(payload)
             setMessages(prev => [...prev, payload]);
         });
         setTimeout(() => {
@@ -268,12 +267,10 @@ export default function Chat() {
             options: userPlans.map(p => p.label),
             values: userPlans.map(p => p.id),
             onConfirm: (selected, value) => {
-                console.log(selected, value);
                 if (!selected || !value) return;
 
                 const plan = userPlans.find(p => p.id === value);
 
-                console.log(plan.id)
                 const extraInformation = {
                     context: 'mealplan',
                     planId: plan.id,

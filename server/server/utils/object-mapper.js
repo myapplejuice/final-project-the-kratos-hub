@@ -101,6 +101,7 @@ export default class ObjectMapper {
             DateTimeSent: 'dateTimeSent',
             SeenAt: 'seenAt',
             SourcePlanId: 'sourcePlanId',
+            ImageURL: 'imageURL'
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -205,7 +206,8 @@ export default class ObjectMapper {
             messageId: 'MessageId',
             seenAt: 'SeenAt',
             dateTimeSent: 'DateTimeSent',
-            sourcePlanId: 'SourcePlanId'
+            sourcePlanId: 'SourcePlanId',
+            imageURL: 'ImageURL'
         };
         return map[key] || key;
     }
@@ -223,6 +225,7 @@ export default class ObjectMapper {
             Phone: sql.VarChar(50),
             Password: sql.VarChar(256),
             ImageBase64: sql.VarChar(sql.MAX),
+            ImageURL: sql.VarChar(sql.MAX),
 
             // UserMetrics
             UserId: sql.UniqueIdentifier,
@@ -339,7 +342,7 @@ export default class ObjectMapper {
             gender: record.Gender,
             email: record.Email,
             phone: record.Phone,
-            imageBase64: record.ImageBase64,
+            imageURL: record.ImageURL,
         };
     }
 

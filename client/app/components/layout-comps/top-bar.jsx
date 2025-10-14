@@ -119,7 +119,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                     {screen === routes.CHAT && (
                         <>
                             <TouchableOpacity onPress={handleUserProfilePress}>
-                                <Image source={chattedUser.image} style={styles.chattedUserImage} />
+                                <Image source={{uri: chattedUser.imageURL}} style={styles.chattedUserImage}   cachePolicy="disk"   />
                             </TouchableOpacity>
                         </>
                     )}
@@ -161,7 +161,8 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                             <TouchableOpacity onPress={() => router.push(routes.PROFILE)}>
                                 <Image
                                     style={styles.profileImage}
-                                    source={user?.image ? user.image : Images.profilePic}
+                                    source={{ uri: user.imageURL }}
+                                      cachePolicy="disk"   
                                 />
                             </TouchableOpacity>
                         </>

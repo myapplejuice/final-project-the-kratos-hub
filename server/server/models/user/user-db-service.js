@@ -36,15 +36,15 @@ export default class UserDBService {
                 Database.addInput(profileRequest, "Phone", sql.VarChar(50), user.phone);
                 const hashedPassword = await UserEncryption.hashPassword(user.password);
                 Database.addInput(profileRequest, "Password", sql.VarChar(512), hashedPassword);
-                Database.addInput(profileRequest, "ImageBase64", sql.VarChar(sql.MAX), user.imageBase64 || null);
+                Database.addInput(profileRequest, "ImageURL", sql.VarChar(sql.MAX), user.imageURL || null);
                 Database.addInput(profileRequest, "DateOfCreation", sql.DateTime2, new Date());
 
                 const userResult = await profileRequest.query(`
                        INSERT INTO Users
-                       (Firstname, Lastname, Age, Gender, Email, Phone, Password, ImageBase64, DateOfCreation)
+                       (Firstname, Lastname, Age, Gender, Email, Phone, Password, ImageURL, DateOfCreation)
                        OUTPUT INSERTED.Id
                        VALUES
-                       (@Firstname, @Lastname, @Age, @Gender, @Email, @Phone, @Password, @ImageBase64, @DateOfCreation)
+                       (@Firstname, @Lastname, @Age, @Gender, @Email, @Phone, @Password, @ImageURL, @DateOfCreation)
                    `);
 
                 if (userResult.rowsAffected[0] === 0)
@@ -337,7 +337,7 @@ export default class UserDBService {
 
                     Database.addInput(request, pascalKey, sqlType, profile[key]);
 
-                    if (key !== 'imageBase64') {
+                    if (key !== 'imageURL') {
                         changedData[key] = profile[key];
                         changedFields.push(key);
                     }

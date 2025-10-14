@@ -395,18 +395,7 @@ export default function Register() {
     }
 
     async function prepareUserObject() {
-        let imageBase64 = '';
-        try {
-            const asset = Asset.fromModule(Images.profilePic);
-            await asset.downloadAsync();
-            imageBase64 = await FileSystem.readAsStringAsync(asset.localUri, {
-                encoding: FileSystem.EncodingType.Base64,
-            });
-        } catch (error) {
-            console.warn('Error loading default profile image:', error);
-            imageBase64 = '';
-        }
-
+        const imageURL = 'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760445047/profile-pic_xhxuvd.jpg';
         const user = {
             firstname,
             lastname,
@@ -415,7 +404,7 @@ export default function Register() {
             email,
             phone: phonePrefix + phone,
             password,
-            imageBase64,
+            imageURL,
             metrics: {
                 weightKg: Number(weightKg),
                 heightCm: Number(heightCm),

@@ -11,7 +11,7 @@ export function userTablesQuery() {
                     Email VARCHAR(50) NOT NULL UNIQUE,
                     Phone VARCHAR(50) NOT NULL UNIQUE,
                     Password VARCHAR(512) NOT NULL,
-                    ImageBase64 VARCHAR(MAX) NULL
+                    ImageURL VARCHAR(MAX) NULL
                 );
             END;`
 

@@ -32,11 +32,6 @@ export default class DeviceStorageService {
             const profile = profileResponse.data.profile;
             APIService.setUserId(profile.id);
 
-            if (profile.imageBase64) {
-                profile.image = { uri: `data:image/jpeg;base64,${profile.imageBase64}` };
-                delete profile.imageBase64;
-            }
-
             profile.preferences = await this.getUserPreferences();
 
             await SocketService.connect();

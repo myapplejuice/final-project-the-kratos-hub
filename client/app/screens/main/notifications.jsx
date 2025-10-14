@@ -49,11 +49,6 @@ export default function Notifications() {
 
                     for (let i = 0; i < requests.length; i++) {
                         const profile = profiles.find(p => p.id === requests[i].adderId);
-                        if (profile.imageBase64) {
-                            profile.image = { uri: `data:image/jpeg;base64,${profile.imageBase64}` };
-                            delete profile.imageBase64;
-                        }
-
                         requests[i].profile = profile;
                     }
 
@@ -222,7 +217,8 @@ export default function Notifications() {
                                                 <View style={{ flexDirection: 'row', width: '70%' }}>
                                                     <View style={{ marginEnd: 15 }}>
                                                         <Image
-                                                            source={profile.image || Images.profilePic}
+                                                            source={{ uri: profile.imageURL } || Images.profilePic}
+                                                              cachePolicy="disk"   
                                                             style={{ width: 50, height: 50, borderRadius: 25 }}
                                                         />
                                                     </View>

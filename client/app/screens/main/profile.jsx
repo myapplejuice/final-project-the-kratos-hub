@@ -27,7 +27,6 @@ export default function Profile() {
     const { setCameraActive } = useContext(CameraContext);
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, } = usePopups();
     const { user, setUser } = useContext(UserContext);
-    const insets = useSafeAreaInsets();
 
     async function openLogout() {
         createDialog({
@@ -134,7 +133,8 @@ export default function Profile() {
                         }}
                     >
                         <Image
-                            source={user.image}
+                            source={{ uri: user.imageURL }}
+                            cachePolicy="disk"
                             style={styles.profileImage}
                         />
                         <View style={styles.editBadge}>
@@ -159,7 +159,7 @@ export default function Profile() {
                             </View>
                         </View>
 
-                        <View style={[styles.infoRow, {paddingVertical: 10}]}>
+                        <View style={[styles.infoRow, { paddingVertical: 10 }]}>
                             <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecond }]}>
                                 <Image source={Images.phoneTwo} style={[styles.detailIcon]} />
                             </View>

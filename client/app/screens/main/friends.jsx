@@ -45,12 +45,6 @@ export default function Friends() {
 
                     if (result.success) {
                         profiles = result.data.profiles;
-                        for (let i = 0; i < profiles.length; i++) {
-                            if (profiles[i].imageBase64) {
-                                profiles[i].image = { uri: `data:image/jpeg;base64,${profiles[i].imageBase64}` };
-                                delete profiles[i].imageBase64;
-                            }
-                        }
                     }
                 }
 
@@ -96,7 +90,6 @@ export default function Friends() {
     }
 
     function handleFriendClick(chattingFriendProfile, status) {
-        console.log(status)
         setAdditionalContexts({ chattingFriendProfile, friendStatus: status });
         router.push(routes.CHAT)
     }
@@ -182,7 +175,8 @@ export default function Friends() {
                                                 style={styles.imageWrapper}
                                             >
                                                 <Image
-                                                    source={friend.image}
+                                                    source={{uri: friend.imageURL}}
+                                                      cachePolicy="disk"   
                                                     style={{ width: 50, height: 50, borderRadius: 25 }}
                                                 />
                                             </TouchableOpacity>
