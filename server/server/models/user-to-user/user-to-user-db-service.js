@@ -4,6 +4,7 @@ import HistoryDBService from '../history/history-db-service.js';
 import Database from '../database/database.js';
 import ObjectMapper from '../../utils/object-mapper.js';
 import ChatDBService from '../socket/chat-db-service.js';
+import UserTrainerProfileDBService from '../user/user-trainer-profile/user-trainer-profile-db-service.js';
 
 export default class UserToUserDBService {
     static async fetchUserProfile(id, withAdditionalInfo = true) {
@@ -25,15 +26,20 @@ export default class UserToUserDBService {
             if (!result.recordset.length) return null;
 
             const row = result.recordset[0];
+            const trainerProfile = await UserTrainerProfileDBService.fetchTrainerProfile(id);
+            const mapped = ObjectMapper.mapUser(row);
+            mapped.trainerProfile = trainerProfile;
+
+            console.log(mapped)
             if (withAdditionalInfo) {
                 return {
-                    ...ObjectMapper.mapUser(row),
+                    ...mapped,
                     metrics: ObjectMapper.mapMetrics(row),
                     nutrition: ObjectMapper.mapNutrition(row)
                 }
             }
             else {
-                return ObjectMapper.mapUser(row);
+                return mapped;
             }
         } catch (err) {
             console.error('fetchUserProfile error:', err);
@@ -47,7 +53,6 @@ export default class UserToUserDBService {
 
             const request = Database.getRequest();
 
-            // Build dynamic WHERE clause with parameterized inputs
             const idParams = idList.map((_, i) => `@Id${i}`).join(', ');
             idList.forEach((id, i) => {
                 Database.addInput(request, `Id${i}`, sql.UniqueIdentifier, id);
@@ -65,14 +70,18 @@ export default class UserToUserDBService {
             if (!result.recordset.length) return [];
 
             return result.recordset.map(row => {
+                const trainerProfile = UserTrainerProfileDBService.fetchTrainerProfile(row.Id);
+                const mapped = ObjectMapper.mapUser(row);
+                mapped.trainerProfile = trainerProfile;
+
                 if (withAdditionalInfo) {
                     return {
-                        ...ObjectMapper.mapUser(row),
+                        ...mapped,
                         metrics: ObjectMapper.mapMetrics(row),
                         nutrition: ObjectMapper.mapNutrition(row)
                     };
                 } else {
-                    return ObjectMapper.mapUser(row);
+                    return mapped;
                 }
             });
         } catch (err) {
@@ -156,12 +165,12 @@ export default class UserToUserDBService {
     }
 
     static async fetchUserFriend(userId, friendId) {
-    try {
-        const request = Database.getRequest();
-        Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
-        Database.addInput(request, 'FriendId', sql.UniqueIdentifier, friendId);
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
+            Database.addInput(request, 'FriendId', sql.UniqueIdentifier, friendId);
 
-        const query = `
+            const query = `
         SELECT 
             Id,
             CASE 
@@ -176,22 +185,22 @@ export default class UserToUserDBService {
             OR (UserOne = @FriendId AND UserTwo = @UserId)
         `;
 
-        const result = await request.query(query);
+            const result = await request.query(query);
 
-        if (!result.recordset.length) return null;
+            if (!result.recordset.length) return null;
 
-        const r = result.recordset[0];
-        return {
-            id: r.Id,
-            friendId: r.FriendId,
-            terminatedBy: r.TerminatedBy,
-            status: r.Status
-        };
-    } catch (err) {
-        console.error('fetchUserFriend error:', err);
-        return null;
+            const r = result.recordset[0];
+            return {
+                id: r.Id,
+                friendId: r.FriendId,
+                terminatedBy: r.TerminatedBy,
+                status: r.Status
+            };
+        } catch (err) {
+            console.error('fetchUserFriend error:', err);
+            return null;
+        }
     }
-}
 
 
     static async fetchUserPendingFriendsList(userId) {
