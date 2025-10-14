@@ -231,7 +231,7 @@ export default function Friends() {
                         </View>
 
                     ) : (
-                        friendsList.length > 0 ? (
+                        visibleList.length > 0 ? (
                             <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, margin: 15 }}>
                                 <Image source={Images.noProfile} style={{ width: 100, height: 100, tintColor: colors.mutedText + '40' }} />
                                 <AppText style={{ color: colors.mutedText + '60', fontWeight: 'bold', fontSize: scaleFont(25), marginTop: 15 }}>
@@ -242,20 +242,29 @@ export default function Friends() {
                                 </AppText>
                             </View>
                         ) :
-                            <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, margin: 15 }}>
-                                <Image source={Images.sad} style={{ width: 100, height: 100, tintColor: colors.mutedText + '40' }} />
-                                <AppText style={{ color: colors.mutedText + '60', fontWeight: 'bold', fontSize: scaleFont(25), marginTop: 15 }}>
-                                    Your friends list is empty
-                                </AppText>
-                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(15), marginTop: 5, textAlign: 'center' }}>
-                                    Explore the app, contribute to the community, make new friends, and grow your network.
-                                </AppText>
-                                <AnimatedButton
-                                    title="Community Hub"
-                                    onPress={() => console.log('replace with hub later')}
-                                    style={{ marginTop: 20, padding: 15, borderRadius: 20, width: 200, backgroundColor: colors.main }}
-                                />
-                            </View>
+                            selectedList === 'inactive' ? (
+                                <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, margin: 15 }}>
+                                    <Image source={Images.noProfile} style={{ width: 100, height: 100, tintColor: colors.mutedText + '40' }} />
+                                    <AppText style={{ color: colors.mutedText + '60', fontWeight: 'bold', fontSize: scaleFont(25), textAlign: 'center' }}>
+                                        You have no terminated or blocked friends
+                                    </AppText>
+                                </View>
+                            ) : friendsList.length === 0 && (
+                                <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, margin: 15 }}>
+                                    <Image source={Images.sad} style={{ width: 100, height: 100, tintColor: colors.mutedText + '40' }} />
+                                    <AppText style={{ color: colors.mutedText + '60', fontWeight: 'bold', fontSize: scaleFont(25), marginTop: 15, textAlign: 'center' }}>
+                                        Your friends list is empty
+                                    </AppText>
+                                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(15), marginTop: 5, textAlign: 'center' }}>
+                                        Explore the app, contribute to the community, make new friends, and grow your network.
+                                    </AppText>
+                                    <AnimatedButton
+                                        title="Community Hub"
+                                        onPress={() => console.log('replace with hub later')}
+                                        style={{ marginTop: 20, padding: 15, borderRadius: 20, width: 200, backgroundColor: colors.main }}
+                                    />
+                                </View>
+                            )
                     )}
                 </View>
             ) : (
