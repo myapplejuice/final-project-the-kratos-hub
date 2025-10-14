@@ -30,6 +30,8 @@ export const routes = {
     EDIT_PROFILE: '/screens/main/profile/edit-profile',
     USDA_PROFILE: '/screens/main/profile/usda-profile',
     USER_PROFILE: '/screens/main/profile/user-profile',
+    PERSONAL_TRAINING_PROFILE: '/screens/main/profile/personal-training-profile',
+    PERSONAL_TRAINING_EXPLANATION: '/screens/main/profile/personal-training-explanation',
 
     /* SETTINGS CHILDREN */
     UNITS_CHANGE: '/screens/main/profile/settings/units-change',

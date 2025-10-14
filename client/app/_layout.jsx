@@ -119,6 +119,8 @@ function Layout() {
                                             <Stack.Screen name="screens/main/profile/edit-profile" />
                                             <Stack.Screen name="screens/main/profile/usda-profile" />
                                             <Stack.Screen name="screens/main/profile/user-profile" />
+                                            <Stack.Screen name="screens/main/profile/personal-training-profile" />
+                                            <Stack.Screen name="screens/main/profile/personal-training-explanation" />
 
                                             {/* SETTINGS CHILDREN */}
                                             <Stack.Screen name="screens/main/profile/settings/units-change" />

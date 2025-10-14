@@ -36,17 +36,19 @@ export default function Profile() {
         })
     };
 
-    async function setNewImage(newImage) {
+    async function setNewImage(asset) {
         showSpinner();
         try {
-            let imageBase64 = await FileSystem.readAsStringAsync(newImage.uri, {
-                encoding: FileSystem.EncodingType.Base64,
+            const imageURL = await APIService.uploadImageToCloudinary({
+                uri: asset.uri,
+                folder: "profile_images",
+                fileName: `profile_image_user_${user.id}_${Date.now()}.jpg`,
             });
 
-            const result = await APIService.user.update({ profile: { imageBase64 } })
+            const result = await APIService.user.update({ profile: { imageURL } })
 
             if (result.success) {
-                setUser(prev => ({ ...prev, image: { uri: `data:image/jpeg;base64,${imageBase64}` } }));
+                setUser(prev => ({ ...prev, imageURL }));
                 createToast({ message: "Profile picture updated" });
                 return true;
             }
@@ -188,12 +190,13 @@ export default function Profile() {
                 <View style={[styles.card, { marginTop: 15 }]}>
                     <AppText style={styles.cardLabel}>Account & Application</AppText>
                     {[
+                        { icon: Images.personalTrainerOutline, label: 'Personal Training Profile', onPress: () => router.push(routes.PERSONAL_TRAINING_PROFILE) },
                         { icon: Images.password, label: 'Change Password', onPress: openPasswordChange },
                         { icon: Images.editTwo, label: 'Edit Profile', onPress: () => router.push(routes.EDIT_PROFILE) },
                         { icon: Images.settingsTwo, label: 'Settings', onPress: () => router.push(routes.SETTINGS) },
                     ].map((item, i) => (
                         <View key={i}>
-                            <TouchableOpacity key={i} style={[styles.optionRow, i === 2 && { marginBottom: 0 }]} onPress={item.onPress}>
+                            <TouchableOpacity key={i} style={[styles.optionRow, i === 3 && { marginBottom: 0 }]} onPress={item.onPress}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
                                     <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
                                         <Image source={item.icon} style={styles.settingIcon} />
@@ -204,7 +207,7 @@ export default function Profile() {
                                 </View>
                                 <Image source={Images.backArrow} style={[styles.arrow, { transform: [{ scaleX: -1 }] }]} />
                             </TouchableOpacity>
-                            {i !== 2 && <Divider orientation='horizontal' color={colors.divider} />}
+                            {i !== 3 && <Divider orientation='horizontal' color={colors.divider} />}
                         </View>
                     ))}
                 </View>

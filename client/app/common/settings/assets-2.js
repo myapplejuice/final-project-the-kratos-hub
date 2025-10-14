@@ -111,4 +111,6 @@ export const Images_2 = {
     whatsappTwoOutline: require('../../../assets/images/whatsapp2-outline.png'),
     instagramTwo: require('../../../assets/images/instagram2.png'),
     instagramTwoOutline: require('../../../assets/images/instagram2-outline.png'),
+    personalTrainer: require('../../../assets/images/personal-trainer.png'),
+    personalTrainerOutline: require('../../../assets/images/personal-trainer-outline.png'),
 };

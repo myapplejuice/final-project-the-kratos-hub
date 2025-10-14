@@ -1,19 +1,5 @@
-My Foods
-1. Correct, you got it right all good.
-
-Library (USDA)
-2.1. Yes, must press keyboard to start search
-2.2. Yes on each new keyboard submit start from page 1, but... if user types what is already in search query so basically same string, do nothing, because it would be useless api call.
-2.3. Yes, on scroll more pages correct.
-2.4. Yes, on new search start from page 1.
-
-Community
-2.1. Yes, but question: memory data causes lag or only if i render them? because if massive data causes lag dispite not being rendered, i might rethink how to fetch community foods from my API later.
-2.2. Yes, only 10 first (page 1).
-2.3. Yes, more scroll = next pages.
-2.4. Exactly.
-
-Your Questions - My Answers
-1. I think i prefer load more button, good suggestion... because its more direct, user knows there's more of the food and it prevents accidental call if not needed, thanks for the suggestion (same for community).
-2. Same number of items per page as library...
-3. Considering we are doing button instead, i dont think this is needed.
+Do you have experience in personal training? Do you wish to be recognized as a personal trainer? In here, you can mark your availability and be recognized as a personal trainer. 
+Other users in the community will be able to find you and get in touch with you whenever they need nutrition and workout advice. It is recommended that you fill out below a short form about yourself, provide certain certificates or photos of your work for the community to see.
+And if a user gets interested, they can get in touch with you and form a connection for you to work with them.
+Certification or academic degree is not required. But, in the case you do have a certification, it is recommended you apply for training verification to us. 
+If you pass, you will be granted a badge marking you as a trusted trainer in the The Kratos Hub community making your qualification amongst the community stronger.
