@@ -120,6 +120,13 @@ export default function Profile() {
             <ImageCapture onConfirm={async (image) => setNewImage(image)} />
             <AppScroll extraBottom={20}>
                 <View style={[styles.card, { alignItems: 'center' }]}>
+                    {user.trainerProfile.trainerStatus === 'active' &&
+                        <View style={{ padding: 10, backgroundColor: colors.main, borderRadius: 15, marginBottom: 15, flexDirection: 'row', alignSelf: 'flex-start', alignItems: 'center' }}>
+                            <Image source={Images.personalTrainer} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                            <AppText style={{ color: 'white', marginStart: 5, fontSize: scaleFont(12), fontWeight: 'bold' }}>Active Trainer</AppText>
+                        </View>
+                    }
+                    
                     <TouchableOpacity
                         style={styles.imageWrapper}
                         onPress={() => {

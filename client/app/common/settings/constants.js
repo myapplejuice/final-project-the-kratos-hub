@@ -32,6 +32,7 @@ export const routes = {
     USER_PROFILE: '/screens/main/profile/user-profile',
     PERSONAL_TRAINING_PROFILE: '/screens/main/profile/personal-training-profile',
     PERSONAL_TRAINING_EXPLANATION: '/screens/main/profile/personal-training-explanation',
+    BADGE_OF_TRUST: '/screens/main/profile/badge-of-trust',
 
     /* SETTINGS CHILDREN */
     UNITS_CHANGE: '/screens/main/profile/settings/units-change',

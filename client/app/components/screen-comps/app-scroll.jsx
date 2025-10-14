@@ -135,7 +135,6 @@ export default function AppScroll({
             {...props}
         >
             <TouchableWithoutFeedback onPress={() => {
-                console.log(dismissKeyboardOnTap),
                     dismissKeyboardOnTap && Keyboard.dismiss()
             }
             } accessible={false}>

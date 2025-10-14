@@ -21,7 +21,7 @@ export function userTablesQuery() {
                     UserId UNIQUEIDENTIFIER PRIMARY KEY,
                     IsVerified BIT NOT NULL DEFAULT 0,
                     TrainerStatus VARCHAR(20) NOT NULL DEFAULT 'inactive',
-                    Biography VARCHAR(1000) NULL,
+                    Biography VARCHAR(1000) NOT NULL DEFAULT '',
                     YearsOfExperience VARCHAR(20) NULL DEFAULT 'New Trainer',
                     Images VARCHAR(MAX) NULL DEFAULT '[]',
                     CONSTRAINT FK_UserTrainerProfile_Users FOREIGN KEY (UserId)

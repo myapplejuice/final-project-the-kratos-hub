@@ -7,7 +7,7 @@ import NutritionMealPlansDBService from "../nutrition/meal-plans/nutrition-meal-
 import UserToUserDBService from "../user-to-user/user-to-user-db-service.js";
 import NotificationsDBService from "../notifications/notifications-db-service.js";
 import ChatDBService from "../socket/chat-db-service.js";
-import UserTrainerProfileDBService from "./user-trainer-profile/user-trainer-profile-db-service.jsx";
+import UserTrainerProfileDBService from "./user-trainer-profile/user-trainer-profile-db-service.js";
 
 export default class UserController {
     constructor() { }
@@ -71,18 +71,22 @@ export default class UserController {
         profile.pendingFriends = pendingFriends;
         profile.notifications = notifications;
 
-        profile.friends = profile.friends.map(friend => {
-            const summary = friendMessageSummaries.find(s => s.friendId === friend.friendId);
-
-            return {
-                ...friend,
-                lastMessageSenderId: summary?.lastMessageSenderId || null,
-                lastMessage: summary?.lastMessage || null,
-                lastMessageTime: summary?.lastMessageTime || null,
-                unreadCount: summary?.unreadCount || 0,
-                chatRoomId: summary?.chatRoomId
-            };
-        });
+        profile.friends = await Promise.all(
+            profile.friends.map(async (friend) => {
+                const summary = friendMessageSummaries.find(s => s.friendId === friend.friendId);
+                const trainerProfile = await UserTrainerProfileDBService.fetchTrainerProfile(friend.friendId);
+           
+                return {
+                    ...friend,
+                    trainerProfile,
+                    lastMessageSenderId: summary?.lastMessageSenderId || null,
+                    lastMessage: summary?.lastMessage || null,
+                    lastMessageTime: summary?.lastMessageTime || null,
+                    unreadCount: summary?.unreadCount || 0,
+                    chatRoomId: summary?.chatRoomId
+                };
+            })
+        );
 
         return res.status(200).json({ profile });
     }

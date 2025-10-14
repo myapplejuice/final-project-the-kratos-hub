@@ -84,12 +84,18 @@ export default function Friends() {
         router.push({
             pathname: routes.USER_PROFILE,
             params: {
-                userId: profile.id
+                userId: profile.id,
             }
         })
     }
 
     function handleFriendClick(chattingFriendProfile, status) {
+        const trainerProfile = user.friends.find(f => f.friendId === chattingFriendProfile.id).trainerProfile;
+        const isTrainer = trainerProfile.trainerStatus === 'active';
+        const isVerified = trainerProfile.isVerified;
+        chattingFriendProfile.isTrainer = isTrainer;
+        chattingFriendProfile.isVerified = isVerified;
+
         setAdditionalContexts({ chattingFriendProfile, friendStatus: status });
         router.push(routes.CHAT)
     }
@@ -175,8 +181,8 @@ export default function Friends() {
                                                 style={styles.imageWrapper}
                                             >
                                                 <Image
-                                                    source={{uri: friend.imageURL}}
-                                                      cachePolicy="disk"   
+                                                    source={{ uri: friend.imageURL }}
+                                                    cachePolicy="disk"
                                                     style={{ width: 50, height: 50, borderRadius: 25 }}
                                                 />
                                             </TouchableOpacity>

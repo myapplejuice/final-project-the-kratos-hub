@@ -39,49 +39,99 @@ export default function PersonalTrainingProfile() {
     const [selectedImage, setSelectedImage] = useState({});
     const [imagePreviewVisible, setImagePreviewVisible] = useState(false);
 
-    const [trainerStatus, setTrainerStatus] = useState(false);
-    const [biography, setBiography] = useState('');
-    const [yearsOfExperience, setYearsOfExperience] = useState('New Trainer');
-    const [images, setImages] = useState([]);
+    const [trainerStatus, setTrainerStatus] = useState(user.trainerProfile.trainerStatus === 'active');
+    const [biography, setBiography] = useState(user.trainerProfile.biography);
+    const [yearsOfExperience, setYearsOfExperience] = useState(user.trainerProfile.yearsOfExperience);
+    const [images, setImages] = useState(user.trainerProfile.images);
 
     useEffect(() => {
         const obj = {
-            trainerStatus: trainerStatus,
-            biography: biography,
-            yearsOfExperience: yearsOfExperience
+            userId: user.id,
+            isVerified: user.trainerProfile.isVerified,
+            trainerStatus: trainerStatus === true ? 'active' : 'inactive',
+            biography,
+            yearsOfExperience,
+            images
         }
 
-        const isChanged = JSON.stringify(obj) !== JSON.stringify(user?.personalTrainingProfile);
+        const isChanged = JSON.stringify(obj) !== JSON.stringify(user?.trainerProfile);
         setChanges(isChanged);
-    }, [trainerStatus, biography, yearsOfExperience]);
+    }, [trainerStatus, biography, yearsOfExperience, images, user.trainerProfile]);
 
-   
     function handleYearsOfExperience() {
         createOptions({
             title: "Experience",
             options: ["New Trainer", "1 Year", "2 Years", "3+ Years", "6+ Years", "10+ Years"],
             current: yearsOfExperience,
             onConfirm: (selected) => {
-                console.log(selected)
                 if (selected) {
                     setYearsOfExperience(selected);
                 }
             }
-
         })
     }
 
     async function handleNewImage(asset) {
         const payload = {
             fileName: asset.fileName || asset.uri.split('/').pop(),
-            uri: asset.uri,
+            url: asset.uri,
             type: asset.type || 'image/jpeg'
         }
         setImages(prev => [...prev, payload]);
     }
 
-     async function handleNewUpdates() {
+    async function handleNewUpdates() {
+        try {
+            showSpinner();
 
+            const newImages = JSON.stringify(user.trainerProfile.images) !== JSON.stringify(images);
+            let uploadedImages = images;
+
+            if (newImages) {
+                console.log('uploading images');
+                uploadedImages = await Promise.all(
+                    images.map(async (image) => {
+                        if (!image.url.startsWith("http")) {
+                            const url = await APIService.uploadImageToCloudinary({
+                                uri: image.url,
+                                folder: "user_trainer_profile_images",
+                                fileName: `user${user.id}_${Date.now()}_${image.fileName}.jpg`,
+                            });
+                            return { ...image, url };
+                        }
+                        return image;
+                    })
+                );
+            }
+
+            setImages(uploadedImages);
+
+            const payload = {
+                userId: user.id,
+                isVerified: user.trainerProfile.isVerified,
+                trainerStatus: trainerStatus ? 'active' : 'inactive',
+                biography,
+                yearsOfExperience,
+                images: uploadedImages,
+            };
+
+            const result = await APIService.user.trainerProfile.update(payload);
+
+            if (result.success) {
+                createToast({ message: "Trainer profile updated" });
+                setUser(prev => ({
+                    ...prev,
+                    trainerProfile: payload,
+                }));
+            } else {
+                createToast({ message: "Failed to update profile." });
+            }
+        } catch (err) {
+            console.error(err);
+            createToast({ message: "Error updating profile." });
+        } finally {
+            hideSpinner();
+        }
     }
 
     return (
@@ -94,12 +144,21 @@ export default function PersonalTrainingProfile() {
                 style={{ width: '100%', height: 50, backgroundColor: colors.accentGreen }}
                 position={{ bottom: insets.bottom + 20, right: 20, left: 20 }}
                 visible={fabVisible && changes}
-                onPress={() => router.push(routes.FOOD_CREATOR)}
+                onPress={handleNewUpdates}
             />
 
             <FadeInOut visible={imagePreviewVisible} style={{ position: 'absolute', zIndex: 9999, top: 0, left: 0, bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.8)' }}>
-                <TouchableOpacity onPress={() => { setImagePreviewVisible(false), setSelectedImage({}) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <Image source={{ uri: selectedImage.uri || selectedImage.url }} style={{ width: 500, height: 500, alignSelf: 'center' }} resizeMode='contain' />
+                <TouchableOpacity onPress={() => { setImagePreviewVisible(false), setSelectedImage({}), setFabVisible(true) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(30), marginBottom: 15 }}>Tap anywhere to dismiss</AppText>
+                    <Image source={{ uri: selectedImage.url }} style={{ width: 500, height: 500, alignSelf: 'center' }} resizeMode='contain' />
+                    <AnimatedButton
+                        title={'Delete Photo'}
+                        onPress={() => { setImagePreviewVisible(false), setSelectedImage({}), setImages(images.filter(i => i.url !== selectedImage.url)), setFabVisible(true) }}
+                        style={{ backgroundColor: colors.negativeRed, padding: 15, borderRadius: 30, width: '90%', marginTop: 15 }}
+                        textStyle={{ fontSize: scaleFont(15) }}
+                        leftImage={Images.trash}
+                        leftImageStyle={{ width: 20, height: 20, marginEnd: 5 }}
+                    />
                 </TouchableOpacity>
             </FadeInOut>
 
@@ -121,7 +180,7 @@ export default function PersonalTrainingProfile() {
 
                                     <View style={styles.explanationText}>
                                         <AppText style={styles.explanationTitle}>
-                                            What is training profile?
+                                            Trainer Profile
                                         </AppText>
                                     </View>
                                 </View>
@@ -191,7 +250,7 @@ export default function PersonalTrainingProfile() {
                         </AppText>
                         <AppTextInput
                             multiline
-                            value={user.trainerBio}
+                            value={biography}
                             onChangeText={setBiography}
                             style={styles.bioInput}
                             placeholder='Write about your experience, specialties, achievements, and what makes you a great trainer...'
@@ -235,12 +294,12 @@ export default function PersonalTrainingProfile() {
                                 {images.map((image, index) => (
                                     <TouchableOpacity onPress={() => { setSelectedImage(image), setImagePreviewVisible(true) }} key={index}
                                         style={[{
-                                            flexDirection: 'row', justifyContent: 'space-between', width: '100%', padding: 15, backgroundColor: colors.cardBackground,
-                                            borderRadius: 10, marginBottom: 10
+                                            flexDirection: 'row', justifyContent: 'space-between', width: '100%', padding: 20, backgroundColor: colors.cardBackground,
+                                            borderRadius: 20, marginBottom: 10, alignItems: 'center'
                                         }]}>
-                                        <AppText numberOfLines={1} ellipsizeMode="tail"  style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12), width: '90%' }}>{image.fileName}</AppText>
-                                        <View style={{width: '10%', alignItems: 'flex-end'}}>
-                                        <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                                        <AppText numberOfLines={1} ellipsizeMode="tail" style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12), width: '91%' }}>{image.fileName}</AppText>
+                                        <View style={{ width: '9%', alignItems: 'center', flexDirection: 'row', }}>
+                                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white', marginStart: 10 }} />
                                         </View>
                                     </TouchableOpacity>
                                 ))}
@@ -267,7 +326,7 @@ export default function PersonalTrainingProfile() {
                                     PNG, JPG up to 10MB
                                 </AppText>
                                 <Image
-                                    source={Images.arrow} // Replace with your upload icon
+                                    source={Images.arrow}
                                     style={[styles.uploadIcon, { transform: [{ rotate: '90deg' }], width: 25, height: 25, marginBottom: 0, marginTop: 10 }]}
                                 />
                             </View>

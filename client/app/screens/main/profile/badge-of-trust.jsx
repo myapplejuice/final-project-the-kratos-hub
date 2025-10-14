@@ -21,7 +21,7 @@ import { CameraContext } from '../../../common/contexts/camera-context';
 import { LibraryContext } from '../../../common/contexts/library-context';
 import AnimatedButton from '../../../components/screen-comps/animated-button';
 
-export default function PersonalTrainingExplanation() {
+export default function BadgeOfTrust() {
     const { setLibraryActive } = useContext(LibraryContext);
     const { setCameraActive } = useContext(CameraContext);
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, } = usePopups();
@@ -30,7 +30,7 @@ export default function PersonalTrainingExplanation() {
     return (
         <View style={styles.main}>
             <ImageCapture />
-            <AppScroll extraBottom={200}>
+            <AppScroll extraBottom={20}>
                 <View style={{ marginHorizontal: 15 }}>
                     <View style={styles.stepsContainer}>
                         <View style={styles.stepItem}>
@@ -79,13 +79,6 @@ export default function PersonalTrainingExplanation() {
                             <AppText style={styles.stepDescription}>
                                 Submit an application with certificates and/or academic qualifications to earn a badge marking you as a trusted trainer, which boosts other users' confidence in your services. Verification is optional but adds credibility.
                             </AppText>
-                            <AnimatedButton
-                                onPress={() => router.push(routes.BADGE_OF_TRUST)}
-                                rightImage={Images.arrow}
-                                rightImageStyle={{ marginStart: 5 }}
-                                style={{ marginTop: 15, alignItems: 'center', padding: 13, marginStart: 35, backgroundColor: colors.main, borderRadius: 15 }}
-                                title={"For more information, click here"}
-                            />
                         </View>
                     </View>
                 </View>

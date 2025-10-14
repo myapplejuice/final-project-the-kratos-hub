@@ -101,7 +101,12 @@ export default class ObjectMapper {
             DateTimeSent: 'dateTimeSent',
             SeenAt: 'seenAt',
             SourcePlanId: 'sourcePlanId',
-            ImageURL: 'imageURL'
+            ImageURL: 'imageURL',
+            IsVerified: 'isVerified',
+            TrainerStatus: 'trainerStatus',
+            Biography: 'biography',
+            YearsOfExperience: 'yearsOfExperience',
+            Images: 'images',
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -207,7 +212,12 @@ export default class ObjectMapper {
             seenAt: 'SeenAt',
             dateTimeSent: 'DateTimeSent',
             sourcePlanId: 'SourcePlanId',
-            imageURL: 'ImageURL'
+            imageURL: 'ImageURL',
+            yearsOfExperience: 'YearsOfExperience',
+            images: 'Images',
+            trainerStatus: 'TrainerStatus',
+            biography: 'Biography',
+            isVerified: 'IsVerified',
         };
         return map[key] || key;
     }

@@ -92,7 +92,8 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.FRIENDS]: "Friends",
         [routes.CHAT]: `${chattedUser ? chattedUser.firstname + " " + chattedUser.lastname : 'Chat'}`,
         [routes.PERSONAL_TRAINING_PROFILE]: "Trainer Profile",
-        [routes.PERSONAL_TRAINING_EXPLANATION]: "Trainer Profile",
+        [routes.PERSONAL_TRAINING_EXPLANATION]: "What is A Trainer Profile?",
+    [routes.BADGE_OF_TRUST]: "Badge of Trust",
     };
 
     function handleUserProfilePress() {
@@ -121,7 +122,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                     {screen === routes.CHAT && (
                         <>
                             <TouchableOpacity onPress={handleUserProfilePress}>
-                                <Image source={{uri: chattedUser.imageURL}} style={styles.chattedUserImage}   cachePolicy="disk"   />
+                                <Image source={{ uri: chattedUser.imageURL }} style={styles.chattedUserImage} cachePolicy="disk" />
                             </TouchableOpacity>
                         </>
                     )}
@@ -133,6 +134,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                 <View style={styles.right}>
                     {inMain && (
                         <>
+
                             <View style={styles.bellWrapper}>
                                 <TouchableOpacity onPress={() => router.push(routes.FRIENDS)}>
                                     <Image style={styles.bellImage} source={unreadMessagesCount > 0 ? Images.message : Images.noMessage} />
@@ -164,9 +166,30 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                                 <Image
                                     style={styles.profileImage}
                                     source={{ uri: user.imageURL }}
-                                      cachePolicy="disk"   
+                                    cachePolicy="disk"
                                 />
                             </TouchableOpacity>
+                        </>
+                    )}
+                    {screen === routes.CHAT && chattedUser && (
+                        <>
+                            {chattedUser.isTrainer && (
+                                <View style={{ alignSelf: 'center' }}>
+                                    <Image
+                                        source={Images.personalTrainer}
+                                        style={{ width: 20, height: 20, tintColor: 'white' }}
+                                    />
+                                </View>
+                            )}
+
+                            {chattedUser.isVerified && (
+                                <TouchableOpacity onPress={() => router.push(routes.BADGE_OF_TRUST)} style={{ alignSelf: 'center', marginStart: 8 }}>
+                                    <Image
+                                        source={Images.verifiedSeven}
+                                        style={{ width: 18, height: 18, tintColor: 'white' }}
+                                    />
+                                </TouchableOpacity>
+                            )}
                         </>
                     )}
                 </View>

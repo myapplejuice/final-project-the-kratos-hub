@@ -148,7 +148,10 @@ export default class APIService {
         update: (payload) => APIService.request(`/user/update/${APIService.USER_ID}`, 'PUT', payload),
         destroy: (payload) => APIService.request(`/user/delete/${APIService.USER_ID}`, 'DELETE', payload),
         recoveryMail: (payload) => APIService.request('/user/recovery/send-code', 'POST', payload, false),
-        updateByRecovery: (payload, recoveryToken) => APIService.request('/user/recovery/update-password', 'PUT', payload, true, recoveryToken)
+        updateByRecovery: (payload, recoveryToken) => APIService.request('/user/recovery/update-password', 'PUT', payload, true, recoveryToken),
+        trainerProfile: {
+            update: (payload) => APIService.request(`/user/trainer-profile/${APIService.USER_ID}`, 'PUT', payload),
+        }
     };
 
     static userToUser = {

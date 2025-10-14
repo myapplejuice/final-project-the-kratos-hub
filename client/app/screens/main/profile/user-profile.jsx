@@ -178,7 +178,7 @@ export default function UserProfile() {
                 >
                     <Image
                         source={{ uri: profile.imageURL }}
-                          cachePolicy="disk"   
+                        cachePolicy="disk"
                         style={styles.fullscreenImage}
                     />
                 </TouchableOpacity>
@@ -208,10 +208,23 @@ export default function UserProfile() {
                             </View>
                         }
                         <View style={[styles.card, { alignItems: 'center', marginTop: friend?.status && friend.status !== 'active' ? 15 : 0 }]}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start', width: '100%' }}>
+                                {friend && !friend.trainerProfile.isVerified &&
+                                    <View style={{ padding: 10, backgroundColor: colors.main, borderRadius: 15, marginBottom: 15, flexDirection: 'row', alignItems: 'center' }}>
+                                        <Image source={Images.verifiedSeven} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                                        <AppText style={{ color: 'white', marginStart: 5, fontSize: scaleFont(12), fontWeight: 'bold' }}>Verified Trainer</AppText>
+                                    </View>
+                                }
+                                {friend && friend.trainerProfile.trainerStatus === 'active' &&
+                                    <View style={{ padding: 10, backgroundColor: colors.main, borderRadius: 15, marginBottom: 15, flexDirection: 'row', alignItems: 'center' }}>
+                                        <Image source={Images.personalTrainer} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                                    </View>
+                                }
+                            </View>
                             <TouchableOpacity onPress={() => setViewImage(true)} style={styles.imageWrapper}>
                                 <Image
                                     source={{ uri: profile.imageURL }}
-                                      cachePolicy="disk"   
+                                    cachePolicy="disk"
                                     style={styles.profileImage}
                                 />
                             </TouchableOpacity>
@@ -247,7 +260,7 @@ export default function UserProfile() {
                                     </View>
                                 </View>
 
-                                <View style={[styles.infoRow, { paddingVertical: 10 }]}>
+                                <View style={[styles.infoRow]}>
                                     <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecond }]}>
                                         <Image source={Images.phoneTwo} style={[styles.detailIcon]} />
                                     </View>
@@ -259,7 +272,7 @@ export default function UserProfile() {
                                     </View>
                                 </View>
 
-                                <View style={[styles.infoRow, { marginBottom: 0 }]}>
+                                <View style={[styles.infoRow]}>
                                     <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecond }]}>
                                         <Image source={Images.calendar} style={[styles.detailIcon]} />
                                     </View>
@@ -428,7 +441,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 12,
-        marginBottom: 10,
+        marginTop: 15,
     },
     iconContainer: {
         padding: 13,

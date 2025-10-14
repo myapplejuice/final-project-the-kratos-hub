@@ -125,6 +125,7 @@ function Layout() {
                                             <Stack.Screen name="screens/main/profile/user-profile" />
                                             <Stack.Screen name="screens/main/profile/personal-training-profile" />
                                             <Stack.Screen name="screens/main/profile/personal-training-explanation" />
+                                            <Stack.Screen name="screens/main/profile/badge-of-trust" />
 
                                             {/* SETTINGS CHILDREN */}
                                             <Stack.Screen name="screens/main/profile/settings/units-change" />

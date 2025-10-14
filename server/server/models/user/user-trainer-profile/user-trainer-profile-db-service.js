@@ -1,5 +1,6 @@
 import sql from "mssql/msnodesqlv8.js";
 import Database from "../../database/database.js";
+import ObjectMapper from "../../../utils/object-mapper.js";
 
 export default class UserTrainerProfileDBService {
     static async fetchTrainerProfile(userId) {
@@ -11,7 +12,15 @@ export default class UserTrainerProfileDBService {
                 SELECT * FROM UserTrainerProfile WHERE UserId = @UserId
             `);
 
-            return result.recordset[0] || [];
+            const profile = result.recordset.map(row => {
+                const trainerProfile = {};
+                for (const key in row) {
+                    trainerProfile[ObjectMapper.toCamelCase(key)] = key === 'Images' ? JSON.parse(row[key]) : row[key];
+                }
+                return trainerProfile;
+            });
+
+            return profile[0] || null;
         } catch (err) {
             console.error("fetchProfile error:", err);
             return null;
@@ -20,32 +29,28 @@ export default class UserTrainerProfileDBService {
 
     static async updateTrainerProfile(userId, payload) {
         try {
-            const updates = [];
             const request = Database.getRequest();
 
-            for (const [key, value] of Object.entries(payload)) {
-                const pascalKey = key.charAt(0).toUpperCase() + key.slice(1);
-                updates.push(`${pascalKey} = @${pascalKey}`);
-                Database.addInput(request, pascalKey, sql.VarChar(sql.MAX), value);
-            }
-
-            if (updates.length === 0) {
-                return { success: false, message: "No fields to update." };
-            }
-
             Database.addInput(request, "UserId", sql.UniqueIdentifier, userId);
+            Database.addInput(request, "TrainerStatus", sql.VarChar(20), payload.trainerStatus);
+            Database.addInput(request, "Biography", sql.VarChar(1000), payload.biography || '');
+            Database.addInput(request, "YearsOfExperience", sql.VarChar(20), payload.yearsOfExperience);
+            Database.addInput(request, "Images", sql.VarChar(sql.MAX), JSON.stringify(payload.images));
 
             const query = `
-                UPDATE UserTrainerProfile
-                SET ${updates.join(", ")}
-                WHERE UserId = @UserId
-            `;
+            UPDATE UserTrainerProfile
+            SET
+                TrainerStatus = @TrainerStatus,
+                Biography = @Biography,
+                YearsOfExperience = @YearsOfExperience,
+                Images = @Images
+            WHERE UserId = @UserId
+        `;
 
             await request.query(query);
-
             return { success: true };
         } catch (err) {
-            console.error("updateProfile error:", err);
+            console.error("updateTrainerProfile error:", err);
             return { success: false, message: "Error updating trainer profile." };
         }
     }
