@@ -206,7 +206,7 @@ export default function UserProfile() {
                                 <AppText style={[styles.cardLabel, { marginBottom: 10 }]}>Friendship Pending Status</AppText>
                                 <AppText style={{ color: 'white' }}>{
                                     friend.adderId === user.id ?
-                                        'Friend requests sent to user, you will be notified when they reply.' :
+                                        'Friend request sent to user, you will be notified when they reply.' :
                                         'This user has sent you a friend request, you can accept it in the notifications section.'
                                 }
                                 </AppText>

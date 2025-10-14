@@ -216,7 +216,7 @@ export default function Notifications() {
                                         <TouchableOpacity
                                             key={index}
                                             onPress={() => request.status === 'pending' ? setOpenRequest(prev => (prev === profile.id ? null : profile.id)) : handleProfile(profile)}
-                                            style={{ marginBottom: index === requests.length - 1 ? 0 : 25, backgroundColor: colors.cardBackground + '60', padding: 15, borderRadius: 15 }}
+                                            style={{ marginBottom: index === requests.length - 1 ? 0 : 15, backgroundColor: colors.cardBackground + '60', padding: 15, borderRadius: 15 }}
                                         >
                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                                 <View style={{ flexDirection: 'row', width: '70%' }}>
