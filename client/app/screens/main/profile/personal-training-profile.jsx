@@ -68,8 +68,8 @@ export default function PersonalTrainingProfile() {
         })
     }
 
-    function handleNewImage() {
-
+    async function handleNewImage(asset) {
+        console.log(asset)
     }
 
     return (
@@ -86,7 +86,7 @@ export default function PersonalTrainingProfile() {
             />
 
             <View style={styles.main}>
-                <ImageCapture />
+                <ImageCapture onConfirm={async (image) => handleNewImage(image)}  />
                 <AppScroll extraBottom={200} onScrollSetStates={setFabVisible}>
                     {/* Explanation Card */}
                     <View style={{ flexDirection: 'row', marginHorizontal: 15, justifyContent: 'space-between' }}>
@@ -229,7 +229,17 @@ export default function PersonalTrainingProfile() {
                 )}*/}
 
                         <TouchableOpacity
-                            onPress={handleNewImage}
+                            onPress={() => {
+                                createSelector({
+                                    title: "Profile Picture",
+                                    text: "Do you want to take a photo using camera or upload an image?",
+                                    optionAText: "Take a Photo",
+                                    optionBText: "Upload Image",
+                                    cancelText: "Cancel",
+                                    onPressA: async () => setCameraActive(true),
+                                    onPressB: async () => setLibraryActive(true)
+                                });
+                            }}
                             style={styles.uploadButton}
                         >
                             <View style={styles.uploadContent}>
