@@ -41,11 +41,6 @@ export default class SocketController {
                 ...userFriend,
                 lastMessageSenderId: newFriendSummary?.lastMessageSenderId || null,
                 lastMessage: newFriendSummary?.lastMessage || null,
-                lastMessageExtraInfoUrl: newFriendSummary?.extraInformation
-                    ? newFriendSummary.extraInformation.inviteUrl
-                    || newFriendSummary.extraInformation.imageUrl
-                    || newFriendSummary.extraInformation.documentName
-                    : null,
                 lastMessageTime: newFriendSummary?.lastMessageTime || null,
                 unreadCount: newFriendSummary?.unreadCount || 0,
                 chatRoomId: newFriendSummary?.chatRoomId

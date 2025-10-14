@@ -64,14 +64,7 @@ export default class SocketService {
                 ...prev,
                 friends: prev.friends.map(f =>
                     f.friendId === msg.senderId
-                        ? {
-                            ...f, unreadCount: (f.unreadCount || 0) + 1, lastMessage: msg.message, lastMessageTime: msg.dateTimeSent, lastMessageSenderId: msg.senderId,
-                            lastMessageExtraInfoUrl: msg.extraInformation
-                                ? msg.extraInformation.inviteUrl
-                                || msg.extraInformation.imageUrl
-                                || msg.extraInformation.documentName
-                                : null,
-                        }
+                        ? { ...f, unreadCount: (f.unreadCount || 0) + 1, lastMessage: msg.message, lastMessageTime: msg.dateTimeSent, lastMessageSenderId: msg.senderId }
                         : f
                 )
             }));

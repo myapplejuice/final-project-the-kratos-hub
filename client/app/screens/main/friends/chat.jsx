@@ -38,6 +38,7 @@ export default function Chat() {
     const currentPage = useRef(1);
     const morePages = useRef(true);
 
+    const [noMessageWarningVisible, setNoMessageWarningVisible] = useState(additionalContexts.friendStatus === 'inactive');
     const [chatBarVisible, setChatBarVisible] = useState(true);
     const [uploadOptionsVisible, setUploadOptionsVisible] = useState(false);
     const [fabVisible, setFabVisible] = useState(false);
@@ -99,8 +100,6 @@ export default function Chat() {
             }
         }
 
-        fetchMessages();
-
         Animated.loop(
             Animated.timing(rotate, {
                 toValue: 1,
@@ -125,6 +124,8 @@ export default function Chat() {
             }
         );
 
+
+        fetchMessages();
         return () => {
             showListener.remove();
             hideListener.remove();
@@ -236,7 +237,12 @@ export default function Chat() {
             senderId: user.id,
             receiverId: additionalContexts.chattingFriendProfile.id,
             chatRoomId: roomId,
-            message: extraInformation?.context === 'mealplan' ? 'Imported plan' : message,
+            message:
+                extraInformation?.context === 'mealplan' ? extraInformation.planLabel :
+                    extraInformation?.context === 'image' ? extraInformation.imageUrl :
+                        extraInformation?.context === 'document' ? extraInformation.documentName :
+                            extraInformation?.context === 'invite/whatsapp' ? extraInformation.inviteUrl :
+                                message,
             seenBy: [user.id],
             extraInformation: extraInformation,
             dateTimeSent: new Date()
@@ -386,7 +392,7 @@ export default function Chat() {
     async function handleWhatsAppInvite() {
         const phoneNumber = user.phone.replace(/\+/g, '');
         const url = `https://wa.me/${phoneNumber}`;
-        
+
         handleMessageSend({
             context: 'invite/whatsapp',
             senderName: user.firstname,
@@ -498,9 +504,7 @@ export default function Chat() {
                 </View>
             </FadeInOut>
 
-
-            {/* Chat Input Bar */}
-            <FadeInOut visible={chatBarVisible} style={{
+            <FadeInOut visible={chatBarVisible && additionalContexts.friendStatus === 'active'} style={{
                 position: 'absolute',
                 bottom: 0,
                 paddingBottom: insets.bottom + 10 + keyboardHeight,
@@ -529,6 +533,7 @@ export default function Chat() {
                         multiline
                         onChangeText={setMessage}
                         value={message}
+                        editable={additionalContexts.friendStatus === 'active'}
                         placeholder="Type a message..."
                         placeholderTextColor={"rgba(255, 255, 255, 0.4)"}
                         style={[styles.inputStripped, {
@@ -564,6 +569,32 @@ export default function Chat() {
             <FadeInOut visible={isLoadingMessages} style={{ position: 'absolute', top: 100, alignSelf: 'center', zIndex: 9999 }}>
                 <Animated.View style={[styles.spinner, { transform: [{ rotate: spin }] }]} />
             </FadeInOut>
+
+            {additionalContexts.friendStatus === 'inactive' && noMessageWarningVisible && (
+                <TouchableOpacity
+                    activeOpacity={0.9}
+                    onPress={() => setNoMessageWarningVisible(false)}
+                    style={{
+                        position: 'absolute',
+                        bottom: insets.bottom + 50,
+                        left: 20,
+                        right: 20,
+                        backgroundColor: colors.negativeRed, 
+                        borderRadius: 15,
+                        padding: 15,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 9999,
+                    }}
+                >
+                    <AppText style={{ color: 'white', fontSize: scaleFont(13), textAlign: 'center', marginBottom: 5 }}>
+                        Messaging is unavailable. Either you or this friend has blocked the other. Chat history remains visible.
+                    </AppText>
+                    <AppText style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, textAlign: 'center' }}>
+                        Tap to dismiss
+                    </AppText>
+                </TouchableOpacity>
+            )}
 
             {/* Messages Container */}
             <View style={styles.main}>

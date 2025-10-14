@@ -27,18 +27,17 @@ import AppTextInput from '../../components/screen-comps/app-text-input';
 
 export default function Friends() {
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
-    const { user, setUser, setAdditionalContexts } = useContext(UserContext);
+    const { user, setAdditionalContexts } = useContext(UserContext);
     const [friendsList, setFriendsList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedList, setSelectedList] = useState('all');
+    const [selectedList, setSelectedList] = useState('active');
     const [visibleList, setVisibleList] = useState([]);
 
-    //GET FRIENDS
     useEffect(() => {
         async function fetchFriendsProfiles() {
             try {
-                const idList = user.friends.filter(friend => friend.status === 'active').map(friend => friend.friendId);
+                const idList = user.friends.map(friend => friend.friendId);
                 let profiles = [];
 
                 if (idList.length > 0) {
@@ -55,8 +54,9 @@ export default function Friends() {
                     }
                 }
 
+                const activeIds = user.friends.filter(friend => friend.status === 'active').map(friend => friend.friendId);
                 setFriendsList(profiles);
-                setVisibleList(profiles);
+                setVisibleList(profiles.filter(profile => activeIds.includes(profile.id)));
             } catch (error) {
                 console.log(error);
             } finally {
@@ -68,10 +68,10 @@ export default function Friends() {
     }, []);
 
     useEffect(() => {
-        const idList = user.friends.filter(friend => friend.status === 'active').map(friend => friend.friendId);
+        const idList = user.friends.filter(friend => friend.status === selectedList).map(friend => friend.friendId);
         const filtered = friendsList.filter(profile => idList.includes(profile.id));
         setVisibleList(filtered);
-    }, [user.friends]);
+    }, [selectedList, user.friends]);
 
     useEffect(() => {
         if (searchQuery === '') {
@@ -95,8 +95,9 @@ export default function Friends() {
         })
     }
 
-    function handleFriendClick(chattingFriendProfile) {
-        setAdditionalContexts({ chattingFriendProfile });
+    function handleFriendClick(chattingFriendProfile, status) {
+        console.log(status)
+        setAdditionalContexts({ chattingFriendProfile, friendStatus: status });
         router.push(routes.CHAT)
     }
 
@@ -117,11 +118,11 @@ export default function Friends() {
                             </View>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
-                            <TouchableOpacity onPress={() => setSelectedList('all')} style={{ padding: 10, borderWidth: 1, borderColor: selectedList === 'all' ? colors.main : colors.mutedText, backgroundColor: selectedList === 'all' ? colors.main : 'transparent', borderRadius: 15, width: '48%', alignItems: 'center' }}>
-                                <AppText style={{ color: 'white', fontWeight: 'bold' }}>All</AppText>
+                            <TouchableOpacity onPress={() => setSelectedList('active')} style={{ padding: 10, borderWidth: 1, borderColor: selectedList === 'active' ? colors.main : colors.mutedText, backgroundColor: selectedList === 'active' ? colors.main : 'transparent', borderRadius: 15, width: '48%', alignItems: 'center' }}>
+                                <AppText style={{ color: 'white', fontWeight: 'bold' }}>Active Friends</AppText>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => setSelectedList('unread')} style={{ padding: 10, borderWidth: 1, borderColor: selectedList === 'unread' ? colors.main : colors.mutedText, backgroundColor: selectedList === 'unread' ? colors.main : 'transparent', borderRadius: 15, width: '48%', alignItems: 'center' }}>
-                                <AppText style={{ color: 'white', fontWeight: 'bold' }}>Unread</AppText>
+                            <TouchableOpacity onPress={() => setSelectedList('inactive')} style={{ padding: 10, borderWidth: 1, borderColor: selectedList === 'inactive' ? colors.main : colors.mutedText, backgroundColor: selectedList === 'inactive' ? colors.main : 'transparent', borderRadius: 15, width: '48%', alignItems: 'center' }}>
+                                <AppText style={{ color: 'white', fontWeight: 'bold' }}>Blocked Friends</AppText>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -129,13 +130,13 @@ export default function Friends() {
                     {visibleList.length > 0 ? (
                         <View>
                             {visibleList.map((friend, i) => {
-                                const messagingDetails = user.friends.find(f => f.friendId === friend.id) || {};
-                                const sender = messagingDetails.lastMessageSenderId === user.id ? 'You: ' : '';
-                                const displayMessage = messagingDetails.lastMessage || messagingDetails.lastMessageExtraInfoUrl || 'No messages yet';
+                                const friendship = user.friends.find(f => f.friendId === friend.id) || {};
+                                const sender = friendship.lastMessageSenderId === user.id ? 'You: ' : '';
+                                const displayMessage = friendship.lastMessage || 'No messages yet';
 
-                                const messageTimeDetails = new Date(messagingDetails.lastMessageTime);
+                                const messageTimeDetails = new Date(friendship.lastMessageTime);
                                 const displayTime = (() => {
-                                    if (!messagingDetails.lastMessageTime) return '';
+                                    if (!friendship.lastMessageTime) return '';
 
                                     const now = new Date();
                                     const diffMs = now - messageTimeDetails;
@@ -156,11 +157,11 @@ export default function Friends() {
                                     }
                                 })();
 
-                                const isUnread = messagingDetails.unreadCount > 0;
+                                const isUnread = friendship.unreadCount > 0;
 
                                 return (
                                     <TouchableOpacity
-                                        onPress={() => handleFriendClick(friend)}
+                                        onPress={() => handleFriendClick(friend, friendship.status)}
                                         style={{
                                             flexDirection: 'row',
                                             justifyContent: 'space-between',

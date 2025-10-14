@@ -325,7 +325,6 @@ static async fetchSingleFriendMessageSummary(currentUserId, friendId) {
             mapped[ObjectMapper.toCamelCase(key)] = raw[key];
         }
 
-        // Parse ExtraInformation JSON
         if (mapped.extraInformation) {
             try {
                 mapped.extraInformation = JSON.parse(mapped.extraInformation);
