@@ -27,7 +27,6 @@ import { useBackHandlerContext } from '../../../common/contexts/back-handler-con
 import FadeInOut from '../../../components/effects/fade-in-out';
 
 export default function ShieldApplication() {
-    const { setBackHandler } = useBackHandlerContext();
     const { setLibraryActive } = useContext(LibraryContext);
     const { setCameraActive } = useContext(CameraContext);
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert, createOptions } = usePopups();

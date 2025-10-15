@@ -48,7 +48,6 @@ function Layout() {
         const handlers = {
             // Temporary until i find solution for library asset function
             replace: () => {
-                console.log('came here')
                 if (screen === routes.PERSONAL_TRAINING_PROFILE || screen === routes.SHIELD_APPLICATIONS)
                     router.replace(routes.PROFILE);
                 else if (screen === routes.SHIELD_APPLICATION)
