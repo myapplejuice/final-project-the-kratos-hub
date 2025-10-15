@@ -8,15 +8,16 @@ export default class VerificationDBService {
 
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, details.userId);
             Database.addInput(request, 'Status', sql.VarChar(20), details.status || 'pending');
+            Database.addInput(request, 'DateOfCreation', sql.DateTime2, new Date());
             Database.addInput(request, 'Summary', sql.VarChar(1000), details.summary || '');
             Database.addInput(request, 'Education', sql.VarChar(1000), details.education || '');
             Database.addInput(request, 'Images', sql.VarChar(sql.MAX), JSON.stringify(details.images || []));
             Database.addInput(request, 'Links', sql.VarChar(sql.MAX), JSON.stringify(details.links || []));
 
             const insertQuery = `
-                INSERT INTO VerificationApplications (UserId, Status, Summary, Education, Images, Links)
+                INSERT INTO VerificationApplications (UserId, Status, DateOfCreation, Summary, Education, Images, Links)
                 OUTPUT inserted.Id
-                VALUES (@UserId, @Status, @Summary, @Education, @Images, @Links)
+                VALUES (@UserId, @Status, @DateOfCreation, @Summary, @Education, @Images, @Links)
             `;
 
             const result = await request.query(insertQuery);

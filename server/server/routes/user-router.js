@@ -13,7 +13,6 @@ export default class UserRouter {
         const tokenAuthorization = MiddlewaresManager.tokenAuthorization;
         const userAuthorization = MiddlewaresManager.userAuthorization;
 
-
         this.userRouter.post('/create', asyncHandler(UserController.createUser));
         this.userRouter.post('/login', asyncHandler(UserController.loginUser));
 
@@ -28,10 +27,6 @@ export default class UserRouter {
 
         this.userRouter.get("/trainer-profile/:id", tokenAuthorization, userAuthorization, UserTrainerProfileController.getTrainerProfile);
         this.userRouter.put("/trainer-profile/:id", tokenAuthorization, userAuthorization, UserTrainerProfileController.updateTrainerProfile);
-
-        this.userRouter.post("/verification/:id", tokenAuthorization, userAuthorization, asyncHandler(VerificationController.createApplication));
-        this.userRouter.put("/verification/:id", tokenAuthorization, userAuthorization, asyncHandler(VerificationController.updateApplication));
-        this.userRouter.delete("/verification/:id", tokenAuthorization, userAuthorization, asyncHandler(VerificationController.deleteApplication));
 
         return this.userRouter;
     }

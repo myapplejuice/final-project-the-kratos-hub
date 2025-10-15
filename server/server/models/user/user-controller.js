@@ -52,7 +52,7 @@ export default class UserController {
         }
 
         const [trainerProfile, nutritionLogs, foods, plans,
-            friends, pendingFriends, friendMessageSummaries, notifications, badgeApplication
+            friends, pendingFriends, friendMessageSummaries, notifications
         ] = await Promise.all([
             UserTrainerProfileDBService.fetchTrainerProfile(id),
             NutritionDaysDBService.fetchAllDays(id),
@@ -61,8 +61,7 @@ export default class UserController {
             UserToUserDBService.fetchUserFriendsList(id),
             UserToUserDBService.fetchUserPendingFriendsList(id),
             ChatDBService.fetchFriendMessageSummaries(id),
-            NotificationsDBService.fetchNotifications(id),
-            VerificationDBService.fetchLatestPendingApplicationByUserId(id),
+            NotificationsDBService.fetchNotifications(id)
         ]);
 
         profile.trainerProfile = trainerProfile;
@@ -72,7 +71,6 @@ export default class UserController {
         profile.friends = friends;
         profile.pendingFriends = pendingFriends;
         profile.notifications = notifications;
-        if (badgeApplication) profile.badgeApplication = badgeApplication;
 
         profile.friends = await Promise.all(
             profile.friends.map(async (friend) => {

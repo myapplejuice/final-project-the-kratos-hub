@@ -4,6 +4,7 @@ import NutritionRouter from './nutrition-router.js';
 import TrainingRouter from './training-router.js';
 import UserToUserRouter from './user-to-user-router.js';
 import NotificationsRouter from './notifications-router.js';
+import VerificationRouter from './verification-router.js';
 
 export default class ServerRouter {
     static ping(req, res) {
@@ -16,6 +17,7 @@ export default class ServerRouter {
         const trainingRouter = TrainingRouter.init();
         const userToUserRouter = UserToUserRouter.init();
         const notificationsRouter = NotificationsRouter.init();
+        const verificationRouter = VerificationRouter.init();
 
         const serverRouter = new Router();
         serverRouter.get('/ping', this.ping);
@@ -24,6 +26,7 @@ export default class ServerRouter {
         serverRouter.use('/training', trainingRouter);
         serverRouter.use('/user-to-user', userToUserRouter)
         serverRouter.use('/notifications', notificationsRouter);
+        serverRouter.use('/verification', verificationRouter);
 
         return serverRouter;
     }

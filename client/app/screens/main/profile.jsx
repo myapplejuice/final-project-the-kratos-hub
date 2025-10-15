@@ -126,7 +126,7 @@ export default function Profile() {
                             <AppText style={{ color: 'white', marginStart: 5, fontSize: scaleFont(12), fontWeight: 'bold' }}>Active Trainer</AppText>
                         </View>
                     }
-                    
+
                     <TouchableOpacity
                         style={styles.imageWrapper}
                         onPress={() => {
@@ -195,9 +195,31 @@ export default function Profile() {
                 </View>
 
                 <View style={[styles.card, { marginTop: 15 }]}>
-                    <AppText style={styles.cardLabel}>Account & Application</AppText>
+                    <AppText style={styles.cardLabel}>Trainer Status & Coaching</AppText>
                     {[
                         { icon: Images.personalTrainerOutline, label: 'Personal Training Profile', onPress: () => router.replace(routes.PERSONAL_TRAINING_PROFILE) },
+                        { icon: Images.shieldOutline, label: 'Shield Applications', onPress: () => router.replace(routes.SHIELD_APPLICATIONS) },
+                    ].map((item, i) => (
+                        <View key={i}>
+                            <TouchableOpacity key={i} style={[styles.optionRow, i === 1 && { marginBottom: 0 }]} onPress={item.onPress}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
+                                    <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
+                                        <Image source={item.icon} style={styles.settingIcon} />
+                                    </View>
+                                    <AppText style={styles.label}>
+                                        {item.label}
+                                    </AppText>
+                                </View>
+                                <Image source={Images.backArrow} style={[styles.arrow, { transform: [{ scaleX: -1 }] }]} />
+                            </TouchableOpacity>
+                            {i !== 1 && <Divider orientation='horizontal' color={colors.divider} />}
+                        </View>
+                    ))}
+                </View>
+
+                <View style={[styles.card, { marginTop: 15 }]}>
+                    <AppText style={styles.cardLabel}>Account & Settings</AppText>
+                    {[
                         { icon: Images.password, label: 'Change Password', onPress: openPasswordChange },
                         { icon: Images.editTwo, label: 'Edit Profile', onPress: () => router.push(routes.EDIT_PROFILE) },
                         { icon: Images.settingsTwo, label: 'Settings', onPress: () => router.push(routes.SETTINGS) },

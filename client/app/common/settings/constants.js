@@ -34,6 +34,7 @@ export const routes = {
     PERSONAL_TRAINING_EXPLANATION: '/screens/main/profile/personal-training-explanation',
     SHIELD_OF_TRUST: '/screens/main/profile/shield-of-trust',
     SHIELD_APPLICATION: '/screens/main/profile/shield-application',
+    SHIELD_APPLICATIONS: '/screens/main/profile/shield-applications',
 
     /* SETTINGS CHILDREN */
     UNITS_CHANGE: '/screens/main/profile/settings/units-change',

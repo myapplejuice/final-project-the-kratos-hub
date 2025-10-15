@@ -39,7 +39,7 @@ export default class VerificationController {
 
     static async getApplications(req, res){
         const userId = req.params.id;
-        
+
         const result = await VerificationDBService.fetchApplicationsByUserId(userId);
         if (!result.success) return res.status(400).json({ message: result.message });
 
