@@ -55,7 +55,7 @@ export default function ShieldApplications() {
     }, []);
 
     async function handleNewSubmittion() {
-        if (user.shieldApplication)
+        if (applications.some(app => app.status === 'pending'))
             return createToast({ message: 'You have already submitted an application' });
 
         router.replace(routes.SHIELD_APPLICATION);

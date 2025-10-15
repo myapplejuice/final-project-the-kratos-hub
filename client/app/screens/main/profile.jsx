@@ -121,9 +121,16 @@ export default function Profile() {
             <AppScroll extraBottom={20}>
                 <View style={[styles.card, { alignItems: 'center' }]}>
                     {user.trainerProfile.trainerStatus === 'active' &&
-                        <View style={{ padding: 10, backgroundColor: colors.main, borderRadius: 15, marginBottom: 15, flexDirection: 'row', alignSelf: 'flex-start', alignItems: 'center' }}>
-                            <Image source={Images.personalTrainer} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                            <AppText style={{ color: 'white', marginStart: 5, fontSize: scaleFont(12), fontWeight: 'bold' }}>Active Trainer</AppText>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 20 }}>
+                            {user.trainerProfile.isVerified &&
+                                <TouchableOpacity onPress={() => router.push(routes.SHIELD_OF_TRUST)} style={{ padding: 10, backgroundColor: colors.main, borderRadius: 15, flexDirection: 'row', alignItems: 'center' }}>
+                                    <Image source={Images.shield} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                                    <AppText style={{ color: 'white', marginStart: 5, fontSize: scaleFont(12), fontWeight: 'bold' }}>Trusted Trainer</AppText>
+                                </TouchableOpacity>
+                            }
+                             <View style={{ width: 40, height: 40, backgroundColor: colors.main, borderRadius: 20, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                                <Image source={Images.personalTrainer} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                            </View>
                         </View>
                     }
 
@@ -226,7 +233,7 @@ export default function Profile() {
                         { icon: Images.settingsTwo, label: 'Settings', onPress: () => router.push(routes.SETTINGS) },
                     ].map((item, i) => (
                         <View key={i}>
-                            <TouchableOpacity key={i} style={[styles.optionRow, i === 3 && { marginBottom: 0 }]} onPress={item.onPress}>
+                            <TouchableOpacity key={i} style={[styles.optionRow, i === 2 && { marginBottom: 0 }]} onPress={item.onPress}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
                                     <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
                                         <Image source={item.icon} style={styles.settingIcon} />
@@ -237,7 +244,7 @@ export default function Profile() {
                                 </View>
                                 <Image source={Images.backArrow} style={[styles.arrow, { transform: [{ scaleX: -1 }] }]} />
                             </TouchableOpacity>
-                            {i !== 3 && <Divider orientation='horizontal' color={colors.divider} />}
+                            {i !== 2 && <Divider orientation='horizontal' color={colors.divider} />}
                         </View>
                     ))}
                 </View>
