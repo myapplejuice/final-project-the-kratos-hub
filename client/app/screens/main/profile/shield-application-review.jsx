@@ -1,6 +1,6 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import { Image } from "expo-image";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { Keyboard, Linking, StyleSheet, TouchableOpacity, View } from "react-native";
 import BuildFooter from "../../../components/layout-comps/build-footer";
@@ -27,24 +27,45 @@ import { useBackHandlerContext } from '../../../common/contexts/back-handler-con
 import FadeInOut from '../../../components/effects/fade-in-out';
 
 export default function ShieldApplicationReview() {
+    const application = JSON.parse(useLocalSearchParams().application);
     const { setLibraryActive } = useContext(LibraryContext);
     const { setCameraActive } = useContext(CameraContext);
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert, createOptions } = usePopups();
     const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
+    const [submittionChanged, setSubmittionChanged] = useState(false);
     const [fabVisible, setFabVisible] = useState(true);
     const [selectedImage, setSelectedImage] = useState({});
     const [imagePreviewVisible, setImagePreviewVisible] = useState(false);
 
-    const [summary, setSummary] = useState('');
-    const [education, setEducation] = useState('');
-    const [images, setImages] = useState([]);
+    const [summary, setSummary] = useState(application.summary);
+    const [education, setEducation] = useState(application.education);
+    const [images, setImages] = useState(application.images);
 
-    const [instagramLink, setInstagramLink] = useState('');
-    const [facebookLink, setFacebookLink] = useState('');
-    const [tikTokLink, setTikTokLink] = useState('');
-    const [xLink, setXLink] = useState('');
+    const [instagramLink, setInstagramLink] = useState(application.links[0]);
+    const [facebookLink, setFacebookLink] = useState(application.links[1]);
+    const [tikTokLink, setTikTokLink] = useState(application.links[2]);
+    const [xLink, setXLink] = useState(application.links[3]);
+
+    useEffect(() => {
+        const original = {
+            summary: application.summary,
+            education: application.education,
+            images: application.images,
+            links: application.links
+        }
+
+        const obj = {
+            summary,
+            education,
+            images,
+            links: [instagramLink, facebookLink, tikTokLink, xLink]
+        }
+
+        const isChanged = JSON.stringify(original) !== JSON.stringify(obj);
+        setSubmittionChanged(isChanged);
+    }, [summary, education, images, instagramLink, facebookLink, tikTokLink, xLink]);
 
     async function handleNewImage(asset) {
         const payload = {
@@ -152,12 +173,12 @@ export default function ShieldApplicationReview() {
             xLink.trim() !== '',
         ].filter(Boolean).length;
 
-        if (formFillCount < 2) return createToast({ message: 'Please fill out at least 2 sections before submitting' });
+        if (formFillCount < 2) return createToast({ message: 'Atleast 2 sections must remain filled in the application' });
 
         createDialog({
-            title: 'Submit Application',
-            text: 'Are you sure you want to submit your application?',
-            confirmText: 'Submit',
+            title: 'Update Application',
+            text: 'Are you sure you want to update your application?',
+            confirmText: 'Update',
             onConfirm: async () => {
                 try {
                     showSpinner();
@@ -226,12 +247,12 @@ export default function ShieldApplicationReview() {
 
             <FloatingActionButton
                 icon={Images.shield}
-                label={"Submit Application"}
+                label={"Update Application"}
                 iconSize={18}
                 labelStyle={{ fontSize: scaleFont(14) }}
                 style={{ width: '100%', height: 50, backgroundColor: colors.accentGreen }}
                 position={{ bottom: insets.bottom + 20, right: 20, left: 20 }}
-                visible={fabVisible}
+                visible={fabVisible && submittionChanged}
                 onPress={handleSubmittion}
             />
 
@@ -239,8 +260,8 @@ export default function ShieldApplicationReview() {
                 <View style={{ alignItems: 'center' }}>
                     <Image source={Images.shield} style={{ width: 80, height: 80, tintColor: 'white', marginTop: 25 }} />
                     <AppText style={{ color: 'white', fontSize: scaleFont(22), fontWeight: 'bold', marginTop: 15 }}>Application for Shield of Trust</AppText>
-                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12), textAlign: 'center', lineHeight: 20, marginTop: 5, marginHorizontal: 15 }}>
-                        Fill out the form below - while all sections are optional, you must complete at least two to submit your application. However, it's strongly recommended that you complete the entire form to strengthen your application and improve your chances of approval.
+                    <AppText style={{ color: colors.accentYellow, fontSize: scaleFont(12), textAlign: 'center', lineHeight: 20, marginTop: 5, marginHorizontal: 15 }}>
+                        {application.status === 'pending' && 'Your application is currently under review.'}
                     </AppText>
                 </View>
 

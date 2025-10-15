@@ -176,7 +176,6 @@ export default function ShieldApplication() {
                         })
                     );
 
-                    const links = [instagramLink, facebookLink, tikTokLink, xLink].filter(Boolean);
                     setImages(uploadedImages);
 
                     const payload = {
@@ -185,7 +184,12 @@ export default function ShieldApplication() {
                         summary,
                         education,
                         images: uploadedImages,
-                        links
+                        links: [
+                            instagramLink || '',
+                            facebookLink || '',
+                            tikTokLink || '',
+                            xLink || '',
+                        ]
                     }
 
                     const result = await APIService.verification.apply(payload);

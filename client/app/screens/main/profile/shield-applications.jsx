@@ -65,7 +65,7 @@ export default function ShieldApplications() {
     function handleApplicationPress(application) {
         router.replace({
             pathname: routes.SHIELD_APPLICATION_REVIEW,
-            params: { application }
+            params: { application: JSON.stringify(application) }
         });
     }
 

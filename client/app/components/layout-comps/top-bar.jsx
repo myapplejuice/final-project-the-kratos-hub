@@ -95,7 +95,8 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.PERSONAL_TRAINING_EXPLANATION]: "What is A Trainer Profile?",
         [routes.SHIELD_OF_TRUST]: "Shield of Trust",
         [routes.SHIELD_APPLICATION]: "Shield Application",
-        [routes.SHIELD_APPLICATIONS]: "My Applications",
+        [routes.SHIELD_APPLICATIONS]: "My Shield Applications",
+        [routes.SHIELD_APPLICATION_REVIEW]: "Shield Application Review",
     };
 
     function handleUserProfilePress() {

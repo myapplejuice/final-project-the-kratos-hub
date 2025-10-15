@@ -50,7 +50,7 @@ function Layout() {
             replace: () => {
                 if (screen === routes.PERSONAL_TRAINING_PROFILE || screen === routes.SHIELD_APPLICATIONS)
                     router.replace(routes.PROFILE);
-                else if (screen === routes.SHIELD_APPLICATION)
+                else if (screen === routes.SHIELD_APPLICATION || screen === routes.SHIELD_APPLICATION_REVIEW)
                     router.replace(routes.SHIELD_APPLICATIONS);
                 else if (screen === routes.SHIELD_APPLICATIONS) {
                     router.replace(routes.PROFILE);
@@ -64,7 +64,8 @@ function Layout() {
 
         if (screen === routes.PERSONAL_TRAINING_PROFILE ||
             screen === routes.SHIELD_APPLICATIONS ||
-            screen === routes.SHIELD_APPLICATION) {
+            screen === routes.SHIELD_APPLICATION ||
+            screen === routes.SHIELD_APPLICATION_REVIEW) {
             setBackHandler(handlers.replace);
         } else if (exitAppBackScreens.includes(screen)) {
             setBackHandler(handlers.exit);
