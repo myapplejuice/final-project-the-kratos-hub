@@ -80,11 +80,10 @@ export default function BadgeOfTrust() {
                     <View style={{ width: '90%' }}>
                         <AppText style={[styles.cardLabel,]}>Shield of Trust</AppText>
                         <AppText style={{ color: colors.detailText, lineHeight: 20, marginTop: 8 }}>
-                            The Shield of Trust is a verification mark similar to popular social media verification badges such as Instagram and Facebook.{'\n'}
+                            The Shield of Trust is a verification mark similar to popular social media verification badges such as Instagram and Facebook.
                         </AppText>
-                        <AppText style={{ color: colors.detailText, lineHeight: 20 }}>
-                            Being equipped with this shield would mean that you
-                            are a trusted trainer in the Kratos Hub community and with it it boosts your chances of attracting other athletes and getting more clients.
+                        <AppText style={{ color: colors.detailText, lineHeight: 20, marginTop: 8 }}>
+                            Being equipped with this shield would mean that you are a trusted trainer in the Kratos Hub community and with it it boosts your chances of attracting other athletes and getting more clients.
                         </AppText>
                     </View>
                 </View>
@@ -97,7 +96,9 @@ export default function BadgeOfTrust() {
                         <AppText style={[styles.cardLabel,]}>Is the shield mandatory?</AppText>
                         <AppText style={{ color: colors.detailText, lineHeight: 20, marginTop: 8 }}>
                             No. The shield is not mandatory for you to be marked as a trainer, but with it, you would stand out amongst other trainers in our platform.
-                            With this shield, your credibility is higher than a regular trainer mark, granting you a competitive edge.
+                        </AppText>
+                          <AppText style={{ color: colors.detailText, lineHeight: 20, marginTop: 8 }}>
+                         With this shield, your credibility is higher than a regular trainer mark, granting you a competitive edge.
                         </AppText>
                     </View>
                 </View>
@@ -110,17 +111,13 @@ export default function BadgeOfTrust() {
                         <View style={{ width: '90%' }}>
                             <AppText style={[styles.cardLabel,]}>How to get the Shield?</AppText>
                             <AppText style={{ color: colors.detailText, lineHeight: 20, marginTop: 8 }}>
-                                You can submit an application for the Shield of Trust by by clicking below or in the trainer profile page.
+                                You can submit an application for the Shield of Trust by filling out the form in your trainer profile page.
+                            </AppText>
+                            <AppText style={{ color: colors.detailText, lineHeight: 20, marginTop: 8 }}>
+                                There all will be explain further. And if your application is approved, you will be marked with the Shield of Trust.
                             </AppText>
                         </View>
                     </View>
-
-                    <AnimatedButton
-                        title={"Apply here"}
-                        onPress={() => router.push(routes.SHIELD_APPLICATION)}
-                        rightImage={Images.arrow}
-                        rightImageStyle={{ marginStart: 5 }}
-                        style={{ backgroundColor: colors.main, padding: 15, borderRadius: 20, marginTop: 25, }} />
                 </View>
             </AppScroll>
         </View>

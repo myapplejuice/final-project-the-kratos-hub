@@ -2,7 +2,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Linking, StyleSheet, TouchableOpacity, View } from "react-native";
 import BuildFooter from "../../../components/layout-comps/build-footer";
 import AppText from "../../../components/screen-comps/app-text";
 import { Images } from '../../../common/settings/assets';
@@ -41,14 +41,110 @@ export default function ShieldApplication() {
     const [summary, setSummary] = useState('');
     const [education, setEducation] = useState('');
     const [images, setImages] = useState([]);
-    const [userInstagramLink, setUserInstagramLink] = useState('');
+
+    const [instagramLink, setInstagramLink] = useState('');
     const [facebookLink, setFacebookLink] = useState('');
-    const [tiktokLink, setTiktokLink] = useState('');
+    const [tikTokLink, setTikTokLink] = useState('');
     const [xLink, setXLink] = useState('');
+
+    async function handleNewImage(asset) {
+        const payload = {
+            fileName: asset.fileName || asset.uri.split('/').pop(),
+            url: asset.uri,
+            type: asset.type || 'image/jpeg'
+        }
+        setImages(prev => [...prev, payload]);
+    }
+
+    async function handleSocialMediaLink(platform) {
+        platform = platform.trim();
+
+        const platformMap = {
+            Instagram: {
+                getUrl: handle => `https://www.instagram.com/${handle}`,
+                link: instagramLink,
+                setter: setInstagramLink,
+            },
+            Facebook: {
+                getUrl: handle => `https://www.facebook.com/${handle}`,
+                link: facebookLink,
+                setter: setFacebookLink,
+            },
+            TikTok: {
+                getUrl: handle => `https://www.tiktok.com/@${handle}`,
+                link: tikTokLink,
+                setter: setTikTokLink,
+            },
+            X: {
+                getUrl: handle => `https://x.com/${handle}`,
+                link: xLink,
+                setter: setXLink,
+            },
+        };
+
+        const link = platformMap[platform];
+        if (!link) return;
+
+        const cleanHandle = handle =>
+            handle.replace(/^https?:\/\/(www\.)?(instagram\.com|facebook\.com|tiktok\.com|x\.com|twitter\.com)\/@?/, '');
+
+        if (!link.link) {
+            createInput({
+                title: 'Social Media Link',
+                confirmText: 'Ok',
+                text: `Enter your ${platform} handle (e.g. ${user.firstname}.${user.lastname})`,
+                placeholders: [platform],
+                onSubmit: async ([handle]) => {
+                    if (!handle) return;
+                    link.setter(link.getUrl(cleanHandle(handle.trim())));
+                },
+            });
+            return;
+        }
+
+        createDialog({
+            title: 'Social Media Link',
+            text: `Do you wish to change your ${platform} link or test it?`,
+            confirmText: 'Change Link',
+            abortText: 'Go To Link',
+            onConfirm: () => {
+                createInput({
+                    title: 'Social Media Link',
+                    confirmText: 'Ok',
+                    text: `Enter your ${platform} handle (e.g. ${user.firstname}.${user.lastname})`,
+                    placeholders: [platform],
+                    onSubmit: async ([handle]) => {
+                        if (!handle) return;
+                        link.setter(link.getUrl(cleanHandle(handle.trim())));
+                    },
+                });
+            },
+            onAbort: async () => {
+                await Linking.openURL(link.link).catch(err =>
+                    console.warn('Failed to open link', err)
+                );
+            },
+        });
+    }
+
+    function handleSocialMediaReset() {
+        createDialog({
+            title: 'Reset Links',
+            text: 'Are you sure you want to reset your social media links?',
+            confirmText: 'Reset',
+            confirmButtonStyle: { backgroundColor: colors.negativeRed, borderColor: colors.negativeRed },
+            onConfirm: () => {
+                setInstagramLink('');
+                setFacebookLink('');
+                setTikTokLink('');
+                setXLink('');
+            },
+        })
+    }
 
     return (
         <>
-
+                <ImageCapture onConfirm={async (image) => handleNewImage(image)} />
             <FadeInOut visible={imagePreviewVisible} style={{ position: 'absolute', zIndex: 9999, top: 0, left: 0, bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.8)' }}>
                 <TouchableOpacity onPress={() => { setImagePreviewVisible(false), setSelectedImage({}), setFabVisible(true) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(30), marginBottom: 15 }}>Tap anywhere to dismiss</AppText>
@@ -68,7 +164,9 @@ export default function ShieldApplication() {
                 <View style={{ alignItems: 'center' }}>
                     <Image source={Images.shield} style={{ width: 80, height: 80, tintColor: 'white', marginTop: 25 }} />
                     <AppText style={{ color: 'white', fontSize: scaleFont(22), fontWeight: 'bold', marginTop: 15 }}>Application for Shield of Trust</AppText>
- 
+                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12), textAlign: 'center', lineHeight: 20, marginTop: 5, marginHorizontal: 15 }}>
+                        Fill out the form below - while all sections are optional, you must complete at least two to submit your application. However, it's strongly recommended that you complete the entire form to strengthen your application and improve your chances of approval.
+                    </AppText>
                 </View>
 
                 <Divider orientation='horizontal' style={{ marginVertical: 15 }} />
@@ -100,10 +198,10 @@ export default function ShieldApplication() {
                     </AppText>
                     <AppTextInput
                         multiline
-                        value={summary}
-                        onChangeText={setSummary}
+                        value={education}
+                        onChangeText={setEducation}
                         style={styles.bioInput}
-                        placeholder='          College, university, or other educational or academic institution...'
+                        placeholder='College, university, or other educational or academic institution...'
                         placeholderTextColor={colors.mutedText}
                         textAlignVertical='top'
                         textAlign='left'
@@ -173,15 +271,51 @@ export default function ShieldApplication() {
                         </AppText>
                     </View>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <View style={{ flexDirection: 'row', }}>
-                            <Image source={Images.instagram} style={{ width: 30, height: 30, marginStart: 10 }} />
-                            <AppText>{userInstagramLink}</AppText>
-                        </View>
-                        <AppText>Instagram</AppText>
-                    </View>
 
+                    <TouchableOpacity onPress={() => handleSocialMediaLink('Instagram')} style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.cardBackground, padding: 12, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={Images.instagram} style={{ width: 30, height: 30 }} />
+                            <AppText style={{ color: 'white', marginStart: 10, fontWeight: 'bold', fontSize: scaleFont(12) }}>{instagramLink || 'Not Linked'}</AppText>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                        </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => handleSocialMediaLink('Facebook')} style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.cardBackground, padding: 12, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={Images.facebook} style={{ width: 30, height: 30 }} />
+                            <AppText style={{ color: 'white', marginStart: 10, fontWeight: 'bold', fontSize: scaleFont(12) }}>{facebookLink || 'Not Linked'}</AppText>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                        </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => handleSocialMediaLink('TikTok')} style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.cardBackground, padding: 12, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={Images.tiktokTwo} style={{ width: 30, height: 30 }} />
+                            <AppText style={{ color: 'white', marginStart: 10, fontWeight: 'bold', fontSize: scaleFont(12) }}>{tikTokLink || 'Not Linked'}</AppText>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                        </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => handleSocialMediaLink('X')} style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.cardBackground, padding: 12, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={Images.xTwo} style={{ width: 30, height: 30, tintColor: 'white' }} />
+                            <AppText style={{ color: 'white', marginStart: 10, fontWeight: 'bold', fontSize: scaleFont(12) }}>{xLink || 'Not Linked'}</AppText>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                        </View>
+                    </TouchableOpacity>
                 </View>
+
+                <TouchableOpacity onPress={handleSocialMediaReset} style={{ width: 150, alignSelf: 'center', backgroundColor: colors.negativeRed, padding: 15, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
+                    <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12) }}>Reset Links</AppText>
+                </TouchableOpacity>
 
             </AppScroll>
         </>

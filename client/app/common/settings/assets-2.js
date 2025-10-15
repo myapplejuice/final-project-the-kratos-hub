@@ -135,4 +135,12 @@ export const Images_2 = {
     premium: require('../../../assets/images/premium.png'),
     premiumOutline: require('../../../assets/images/premium-outline.png'),
     premiumTwo: require('../../../assets/images/premium-2.png'),
+    tiktok: require('../../../assets/images/tiktok.png'),
+    tiktokOutline: require('../../../assets/images/tiktok-outline.png'),
+    tiktokTwo: require('../../../assets/images/tiktok-2.png'),
+    x: require('../../../assets/images/x.png'),
+    xOutline: require('../../../assets/images/x-outline.png'),
+    xTwo: require('../../../assets/images/x-2.png'),
+    xTwoOutline: require('../../../assets/images/x-2-outline.png'),
+ 
 };

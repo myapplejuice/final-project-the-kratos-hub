@@ -189,7 +189,7 @@ export default function PersonalTrainingProfile() {
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                            onPress={() => router.push(routes.SHIELD_APPLICATION)}
+                            onPress={() => router.replace(routes.SHIELD_APPLICATION)}
                             style={[styles.explanationCard, { width: '48%' }]}
                         >
                             <View style={styles.explanationContent}>
