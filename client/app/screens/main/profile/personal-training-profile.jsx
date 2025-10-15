@@ -327,7 +327,7 @@ export default function PersonalTrainingProfile() {
                                 />
                                 <AppText style={styles.uploadText}>Upload Image</AppText>
                                 <AppText style={styles.uploadHint}>
-                                    PNG, JPG up to 10MB
+                                   PNG, JPG, JPEG up to 10MB
                                 </AppText>
 
                             </View>

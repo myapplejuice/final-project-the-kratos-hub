@@ -35,117 +35,19 @@ export default function ShieldApplication() {
     const insets = useSafeAreaInsets();
 
     const [fabVisible, setFabVisible] = useState(true);
-    const [changes, setChanges] = useState(false);
     const [selectedImage, setSelectedImage] = useState({});
     const [imagePreviewVisible, setImagePreviewVisible] = useState(false);
 
-    const [trainerStatus, setTrainerStatus] = useState(user.trainerProfile.trainerStatus === 'active');
-    const [biography, setBiography] = useState(user.trainerProfile.biography);
-    const [yearsOfExperience, setYearsOfExperience] = useState(user.trainerProfile.yearsOfExperience);
-    const [images, setImages] = useState(user.trainerProfile.images);
-
-    useEffect(() => {
-        const obj = {
-            userId: user.id,
-            isVerified: user.trainerProfile.isVerified,
-            trainerStatus: trainerStatus === true ? 'active' : 'inactive',
-            biography,
-            yearsOfExperience,
-            images
-        }
-
-        const isChanged = JSON.stringify(obj) !== JSON.stringify(user?.trainerProfile);
-        setChanges(isChanged);
-    }, [trainerStatus, biography, yearsOfExperience, images, user.trainerProfile]);
-
-    function handleYearsOfExperience() {
-        createOptions({
-            title: "Experience",
-            options: ["New Trainer", "1 Year", "2 Years", "3+ Years", "6+ Years", "10+ Years"],
-            current: yearsOfExperience,
-            onConfirm: (selected) => {
-                if (selected) {
-                    setYearsOfExperience(selected);
-                }
-            }
-        })
-    }
-
-    async function handleNewImage(asset) {
-        const payload = {
-            fileName: asset.fileName || asset.uri.split('/').pop(),
-            url: asset.uri,
-            type: asset.type || 'image/jpeg'
-        }
-        setImages(prev => [...prev, payload]);
-    }
-
-    async function handleNewUpdates() {
-        try {
-            showSpinner();
-
-            const newImages = JSON.stringify(user.trainerProfile.images) !== JSON.stringify(images);
-            let uploadedImages = images;
-
-            if (newImages) {
-                console.log('uploading images');
-                uploadedImages = await Promise.all(
-                    images.map(async (image) => {
-                        if (!image.url.startsWith("http")) {
-                            const url = await APIService.uploadImageToCloudinary({
-                                uri: image.url,
-                                folder: "user_trainer_profile_images",
-                                fileName: `user${user.id}_${Date.now()}_${image.fileName}.jpg`,
-                            });
-                            return { ...image, url };
-                        }
-                        return image;
-                    })
-                );
-            }
-
-            setImages(uploadedImages);
-
-            const payload = {
-                userId: user.id,
-                isVerified: user.trainerProfile.isVerified,
-                trainerStatus: trainerStatus ? 'active' : 'inactive',
-                biography,
-                yearsOfExperience,
-                images: uploadedImages,
-            };
-
-            const result = await APIService.user.trainerProfile.update(payload);
-
-            if (result.success) {
-                createToast({ message: "Trainer profile updated" });
-                setUser(prev => ({
-                    ...prev,
-                    trainerProfile: payload,
-                }));
-            } else {
-                createToast({ message: "Failed to update profile." });
-            }
-        } catch (err) {
-            console.error(err);
-            createToast({ message: "Error updating profile." });
-        } finally {
-            hideSpinner();
-        }
-    }
+    const [summary, setSummary] = useState('');
+    const [education, setEducation] = useState('');
+    const [images, setImages] = useState([]);
+    const [userInstagramLink, setUserInstagramLink] = useState('');
+    const [facebookLink, setFacebookLink] = useState('');
+    const [tiktokLink, setTiktokLink] = useState('');
+    const [xLink, setXLink] = useState('');
 
     return (
         <>
-            <FloatingActionButton
-                icon={Images.checkMark}
-                label={"Confirm Changes"}
-                iconSize={18}
-                labelStyle={{ fontSize: scaleFont(14) }}
-                style={{ width: '100%', height: 50, backgroundColor: colors.accentGreen }}
-                position={{ bottom: insets.bottom + 20, right: 20, left: 20 }}
-                visible={fabVisible && changes}
-                onPress={handleNewUpdates}
-            />
 
             <FadeInOut visible={imagePreviewVisible} style={{ position: 'absolute', zIndex: 9999, top: 0, left: 0, bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.8)' }}>
                 <TouchableOpacity onPress={() => { setImagePreviewVisible(false), setSelectedImage({}), setFabVisible(true) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -162,16 +64,126 @@ export default function ShieldApplication() {
                 </TouchableOpacity>
             </FadeInOut>
 
-            <View style={styles.main}>
-                <ImageCapture onConfirm={async (image) => handleNewImage(image)} />
-                <AppScroll extraBottom={200} onScrollSetStates={setFabVisible}>
-                    <View style={{ alignItems: 'center' }}>
-                        <Image source={Images.shield} style={{ width: 80, height: 80, tintColor: 'white', marginTop: 5 }} />
-                        <AppText style={{ color: 'white', fontSize: scaleFont(22), fontWeight: 'bold', marginTop: 15 }}>Application for Shield of Trust</AppText>
+            <AppScroll extraBottom={200} onScrollSetStates={setFabVisible}>
+                <View style={{ alignItems: 'center' }}>
+                    <Image source={Images.shield} style={{ width: 80, height: 80, tintColor: 'white', marginTop: 25 }} />
+                    <AppText style={{ color: 'white', fontSize: scaleFont(22), fontWeight: 'bold', marginTop: 15 }}>Application for Shield of Trust</AppText>
+ 
+                </View>
+
+                <Divider orientation='horizontal' style={{ marginVertical: 15 }} />
+
+                <View style={styles.section}>
+                    <AppText style={styles.sectionTitle}>Summary</AppText>
+                    <AppText style={styles.inputHint}>
+                        Write about your experience as a professional trainer
+                    </AppText>
+                    <AppTextInput
+                        multiline
+                        value={summary}
+                        onChangeText={setSummary}
+                        style={styles.bioInput}
+                        placeholder='Experience, specialties, achievements, and what makes you a great trainer...'
+                        placeholderTextColor={colors.mutedText}
+                        textAlignVertical='top'
+                        textAlign='left'
+                        fontSize={14}
+                        color='white'
+                        fontWeight='normal'
+                    />
+                </View>
+
+                <View style={styles.section}>
+                    <AppText style={styles.sectionTitle}>Education</AppText>
+                    <AppText style={styles.inputHint}>
+                        Write about your educational background
+                    </AppText>
+                    <AppTextInput
+                        multiline
+                        value={summary}
+                        onChangeText={setSummary}
+                        style={styles.bioInput}
+                        placeholder='          College, university, or other educational or academic institution...'
+                        placeholderTextColor={colors.mutedText}
+                        textAlignVertical='top'
+                        textAlign='left'
+                        fontSize={14}
+                        color='white'
+                        fontWeight='normal'
+                    />
+                </View>
+
+                <View style={styles.section}>
+                    <View style={styles.sectionHeader}>
+                        <AppText style={styles.sectionTitle}>Images</AppText>
+                        <AppText style={styles.sectionSubtitle}>
+                            Your work, certificates and achievements to support your application
+                        </AppText>
                     </View>
 
-                </AppScroll>
-            </View>
+                    {images.length > 0 && (
+                        <>
+                            {images.map((image, index) => (
+                                <TouchableOpacity onPress={() => { setSelectedImage(image), setImagePreviewVisible(true) }} key={index}
+                                    style={[{
+                                        flexDirection: 'row', justifyContent: 'space-between', width: '100%', padding: 20, backgroundColor: colors.cardBackground,
+                                        borderRadius: 20, marginBottom: 10, alignItems: 'center'
+                                    }]}>
+                                    <AppText numberOfLines={1} ellipsizeMode="tail" style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12), width: '91%' }}>{image.fileName}</AppText>
+                                    <View style={{ width: '9%', alignItems: 'center', flexDirection: 'row', }}>
+                                        <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white', marginStart: 10 }} />
+                                    </View>
+                                </TouchableOpacity>
+                            ))}
+                        </>
+                    )}
+
+                    <TouchableOpacity
+                        onPress={() => {
+                            createSelector({
+                                title: "Profile Picture",
+                                text: "Do you want to take a photo using camera or upload an image?",
+                                optionAText: "Take a Photo",
+                                optionBText: "Upload Image",
+                                cancelText: "Cancel",
+                                onPressA: async () => setCameraActive(true),
+                                onPressB: async () => setLibraryActive(true)
+                            });
+                        }}
+                        style={styles.uploadButton}
+                    >
+                        <View style={styles.uploadContent}>
+                            <Image
+                                source={Images.arrow}
+                                style={[styles.uploadIcon, { transform: [{ rotate: '-90deg' }], width: 25, height: 25, marginBottom: 0, marginBottom: 10 }]}
+                            />
+                            <AppText style={styles.uploadText}>Upload Image</AppText>
+                            <AppText style={styles.uploadHint}>
+                                PNG, JPG, JPEG up to 10MB
+                            </AppText>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.section}>
+                    <View style={styles.sectionHeader}>
+                        <AppText style={styles.sectionTitle}>Social Media</AppText>
+                        <AppText style={styles.sectionSubtitle}>
+                            Link your social media profiles if any...
+                        </AppText>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <View style={{ flexDirection: 'row', }}>
+                            <Image source={Images.instagram} style={{ width: 30, height: 30, marginStart: 10 }} />
+                            <AppText>{userInstagramLink}</AppText>
+                        </View>
+                        <AppText>Instagram</AppText>
+                    </View>
+
+                </View>
+
+            </AppScroll>
         </>
     );
 }
