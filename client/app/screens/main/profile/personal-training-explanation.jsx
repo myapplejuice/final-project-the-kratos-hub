@@ -50,7 +50,7 @@ export default function PersonalTrainingExplanation() {
                                 <View style={styles.stepNumber}>
                                     <AppText style={styles.stepNumberText}>2</AppText>
                                 </View>
-                                <AppText style={styles.stepTitle}>Build Your Training Profile</AppText>
+                                <AppText style={styles.stepTitle}>Build Your Trainer Profile</AppText>
                             </View>
                             <AppText style={styles.stepDescription}>
                                 Add a short biography, your experience, specialties, and upload photos or videos of your work. Keep it updated to show your skills and availability.

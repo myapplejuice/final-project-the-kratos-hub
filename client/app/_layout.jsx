@@ -48,20 +48,24 @@ function Layout() {
         const handlers = {
             // Temporary until i find solution for library asset function
             replace: () => {
-                if (screen === routes.PERSONAL_TRAINING_PROFILE) {
+                console.log('came here')
+                if (screen === routes.PERSONAL_TRAINING_PROFILE || screen === routes.SHIELD_APPLICATIONS)
                     router.replace(routes.PROFILE);
-                    return true;
+                else if (screen === routes.SHIELD_APPLICATION)
+                    router.replace(routes.SHIELD_APPLICATIONS);
+                else if (screen === routes.SHIELD_APPLICATIONS) {
+                    router.replace(routes.PROFILE);
+                    return false;
                 }
-                else if (screen === routes.SHIELD_APPLICATION) {
-                    router.replace(routes.PERSONAL_TRAINING_PROFILE);
-                    return true;
-                }
+                return true;
             },
             exit: () => { BackHandler.exitApp(); return true; },
             back: () => { router.back(); return true; },
         };
 
-        if (screen === routes.PERSONAL_TRAINING_PROFILE || screen === routes.SHIELD_APPLICATION) {
+        if (screen === routes.PERSONAL_TRAINING_PROFILE ||
+            screen === routes.SHIELD_APPLICATIONS ||
+            screen === routes.SHIELD_APPLICATION) {
             setBackHandler(handlers.replace);
         } else if (exitAppBackScreens.includes(screen)) {
             setBackHandler(handlers.exit);

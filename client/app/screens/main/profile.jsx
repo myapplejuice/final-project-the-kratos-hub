@@ -195,13 +195,14 @@ export default function Profile() {
                 </View>
 
                 <View style={[styles.card, { marginTop: 15 }]}>
-                    <AppText style={styles.cardLabel}>Trainer Status & Coaching</AppText>
+                    <AppText style={styles.cardLabel}>Trainer Profile</AppText>
                     {[
-                        { icon: Images.personalTrainerOutline, label: 'Personal Training Profile', onPress: () => router.replace(routes.PERSONAL_TRAINING_PROFILE) },
+                        { icon: Images.noHelp, label: 'What is Trainer Profile', onPress: () => router.push(routes.PERSONAL_TRAINING_EXPLANATION) },
+                        { icon: Images.personalTrainerOutline, label: 'Personal Trainer Profile', onPress: () => router.replace(routes.PERSONAL_TRAINING_PROFILE) },
                         { icon: Images.shieldOutline, label: 'Shield Applications', onPress: () => router.replace(routes.SHIELD_APPLICATIONS) },
                     ].map((item, i) => (
                         <View key={i}>
-                            <TouchableOpacity key={i} style={[styles.optionRow, i === 1 && { marginBottom: 0 }]} onPress={item.onPress}>
+                            <TouchableOpacity key={i} style={[styles.optionRow, i === 2 && { marginBottom: 0 }]} onPress={item.onPress}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
                                     <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
                                         <Image source={item.icon} style={styles.settingIcon} />
@@ -212,7 +213,7 @@ export default function Profile() {
                                 </View>
                                 <Image source={Images.backArrow} style={[styles.arrow, { transform: [{ scaleX: -1 }] }]} />
                             </TouchableOpacity>
-                            {i !== 1 && <Divider orientation='horizontal' color={colors.divider} />}
+                            {i !== 2 && <Divider orientation='horizontal' color={colors.divider} />}
                         </View>
                     ))}
                 </View>

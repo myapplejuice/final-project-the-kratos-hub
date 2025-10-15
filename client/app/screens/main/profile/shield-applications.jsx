@@ -61,7 +61,7 @@ export default function ShieldApplications() {
         if (user.shieldApplication)
             return createToast({ message: 'You have already submitted an application' });
 
-        router.push(routes.SHIELD_APPLICATION);
+        router.replace(routes.SHIELD_APPLICATION);
     }
 
     return (

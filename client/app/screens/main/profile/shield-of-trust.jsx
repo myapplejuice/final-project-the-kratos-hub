@@ -111,7 +111,7 @@ export default function BadgeOfTrust() {
                         <View style={{ width: '90%' }}>
                             <AppText style={[styles.cardLabel,]}>How to get the Shield?</AppText>
                             <AppText style={{ color: colors.detailText, lineHeight: 20, marginTop: 8 }}>
-                                You can submit an application for the Shield of Trust by filling out the form in your trainer profile page.
+                                You can submit an application for the Shield of Trust by filling out the form in your profile page.
                             </AppText>
                             <AppText style={{ color: colors.detailText, lineHeight: 20, marginTop: 8 }}>
                                 There all will be explain further. And if your application is approved, you will be marked with the Shield of Trust.

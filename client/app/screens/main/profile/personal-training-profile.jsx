@@ -165,52 +165,6 @@ export default function PersonalTrainingProfile() {
             <View style={styles.main}>
                 <ImageCapture onConfirm={async (image) => handleNewImage(image)} />
                 <AppScroll extraBottom={200} onScrollSetStates={setFabVisible}>
-                    {!user.trainerProfile.isVerified &&
-                        <View style={{ flexDirection: 'row', marginHorizontal: 15, justifyContent: 'space-between' }}>
-                            <TouchableOpacity
-                                onPress={() => router.push(routes.PERSONAL_TRAINING_EXPLANATION)}
-                                style={[styles.explanationCard, { width: '48%' }]}
-                            >
-                                <View style={styles.explanationContent}>
-                                    <Image
-                                        source={Images.noHelp}
-                                        style={styles.explanationIcon}
-                                    />
-                                    <View style={styles.explanationLeft}>
-
-                                        <View style={styles.explanationText}>
-                                            <AppText style={styles.explanationTitle}>
-                                                Trainer Profile
-                                            </AppText>
-                                        </View>
-                                    </View>
-
-                                </View>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                onPress={() => router.push(routes.SHIELD_APPLICATIONS)}
-                                style={[styles.explanationCard, { width: '48%' }]}
-                            >
-                                <View style={styles.explanationContent}>
-                                    <Image
-                                        source={Images.shieldOutline}
-                                        style={styles.explanationIcon}
-                                    />
-                                    <View style={styles.explanationLeft}>
-
-                                        <View style={styles.explanationText}>
-                                            <AppText style={styles.explanationTitle}>
-                                                Apply for Verification
-                                            </AppText>
-                                        </View>
-                                    </View>
-
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-                    }
-
                     {/* Trainer Status Card */}
                     <View style={styles.card}>
                         <View style={styles.cardHeader}>
