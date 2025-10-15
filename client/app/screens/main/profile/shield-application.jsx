@@ -2,7 +2,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import { Linking, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Keyboard, Linking, StyleSheet, TouchableOpacity, View } from "react-native";
 import BuildFooter from "../../../components/layout-comps/build-footer";
 import AppText from "../../../components/screen-comps/app-text";
 import { Images } from '../../../common/settings/assets';
@@ -142,9 +142,74 @@ export default function ShieldApplication() {
         })
     }
 
+    async function handleSubmittion() {
+        const formFillCount = [
+            summary.trim() !== '',
+            education.trim() !== '',
+            images.length > 0,
+            instagramLink.trim() !== '',
+            facebookLink.trim() !== '',
+            tikTokLink.trim() !== '',
+            xLink.trim() !== '',
+        ].filter(Boolean).length;
+
+        if (formFillCount < 2) return createToast({ message: 'Please fill out at least 2 sections before submitting' });
+
+        try {
+            showSpinner();
+
+            const uploadedImages = await Promise.all(
+                images.map(async (image) => {
+                    if (!image.url.startsWith("http")) {
+                        const url = await APIService.uploadImageToCloudinary({
+                            uri: image.url,
+                            folder: "user_trainer_profile_images",
+                            fileName: `user${user.id}_${Date.now()}_${image.fileName}.jpg`,
+                        });
+                        return { ...image, url };
+                    }
+                    return image;
+                })
+            );
+
+            setImages(uploadedImages);
+
+            const payload = {
+                userId: user.id,
+                trainerProfile: user.trainerProfile,
+                application: {
+                    summary,
+                    education,
+                    images: uploadedImages,
+                    instagramLink,
+                    facebookLink,
+                    tikTokLink,
+                    xLink
+                }
+            }
+
+            const result = await APIService.verification.apply(payload);
+
+            if (result.success) {
+                createToast({ message: "Trainer profile updated" });
+                setUser(prev => ({
+                    ...prev,
+                    badgeApplication: payload,
+                }));
+            } else {
+                createToast({ message: "Failed to update profile." });
+            }
+        }
+        catch (err) {
+            console.error("Image upload failed:", err);
+        } finally {
+            hideSpinner();
+        }
+    }
+
     return (
         <>
-                <ImageCapture onConfirm={async (image) => handleNewImage(image)} />
+            <ImageCapture onConfirm={async (image) => handleNewImage(image)} />
             <FadeInOut visible={imagePreviewVisible} style={{ position: 'absolute', zIndex: 9999, top: 0, left: 0, bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.8)' }}>
                 <TouchableOpacity onPress={() => { setImagePreviewVisible(false), setSelectedImage({}), setFabVisible(true) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(30), marginBottom: 15 }}>Tap anywhere to dismiss</AppText>
@@ -159,6 +224,17 @@ export default function ShieldApplication() {
                     />
                 </TouchableOpacity>
             </FadeInOut>
+
+            <FloatingActionButton
+                icon={Images.shield}
+                label={"Submit Application"}
+                iconSize={18}
+                labelStyle={{ fontSize: scaleFont(14) }}
+                style={{ width: '100%', height: 50, backgroundColor: colors.accentGreen }}
+                position={{ bottom: insets.bottom + 20, right: 20, left: 20 }}
+                visible={fabVisible}
+                onPress={handleSubmittion}
+            />
 
             <AppScroll extraBottom={200} onScrollSetStates={setFabVisible}>
                 <View style={{ alignItems: 'center' }}>
@@ -238,6 +314,8 @@ export default function ShieldApplication() {
 
                     <TouchableOpacity
                         onPress={() => {
+                            Keyboard.dismiss();
+
                             createSelector({
                                 title: "Profile Picture",
                                 text: "Do you want to take a photo using camera or upload an image?",
