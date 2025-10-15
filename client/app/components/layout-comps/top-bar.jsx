@@ -93,7 +93,8 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.CHAT]: `${chattedUser ? chattedUser.firstname + " " + chattedUser.lastname : 'Chat'}`,
         [routes.PERSONAL_TRAINING_PROFILE]: "Trainer Profile",
         [routes.PERSONAL_TRAINING_EXPLANATION]: "What is A Trainer Profile?",
-    [routes.BADGE_OF_TRUST]: "Badge of Trust",
+        [routes.SHIELD_OF_TRUST]: "Shield of Trust",
+        [routes.SHIELD_APPLICATION]: "Shield Application",
     };
 
     function handleUserProfilePress() {
@@ -183,9 +184,9 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                             )}
 
                             {chattedUser.isVerified && (
-                                <TouchableOpacity onPress={() => router.push(routes.BADGE_OF_TRUST)} style={{ alignSelf: 'center', marginStart: 8 }}>
+                                <TouchableOpacity onPress={() => router.push(routes.SHIELD_OF_TRUST)} style={{ alignSelf: 'center', marginStart: 8 }}>
                                     <Image
-                                        source={Images.verifiedSeven}
+                                        source={Images.shield}
                                         style={{ width: 18, height: 18, tintColor: 'white' }}
                                     />
                                 </TouchableOpacity>

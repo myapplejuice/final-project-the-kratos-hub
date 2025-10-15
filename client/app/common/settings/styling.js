@@ -6,7 +6,7 @@ export const colors = {
     mainOpacied: '#008CFF80', // 50% opacity as 8-digit hex
     mainSecond: '#004682',
     cardBackground: '#1A1A1A',
-    detailText: '#666666', // userInformationCard.detail
+    detailText: '#cfcfcfff', // userInformationCard.detail
     mutedText: '#666666', // metricLabel, rowInfoLabel, statLabel
     lightMutedText: '#66666633', // 20% opacity
     accentPink: '#FF536A',

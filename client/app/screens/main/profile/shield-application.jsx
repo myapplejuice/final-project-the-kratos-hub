@@ -26,7 +26,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBackHandlerContext } from '../../../common/contexts/back-handler-context';
 import FadeInOut from '../../../components/effects/fade-in-out';
 
-export default function PersonalTrainingProfile() {
+export default function ShieldApplication() {
     const { setBackHandler } = useBackHandlerContext();
     const { setLibraryActive } = useContext(LibraryContext);
     const { setCameraActive } = useContext(CameraContext);
@@ -165,174 +165,11 @@ export default function PersonalTrainingProfile() {
             <View style={styles.main}>
                 <ImageCapture onConfirm={async (image) => handleNewImage(image)} />
                 <AppScroll extraBottom={200} onScrollSetStates={setFabVisible}>
-                    {/* Explanation Card */}
-                    <View style={{ flexDirection: 'row', marginHorizontal: 15, justifyContent: 'space-between' }}>
-                        <TouchableOpacity
-                            onPress={() => router.push(routes.PERSONAL_TRAINING_EXPLANATION)}
-                            style={[styles.explanationCard, { width: '48%' }]}
-                        >
-                            <View style={styles.explanationContent}>
-                                <Image
-                                    source={Images.noHelp}
-                                    style={styles.explanationIcon}
-                                />
-                                <View style={styles.explanationLeft}>
-
-                                    <View style={styles.explanationText}>
-                                        <AppText style={styles.explanationTitle}>
-                                            Trainer Profile
-                                        </AppText>
-                                    </View>
-                                </View>
-
-                            </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            onPress={() => router.push(routes.SHIELD_APPLICATION)}
-                            style={[styles.explanationCard, { width: '48%' }]}
-                        >
-                            <View style={styles.explanationContent}>
-                                <Image
-                                    source={Images.shieldOutline}
-                                    style={styles.explanationIcon}
-                                />
-                                <View style={styles.explanationLeft}>
-
-                                    <View style={styles.explanationText}>
-                                        <AppText style={styles.explanationTitle}>
-                                            Apply for Verification
-                                        </AppText>
-                                    </View>
-                                </View>
-
-                            </View>
-                        </TouchableOpacity>
+                    <View style={{ alignItems: 'center' }}>
+                        <Image source={Images.shield} style={{ width: 80, height: 80, tintColor: 'white', marginTop: 5 }} />
+                        <AppText style={{ color: 'white', fontSize: scaleFont(22), fontWeight: 'bold', marginTop: 15 }}>Application for Shield of Trust</AppText>
                     </View>
 
-                    {/* Trainer Status Card */}
-                    <View style={styles.card}>
-                        <View style={styles.cardHeader}>
-                            <AppText style={styles.cardTitle}>Trainer Status</AppText>
-                            <TouchableOpacity
-                                onPress={() => setTrainerStatus(!trainerStatus)}
-                                style={styles.toggleContainer}
-                            >
-                                <View style={[
-                                    styles.toggleOption,
-                                    styles.toggleLeft,
-                                    trainerStatus && styles.toggleActive
-                                ]}>
-                                    <AppText style={[
-                                        styles.toggleText,
-                                        trainerStatus && styles.toggleTextActive
-                                    ]}>On</AppText>
-                                </View>
-                                <View style={[
-                                    styles.toggleOption,
-                                    styles.toggleRight,
-                                    !trainerStatus && styles.toggleActive
-                                ]}>
-                                    <AppText style={[
-                                        styles.toggleText,
-                                        !trainerStatus && styles.toggleTextActive
-                                    ]}>Off</AppText>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-
-                    {/* Professional Overview Section */}
-                    <View style={styles.section}>
-                        <AppText style={styles.sectionTitle}>Professional Overview</AppText>
-                        <AppText style={styles.inputHint}>
-                            This will be visible to potential clients
-                        </AppText>
-                        <AppTextInput
-                            multiline
-                            value={biography}
-                            onChangeText={setBiography}
-                            style={styles.bioInput}
-                            placeholder='Write about your experience, specialties, achievements, and what makes you a great trainer...'
-                            placeholderTextColor={colors.mutedText}
-                            textAlignVertical='top'
-                            textAlign='left'
-                            fontSize={14}
-                            color='white'
-                            fontWeight='normal'
-                        />
-                    </View>
-
-                    {/* Years of Experience Card */}
-                    <TouchableOpacity
-                        onPress={handleYearsOfExperience}
-                        style={styles.card}
-                    >
-                        <View style={styles.cardContent}>
-                            <AppText style={styles.cardTitle}>Years of Experience</AppText>
-                            <View style={styles.valueContainer}>
-                                <AppText style={styles.valueText}>{yearsOfExperience}</AppText>
-                                <Image
-                                    source={Images.arrow}
-                                    style={styles.arrowIcon}
-                                />
-                            </View>
-                        </View>
-                    </TouchableOpacity>
-
-                    {/* Certificates Section */}
-                    <View style={styles.section}>
-                        <View style={styles.sectionHeader}>
-                            <AppText style={styles.sectionTitle}>Certificates & Awards</AppText>
-                            <AppText style={styles.sectionSubtitle}>
-                                Showcase your qualifications and achievements
-                            </AppText>
-                        </View>
-
-                        {images.length > 0 && (
-                            <>
-                                {images.map((image, index) => (
-                                    <TouchableOpacity onPress={() => { setSelectedImage(image), setImagePreviewVisible(true) }} key={index}
-                                        style={[{
-                                            flexDirection: 'row', justifyContent: 'space-between', width: '100%', padding: 20, backgroundColor: colors.cardBackground,
-                                            borderRadius: 20, marginBottom: 10, alignItems: 'center'
-                                        }]}>
-                                        <AppText numberOfLines={1} ellipsizeMode="tail" style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12), width: '91%' }}>{image.fileName}</AppText>
-                                        <View style={{ width: '9%', alignItems: 'center', flexDirection: 'row', }}>
-                                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white', marginStart: 10 }} />
-                                        </View>
-                                    </TouchableOpacity>
-                                ))}
-                            </>
-                        )}
-
-                        <TouchableOpacity
-                            onPress={() => {
-                                createSelector({
-                                    title: "Profile Picture",
-                                    text: "Do you want to take a photo using camera or upload an image?",
-                                    optionAText: "Take a Photo",
-                                    optionBText: "Upload Image",
-                                    cancelText: "Cancel",
-                                    onPressA: async () => setCameraActive(true),
-                                    onPressB: async () => setLibraryActive(true)
-                                });
-                            }}
-                            style={styles.uploadButton}
-                        >
-                            <View style={styles.uploadContent}>
-                                <Image
-                                    source={Images.arrow}
-                                    style={[styles.uploadIcon, { transform: [{ rotate: '-90deg' }], width: 25, height: 25, marginBottom: 0, marginBottom: 10 }]}
-                                />
-                                <AppText style={styles.uploadText}>Upload Image</AppText>
-                                <AppText style={styles.uploadHint}>
-                                    PNG, JPG up to 10MB
-                                </AppText>
-
-                            </View>
-                        </TouchableOpacity>
-                    </View>
                 </AppScroll>
             </View>
         </>

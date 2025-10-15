@@ -217,8 +217,8 @@ export default function UserProfile() {
                                         </View>
                                     }
                                     {profile && profile.trainerProfile.trainerStatus === 'active' && profile.trainerProfile.isVerified &&
-                                        <TouchableOpacity onPress={() => router.push(routes.BADGE_OF_TRUST)} style={{ padding: 10, backgroundColor: colors.main, borderRadius: 15, flexDirection: 'row', alignItems: 'center', marginStart: 5 }}>
-                                            <Image source={Images.verifiedSeven} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                                        <TouchableOpacity onPress={() => router.push(routes.SHIELD_OF_TRUST)} style={{ padding: 10, backgroundColor: colors.main, borderRadius: 15, flexDirection: 'row', alignItems: 'center', marginStart: 5 }}>
+                                            <Image source={Images.shield} style={{ width: 20, height: 20, tintColor: 'white' }} />
                                             <AppText style={{ color: 'white', marginStart: 5, fontSize: scaleFont(12), fontWeight: 'bold' }}>Trusted Trainer</AppText>
                                         </TouchableOpacity>
                                     }

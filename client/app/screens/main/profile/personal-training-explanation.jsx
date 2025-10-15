@@ -74,13 +74,13 @@ export default function PersonalTrainingExplanation() {
                                 <View style={styles.stepNumber}>
                                     <AppText style={styles.stepNumberText}>4</AppText>
                                 </View>
-                                <AppText style={styles.stepTitle}>Verification Badge (Optional)</AppText>
+                                <AppText style={styles.stepTitle}>Apply For Verification (Optional)</AppText>
                             </View>
                             <AppText style={styles.stepDescription}>
-                                Submit an application with certificates and/or academic qualifications to earn a badge marking you as a trusted trainer, which boosts other users' confidence in your services. Verification is optional but adds credibility.
+                                Submit an application with certificates and/or academic qualifications to earn a shield marking you as a trusted trainer, which boosts other users' confidence in your services. Verification is optional but adds credibility.
                             </AppText>
                             <AnimatedButton
-                                onPress={() => router.push(routes.BADGE_OF_TRUST)}
+                                onPress={() => router.push(routes.SHIELD_OF_TRUST)}
                                 rightImage={Images.arrow}
                                 rightImageStyle={{ marginStart: 5 }}
                                 style={{ marginTop: 15, alignItems: 'center', padding: 13, marginStart: 35, backgroundColor: colors.main, borderRadius: 15 }}

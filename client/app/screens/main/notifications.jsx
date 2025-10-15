@@ -355,7 +355,7 @@ export default function Notifications() {
                                             <View key={notification.id}>
                                                 <TouchableOpacity style={{ marginBottom: 25 }} onPress={() => notification.clickable && handleNotificationPress(notification)}>
                                                     <View style={{ borderStartColor: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white', borderStartWidth: 2, paddingHorizontal: 15 }}>
-                                                        <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white' }}>
+                                                        <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: notification.seen ? colors.mutedText : 'white' }}>
                                                             {notification.notification}
                                                         </AppText>
                                                         <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: colors.mutedText, marginTop: 5, alignSelf: 'flex-end' }}>
