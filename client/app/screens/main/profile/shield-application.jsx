@@ -163,7 +163,7 @@ export default function ShieldApplication() {
                     if (!image.url.startsWith("http")) {
                         const url = await APIService.uploadImageToCloudinary({
                             uri: image.url,
-                            folder: "user_trainer_profile_images",
+                            folder: "verification_application_images",
                             fileName: `user${user.id}_${Date.now()}_${image.fileName}.jpg`,
                         });
                         return { ...image, url };
@@ -172,19 +172,18 @@ export default function ShieldApplication() {
                 })
             );
 
+            const links = [instagramLink, facebookLink, tikTokLink, xLink].filter(Boolean);
             setImages(uploadedImages);
 
             const payload = {
                 userId: user.id,
                 trainerProfile: user.trainerProfile,
                 application: {
+                    status: 'pending',
                     summary,
                     education,
                     images: uploadedImages,
-                    instagramLink,
-                    facebookLink,
-                    tikTokLink,
-                    xLink
+                    links
                 }
             }
 
@@ -194,7 +193,7 @@ export default function ShieldApplication() {
                 createToast({ message: "Trainer profile updated" });
                 setUser(prev => ({
                     ...prev,
-                    badgeApplication: payload,
+                    badgeApplication: payload.application,
                 }));
             } else {
                 createToast({ message: "Failed to update profile." });

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import UserController from '../models/user/user-controller.js';
 import MiddlewaresManager from '../utils/middlewares-manager.js';
 import UserTrainerProfileController from '../models/user/user-trainer-profile/user-trainer-profile-controller.js';
+import VerificationController from '../models/verification/verification-controller.js';
 
 export default class UserRouter {
     static userRouter;
@@ -27,6 +28,10 @@ export default class UserRouter {
 
         this.userRouter.get("/trainer-profile/:id", tokenAuthorization, userAuthorization, UserTrainerProfileController.getTrainerProfile);
         this.userRouter.put("/trainer-profile/:id", tokenAuthorization, userAuthorization, UserTrainerProfileController.updateTrainerProfile);
+
+        this.userRouter.post("/verification/:id", tokenAuthorization, userAuthorization, asyncHandler(VerificationController.createApplication));
+        this.userRouter.put("/verification/:id", tokenAuthorization, userAuthorization, asyncHandler(VerificationController.updateApplication));
+        this.userRouter.delete("/verification/:id", tokenAuthorization, userAuthorization, asyncHandler(VerificationController.deleteApplication));
 
         return this.userRouter;
     }

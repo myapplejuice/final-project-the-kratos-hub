@@ -253,7 +253,7 @@ export default function PersonalTrainingProfile() {
                             value={biography}
                             onChangeText={setBiography}
                             style={styles.bioInput}
-                            placeholder='Write about your experience, specialties, achievements, and what makes you a great trainer...'
+                            placeholder='Write about yourself and your experience...'
                             placeholderTextColor={colors.mutedText}
                             textAlignVertical='top'
                             textAlign='left'
