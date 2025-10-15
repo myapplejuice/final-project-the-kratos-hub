@@ -30,7 +30,7 @@ export default function ShieldApplication() {
     const { setBackHandler } = useBackHandlerContext();
     const { setLibraryActive } = useContext(LibraryContext);
     const { setCameraActive } = useContext(CameraContext);
-    const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createOptions } = usePopups();
+    const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert, createOptions } = usePopups();
     const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
@@ -155,55 +155,62 @@ export default function ShieldApplication() {
 
         if (formFillCount < 2) return createToast({ message: 'Please fill out at least 2 sections before submitting' });
 
-        try {
-            showSpinner();
+        createDialog({
+            title: 'Submit Application',
+            text: 'Are you sure you want to submit your application?',
+            confirmText: 'Submit',
+            onConfirm: async () => {
+                try {
+                    showSpinner();
 
-            const uploadedImages = await Promise.all(
-                images.map(async (image) => {
-                    if (!image.url.startsWith("http")) {
-                        const url = await APIService.uploadImageToCloudinary({
-                            uri: image.url,
-                            folder: "verification_application_images",
-                            fileName: `user${user.id}_${Date.now()}_${image.fileName}.jpg`,
-                        });
-                        return { ...image, url };
+                    const uploadedImages = await Promise.all(
+                        images.map(async (image) => {
+                            if (!image.url.startsWith("http")) {
+                                const url = await APIService.uploadImageToCloudinary({
+                                    uri: image.url,
+                                    folder: "verification_application_images",
+                                    fileName: `user${user.id}_${Date.now()}_${image.fileName}.jpg`,
+                                });
+                                return { ...image, url };
+                            }
+                            return image;
+                        })
+                    );
+
+                    const links = [instagramLink, facebookLink, tikTokLink, xLink].filter(Boolean);
+                    setImages(uploadedImages);
+
+                    const payload = {
+                        userId: user.id,
+                        status: 'pending',
+                        summary,
+                        education,
+                        images: uploadedImages,
+                        links
                     }
-                    return image;
-                })
-            );
 
-            const links = [instagramLink, facebookLink, tikTokLink, xLink].filter(Boolean);
-            setImages(uploadedImages);
+                    const result = await APIService.verification.apply(payload);
+                    console.log('result', result)
+                    if (result.success) {
+                        payload.id = result.data.applicationId;
 
-            const payload = {
-                userId: user.id,
-                trainerProfile: user.trainerProfile,
-                application: {
-                    status: 'pending',
-                    summary,
-                    education,
-                    images: uploadedImages,
-                    links
+                        setUser(prev => ({
+                            ...prev,
+                            badgeApplication: payload,
+                        }));
+                        createAlert({ title: 'Success', text: 'Your application has been submitted successfully!\nYou will be notified when we review your application.' });
+                    } else {
+                        createToast({ message: "Failed to update profile." });
+                    }
+                }
+                catch (err) {
+                    console.error("Image upload failed:", err);
+                } finally {
+                    hideSpinner();
                 }
             }
+        })
 
-            const result = await APIService.verification.apply(payload);
-
-            if (result.success) {
-                createToast({ message: "Trainer profile updated" });
-                setUser(prev => ({
-                    ...prev,
-                    badgeApplication: payload.application,
-                }));
-            } else {
-                createToast({ message: "Failed to update profile." });
-            }
-        }
-        catch (err) {
-            console.error("Image upload failed:", err);
-        } finally {
-            hideSpinner();
-        }
     }
 
     return (

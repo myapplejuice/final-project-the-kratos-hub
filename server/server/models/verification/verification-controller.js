@@ -20,7 +20,7 @@ export default class VerificationController {
     }
 
     static async updateApplication(req, res) {
-         const details = req.body;
+        const details = req.body;
 
         const result = await VerificationDBService.updateApplication(details);
         if (!result.success) return res.status(400).json({ message: result.message });
@@ -35,5 +35,14 @@ export default class VerificationController {
         if (!result.success) return res.status(400).json({ message: result.message });
 
         return res.status(200).json({ success: true, message: result.message });
+    }
+
+    static async getApplications(req, res){
+        const userId = req.params.id;
+        
+        const result = await VerificationDBService.fetchApplicationsByUserId(userId);
+        if (!result.success) return res.status(400).json({ message: result.message });
+
+        return res.status(200).json({ success: true, applications: result.applications });
     }
 }

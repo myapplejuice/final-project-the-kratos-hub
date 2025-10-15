@@ -135,6 +135,13 @@ export default class APIService {
         }
     }
 
+    static verification = {
+        apply: (payload) => APIService.request(`/verification/${APIService.USER_ID}`, 'POST', payload),
+        update: (payload) => APIService.request(`/verification/${APIService.USER_ID}`, 'PUT', payload),
+        delete: (payload) => APIService.request(`/verification/${APIService.USER_ID}`, 'DELETE', payload),
+        fetchApplications: () => APIService.request(`/verification/${APIService.USER_ID}`, 'GET'),
+    }
+
     static notifications = {
         all: () => APIService.request(`/notifications/${APIService.USER_ID}`, 'GET'),
         push: (payload) => APIService.request(`/notifications/${APIService.USER_ID}`, 'POST', payload),

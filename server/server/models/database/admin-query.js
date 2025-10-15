@@ -9,6 +9,7 @@ export function adminQuery() {
                 Id INT IDENTITY(1,1) PRIMARY KEY,
                 UserId UNIQUEIDENTIFIER NOT NULL,
                 Status VARCHAR(20) NOT NULL DEFAULT 'pending',
+                DateOfCreation DATETIME2 NOT NULL,
                 
                 Summary VARCHAR(1000) NOT NULL,
                 Education VARCHAR(1000) NOT NULL,

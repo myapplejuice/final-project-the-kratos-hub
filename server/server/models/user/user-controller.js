@@ -8,6 +8,7 @@ import UserToUserDBService from "../user-to-user/user-to-user-db-service.js";
 import NotificationsDBService from "../notifications/notifications-db-service.js";
 import ChatDBService from "../socket/chat-db-service.js";
 import UserTrainerProfileDBService from "./user-trainer-profile/user-trainer-profile-db-service.js";
+import VerificationDBService from "../verification/verification-db-service.js";
 
 export default class UserController {
     constructor() { }
@@ -51,7 +52,7 @@ export default class UserController {
         }
 
         const [trainerProfile, nutritionLogs, foods, plans,
-            friends, pendingFriends, friendMessageSummaries, notifications
+            friends, pendingFriends, friendMessageSummaries, notifications, badgeApplication
         ] = await Promise.all([
             UserTrainerProfileDBService.fetchTrainerProfile(id),
             NutritionDaysDBService.fetchAllDays(id),
@@ -60,7 +61,8 @@ export default class UserController {
             UserToUserDBService.fetchUserFriendsList(id),
             UserToUserDBService.fetchUserPendingFriendsList(id),
             ChatDBService.fetchFriendMessageSummaries(id),
-            NotificationsDBService.fetchNotifications(id)
+            NotificationsDBService.fetchNotifications(id),
+            VerificationDBService.fetchLatestPendingApplicationByUserId(id),
         ]);
 
         profile.trainerProfile = trainerProfile;
@@ -70,12 +72,13 @@ export default class UserController {
         profile.friends = friends;
         profile.pendingFriends = pendingFriends;
         profile.notifications = notifications;
+        if (badgeApplication) profile.badgeApplication = badgeApplication;
 
         profile.friends = await Promise.all(
             profile.friends.map(async (friend) => {
                 const summary = friendMessageSummaries.find(s => s.friendId === friend.friendId);
                 const trainerProfile = await UserTrainerProfileDBService.fetchTrainerProfile(friend.friendId);
-           
+
                 return {
                     ...friend,
                     trainerProfile,
