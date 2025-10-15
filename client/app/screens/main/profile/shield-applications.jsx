@@ -25,6 +25,7 @@ import FloatingActionButton from '../../../components/screen-comps/floating-acti
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBackHandlerContext } from '../../../common/contexts/back-handler-context';
 import FadeInOut from '../../../components/effects/fade-in-out';
+import SocketService from '../../../common/services/socket-service';
 
 export default function ShieldApplications() {
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert, createOptions } = usePopups();
@@ -41,7 +42,7 @@ export default function ShieldApplications() {
                 const result = await APIService.verification.fetchApplications();
 
                 if (result.success) {
-                    const applications = result.applications;
+                    const applications = result.data.applications;
                     setApplications(applications);
                 }
             } catch (error) {
@@ -61,6 +62,13 @@ export default function ShieldApplications() {
         router.replace(routes.SHIELD_APPLICATION);
     }
 
+    function handleApplicationPress(application) {
+        router.replace({
+            pathname: routes.SHIELD_APPLICATION_REVIEW,
+            params: { application }
+        });
+    }
+
     return (
         <>
 
@@ -76,8 +84,16 @@ export default function ShieldApplications() {
             <AppScroll extraBottom={200} onScrollSetStates={setFabVisible}>
                 {!loading ?
                     applications.length > 0 ?
-                        <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, backgroundColor: colors.background }}>
-
+                        <View>
+                            {applications.map((application, index) => (
+                                <TouchableOpacity onPress={() => handleApplicationPress(application)} key={index} style={[styles.card, { flexDirection: 'row', justifyContent: 'space-between', padding: 15, marginTop: 15 }]}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} >
+                                        <AppText style={styles.cardTitle}>{formatDate(application.dateOfCreation, { format: user.preferences.dateFormat.key })} - </AppText>
+                                        <AppText style={{ fontWeight: 'bold', fontSize: scaleFont(14), color: application.status === 'pending' ? colors.accentYellow : application.status === 'accepted' ? colors.accentGreen : colors.negativeRed }}>{application.status.toUpperCase()}</AppText>
+                                    </View>
+                                    <Image source={Images.arrow} style={{ width: 15, height: 15, tintColor: 'white' }} />
+                                </TouchableOpacity>
+                            ))}
                         </View>
                         :
                         <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, backgroundColor: colors.background }}>

@@ -140,6 +140,7 @@ function Layout() {
                                             <Stack.Screen name="screens/main/profile/shield-of-trust" />
                                             <Stack.Screen name="screens/main/profile/shield-application" />
                                             <Stack.Screen name="screens/main/profile/shield-applications" />
+                                            <Stack.Screen name="screens/main/profile/shield-application-review" />
 
                                             {/* SETTINGS CHILDREN */}
                                             <Stack.Screen name="screens/main/profile/settings/units-change" />

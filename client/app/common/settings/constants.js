@@ -35,6 +35,7 @@ export const routes = {
     SHIELD_OF_TRUST: '/screens/main/profile/shield-of-trust',
     SHIELD_APPLICATION: '/screens/main/profile/shield-application',
     SHIELD_APPLICATIONS: '/screens/main/profile/shield-applications',
+    SHIELD_APPLICATION_REVIEW: '/screens/main/profile/shield-application-review',
 
     /* SETTINGS CHILDREN */
     UNITS_CHANGE: '/screens/main/profile/settings/units-change',

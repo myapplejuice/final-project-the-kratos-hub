@@ -107,6 +107,9 @@ export default class ObjectMapper {
             Biography: 'biography',
             YearsOfExperience: 'yearsOfExperience',
             Images: 'images',
+            Summary: 'summary',
+            Education: 'education',
+            Links: 'links',
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -218,6 +221,10 @@ export default class ObjectMapper {
             trainerStatus: 'TrainerStatus',
             biography: 'Biography',
             isVerified: 'IsVerified',
+            summary: 'Summary',
+            education: 'Education',
+            links: 'Links',
+            
         };
         return map[key] || key;
     }

@@ -26,7 +26,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBackHandlerContext } from '../../../common/contexts/back-handler-context';
 import FadeInOut from '../../../components/effects/fade-in-out';
 
-export default function ShieldApplication() {
+export default function ShieldApplicationReview() {
     const { setLibraryActive } = useContext(LibraryContext);
     const { setCameraActive } = useContext(CameraContext);
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert, createOptions } = usePopups();

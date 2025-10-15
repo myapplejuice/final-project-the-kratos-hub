@@ -1,5 +1,6 @@
 import sql from 'mssql/msnodesqlv8.js';
 import Database from '../database/database.js';
+import ObjectMapper from '../../utils/object-mapper.js';
 
 export default class VerificationDBService {
     static async createApplication(details) {
@@ -107,11 +108,19 @@ export default class VerificationDBService {
             const result = await request.query(query);
 
             if (!result.recordset.length) return null;
-            const row = result.recordset[0];
-            row.Images = JSON.parse(row.Images || '[]');
-            row.Links = JSON.parse(row.Links || '[]');
 
-            return row;
+            const row = result.recordset[0];
+            const app = {};
+
+            for (const key in row) {
+                let value = row[key];
+                if (key === 'Images' || key === 'Links') {
+                    value = value ? JSON.parse(value) : [];
+                }
+                app[ObjectMapper.toCamelCase(key)] = value;
+            }
+
+            return app;
         } catch (err) {
             console.error('fetchApplication error:', err);
             return null;
@@ -123,18 +132,32 @@ export default class VerificationDBService {
             const request = Database.getRequest();
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
 
-            const query = `SELECT * FROM VerificationApplications WHERE UserId = @UserId ORDER BY Id DESC`;
+            const query = `
+                SELECT * FROM VerificationApplications 
+                WHERE UserId = @UserId 
+                ORDER BY Id DESC
+            `;
             const result = await request.query(query);
 
-            if (!result.recordset.length) return [];
+            if (!result.recordset.length) {
+                return { success: false, message: 'No applications found' };
+            }
 
-            return result.recordset.map(row => ({
-                ...row,
-                Images: JSON.parse(row.Images || '[]'),
-                Links: JSON.parse(row.Links || '[]')
-            }));
+            const applications = result.recordset.map(row => {
+                const obj = {};
+                for (const key in row) {
+                    let value = row[key];
+                    if (key === 'Images' || key === 'Links') {
+                        value = value ? JSON.parse(value) : [];
+                    }
+                    obj[ObjectMapper.toCamelCase(key)] = value;
+                }
+                return obj;
+            });
+
+            return { success: true, applications };
         } catch (err) {
-            console.error('fetchApplicationsByUser error:', err);
+            console.error('fetchApplicationsByUserId error:', err);
             return [];
         }
     }
@@ -145,21 +168,27 @@ export default class VerificationDBService {
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
 
             const query = `
-            SELECT TOP 1 *
-            FROM VerificationApplications
-            WHERE UserId = @UserId AND Status = 'pending'
-            ORDER BY Id DESC
-        `;
-
+                SELECT TOP 1 *
+                FROM VerificationApplications
+                WHERE UserId = @UserId AND Status = 'pending'
+                ORDER BY Id DESC
+            `;
             const result = await request.query(query);
 
             if (!result.recordset.length) return null;
 
             const row = result.recordset[0];
-            row.Images = JSON.parse(row.Images || '[]');
-            row.Links = JSON.parse(row.Links || '[]');
+            const app = {};
 
-            return row;
+            for (const key in row) {
+                let value = row[key];
+                if (key === 'Images' || key === 'Links') {
+                    value = value ? JSON.parse(value) : [];
+                }
+                app[ObjectMapper.toCamelCase(key)] = value;
+            }
+
+            return app;
         } catch (err) {
             console.error('fetchLatestPendingApplicationByUserId error:', err);
             return null;
