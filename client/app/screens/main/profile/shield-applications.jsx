@@ -120,7 +120,7 @@ export default function ShieldApplications() {
                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} >
                                                 <AppText style={[styles.cardTitle, { fontSize: scaleFont(16) }]}>{formatDate(application.dateOfCreation, { format: user.preferences.dateFormat.key })}</AppText>
                                                 <AppText style={{ marginStart: 10, textAlign: 'center', fontSize: scaleFont(10), color: 'white', backgroundColor: application.status === 'pending' ? colors.accentYellow : application.status === 'accepted' ? colors.accentGreen : colors.negativeRed, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12 }}>
-                                                    {application.status === 'pending' ? 'Under Review' : application.status === 'accepted' ? 'Accepted' : application.status === 'cancelled' ? 'Cancelled' : 'Rejected'}
+                                                    {application.status === 'pending' ? 'Under Review' : application.status === 'accepted' ? 'Approved' : application.status === 'cancelled' ? 'Cancelled' : 'Denied'}
                                                 </AppText>
                                             </View>
                                             <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12), marginTop: 2 }}>

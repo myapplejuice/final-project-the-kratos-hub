@@ -27,13 +27,13 @@ import { useBackHandlerContext } from '../../../common/contexts/back-handler-con
 import FadeInOut from '../../../components/effects/fade-in-out';
 
 export default function ShieldApplicationReview() {
-    const application = JSON.parse(useLocalSearchParams().application);
     const { setLibraryActive } = useContext(LibraryContext);
     const { setCameraActive } = useContext(CameraContext);
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert, createOptions } = usePopups();
     const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
+    const [application, setApplication] = useState(JSON.parse(useLocalSearchParams().application));
     const [submittionChanged, setSubmittionChanged] = useState(false);
     const [fabVisible, setFabVisible] = useState(true);
     const [selectedImage, setSelectedImage] = useState({});
@@ -197,7 +197,7 @@ export default function ShieldApplicationReview() {
         })
     }
 
-    async function handleSubmittion() {
+    async function handleUpdate() {
         const formFillCount = [
             summary.trim() !== '',
             education.trim() !== '',
@@ -212,42 +212,54 @@ export default function ShieldApplicationReview() {
 
         createDialog({
             title: 'Update Application',
-            text: 'Are you sure you want to update your application?',
+            text: 'Are you sure you want to apply these changes?',
             confirmText: 'Update',
             onConfirm: async () => {
                 try {
-                    showSpinner();
+                    console.log(images)
 
                     const uploadedImages = await Promise.all(
                         images.map(async (image) => {
-                            if (!image.url.startsWith("http")) {
+                            if (image.url?.includes("res.cloudinary.com")) {
+                                return image;
+                            }
+
+                            try {
                                 const url = await APIService.uploadImageToCloudinary({
-                                    uri: image.url,
+                                    uri: image.url || image.uri,
                                     folder: "verification_application_images",
                                     fileName: `user${user.id}_${Date.now()}_${image.fileName}.jpg`,
                                 });
+
                                 return { ...image, url };
+                            } catch (err) {
+                                console.error(`Failed to upload image ${image.fileName}:`, err);
+                                return image;
                             }
-                            return image;
                         })
                     );
 
-                    const links = [instagramLink, facebookLink, tikTokLink, xLink].filter(Boolean);
                     setImages(uploadedImages);
 
                     const payload = {
-                        userId: user.id,
-                        status: 'pending',
+                        applicationId: application.id,
                         summary,
                         education,
                         images: uploadedImages,
-                        links
+                        links: [
+                            instagramLink || '',
+                            facebookLink || '',
+                            tikTokLink || '',
+                            xLink || '',
+                        ]
                     }
 
-                    const result = await APIService.verification.apply(payload);
-                    console.log('result', result)
+                    const result = await APIService.verification.update(payload);
+
                     if (result.success) {
-                        createAlert({ title: 'Success', text: 'Your application has been submitted!\n\nYou will be notified when we review your application.', onPress: () => router.replace(routes.SHIELD_APPLICATIONS) });
+                        createAlert({ title: 'Success', text: 'Application updated with new information, please wait for approval.' });
+                        setApplication({ ...application, summary: payload.summary, education: payload.education, images: payload.images, links: payload.links });
+                        setSubmittionChanged(false);
                     } else {
                         createToast({ message: "Failed to update profile." });
                     }
@@ -289,18 +301,18 @@ export default function ShieldApplicationReview() {
                 labelStyle={{ fontSize: scaleFont(14) }}
                 style={{ width: '100%', height: 50, backgroundColor: colors.accentGreen }}
                 position={{ bottom: insets.bottom + 20, right: 20, left: 20 }}
-                visible={fabVisible && submittionChanged}
-                onPress={handleSubmittion}
+                visible={fabVisible && submittionChanged && application.status === 'pending'}
+                onPress={handleUpdate}
             />
 
             <AppScroll extraBottom={200} onScrollSetStates={setFabVisible}>
                 <View style={{ alignItems: 'center' }}>
                     <Image source={Images.shield} style={{ width: 80, height: 80, tintColor: 'white', marginTop: 25 }} />
                     <AppText style={{ color: 'white', fontSize: scaleFont(22), fontWeight: 'bold', marginTop: 15 }}>Application for Shield of Trust</AppText>
-                    <AppText style={{ color: application.status === 'pending' ? colors.accentYellow : application.status === 'approved' ? colors.accentGreen : colors.negativeRed, fontSize: scaleFont(12), textAlign: 'center', lineHeight: 20, marginTop: 5, marginHorizontal: 15 }}>
+                    <AppText style={{ color: application.status === 'pending' ? colors.accentYellow : application.status === 'accepted' ? colors.accentGreen : colors.negativeRed, fontSize: scaleFont(12), textAlign: 'center', lineHeight: 20, marginTop: 5, marginHorizontal: 15 }}>
                         {application.status === 'pending' ? 'Application is currently under review.' :
-                            application.status === 'approved' ? 'Application has been approved.' :
-                                application.status === 'cancelled' ? 'Application has been cancelled by the user.'
+                            application.status === 'accepted' ? 'Application has been approved.' :
+                                application.status === 'cancelled' ? 'Application cancelled by the user.'
                                     : 'Application has been denied.'
                         }
                     </AppText>

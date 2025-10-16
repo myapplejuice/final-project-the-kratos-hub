@@ -36,7 +36,6 @@ export default class VerificationDBService {
             const request = Database.getRequest();
 
             Database.addInput(request, 'Id', sql.Int, details.applicationId);
-            Database.addInput(request, 'TrainerStatus', sql.VarChar(20), details.trainerProfile?.trainerStatus || 'inactive');
             Database.addInput(request, 'Summary', sql.VarChar(1000), details.summary || '');
             Database.addInput(request, 'Education', sql.VarChar(1000), details.education || '');
             Database.addInput(request, 'Images', sql.VarChar(sql.MAX), JSON.stringify(details.images || []));

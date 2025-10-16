@@ -164,15 +164,22 @@ export default function ShieldApplication() {
 
                     const uploadedImages = await Promise.all(
                         images.map(async (image) => {
-                            if (!image.url.startsWith("http")) {
+                            if (image.url?.includes("res.cloudinary.com")) {
+                                return image;
+                            }
+
+                            try {
                                 const url = await APIService.uploadImageToCloudinary({
-                                    uri: image.url,
+                                    uri: image.url || image.uri,
                                     folder: "verification_application_images",
                                     fileName: `user${user.id}_${Date.now()}_${image.fileName}.jpg`,
                                 });
+
                                 return { ...image, url };
+                            } catch (err) {
+                                console.error(`Failed to upload image ${image.fileName}:`, err);
+                                return image;
                             }
-                            return image;
                         })
                     );
 
