@@ -144,5 +144,9 @@ export const Images_2 = {
     xTwoOutline: require('../../../assets/images/x-2-outline.png'),
     credibilityThree: require('../../../assets/images/credibility-3.png'),
     rocket: require('../../../assets/images/rocket.png'),
- 
+ hide: require('../../../assets/images/hide.png'),
+    hideOutline: require('../../../assets/images/hide-outline.png'),
+    unHide: require('../../../assets/images/unhide.png'),
+    unHideOutline: require('../../../assets/images/unhide-outline.png'),
+    unHideTwo: require('../../../assets/images/unhide-2.png'),
 };

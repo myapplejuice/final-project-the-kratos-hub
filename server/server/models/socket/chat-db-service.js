@@ -41,14 +41,14 @@ export default class ChatDBService {
     }
 
     static async fetchUserMessages(userId, friendId = null, page = 1, pageSize = 20) {
-    try {
-        const request = Database.getRequest();
-        Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
-        // Offset for pages where page=1 => offset 0 (newest page)
-        Database.addInput(request, 'Offset', sql.Int, (page - 1) * pageSize);
-        Database.addInput(request, 'PageSize', sql.Int, pageSize);
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
+            // Offset for pages where page=1 => offset 0 (newest page)
+            Database.addInput(request, 'Offset', sql.Int, (page - 1) * pageSize);
+            Database.addInput(request, 'PageSize', sql.Int, pageSize);
 
-        let query = `
+            let query = `
             SELECT m.Id,
                    m.ChatRoomId,
                    m.SenderId,
@@ -61,68 +61,58 @@ export default class ChatDBService {
             WHERE ucr.UserId = @UserId
         `;
 
-        if (friendId) {
-            Database.addInput(request, 'FriendId', sql.UniqueIdentifier, friendId);
-            query += `
+            if (friendId) {
+                Database.addInput(request, 'FriendId', sql.UniqueIdentifier, friendId);
+                query += `
               AND m.ChatRoomId IN (
                   SELECT ChatRoomId
                   FROM UserChatRooms
                   WHERE UserId = @FriendId
               )
             `;
-        }
+            }
 
-        /* 
-         * IMPORTANT:
-         * ORDER BY DateTimeSent DESC so the OFFSET pages start
-         * from the newest messages.
-         * Then we will reverse the returned rows in JS so that
-         * messages are chronological (oldest->newest) within the returned chunk.
-         */
-        query += `
+            query += `
             ORDER BY m.DateTimeSent DESC
             OFFSET @Offset ROWS
             FETCH NEXT @PageSize ROWS ONLY;
         `;
 
-        const result = await request.query(query);
+            const result = await request.query(query);
 
-        const mapped = result.recordset.map(raw => {
-            const msg = {};
-            for (const key in raw) {
-                msg[ObjectMapper.toCamelCase(key)] = raw[key];
-            }
+            const mapped = result.recordset.map(raw => {
+                const msg = {};
+                for (const key in raw) {
+                    msg[ObjectMapper.toCamelCase(key)] = raw[key];
+                }
 
-            // Parse ExtraInformation JSON
-            if (msg.extraInformation) {
-                try { msg.extraInformation = JSON.parse(msg.extraInformation); }
-                catch { msg.extraInformation = null; }
-            }
+                if (msg.extraInformation) {
+                    try { msg.extraInformation = JSON.parse(msg.extraInformation); }
+                    catch { msg.extraInformation = null; }
+                }
 
-            // Parse SeenBy JSON
-            if (msg.seenBy) {
-                try { msg.seenBy = JSON.parse(msg.seenBy); }
-                catch { msg.seenBy = []; }
-            } else {
-                msg.seenBy = [];
-            }
+                if (msg.seenBy) {
+                    try { msg.seenBy = JSON.parse(msg.seenBy); }
+                    catch { msg.seenBy = []; }
+                } else {
+                    msg.seenBy = [];
+                }
 
-            return msg;
-        });
+                return msg;
+            });
 
-        // reverse so within the page messages go oldest -> newest (so prepend works nicely)
-        const chunk = mapped.reverse();
+            const chunk = mapped.reverse();
 
-        return {
-            messages: chunk,
-            page,
-            hasMore: mapped.length === pageSize
-        };
-    } catch (err) {
-        console.error('fetchUserMessages error:', err);
-        return { messages: [], page, hasMore: false };
+            return {
+                messages: chunk,
+                page,
+                hasMore: mapped.length === pageSize
+            };
+        } catch (err) {
+            console.error('fetchUserMessages error:', err);
+            return { messages: [], page, hasMore: false };
+        }
     }
-}
 
     static async insertMessage(details) {
         try {
@@ -187,11 +177,11 @@ export default class ChatDBService {
     }
 
     static async fetchFriendMessageSummaries(currentUserId) {
-    try {
-        const request = Database.getRequest();
-        Database.addInput(request, 'CurrentUserId', sql.UniqueIdentifier, currentUserId);
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'CurrentUserId', sql.UniqueIdentifier, currentUserId);
 
-        const query = `
+            const query = `
         WITH LastMessages AS (
             SELECT 
                 m.ChatRoomId,
@@ -200,7 +190,8 @@ export default class ChatDBService {
                 m.SenderId,
                 m.DateTimeSent,
                 m.SeenBy,
-                m.ExtraInformation,
+                m.Hidden,           -- <-- BIT column
+                m.Discarded,        -- <-- BIT column
                 ROW_NUMBER() OVER (PARTITION BY m.ChatRoomId ORDER BY m.DateTimeSent DESC) AS rn
             FROM Messages m
         ),
@@ -220,11 +211,13 @@ export default class ChatDBService {
         SELECT 
             ucr.ChatRoomId,
             ucr2.UserId AS FriendId,
+            lm.MessageId AS LastMessageId,
             lm.Message AS LastMessage,
             lm.SenderId AS LastMessageSenderId,
             lm.DateTimeSent AS LastMessageTime,
             ISNULL(uc.UnreadCount, 0) AS UnreadCount,
-            lm.ExtraInformation
+            lm.Hidden,
+            lm.Discarded
         FROM UserChatRooms ucr
         INNER JOIN UserChatRooms ucr2 
             ON ucr.ChatRoomId = ucr2.ChatRoomId AND ucr2.UserId != ucr.UserId
@@ -236,41 +229,35 @@ export default class ChatDBService {
         ORDER BY lm.DateTimeSent DESC
         `;
 
-        const result = await request.query(query);
+            const result = await request.query(query);
 
-        return result.recordset.map(raw => {
-            const mapped = {};
-            for (const key in raw) {
-                mapped[ObjectMapper.toCamelCase(key)] = raw[key];
-            }
-
-            // Parse ExtraInformation JSON if exists
-            if (mapped.extraInformation) {
-                try {
-                    mapped.extraInformation = JSON.parse(mapped.extraInformation);
-                } catch (err) {
-                    mapped.extraInformation = null;
+            return result.recordset.map(raw => {
+                const mapped = {};
+                for (const key in raw) {
+                    mapped[ObjectMapper.toCamelCase(key)] = raw[key];
                 }
-            } else {
-                mapped.extraInformation = null;
-            }
 
-            return mapped;
-        });
-    } catch (err) {
-        console.error('fetchFriendMessageSummaries error:', err);
-        return [];
+                mapped.lastMessageHidden = mapped.hidden === 1;
+                mapped.lastMessageDiscarded = mapped.discarded === 1;
+
+                delete mapped.hidden;
+                delete mapped.discarded;
+
+                return mapped;
+            });
+        } catch (err) {
+            console.error('fetchFriendMessageSummaries error:', err);
+            return [];
+        }
     }
-}
 
+    static async fetchSingleFriendMessageSummary(currentUserId, friendId) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'CurrentUserId', sql.UniqueIdentifier, currentUserId);
+            Database.addInput(request, 'FriendId', sql.UniqueIdentifier, friendId);
 
-static async fetchSingleFriendMessageSummary(currentUserId, friendId) {
-    try {
-        const request = Database.getRequest();
-        Database.addInput(request, 'CurrentUserId', sql.UniqueIdentifier, currentUserId);
-        Database.addInput(request, 'FriendId', sql.UniqueIdentifier, friendId);
-
-        const query = `
+            const query = `
         WITH LastMessages AS (
             SELECT 
                 m.ChatRoomId,
@@ -279,7 +266,8 @@ static async fetchSingleFriendMessageSummary(currentUserId, friendId) {
                 m.SenderId,
                 m.DateTimeSent,
                 m.SeenBy,
-                m.ExtraInformation,
+                m.Hidden,
+                m.Discarded,
                 ROW_NUMBER() OVER (PARTITION BY m.ChatRoomId ORDER BY m.DateTimeSent DESC) AS rn
             FROM Messages m
         ),
@@ -299,11 +287,13 @@ static async fetchSingleFriendMessageSummary(currentUserId, friendId) {
         SELECT 
             ucr.ChatRoomId,
             ucr2.UserId AS FriendId,
+            lm.MessageId AS LastMessageId,
             lm.Message AS LastMessage,
             lm.SenderId AS LastMessageSenderId,
             lm.DateTimeSent AS LastMessageTime,
             ISNULL(uc.UnreadCount, 0) AS UnreadCount,
-            lm.ExtraInformation
+            lm.Hidden,
+            lm.Discarded
         FROM UserChatRooms ucr
         INNER JOIN UserChatRooms ucr2 
             ON ucr.ChatRoomId = ucr2.ChatRoomId AND ucr2.UserId != ucr.UserId
@@ -315,32 +305,28 @@ static async fetchSingleFriendMessageSummary(currentUserId, friendId) {
           AND ucr2.UserId = @FriendId
         `;
 
-        const result = await request.query(query);
+            const result = await request.query(query);
 
-        if (result.recordset.length === 0) return null;
+            if (result.recordset.length === 0) return null;
 
-        const raw = result.recordset[0];
-        const mapped = {};
-        for (const key in raw) {
-            mapped[ObjectMapper.toCamelCase(key)] = raw[key];
-        }
-
-        if (mapped.extraInformation) {
-            try {
-                mapped.extraInformation = JSON.parse(mapped.extraInformation);
-            } catch (err) {
-                mapped.extraInformation = null;
+            const raw = result.recordset[0];
+            const mapped = {};
+            for (const key in raw) {
+                mapped[ObjectMapper.toCamelCase(key)] = raw[key];
             }
-        } else {
-            mapped.extraInformation = null;
-        }
 
-        return mapped;
-    } catch (err) {
-        console.error('fetchSingleFriendMessageSummary error:', err);
-        return null;
+            mapped.lastMessageHidden = mapped.hidden === 1;
+            mapped.lastMessageDiscarded = mapped.discarded === 1;
+
+            delete mapped.hidden;
+            delete mapped.discarded;
+
+            return mapped;
+        } catch (err) {
+            console.error('fetchSingleFriendMessageSummary error:', err);
+            return null;
+        }
     }
-}
 
     static async fetchChatRoomId(userId1, userId2) {
         try {
@@ -361,6 +347,96 @@ static async fetchSingleFriendMessageSummary(currentUserId, friendId) {
         } catch (err) {
             console.error('fetchChatRoomId error:', err);
             return null;
+        }
+    }
+
+    static async handleMessageUpdate(details) {
+        const context = details.context;
+
+        if (context === 'hide')
+            return await ChatDBService.hideMessageById(details.messageId);
+        else if (context === 'unhide')
+            return await ChatDBService.unhideMessageById(details.messageId);
+        else if (context === 'discard')
+            return await ChatDBService.discardMessageById(details.messageId);
+        else if (context === 'restore')
+            return await ChatDBService.reinstateMessageById(details.messageId);
+    }
+
+    static async hideMessageById(messageId) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'Id', sql.Int, messageId);
+
+            const query = `
+                UPDATE Messages
+                SET Hidden = 1
+                WHERE Id = @Id
+            `;
+
+            const result = await request.query(query);
+            if (!result.rowsAffected[0]) return { success: false, message: "Failed to hide message" };
+            return { success: true }
+        } catch (err) {
+            console.error('hideMessageById error:', err);
+        }
+    }
+
+    static async unhideMessageById(messageId) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'Id', sql.Int, messageId);
+
+            const query = `
+                UPDATE Messages
+                SET Hidden = 0
+                WHERE Id = @Id
+            `;
+
+            const result = await request.query(query);
+            if (!result.rowsAffected[0]) return { success: false, message: "Failed to unhide message" };
+            return { success: true }
+        } catch (err) {
+            console.error('unhideMessageById error:', err);
+        }
+    }
+
+    static async discardMessageById(messageId) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'Id', sql.Int, messageId);
+
+            const query = `
+                UPDATE Messages
+                SET Discarded = 1
+                WHERE Id = @Id
+            `;
+
+            const result = await request.query(query);
+            if (!result.rowsAffected[0]) return { success: false, message: "Failed to discard message" };
+            return { success: true }
+        } catch (err) {
+            console.error('discardMessageById error:', err);
+        }
+    }
+
+    static async reinstateMessageById(messageId) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'Id', sql.Int, messageId);
+
+            const query = `
+                UPDATE Messages
+                SET Discarded = 0
+                WHERE Id = @Id
+            `;
+
+            const result = await request.query(query);
+            if (!result.rowsAffected[0]) return { success: false, message: "Failed to reinstate message" };
+            return { success: true }
+
+        } catch (err) {
+            console.error('reinstateMessageById error:', err);
         }
     }
 }

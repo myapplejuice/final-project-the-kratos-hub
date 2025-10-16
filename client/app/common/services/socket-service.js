@@ -60,15 +60,39 @@ export default class SocketService {
 
     static hook(setUser) {
         function handleMessage(msg) {
+            console.log(msg)
             setUser(prev => ({
                 ...prev,
                 friends: prev.friends.map(f =>
                     f.friendId === msg.senderId
-                        ? { ...f, unreadCount: (f.unreadCount || 0) + 1, lastMessage: msg.message, lastMessageTime: msg.dateTimeSent, lastMessageSenderId: msg.senderId }
+                        ? { ...f, unreadCount: (f.unreadCount || 0) + 1, lastMessageId: msg.id, lastMessage: msg.message, lastMessageTime: msg.dateTimeSent, lastMessageSenderId: msg.senderId, lastMessageHidden: false, lastMessageDiscarded: false }
                         : f
                 )
             }));
         };
+
+        function handleMessageUpdate(msg) {
+            setUser(prev => ({
+                ...prev,
+                friends: prev.friends.map(f => {
+                    if (f.friendId !== msg.senderId) return f;
+                    if (msg.messageId !== f.lastMessageId) return f;
+
+                    switch (msg.context) {
+                        case "hide":
+                            return { ...f, lastMessageHidden: true };
+                        case "unhide":
+                            return { ...f, lastMessageHidden: false };
+                        case "discard":
+                            return { ...f, lastMessageDiscarded: true };
+                        case "restore":
+                            return { ...f, lastMessageDiscarded: false };
+                        default:
+                            return f;
+                    }
+                })
+            }));
+        }
 
         function handleNotification(notification) {
             setUser(prev => ({
@@ -126,14 +150,16 @@ export default class SocketService {
             }));
         }
 
-        SocketService.on("new-message", handleMessage);
+        SocketService.on("new-message-notification", handleMessage);
+        SocketService.on("updated-message-visibility", handleMessageUpdate);
         SocketService.on("new-notification", handleNotification);
         SocketService.on("new-friend-request", handleNewFriendRequest);
         SocketService.on("new-friend-response", handleNewFriendResponse);
         SocketService.on("new-friend-status", handleNewFriendStatus);
 
         return () => {
-            SocketService.off("new-message", handleMessage)
+            SocketService.off("new-message-notification", handleMessage)
+            SocketService.off("updated-message-visibility", handleMessageUpdate)
             SocketService.off("new-notification", handleNotification)
             SocketService.off("new-friend-request", handleNewFriendRequest)
             SocketService.off("new-friend-response", handleNewFriendResponse)

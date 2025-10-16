@@ -14,10 +14,27 @@ export default class SocketController {
         const receiverInChat = receiverSockets.some(s => s.userId === payload.receiverId && s.rooms.has(payload.chatRoomId));
 
         if (!receiverInChat) {
-            io.to(payload.receiverId).emit('new-message', payload);
+            io.to(payload.receiverId).emit('new-message-notification', payload);
         }
 
         return savedMessageId;
+    }
+
+    static async updateMessage(payload) {
+        const result = await ChatDBService.handleMessageUpdate(payload);
+
+
+        if (result.success) {
+            const io = Server.getIoSocket();
+            io.to(payload.chatRoomId).emit('updated-message', payload);
+
+            const receiverSockets = Array.from(io.sockets.sockets.values());
+            const receiverInChat = receiverSockets.some(s => s.userId === payload.receiverId && s.rooms.has(payload.chatRoomId));
+
+            if (!receiverInChat) {
+                io.to(payload.receiverId).emit('updated-message-visibility', payload);
+            }
+        }
     }
 
     static emitNotification(userId, payload) {

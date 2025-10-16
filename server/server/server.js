@@ -78,19 +78,19 @@ export default class Server {
                 console.log('Socket disconnected:', socket.id);
             });
 
-            socket.on('send-message', async (payload, callback) => {
+            socket.on('send-message', async (payload) => {
                 console.log('Socket received message:', payload);
-                const savedMessageId = await ChatController.sendMessage(payload);
-                if (callback) callback(savedMessageId);
+                await ChatController.sendMessage(payload);
+            });
+
+            socket.on('update-message', async (payload) => {
+                console.log('Socket update message:', payload);
+                await ChatController.updateMessage(payload);
             });
 
             socket.on('mark-seen', async ({ userId, messageIds }) => {
-                try {
-                    await ChatDBService.markMessagesSeen([userId], messageIds);
-                    console.log(`User ${userId} marked messages ${messageIds.join(', ')} as seen`);
-                } catch (err) {
-                    console.error('Error marking messages as seen:', err);
-                }
+                await ChatDBService.markMessagesSeen([userId], messageIds);
+                console.log(`User ${userId} marked messages ${messageIds.join(', ')} as seen`);
             });
         });
     }

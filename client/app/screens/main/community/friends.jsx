@@ -131,7 +131,7 @@ export default function Friends() {
                             {visibleList.map((friend, i) => {
                                 const friendship = user.friends.find(f => f.friendId === friend.id) || {};
                                 const sender = friendship.lastMessageSenderId === user.id ? 'You: ' : '';
-                                const displayMessage = friendship.lastMessage || 'No messages yet';
+                                const displayMessage = friendship.lastMessageHidden ? 'Hidden message' : friendship.lastMessage || 'No messages yet';
 
                                 const messageTimeDetails = new Date(friendship.lastMessageTime);
                                 const displayTime = (() => {

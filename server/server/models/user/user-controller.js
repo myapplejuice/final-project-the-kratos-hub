@@ -80,9 +80,12 @@ export default class UserController {
                 return {
                     ...friend,
                     trainerProfile,
+                    lastMessageId: summary?.lastMessageId || null,
                     lastMessageSenderId: summary?.lastMessageSenderId || null,
                     lastMessage: summary?.lastMessage || null,
                     lastMessageTime: summary?.lastMessageTime || null,
+                    lastMessageHidden: summary?.lastMessageHidden || false,
+                    lastMessageDiscarded: summary?.lastMessageDiscarded || false,
                     unreadCount: summary?.unreadCount || 0,
                     chatRoomId: summary?.chatRoomId
                 };

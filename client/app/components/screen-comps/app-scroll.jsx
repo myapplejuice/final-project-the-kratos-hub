@@ -50,7 +50,6 @@ export default function AppScroll({
 
     useImperativeHandle(ref, () => ({
         scrollToBottom: () => {
-            console.log('gets to bottom here')
             if (scrollRef.current) {
                 scrollRef.current.scrollToEnd({ animated: true });
             }

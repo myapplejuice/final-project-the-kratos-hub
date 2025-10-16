@@ -25,6 +25,7 @@ import AnimatedButton from "../../../components/screen-comps/animated-button";
 import ImageCapture from "../../../components/screen-comps/image-capture";
 import { LibraryContext } from "../../../common/contexts/library-context";
 import { CameraContext } from "../../../common/contexts/camera-context";
+import { colorWithOpacity } from "../../../common/utils/random-functions";
 
 export default function Chat() {
     const { createOptions, createDialog, createToast, showSpinner, hideSpinner } = usePopups();
@@ -84,7 +85,60 @@ export default function Chat() {
     }, [messages]);
 
     useEffect(() => {
+        const profile = additionalContexts.chattingFriendProfile;
+        if (!profile || !user?.id) return;
+
+        const friendId = profile.id;
+        const friendData = user.friends.find(f => f.friendId === friendId);
+        if (!friendData) return;
+
+        const chatRoomId = friendData.chatRoomId;
+        setRoomId(chatRoomId);
+
+        function handleNewMessage(msg) {
+            if (msg.chatRoomId !== chatRoomId)
+                return;
+
+            if (!msg.seenBy.includes(user.id))
+                msg.seenBy.push(user.id);
+
+            setMessages(prev => [...prev, msg]);
+
+            if (msg.senderId !== user.id) {
+                const isScrolledUp = scrollRef.current?.isScrolledToBottom(1000);
+                if (isScrolledUp) {
+                    setNewMessageText(true);
+                    setTimeout(() => setNewMessageText(false), 2000);
+                    setFabVisible(true);
+                }
+            }
+        };
+
+        function handleUpdatedMessage(payload) {
+            const { context, messageId } = payload;
+            setMessages(prev =>
+                prev.map(m => {
+                    if (m.id !== messageId) return m;
+
+                    switch (context) {
+                        case "hide": return { ...m, hidden: true };
+                        case "unhide": return { ...m, hidden: false };
+                        case "discard": return { ...m, discarded: true };
+                        case "restore": return { ...m, discarded: false };
+                        default: return m;
+                    }
+                })
+            );
+        };
+
+        SocketService.joinRoom(chatRoomId);
+        SocketService.on("new-message", handleNewMessage);
+        SocketService.on("updated-message", handleUpdatedMessage);
+
+        // messages and keyboard funcs
+
         async function fetchMessages() {
+            showSpinner();
             const friendId = additionalContexts.chattingFriendProfile.id;
             const payload = {
                 userId: user.id,
@@ -99,17 +153,19 @@ export default function Chat() {
             } catch (error) {
                 console.log(error);
             } finally {
+                hideSpinner();
             }
         }
 
-        Animated.loop(
+        const rotationAnimation = Animated.loop(
             Animated.timing(rotate, {
                 toValue: 1,
                 duration: 800,
                 easing: Easing.linear,
                 useNativeDriver: true,
             })
-        ).start();
+        );
+        rotationAnimation.start();
 
         const showListener = Keyboard.addListener(
             Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
@@ -126,69 +182,34 @@ export default function Chat() {
             }
         );
 
-
         fetchMessages();
-        return () => {
-            showListener.remove();
-            hideListener.remove();
-        };
-    }, []);
-
-    useEffect(() => {
-        const profile = additionalContexts.chattingFriendProfile;
-        if (!profile || !user?.id) return;
-
-        const friendId = profile.id;
-        const chatRoomId = user.friends.find(f => f.friendId === friendId).chatRoomId;
-        setRoomId(chatRoomId);
-
-        SocketService.joinRoom(chatRoomId);
-        SocketService.on("new-message", (msg) => {
-            if (msg.chatRoomId === chatRoomId) {
-                if (!msg.seenBy.includes(user.id))
-                    msg.seenBy.push(user.id);
-                setMessages((prev) => [...prev, msg]);
-
-                if (msg.senderId !== user.id) {
-                    const isScrolledUp = scrollRef.current?.isScrolledToBottom(1000);
-                    if (isScrolledUp) {
-                        setNewMessageText(true);
-                        setTimeout(() => setNewMessageText(false), 2000);
-                        setFabVisible(true);
-                    }
-                }
-            }
-        });
-
         return () => {
             const messageIds = messagesRef.current.map(m => m.id);
             if (messageIds.length > 0) {
-                SocketService.emit("mark-seen", {
-                    userId: user.id,
-                    messageIds,
-                });
+                SocketService.emit("mark-seen", { userId: user.id, messageIds });
             }
 
             SocketService.emit("leave-room", chatRoomId);
+            SocketService.off("new-message", handleNewMessage);
+            SocketService.off("updated-message", handleUpdatedMessage);
+            showListener.remove();
+            hideListener.remove();
+            rotationAnimation.stop();
 
             const lastMessageDetails = messagesRef.current[messagesRef.current.length - 1];
-            if (!lastMessageDetails) return;
-
-            const lastMessage = lastMessageDetails.message;
-            const lastMessageTime = lastMessageDetails.dateTimeSent;
-            const lastMessageSenderId = lastMessageDetails.senderId;
-
-            setUser(prev => ({
-                ...prev,
-                friends: prev.friends.map(f =>
-                    f.chatRoomId === chatRoomId
-                        ? { ...f, lastMessage, lastMessageTime, unreadCount: 0, lastMessageSenderId }
-                        : f
-                )
-            }));
+            if (lastMessageDetails) {
+                const { message: lastMessage, dateTimeSent: lastMessageTime, senderId: lastMessageSenderId } = lastMessageDetails;
+                setUser(prev => ({
+                    ...prev,
+                    friends: prev.friends.map(f =>
+                        f.chatRoomId === chatRoomId
+                            ? { ...f, lastMessage, lastMessageTime, unreadCount: 0, lastMessageSenderId }
+                            : f
+                    )
+                }));
+            }
         };
-    }, [additionalContexts.chattingFriendProfile]);
-
+    }, []);
 
     async function fetchMoreMessages() {
         if (morePages.current === false) return;
@@ -230,6 +251,18 @@ export default function Chat() {
         }
     }
 
+    function handleMessageUpdate(messageId, context) {
+        const payload = {
+            senderId: user.id,
+            receiverId: additionalContexts.chattingFriendProfile.id,
+            chatRoomId: roomId,
+            messageId,
+            context
+        }
+
+        SocketService.emit("update-message", payload);
+    }
+
     function handleMessageSend(extraInformation = {}) {
         if (Object.keys(extraInformation).length === 0) {
             if (!message.trim()) return;
@@ -251,10 +284,8 @@ export default function Chat() {
         };
 
         setMessage('');
-        SocketService.emit("send-message", payload, (newMessageId) => {
-            payload.id = newMessageId;
-            setMessages(prev => [...prev, payload]);
-        });
+        SocketService.emit("send-message", payload);
+
         setTimeout(() => {
             scrollRef.current?.scrollToBottom({ animated: false });
         }, 0);
@@ -418,7 +449,7 @@ export default function Chat() {
                         alignItems: 'center',
                         zIndex: 10000
                     }}>
-                    <Image source={{ uri: selectedImage }} style={{ width: 500, height: 500, }}  resizeMode="contain"/>
+                    <Image source={{ uri: selectedImage }} style={{ width: 500, height: 500, }} resizeMode="contain" />
                 </TouchableOpacity>
             }
 
@@ -708,6 +739,23 @@ export default function Chat() {
                                                             resizeMode="cover"
                                                         />
 
+                                                        {message.hidden && message.senderId === user.id &&
+                                                            <View
+                                                                style={{
+                                                                    position: 'absolute',
+                                                                    bottom: 0,
+                                                                    right: 0,
+                                                                    left: 0,
+                                                                    top: 0,
+                                                                    paddingVertical: 15,
+                                                                    backgroundColor: 'rgba(0,0,0,0.9)',
+                                                                    justifyContent: 'center',
+                                                                    alignItems: 'center'
+                                                                }}
+                                                            >
+                                                                <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(16) }}>Message Hidden</AppText>
+                                                            </View>
+                                                        }
                                                         <TouchableOpacity
                                                             onPress={() => downloadAsset(message.extraInformation.imageUrl, `The_Kratos_Hub_Chat_${roomId}_image_${Date.now()}.jpg`)}
                                                             style={{
@@ -728,6 +776,29 @@ export default function Chat() {
                                                                 style={{ width: 18, height: 18, tintColor: 'white', transform: [{ rotate: '90deg' }], marginTop: 3 }}
                                                             />
                                                         </TouchableOpacity>
+
+                                                        {message.senderId === user.id &&
+                                                            <>
+                                                                <TouchableOpacity
+                                                                    onPress={() => handleMessageUpdate(message.id, message.hidden ? 'unhide' : 'hide')}
+                                                                    style={{
+                                                                        position: 'absolute',
+                                                                        top: 15,
+                                                                        right: 10,
+                                                                        padding: 7,
+                                                                        borderRadius: 10,
+                                                                        backgroundColor: colorWithOpacity(colors.cardBackground, 16),
+                                                                        justifyContent: 'center',
+                                                                        alignItems: 'center'
+                                                                    }}
+                                                                >
+                                                                    <Image
+                                                                        source={message.hidden ? Images.unHide : Images.hide}
+                                                                        style={{ width: 18, height: 18, tintColor: 'white' }}
+                                                                    />
+                                                                </TouchableOpacity>
+                                                            </>
+                                                        }
                                                     </TouchableOpacity>
 
                                                 ) :

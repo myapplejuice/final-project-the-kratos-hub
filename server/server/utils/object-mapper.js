@@ -110,6 +110,14 @@ export default class ObjectMapper {
             Summary: 'summary',
             Education: 'education',
             Links: 'links',
+            Hidden: 'hidden',
+            Discarded: 'discarded',
+            LastMessageId: 'lastMessageId',
+            LastMessageSenderId: 'lastMessageSenderId',
+            LastMessage: 'lastMessage',
+            LastMessageTime: 'lastMessageTime',
+            LastMessageHidden: 'lastMessageHidden',
+            LastMessageDiscarded: 'lastMessageDiscarded'
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -224,6 +232,14 @@ export default class ObjectMapper {
             summary: 'Summary',
             education: 'Education',
             links: 'Links',
+            hidden: 'Hidden',
+            discarded: 'Discarded',
+            lastMessageHidden: 'LastMessageHidden',
+            lastMessageDiscarded: 'LastMessageDiscarded',
+            lastMessageId: 'LastMessageId',
+            lastMessageSenderId: 'LastMessageSenderId',
+            lastMessageTime: 'LastMessageTime',
+            lastMessage: 'LastMessage',
             
         };
         return map[key] || key;
