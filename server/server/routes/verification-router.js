@@ -15,7 +15,7 @@ export default class VerificationRouter {
 
         this.verificationRouter.post("/:id", tokenAuthorization, userAuthorization, asyncHandler(VerificationController.createApplication));
         this.verificationRouter.put("/:id", tokenAuthorization, userAuthorization, asyncHandler(VerificationController.updateApplication));
-        this.verificationRouter.delete("/:id", tokenAuthorization, userAuthorization, asyncHandler(VerificationController.deleteApplication));
+        this.verificationRouter.delete("/:id", tokenAuthorization, userAuthorization, asyncHandler(VerificationController.cancelApplication));
         this.verificationRouter.get("/:id", tokenAuthorization, userAuthorization, asyncHandler(VerificationController.getApplications));
 
         return this.verificationRouter;

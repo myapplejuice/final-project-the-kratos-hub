@@ -83,6 +83,31 @@ export default class VerificationDBService {
         }
     }
 
+    static async cancelApplication(applicationId) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'Id', sql.Int, applicationId);
+
+            const updateQuery = `
+            UPDATE VerificationApplications
+            SET Status = 'cancelled'
+            WHERE Id = @Id
+        `;
+
+            const result = await request.query(updateQuery);
+
+            if (!result.rowsAffected[0]) {
+                return { success: false, message: 'Application not found or already cancelled' };
+            }
+
+            return { success: true, message: 'Application cancelled successfully' };
+        } catch (err) {
+            console.error('cancelApplication error:', err);
+            return { success: false, message: 'Failed to cancel application' };
+        }
+    }
+
+
     static async deleteApplication(applicationId) {
         try {
             const request = Database.getRequest();

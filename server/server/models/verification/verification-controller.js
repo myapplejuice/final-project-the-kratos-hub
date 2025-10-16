@@ -28,10 +28,10 @@ export default class VerificationController {
         return res.status(200).json({ success: true, message: result.message, applicationId: result.applicationId });
     }
 
-    static async deleteApplication(req, res) {
+    static async cancelApplication(req, res) {
         const { applicationId } = req.body;
 
-        const result = await VerificationDBService.deleteApplication(applicationId);
+        const result = await VerificationDBService.cancelApplication(applicationId);
         if (!result.success) return res.status(400).json({ message: result.message });
 
         return res.status(200).json({ success: true, message: result.message });

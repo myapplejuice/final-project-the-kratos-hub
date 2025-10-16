@@ -79,6 +79,24 @@ export default function ShieldApplicationReview() {
     async function handleSocialMediaLink(platform) {
         platform = platform.trim();
 
+        if (application.status !== 'pending') {
+            switch (platform) {
+                case 'Instagram':
+                    Linking.openURL(instagramLink);
+                    break;
+                case 'Facebook':
+                    Linking.openURL(facebookLink);
+                    break;
+                case 'TikTok':
+                    Linking.openURL(tikTokLink);
+                    break;
+                case 'X':
+                    Linking.openURL(xLink);
+                    break;
+            }
+            return;
+        }
+
         const platformMap = {
             Instagram: {
                 getUrl: handle => `https://www.instagram.com/${handle}`,
@@ -234,14 +252,16 @@ export default function ShieldApplicationReview() {
                 <TouchableOpacity onPress={() => { setImagePreviewVisible(false), setSelectedImage({}), setFabVisible(true) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(30), marginBottom: 15 }}>Tap anywhere to dismiss</AppText>
                     <Image source={{ uri: selectedImage.url }} style={{ width: 500, height: 500, alignSelf: 'center' }} resizeMode='contain' />
-                    <AnimatedButton
-                        title={'Delete Photo'}
-                        onPress={() => { setImagePreviewVisible(false), setSelectedImage({}), setImages(images.filter(i => i.url !== selectedImage.url)), setFabVisible(true) }}
-                        style={{ backgroundColor: colors.negativeRed, padding: 15, borderRadius: 30, width: '90%', marginTop: 15 }}
-                        textStyle={{ fontSize: scaleFont(15) }}
-                        leftImage={Images.trash}
-                        leftImageStyle={{ width: 20, height: 20, marginEnd: 5 }}
-                    />
+                    {application.status === 'pending' &&
+                        <AnimatedButton
+                            title={'Delete Photo'}
+                            onPress={() => { setImagePreviewVisible(false), setSelectedImage({}), setImages(images.filter(i => i.url !== selectedImage.url)), setFabVisible(true) }}
+                            style={{ backgroundColor: colors.negativeRed, padding: 15, borderRadius: 30, width: '90%', marginTop: 15 }}
+                            textStyle={{ fontSize: scaleFont(15) }}
+                            leftImage={Images.trash}
+                            leftImageStyle={{ width: 20, height: 20, marginEnd: 5 }}
+                        />
+                    }
                 </TouchableOpacity>
             </FadeInOut>
 
@@ -260,8 +280,12 @@ export default function ShieldApplicationReview() {
                 <View style={{ alignItems: 'center' }}>
                     <Image source={Images.shield} style={{ width: 80, height: 80, tintColor: 'white', marginTop: 25 }} />
                     <AppText style={{ color: 'white', fontSize: scaleFont(22), fontWeight: 'bold', marginTop: 15 }}>Application for Shield of Trust</AppText>
-                    <AppText style={{ color: colors.accentYellow, fontSize: scaleFont(12), textAlign: 'center', lineHeight: 20, marginTop: 5, marginHorizontal: 15 }}>
-                        {application.status === 'pending' && 'Your application is currently under review.'}
+                    <AppText style={{ color: application.status === 'pending' ? colors.accentYellow : application.status === 'approved' ? colors.accentGreen : colors.negativeRed, fontSize: scaleFont(12), textAlign: 'center', lineHeight: 20, marginTop: 5, marginHorizontal: 15 }}>
+                        {application.status === 'pending' ? 'Application is currently under review.' :
+                            application.status === 'approved' ? 'Application has been approved.' :
+                                application.status === 'cancelled' ? 'Application has been cancelled by user.'
+                                    : 'Application has been denied.'
+                        }
                     </AppText>
                 </View>
 
@@ -269,40 +293,36 @@ export default function ShieldApplicationReview() {
 
                 <View style={styles.section}>
                     <AppText style={styles.sectionTitle}>Summary</AppText>
-                    <AppText style={styles.inputHint}>
-                        Write about your experience as a professional trainer
-                    </AppText>
                     <AppTextInput
                         multiline
+                        editable={application.status === 'pending'}
                         value={summary}
                         onChangeText={setSummary}
-                        style={styles.bioInput}
+                        style={application.status === 'pending' ? styles.bioInput : styles.bioInputDisabled}
                         placeholder='Experience, specialties, achievements, and what makes you a great trainer...'
                         placeholderTextColor={colors.mutedText}
                         textAlignVertical='top'
                         textAlign='left'
                         fontSize={14}
-                        color='white'
+                        color={application.status === 'pending' ? 'white' : colors.mutedText}
                         fontWeight='normal'
                     />
                 </View>
 
                 <View style={styles.section}>
                     <AppText style={styles.sectionTitle}>Education</AppText>
-                    <AppText style={styles.inputHint}>
-                        Write about your educational background
-                    </AppText>
                     <AppTextInput
+                        editable={application.status === 'pending'}
                         multiline
                         value={education}
                         onChangeText={setEducation}
-                        style={styles.bioInput}
+                        style={application.status === 'pending' ? styles.bioInput : styles.bioInputDisabled}
                         placeholder='College, university, or other educational or academic institution...'
                         placeholderTextColor={colors.mutedText}
                         textAlignVertical='top'
                         textAlign='left'
                         fontSize={14}
-                        color='white'
+                        color={application.status === 'pending' ? 'white' : colors.mutedText}
                         fontWeight='normal'
                     />
                 </View>
@@ -310,9 +330,6 @@ export default function ShieldApplicationReview() {
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <AppText style={styles.sectionTitle}>Images</AppText>
-                        <AppText style={styles.sectionSubtitle}>
-                            Your work, certificates and achievements to support your application
-                        </AppText>
                     </View>
 
                     {images.length > 0 && (
@@ -332,41 +349,40 @@ export default function ShieldApplicationReview() {
                         </>
                     )}
 
-                    <TouchableOpacity
-                        onPress={() => {
-                            Keyboard.dismiss();
+                    {application.status === 'pending' &&
+                        <TouchableOpacity
+                            onPress={() => {
+                                Keyboard.dismiss();
 
-                            createSelector({
-                                title: "Profile Picture",
-                                text: "Do you want to take a photo using camera or upload an image?",
-                                optionAText: "Take a Photo",
-                                optionBText: "Upload Image",
-                                cancelText: "Cancel",
-                                onPressA: async () => setCameraActive(true),
-                                onPressB: async () => setLibraryActive(true)
-                            });
-                        }}
-                        style={styles.uploadButton}
-                    >
-                        <View style={styles.uploadContent}>
-                            <Image
-                                source={Images.arrow}
-                                style={[styles.uploadIcon, { transform: [{ rotate: '-90deg' }], width: 25, height: 25, marginBottom: 0, marginBottom: 10 }]}
-                            />
-                            <AppText style={styles.uploadText}>Upload Image</AppText>
-                            <AppText style={styles.uploadHint}>
-                                PNG, JPG, JPEG up to 10MB
-                            </AppText>
-                        </View>
-                    </TouchableOpacity>
+                                createSelector({
+                                    title: "Profile Picture",
+                                    text: "Do you want to take a photo using camera or upload an image?",
+                                    optionAText: "Take a Photo",
+                                    optionBText: "Upload Image",
+                                    cancelText: "Cancel",
+                                    onPressA: async () => setCameraActive(true),
+                                    onPressB: async () => setLibraryActive(true)
+                                });
+                            }}
+                            style={styles.uploadButton}
+                        >
+                            <View style={styles.uploadContent}>
+                                <Image
+                                    source={Images.arrow}
+                                    style={[styles.uploadIcon, { transform: [{ rotate: '-90deg' }], width: 25, height: 25, marginBottom: 0, marginBottom: 10 }]}
+                                />
+                                <AppText style={styles.uploadText}>Upload Image</AppText>
+                                <AppText style={styles.uploadHint}>
+                                    PNG, JPG, JPEG up to 10MB
+                                </AppText>
+                            </View>
+                        </TouchableOpacity>
+                    }
                 </View>
 
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <AppText style={styles.sectionTitle}>Social Media</AppText>
-                        <AppText style={styles.sectionSubtitle}>
-                            Link your social media profiles if any...
-                        </AppText>
                     </View>
 
 
@@ -547,7 +563,15 @@ const styles = StyleSheet.create({
         padding: 16,
         fontSize: scaleFont(14),
         fontWeight: '500',
-        height: 140,
+        minWidth: '100%',
+        minHeight: 150,
+        textAlignVertical: 'top',
+    },
+    bioInputDisabled: {
+        marginTop: 8,
+        color: colors.mutedText,
+        fontSize: scaleFont(14),
+        fontWeight: 'bold',
         minWidth: '100%',
         textAlignVertical: 'top',
     },

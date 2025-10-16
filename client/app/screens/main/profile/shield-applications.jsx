@@ -26,12 +26,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBackHandlerContext } from '../../../common/contexts/back-handler-context';
 import FadeInOut from '../../../components/effects/fade-in-out';
 import SocketService from '../../../common/services/socket-service';
+import ExpandInOut from '../../../components/effects/expand-in-out';
+import Invert from '../../../components/effects/invert';
 
 export default function ShieldApplications() {
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert, createOptions } = usePopups();
     const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
+    const [openApplication, setOpenApplication] = useState(null);
     const [loading, setLoading] = useState(true);
     const [fabVisible, setFabVisible] = useState(true);
     const [applications, setApplications] = useState([]);
@@ -69,6 +72,30 @@ export default function ShieldApplications() {
         });
     }
 
+    async function handleApplicationCancelation(applicationId) {
+        createDialog({
+            title: 'Cancel Application',
+            text: 'Are you sure you want to cancel this application?',
+            confirmText: 'Cancel',
+            confirmButtonStyle: { backgroundColor: colors.negativeRed, borderColor: colors.negativeRed },
+            onConfirm: async () => {
+                try {
+                    showSpinner();
+
+                    const result = await APIService.verification.cancel({ applicationId });
+
+                    if (result.success) {
+                        setApplications(prev => prev.map(app => app.id === applicationId ? { ...app, status: 'cancelled' } : app));
+                    }
+                } catch (error) {
+                    console.log(error);
+                } finally {
+                    hideSpinner();
+                }
+            }
+        });
+    }
+
     return (
         <>
 
@@ -86,12 +113,38 @@ export default function ShieldApplications() {
                     applications.length > 0 ?
                         <View>
                             {applications.map((application, index) => (
-                                <TouchableOpacity onPress={() => handleApplicationPress(application)} key={index} style={[styles.card, { flexDirection: 'row', justifyContent: 'space-between', padding: 15, marginTop: 15 }]}>
-                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} >
-                                        <AppText style={styles.cardTitle}>{formatDate(application.dateOfCreation, { format: user.preferences.dateFormat.key })} - </AppText>
-                                        <AppText style={{ fontWeight: 'bold', fontSize: scaleFont(14), color: application.status === 'pending' ? colors.accentYellow : application.status === 'accepted' ? colors.accentGreen : colors.negativeRed }}>{application.status.toUpperCase()}</AppText>
+                                <TouchableOpacity onPress={() => setOpenApplication(openApplication === application.id ? null : application.id)} key={index} style={[styles.card, { marginTop: 15 }]}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} >
+                                            <AppText style={styles.cardTitle}>{formatDate(application.dateOfCreation, { format: user.preferences.dateFormat.key })} - </AppText>
+                                            <AppText style={{ fontWeight: 'bold', fontSize: scaleFont(14), color: application.status === 'pending' ? colors.accentYellow : application.status === 'accepted' ? colors.accentGreen : colors.negativeRed }}>
+                                                {application.status === 'pending' ? 'Pending' : application.status === 'accepted' ? 'Accepted' : application.status === 'cancelled' ? 'Cancelled' : 'Rejected'}
+                                            </AppText>
+                                        </View>
+                                        <Invert axis='horizontal' inverted={openApplication === application.id}>
+                                            <Image source={Images.arrow} style={{ width: 15, height: 18, tintColor: 'white', transform: [{ rotate: '90deg' }] }} />
+                                        </Invert>
                                     </View>
-                                    <Image source={Images.arrow} style={{ width: 15, height: 15, tintColor: 'white' }} />
+                                    <ExpandInOut removeWhenHidden visible={openApplication === application.id} style={{}}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 25 }}>
+                                            {application.status === 'pending' &&
+                                                <AnimatedButton
+                                                    onPress={() => handleApplicationCancelation(application.id)}
+                                                    leftImage={Images.xMark}
+                                                    title={"Cancel"} textStyle={{ fontSize: scaleFont(14) }}
+                                                    leftImageStyle={{ textColor: colors.negativeRed, marginEnd: 5 }}
+                                                    style={{ width: '48%', backgroundColor: colors.negativeRed, padding: 15, borderRadius: 20 }}
+                                                />
+                                            }
+                                            <AnimatedButton
+                                                onPress={() => handleApplicationPress(application)}
+                                                rightImage={Images.arrow} title={"View App"}
+                                                textStyle={{ fontSize: scaleFont(14) }}
+                                                rightImageStyle={{ textColor: colors.negativeRed, marginStart: 5 }}
+                                                style={{ width: application.status === 'pending' ? '48%' : '100%', backgroundColor: colors.accentGreen, padding: 15, borderRadius: 20 }}
+                                            />
+                                        </View>
+                                    </ExpandInOut>
                                 </TouchableOpacity>
                             ))}
                         </View>

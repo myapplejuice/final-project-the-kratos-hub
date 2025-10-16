@@ -530,8 +530,8 @@ const styles = StyleSheet.create({
         padding: 16,
         fontSize: scaleFont(14),
         fontWeight: '500',
-        height: 140,
-        minWidth: '100%',
+        minHeight: 150,
+        width: '100%',
         textAlignVertical: 'top',
     },
     inputHint: {
