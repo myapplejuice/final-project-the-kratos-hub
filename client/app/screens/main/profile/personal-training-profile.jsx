@@ -61,7 +61,7 @@ export default function PersonalTrainingProfile() {
     function handleYearsOfExperience() {
         createOptions({
             title: "Experience",
-            options: ["New Trainer", "1 Year", "2 Years", "3+ Years", "6+ Years", "10+ Years"],
+            options: ["New Trainer", "1 Year", "2 Years", "3+ Years", "6+ Years", "10+ Years", "15+ Years", "25+ Years"],
             current: yearsOfExperience,
             onConfirm: (selected) => {
                 if (selected) {
@@ -81,6 +81,23 @@ export default function PersonalTrainingProfile() {
     }
 
     async function handleNewUpdates() {
+        const newTrainerStatus = trainerStatus ? 'active' : 'inactive';
+        if (newTrainerStatus !== user.trainerProfile.trainerStatus) {
+            const text = trainerStatus ?
+                `You turned your trainer status to (active).\n\nThis will show other users you are a trainer, Are you sure you want to continue?` :
+                `You turned your trainer status to (inactive).\n\nThis will hide your trainer mark from other users, Are you sure you want to continue?`;
+
+            createDialog({
+                title: "Trainer Status Changed",
+                text,
+                onConfirm: confirmChanges
+            })
+        } else {
+            confirmChanges();
+        }
+    }
+
+    async function confirmChanges() {
         try {
             showSpinner();
 
@@ -239,7 +256,7 @@ export default function PersonalTrainingProfile() {
                     <View style={styles.section}>
                         <View style={styles.sectionHeader}>
                             <AppText style={styles.sectionTitle}>Certificates & Awards</AppText>
-                            <AppText style={styles.sectionSubtitle}>
+                            <AppText style={styles.inputHint}>
                                 Showcase your qualifications and achievements
                             </AppText>
                         </View>

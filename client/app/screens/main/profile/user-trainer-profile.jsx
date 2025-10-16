@@ -10,6 +10,7 @@ import AppScroll from '../../../components/screen-comps/app-scroll'
 import ImageCapture from '../../../components/screen-comps/image-capture';
 import AppTextInput from '../../../components/screen-comps/app-text-input';
 import FadeInOut from '../../../components/effects/fade-in-out';
+import Divider from '../../../components/screen-comps/divider';
 
 export default function UserTrainerProfile() {
     const [selectedImage, setSelectedImage] = useState({});
@@ -33,65 +34,40 @@ export default function UserTrainerProfile() {
             <View style={styles.main}>
                 <ImageCapture onConfirm={async (image) => handleNewImage(image)} />
                 <AppScroll extraBottom={300}>
-                    {/* Trainer Status Card */}
-                    <View style={styles.card}>
-                        <View style={styles.cardHeader}>
-                            <AppText style={styles.cardTitle}>Trainer Status</AppText>
-                            <View style={styles.toggleContainer} >
-                                <View style={[
-                                    styles.toggleOption,
-                                    styles.toggleLeft,
-                                    trainerStatus && styles.toggleActive
-                                ]}>
-                                    <AppText style={[
-                                        styles.toggleText,
-                                        trainerStatus && styles.toggleTextActive
-                                    ]}>On</AppText>
-                                </View>
-                                <View style={[
-                                    styles.toggleOption,
-                                    styles.toggleRight,
-                                    !trainerStatus && styles.toggleActive
-                                ]}>
-                                    <AppText style={[
-                                        styles.toggleText,
-                                        !trainerStatus && styles.toggleTextActive
-                                    ]}>Off</AppText>
-                                </View>
+                    <View style={{ alignItems: 'center', marginBottom: 15 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 15 }}>
+                            <View style={{ width: 70, height: 70, borderRadius: 35, backgroundColor: colors.main, justifyContent: 'center', alignItems: 'center' }}>
+                                <Image source={Images.personalTrainer} style={{ width: 45, height: 45, tintColor: 'white' }} />
                             </View>
+                            {profile.isVerified &&
+                                <View style={{ width: 70, height: 70, borderRadius: 35, backgroundColor: colors.main, justifyContent: 'center', alignItems: 'center', marginStart: 25 }}>
+                                    <Image source={Images.shield} style={{ width: 45, height: 45, tintColor: 'white' }} />
+                                </View>
+                            }
                         </View>
+                        {profile.isVerified &&
+                            <AppText style={{ color: 'white', fontSize: scaleFont(12), fontWeight: 'bold' }}>This trainer is verified and trusted by the community</AppText>
+                        }
                     </View>
+                    
+                    <Divider orientation="horizontal"/>
 
-                    {/* Professional Overview Section */}
                     <View style={styles.section}>
                         <AppText style={styles.sectionTitle}>Professional Overview</AppText>
                         <AppText style={styles.inputHint}>
-                            This will be visible to potential clients
+                            About this trainer
                         </AppText>
-                        <AppTextInput
-                            multiline
-                            value={biography}
-                            style={styles.bioInput}
-                            placeholder='Write about yourself and your experience...'
-                            placeholderTextColor={colors.mutedText}
-                            textAlignVertical='top'
-                            textAlign='left'
-                            fontSize={14}
-                            color='white'
-                            fontWeight='normal'
-                        />
+                        <AppText style={{ color: 'white', fontSize: scaleFont(12), marginTop: 15, backgroundColor: colors.cardBackground, padding: 15, borderRadius: 20 }}>
+                            {biography}
+                        </AppText>
                     </View>
 
                     {/* Years of Experience Card */}
                     <View style={styles.card}>
                         <View style={styles.cardContent}>
-                            <AppText style={styles.cardTitle}>Years of Experience</AppText>
+                            <AppText style={[styles.cardTitle]}>Years of Experience</AppText>
                             <View style={styles.valueContainer}>
                                 <AppText style={styles.valueText}>{yearsOfExperience}</AppText>
-                                <Image
-                                    source={Images.arrow}
-                                    style={styles.arrowIcon}
-                                />
                             </View>
                         </View>
                     </View>
@@ -100,8 +76,8 @@ export default function UserTrainerProfile() {
                     <View style={styles.section}>
                         <View style={styles.sectionHeader}>
                             <AppText style={styles.sectionTitle}>Certificates & Awards</AppText>
-                            <AppText style={styles.sectionSubtitle}>
-                                Showcase your qualifications and achievements
+                            <AppText style={styles.inputHint}>
+                                Work, Qualifications & Certificates
                             </AppText>
                         </View>
 
