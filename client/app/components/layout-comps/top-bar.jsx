@@ -178,12 +178,12 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                     {screen === routes.CHAT && chattedUser && (
                         <>
                             {chattedUser.isTrainer && (
-                                <View style={{ alignSelf: 'center' }}>
+                                <TouchableOpacity onPress={() => router.push(routes.PERSONAL_TRAINING_EXPLANATION)} style={{ alignSelf: 'center' }}>
                                     <Image
                                         source={Images.personalTrainer}
                                         style={{ width: 20, height: 20, tintColor: 'white' }}
                                     />
-                                </View>
+                                </TouchableOpacity>
                             )}
 
                             {chattedUser.isVerified && (

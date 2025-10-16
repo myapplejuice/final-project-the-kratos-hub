@@ -196,7 +196,7 @@ export default function UserProfile() {
 
             <View style={styles.main}>
                 {Object.keys(profile).length > 0 && (
-                    <AppScroll extraBottom={20}>
+                    <AppScroll extraBottom={200}>
                         {friend && friend.status === 'inactive' &&
                             <View style={[styles.card, { backgroundColor: '#FF3B30' }]}>
                                 <AppText style={[styles.cardLabel, { marginBottom: 10 }]}>Friendship Terminated Status</AppText>
