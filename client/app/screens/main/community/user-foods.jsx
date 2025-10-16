@@ -35,7 +35,7 @@ export default function UserFoods() {
         async function fetchUserFoods() {
             try {
                 const result = await APIService.nutrition.foods.foodsByUserId({ userId });
-console.log(result)
+
                 if (result.success) {
                     setUserFoods(result.data.foods || []);
                 }
@@ -66,7 +66,7 @@ console.log(result)
             pathname: routes.FOOD_PROFILE,
             params: {
                 selectedFood: JSON.stringify(food),
-                foodProfileIntent: 'otherUserFoods'
+                foodProfileIntent: 'userfoods'
             }
         });
     }

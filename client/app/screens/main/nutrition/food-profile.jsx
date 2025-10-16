@@ -638,7 +638,7 @@ export default function FoodProfile() {
                     />
                     <AppText style={styles.servingInfo}>{selectedFood.servingUnit}</AppText>
                 </View>
-                {intent !== 'myfoods' &&
+                {intent !== 'myfoods' && intent !== 'userfoods' &&
                     <TouchableOpacity style={styles.addBtn} onPress={handleFood}>
                         <Image source={Images.plus} style={{ width: 18, height: 18, tintColor: 'white', marginRight: 8 }} />
                         <AppText style={{ color: 'white', fontSize: scaleFont(14) }}>{intent === 'meal/add' || intent === 'mealplan/add' ? `Add` : `Update Serving`}</AppText>
