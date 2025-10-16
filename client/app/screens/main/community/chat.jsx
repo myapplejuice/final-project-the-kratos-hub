@@ -38,6 +38,8 @@ export default function Chat() {
     const currentPage = useRef(1);
     const morePages = useRef(true);
 
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imageViewVisible, setImageViewVisible] = useState(false);
     const [noMessageWarningVisible, setNoMessageWarningVisible] = useState(additionalContexts.friendStatus === 'inactive');
     const [chatBarVisible, setChatBarVisible] = useState(true);
     const [uploadOptionsVisible, setUploadOptionsVisible] = useState(false);
@@ -244,7 +246,7 @@ export default function Chat() {
                             extraInformation?.context === 'invite/whatsapp' ? extraInformation.inviteUrl :
                                 message,
             seenBy: [user.id],
-            extraInformation: extraInformation,
+            extraInformation,
             dateTimeSent: new Date()
         };
 
@@ -402,6 +404,24 @@ export default function Chat() {
         <>
             <ImageCapture onCancel={() => setChatBarVisible(true)} onConfirm={(asset) => handleImageUpload(asset)} />
 
+            {imageViewVisible &&
+                <TouchableOpacity activeOpacity={1} onPress={() => { setImageViewVisible(false) }}
+                    style={{
+                        flex: 1,
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        right: 0,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 10000
+                    }}>
+                    <Image source={{ uri: selectedImage }} style={{ width: 500, height: 500, }}  resizeMode="contain"/>
+                </TouchableOpacity>
+            }
+
             {/* New Message Indicator */}
             <FadeInOut visible={newMessageText} style={{
                 position: 'absolute',
@@ -556,7 +576,7 @@ export default function Chat() {
                     </TouchableOpacity>
                 </View>
                 <View style={{ width: '15%', alignSelf: 'flex-end' }}>
-                    <TouchableOpacity onPress={handleMessageSend} style={styles.sendButton}>
+                    <TouchableOpacity onPress={() => handleMessageSend()} style={styles.sendButton}>
                         <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} resizeMode="contain" />
                     </TouchableOpacity>
                 </View>
@@ -576,7 +596,7 @@ export default function Chat() {
                         bottom: insets.bottom + 50,
                         left: 20,
                         right: 20,
-                        backgroundColor: colors.negativeRed, 
+                        backgroundColor: colors.negativeRed,
                         borderRadius: 15,
                         padding: 15,
                         alignItems: 'center',
@@ -678,12 +698,12 @@ export default function Chat() {
                                                         }
                                                     </View>
                                                 ) : message.extraInformation?.context === 'image' ? (
-                                                    <View style={{ borderRadius: 5, overflow: 'hidden' }}>
+                                                    <TouchableOpacity onPress={() => { setSelectedImage(message.extraInformation.imageUrl), setImageViewVisible(true) }} style={{ borderRadius: 5, overflow: 'hidden' }}>
                                                         <Image
                                                             source={{ uri: message.extraInformation.imageUrl }}
                                                             style={[{
-                                                                width: 300, height: 300, borderTopLeftRadius: 20, borderTopRightRadius: 20, marginTop: 5,
-                                                                borderBottomLeftRadius: message.senderId === user.id ? 20 : 0, borderBottomLeftRadius: message.senderId === user.id ? 20 : 0, backgroundColor: 'transparent'
+                                                                width: 300, height: 300, borderRadius: 20, marginTop: 5,
+                                                                borderTopLeftRadius: message.senderId === user.id ? 20 : 5, borderTopRightRadius: message.senderId !== user.id ? 20 : 5, backgroundColor: 'transparent'
                                                             }]}
                                                             resizeMode="cover"
                                                         />
@@ -695,9 +715,9 @@ export default function Chat() {
                                                                 bottom: 0,
                                                                 right: 0,
                                                                 left: 0,
+                                                                borderBottomLeftRadius: 20,
+                                                                borderBottomRightRadius: 20,
                                                                 paddingVertical: 15,
-                                                                borderBottomLeftRadius: message.senderId === user.id ? 20 : 0,
-                                                                borderBottomLeftRadius: message.senderId === user.id ? 20 : 0,
                                                                 backgroundColor: 'rgba(0,0,0,0.5)',
                                                                 justifyContent: 'center',
                                                                 alignItems: 'center'
@@ -708,7 +728,7 @@ export default function Chat() {
                                                                 style={{ width: 18, height: 18, tintColor: 'white', transform: [{ rotate: '90deg' }], marginTop: 3 }}
                                                             />
                                                         </TouchableOpacity>
-                                                    </View>
+                                                    </TouchableOpacity>
 
                                                 ) :
                                                     message.extraInformation?.context === 'document' ? (
@@ -847,11 +867,11 @@ const styles = StyleSheet.create({
     },
     userBubble: {
         backgroundColor: 'rgba(0, 35, 65, 1)',
-        borderBottomRightRadius: 5,
+        borderTopRightRadius: 5,
     },
     theirBubble: {
         backgroundColor: 'rgba(255,255,255,0.08)',
-        borderBottomLeftRadius: 5,
+        borderTopLeftRadius: 5,
     },
     userMessageBubble: {
         marginLeft: '20%',

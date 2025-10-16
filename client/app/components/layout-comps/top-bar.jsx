@@ -71,7 +71,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.PRIVACY_POLICY]: "Privacy Policy",
         [routes.TERMS_OF_SERVICE]: "Terms of Service",
         [routes.PROFILE]: "Profile",
-        [routes.GOALS]: "Goals & Metrics",
+        [routes.GOALS]: "Goals",
         [routes.NUTRITION_HUB]: "Nutrition",
         [routes.TRAINING_HUB]: "Training",
         [routes.SETTINGS]: "Settings",

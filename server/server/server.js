@@ -12,7 +12,7 @@ import ChatDBService from './models/socket/chat-db-service.js';
 
 export default class Server {
     static instance;
-static io;
+    static io;
 
     constructor(port = process.env.SERVER_PORT) {
         if (Server.instance) {
@@ -79,6 +79,7 @@ static io;
             });
 
             socket.on('send-message', async (payload, callback) => {
+                console.log('Socket received message:', payload);
                 const savedMessageId = await ChatController.sendMessage(payload);
                 if (callback) callback(savedMessageId);
             });
