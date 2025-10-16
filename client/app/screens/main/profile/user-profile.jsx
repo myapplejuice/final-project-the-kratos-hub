@@ -169,6 +169,15 @@ export default function UserProfile() {
         //TODO WHEN REPORTING AND ADMING PAGE READY
     }
 
+    function handleTrainerProfile(){
+        router.push({
+            pathname: routes.USER_TRAINER_PROFILE,
+            params: {
+                profile: JSON.stringify(profile.trainerProfile)
+            }
+        })
+    }
+
     return (
         <>
             <FadeInOut visible={viewImage && profile.imageURL} style={styles.imageOverlay} initialVisible={false}>
@@ -217,9 +226,9 @@ export default function UserProfile() {
                                             <AppText style={{ color: 'white', marginStart: 5, fontSize: scaleFont(12), fontWeight: 'bold' }}>Trusted Trainer</AppText>
                                         </TouchableOpacity>
                                     }
-                                    <View style={{ width: 40, height: 40, backgroundColor: colors.main, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}>
+                                    <TouchableOpacity onPress={() => router.push(routes.PERSONAL_TRAINING_EXPLANATION)} style={{ width: 40, height: 40, backgroundColor: colors.main, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}>
                                         <Image source={Images.personalTrainer} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                                    </View>
+                                    </TouchableOpacity>
                                 </View>
                             }
                             <TouchableOpacity onPress={() => setViewImage(true)} style={styles.imageWrapper}>
@@ -298,6 +307,21 @@ export default function UserProfile() {
                                             <Image source={Images.friend} style={styles.settingIcon} />
                                         </View>
                                         <AppText style={styles.label}>Add Friend</AppText>
+                                    </View>
+                                    <Image
+                                        source={Images.backArrow}
+                                        style={[styles.arrow, { transform: [{ scaleX: -1 }] }]}
+                                    />
+                                </TouchableOpacity>
+                            )}
+
+                            {profile && profile.trainerProfile.trainerStatus === 'active' && (
+                                <TouchableOpacity onPress={handleTrainerProfile} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                        <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
+                                            <Image source={Images.personalTrainerOutline} style={styles.settingIcon} />
+                                        </View>
+                                        <AppText style={styles.label}>Trainer Profile</AppText>
                                     </View>
                                     <Image
                                         source={Images.backArrow}

@@ -136,6 +136,7 @@ function Layout() {
                                             <Stack.Screen name="screens/main/profile/edit-profile" />
                                             <Stack.Screen name="screens/main/profile/usda-profile" />
                                             <Stack.Screen name="screens/main/profile/user-profile" />
+                                            <Stack.Screen name="screens/main/profile/user-trainer-profile" />
                                             <Stack.Screen name="screens/main/profile/personal-training-profile" />
                                             <Stack.Screen name="screens/main/profile/personal-training-explanation" />
                                             <Stack.Screen name="screens/main/profile/shield-of-trust" />

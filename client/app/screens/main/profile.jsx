@@ -128,9 +128,9 @@ export default function Profile() {
                                     <AppText style={{ color: 'white', marginStart: 5, fontSize: scaleFont(12), fontWeight: 'bold' }}>Trusted Trainer</AppText>
                                 </TouchableOpacity>
                             }
-                             <View style={{ width: 40, height: 40, backgroundColor: colors.main, borderRadius: 20, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                             <TouchableOpacity onPress={() => router.push(routes.PERSONAL_TRAINING_EXPLANATION)} style={{ width: 40, height: 40, backgroundColor: colors.main, borderRadius: 20, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                                 <Image source={Images.personalTrainer} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                            </View>
+                            </TouchableOpacity>
                         </View>
                     }
 

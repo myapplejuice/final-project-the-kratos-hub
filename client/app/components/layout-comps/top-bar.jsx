@@ -97,6 +97,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.SHIELD_APPLICATION]: "Shield Application",
         [routes.SHIELD_APPLICATIONS]: "My Shield Applications",
         [routes.SHIELD_APPLICATION_REVIEW]: "Shield Application Review",
+        [routes.USER_TRAINER_PROFILE]: "Trainer",
     };
 
     function handleUserProfilePress() {

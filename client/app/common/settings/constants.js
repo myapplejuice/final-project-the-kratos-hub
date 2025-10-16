@@ -30,6 +30,7 @@ export const routes = {
     EDIT_PROFILE: '/screens/main/profile/edit-profile',
     USDA_PROFILE: '/screens/main/profile/usda-profile',
     USER_PROFILE: '/screens/main/profile/user-profile',
+    USER_TRAINER_PROFILE: '/screens/main/profile/user-trainer-profile',
     PERSONAL_TRAINING_PROFILE: '/screens/main/profile/personal-training-profile',
     PERSONAL_TRAINING_EXPLANATION: '/screens/main/profile/personal-training-explanation',
     SHIELD_OF_TRUST: '/screens/main/profile/shield-of-trust',
