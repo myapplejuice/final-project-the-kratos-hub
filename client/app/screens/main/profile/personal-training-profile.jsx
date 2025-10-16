@@ -164,7 +164,7 @@ export default function PersonalTrainingProfile() {
 
             <View style={styles.main}>
                 <ImageCapture onConfirm={async (image) => handleNewImage(image)} />
-                <AppScroll extraBottom={200} onScrollSetStates={setFabVisible}>
+                <AppScroll extraBottom={300} onScrollSetStates={setFabVisible}>
                     {/* Trainer Status Card */}
                     <View style={styles.card}>
                         <View style={styles.cardHeader}>
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
         padding: 16,
         fontSize: scaleFont(14),
         fontWeight: '500',
-        height: 140,
+        minHeight: 140,
         minWidth: '100%',
         textAlignVertical: 'top',
     },

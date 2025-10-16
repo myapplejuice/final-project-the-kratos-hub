@@ -77,21 +77,38 @@ export default function ShieldApplicationReview() {
     }
 
     async function handleSocialMediaLink(platform) {
+        Keyboard.dismiss();
         platform = platform.trim();
 
         if (application.status !== 'pending') {
             switch (platform) {
                 case 'Instagram':
-                    Linking.openURL(instagramLink);
+                    try {
+                        Linking.openURL(instagramLink);
+                    } catch (e) {
+                        createToast({ message: 'Not linked' });
+                    }
                     break;
                 case 'Facebook':
-                    Linking.openURL(facebookLink);
+                    try {
+                        Linking.openURL(facebookLink);
+                    } catch (e) {
+                        createToast({ message: 'Not linked' });
+                    }
                     break;
                 case 'TikTok':
-                    Linking.openURL(tikTokLink);
+                    try {
+                        Linking.openURL(tikTokLink);
+                    } catch (e) {
+                        createToast({ message: 'Not linked' });
+                    }
                     break;
                 case 'X':
-                    Linking.openURL(xLink);
+                    try {
+                        Linking.openURL(xLink);
+                    } catch (e) {
+                        createToast({ message: 'Not linked' });
+                    }
                     break;
             }
             return;
@@ -283,7 +300,7 @@ export default function ShieldApplicationReview() {
                     <AppText style={{ color: application.status === 'pending' ? colors.accentYellow : application.status === 'approved' ? colors.accentGreen : colors.negativeRed, fontSize: scaleFont(12), textAlign: 'center', lineHeight: 20, marginTop: 5, marginHorizontal: 15 }}>
                         {application.status === 'pending' ? 'Application is currently under review.' :
                             application.status === 'approved' ? 'Application has been approved.' :
-                                application.status === 'cancelled' ? 'Application has been cancelled by user.'
+                                application.status === 'cancelled' ? 'Application has been cancelled by the user.'
                                     : 'Application has been denied.'
                         }
                     </AppText>
@@ -427,10 +444,11 @@ export default function ShieldApplicationReview() {
                     </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity onPress={handleSocialMediaReset} style={{ width: 150, alignSelf: 'center', backgroundColor: colors.negativeRed, padding: 15, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
-                    <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12) }}>Reset Links</AppText>
-                </TouchableOpacity>
-
+                {application.status === 'pending' &&
+                    <TouchableOpacity onPress={handleSocialMediaReset} style={{ width: 150, alignSelf: 'center', backgroundColor: colors.negativeRed, padding: 15, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
+                        <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12) }}>Reset Links</AppText>
+                    </TouchableOpacity>
+                }
             </AppScroll>
         </>
     );
