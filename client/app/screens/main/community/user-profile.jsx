@@ -178,6 +178,15 @@ export default function UserProfile() {
         })
     }
 
+    function handleUserFoods(){
+        router.push({
+            pathname: routes.USER_FOODS,
+            params: {
+                userId: profile.id
+            }
+        })
+    }
+
     return (
         <>
             <FadeInOut visible={viewImage && profile.imageURL} style={styles.imageOverlay} initialVisible={false}>
@@ -329,6 +338,19 @@ export default function UserProfile() {
                                     />
                                 </TouchableOpacity>
                             )}
+
+                                <TouchableOpacity onPress={handleUserFoods} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 15 }}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                        <View style={{ backgroundColor: colors.backgroundSecond, padding: 13, borderRadius: 12 }}>
+                                            <Image source={Images.foodsFive} style={styles.settingIcon} />
+                                        </View>
+                                        <AppText style={styles.label}>User Foods</AppText>
+                                    </View>
+                                    <Image
+                                        source={Images.backArrow}
+                                        style={[styles.arrow, { transform: [{ scaleX: -1 }] }]}
+                                    />
+                                </TouchableOpacity>
 
                             {friend && (
                                 friend.status === 'active' ? (

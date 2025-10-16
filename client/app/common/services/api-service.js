@@ -211,6 +211,7 @@ export default class APIService {
         },
         foods: {
             foods: (scope) => APIService.request(`/nutrition/foods/${APIService.USER_ID}?scope=${scope}`, 'GET'),
+            foodsByUserId: (payload) => APIService.request(`/nutrition/foods/other-user/${APIService.USER_ID}`, 'POST', payload),
             create: (payload) => APIService.request(`/nutrition/foods/${APIService.USER_ID}`, 'POST', payload),
             update: (payload) => APIService.request(`/nutrition/foods/${APIService.USER_ID}`, 'PUT', payload),
             delete: (payload) => APIService.request(`/nutrition/foods/${APIService.USER_ID}`, 'DELETE', payload)

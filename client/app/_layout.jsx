@@ -119,10 +119,13 @@ function Layout() {
                                             <Stack.Screen name="screens/main/nutrition-hub" />
                                             <Stack.Screen name="screens/main/training-hub" />
                                             <Stack.Screen name="screens/main/notifications" />
-                                            <Stack.Screen name="screens/main/friends" />
 
-                                            {/* FRIENDS */}
-                                            <Stack.Screen name="screens/main/friends/chat" />
+                                            {/* COMMUNITY */}
+                                            <Stack.Screen name="screens/main/community/chat" />
+                                            <Stack.Screen name="screens/main/community/friends" />
+                                            <Stack.Screen name="screens/main/community/user-profile" />
+                                            <Stack.Screen name="screens/main/community/user-trainer-profile" />
+                                            <Stack.Screen name="screens/main/community/user-foods" />
 
                                             {/* HOMEPAGE CHILDREN */}
                                             <Stack.Screen name="screens/main/homepage/lean-body-mass" />
@@ -135,8 +138,6 @@ function Layout() {
                                             <Stack.Screen name="screens/main/profile/settings" />
                                             <Stack.Screen name="screens/main/profile/edit-profile" />
                                             <Stack.Screen name="screens/main/profile/usda-profile" />
-                                            <Stack.Screen name="screens/main/profile/user-profile" />
-                                            <Stack.Screen name="screens/main/profile/user-trainer-profile" />
                                             <Stack.Screen name="screens/main/profile/personal-training-profile" />
                                             <Stack.Screen name="screens/main/profile/personal-training-explanation" />
                                             <Stack.Screen name="screens/main/profile/shield-of-trust" />

@@ -13,10 +13,13 @@ export const routes = {
     NUTRITION_HUB: '/screens/main/nutrition-hub',
     TRAINING_HUB: '/screens/main/training-hub',
     NOTIFICATIONS: '/screens/main/notifications',
-    FRIENDS: '/screens/main/friends',
 
-    /* FRIENDS */
-    CHAT: '/screens/main/friends/chat',
+    /* COMMUNITY */
+    CHAT: '/screens/main/community/chat',
+    FRIENDS: '/screens/main/community/friends',
+    USER_PROFILE: '/screens/main/community/user-profile',
+    USER_TRAINER_PROFILE: '/screens/main/community/user-trainer-profile',
+    USER_FOODS: '/screens/main/community/user-foods',
 
     /* HOMEPAGE CHILDREN */
     LEAN_BODY_MASS: '/screens/main/homepage/lean-body-mass',
@@ -29,8 +32,6 @@ export const routes = {
     SETTINGS: '/screens/main/profile/settings',
     EDIT_PROFILE: '/screens/main/profile/edit-profile',
     USDA_PROFILE: '/screens/main/profile/usda-profile',
-    USER_PROFILE: '/screens/main/profile/user-profile',
-    USER_TRAINER_PROFILE: '/screens/main/profile/user-trainer-profile',
     PERSONAL_TRAINING_PROFILE: '/screens/main/profile/personal-training-profile',
     PERSONAL_TRAINING_EXPLANATION: '/screens/main/profile/personal-training-explanation',
     SHIELD_OF_TRUST: '/screens/main/profile/shield-of-trust',
