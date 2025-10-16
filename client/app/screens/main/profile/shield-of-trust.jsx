@@ -33,9 +33,9 @@ export default function BadgeOfTrust() {
             <AppScroll extraBottom={200}>
                 <View style={{ marginBottom: 15 }}>
                     <View style={{ alignSelf: 'center', justifyContent: 'center', alignItems: 'center', padding: 15, backgroundColor: colors.cardBackground, borderRadius: 60, width: 120, height: 120 }}>
-                        <Image source={Images.shield} style={{ width: 80, height: 80, tintColor: colors.main, marginTop: 5 }} />
+                        <Image source={Images.shield} style={{ width: 80, height: 80, tintColor: 'white', marginTop: 5 }} />
                     </View>
-                    <AppText style={[{ textAlign: 'center', fontSize: scaleFont(22), fontWeight: 'bold', color: colors.main, marginTop: 15 }]}>Shield of Trust</AppText>
+                    <AppText style={[{ textAlign: 'center', fontSize: scaleFont(22), fontWeight: 'bold', color: 'white', marginTop: 15 }]}>Shield of Trust</AppText>
                     <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12), textAlign: 'center', fontWeight: 'bold', marginTop: 5 }}>A mark of credibility & trust in the Kratos Hub family</AppText>
                 </View>
 
@@ -50,7 +50,7 @@ export default function BadgeOfTrust() {
 
                         <View style={{ width: '47%', alignItems: 'center', justifyContent: 'center', height: 100, borderRadius: 20, backgroundColor: colors.backgroundTop }}>
                             <View style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: colors.backgroundSecond, justifyContent: 'center', alignItems: 'center' }}>
-                                <Image source={Images.credibilityTwo} style={{ width: 30, height: 30 }} />
+                                <Image source={Images.credibilityThree} style={{ width: 30, height: 30 }} />
                             </View>
                             <AppText style={{ color: 'white', fontWeight: 'bold', marginTop: 5 }}>Credibility</AppText>
                         </View>
@@ -66,7 +66,7 @@ export default function BadgeOfTrust() {
 
                         <View style={{ width: '47%', alignItems: 'center', justifyContent: 'center', height: 100, borderRadius: 20, backgroundColor: colors.backgroundTop }}>
                             <View style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: colors.backgroundSecond, justifyContent: 'center', alignItems: 'center' }}>
-                                <Image source={Images.competitionTwo} style={{ width: 30, height: 30 }} />
+                                <Image source={Images.rocket} style={{ width: 30, height: 30 }} />
                             </View>
                             <AppText style={{ color: 'white', fontWeight: 'bold', marginTop: 5 }}>Competitive Edge</AppText>
                         </View>

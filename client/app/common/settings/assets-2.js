@@ -142,5 +142,7 @@ export const Images_2 = {
     xOutline: require('../../../assets/images/x-outline.png'),
     xTwo: require('../../../assets/images/x-2.png'),
     xTwoOutline: require('../../../assets/images/x-2-outline.png'),
+    credibilityThree: require('../../../assets/images/credibility-3.png'),
+    rocket: require('../../../assets/images/rocket.png'),
  
 };
