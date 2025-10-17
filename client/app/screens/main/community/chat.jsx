@@ -39,6 +39,7 @@ export default function Chat() {
     const currentPage = useRef(1);
     const morePages = useRef(true);
 
+    const [loading, setLoading] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [imageViewVisible, setImageViewVisible] = useState(false);
     const [noMessageWarningVisible, setNoMessageWarningVisible] = useState(additionalContexts.friendStatus === 'inactive');
@@ -154,6 +155,7 @@ export default function Chat() {
                 console.log(error);
             } finally {
                 hideSpinner();
+                setLoading(false);
             }
         }
 
@@ -212,7 +214,7 @@ export default function Chat() {
     }, []);
 
     async function fetchMoreMessages() {
-        if (morePages.current === false) return;
+        if (morePages.current === false || isLoadingMessages) return;
 
         const friendId = additionalContexts.chattingFriendProfile.id;
         const payload = {
@@ -664,246 +666,248 @@ export default function Chat() {
 
             {/* Messages Container */}
             <View style={styles.main}>
-                <View style={{ flex: 1 }}>
-                    <AppScroll
-                        dismissKeyboardOnTap={Platform.OS === 'ios'}
-                        onScrollToTop={() => safeTrigger(fetchMoreMessages)}
-                        ref={scrollRef}
-                        extraBottom={Platform.OS === 'android' && keyboardOpen ? keyboardHeight - 65 : 75}
-                    >
-                        {messages?.length > 0 && messages.map((message, index) => {
-                            const isUser = message.senderId === user.id;
-                            const messageTime = new Date(message.dateTimeSent);
-                            const { isToday, isYesterday } = getDayComparisons(messageTime);
+                {!loading &&
+                    <View style={{ flex: 1 }}>
+                        <AppScroll
+                            dismissKeyboardOnTap={Platform.OS === 'ios'}
+                            onScrollToTop={() => safeTrigger(fetchMoreMessages)}
+                            ref={scrollRef}
+                            extraBottom={Platform.OS === 'android' && keyboardOpen ? keyboardHeight - 65 : 75}
+                        >
+                            {messages?.length > 0 && messages.map((message, index) => {
+                                const isUser = message.senderId === user.id;
+                                const messageTime = new Date(message.dateTimeSent);
+                                const { isToday, isYesterday } = getDayComparisons(messageTime);
 
-                            const timeDisplay = isToday
-                                ? formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })
-                                : isYesterday
-                                    ? `Yesterday, ${formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })}`
-                                    : `${formatDate(message.dateTimeSent, { format: 'MMM d' })}, ${formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })}`;
+                                const timeDisplay = isToday
+                                    ? formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })
+                                    : isYesterday
+                                        ? `Yesterday, ${formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })}`
+                                        : `${formatDate(message.dateTimeSent, { format: 'MMM d' })}, ${formatTime(message.dateTimeSent, { format: user.preferences.timeFormat.key })}`;
 
-                            const prevMessage = messages[index - 1];
-                            const showDateDivider = !prevMessage || new Date(prevMessage.dateTimeSent).toDateString() !== messageTime.toDateString();
-                            const isUnread = !message.seenBy?.includes(user.id);
-                            const showUnreadDivider = isUnread && (!prevMessage || prevMessage.seenBy?.includes(user.id));
+                                const prevMessage = messages[index - 1];
+                                const showDateDivider = !prevMessage || new Date(prevMessage.dateTimeSent).toDateString() !== messageTime.toDateString();
+                                const isUnread = !message.seenBy?.includes(user.id);
+                                const showUnreadDivider = isUnread && (!prevMessage || prevMessage.seenBy?.includes(user.id));
 
-                            const bubbleStyle = isUser ? styles.userBubble : styles.theirBubble;
+                                const bubbleStyle = isUser ? styles.userBubble : styles.theirBubble;
 
-                            const dayLabel = isToday ? 'Today' : isYesterday ? 'Yesterday' : formatDate(message.dateTimeSent, { format: 'MMM d' });
+                                const dayLabel = isToday ? 'Today' : isYesterday ? 'Yesterday' : formatDate(message.dateTimeSent, { format: 'MMM d' });
 
-                            const renderTime = () => (
-                                <AppText style={[styles.messageTime, { alignSelf: isUser ? 'flex-end' : 'flex-start' }]}>
-                                    {timeDisplay}
-                                </AppText>
-                            );
+                                const renderTime = () => (
+                                    <AppText style={[styles.messageTime, { alignSelf: isUser ? 'flex-end' : 'flex-start' }]}>
+                                        {timeDisplay}
+                                    </AppText>
+                                );
 
-                            const renderHiddenNotice = (text) => (
-                                <AppText style={[styles.messageText, { color: colors.mutedText, marginTop: message.extraInformation?.context === 'mealplan' ? 10 : 0 }]}>
-                                    {text}
-                                </AppText>
-                            );
+                                const renderHiddenNotice = (text) => (
+                                    <AppText style={[styles.messageText, { color: colors.mutedText, marginTop: message.extraInformation?.context === 'mealplan' ? 10 : 0 }]}>
+                                        {text}
+                                    </AppText>
+                                );
 
-                            const renderDivider = (text, styleText, styleLine) => (
-                                <View style={styleLine}>
-                                    <AppText style={styleText}>{text}</AppText>
-                                </View>
-                            );
+                                const renderDivider = (text, styleText, styleLine) => (
+                                    <View style={styleLine}>
+                                        <AppText style={styleText}>{text}</AppText>
+                                    </View>
+                                );
 
-                            const renderMealPlan = () => (
-                                <View style={styles.mealPlanContainer}>
-                                    <AppText style={styles.mealPlanTitle}>{message.extraInformation.planLabel}</AppText>
-                                    <AppText style={styles.mealPlanDescription}>{message.extraInformation.planDescription}</AppText>
+                                const renderMealPlan = () => (
+                                    <View style={styles.mealPlanContainer}>
+                                        <AppText style={styles.mealPlanTitle}>{message.extraInformation.planLabel}</AppText>
+                                        <AppText style={styles.mealPlanDescription}>{message.extraInformation.planDescription}</AppText>
 
-                                    {message.senderId !== user.id && user.plans.find(p => p.sourcePlanId === message.extraInformation.planId) === undefined ? (
-                                        <AnimatedButton
-                                            onPress={() => handleMealPlanSave(message.extraInformation.planId, message.senderId)}
-                                            title="Save Plan"
-                                            style={styles.savePlanButton}
-                                            textStyle={styles.savePlanButtonText}
-                                        />
-                                    ) : (
-                                        user.id !== message.senderId && (
-                                            <View style={styles.savedPlanContainer}>
-                                                <Image source={Images.checkMark} style={styles.checkMark} />
-                                                <AppText style={styles.savedPlanText}>Plan Saved</AppText>
-                                            </View>
-                                        )
-                                    )}
-                                </View>
-                            );
-
-                            const renderImageMessage = () => (
-                                <TouchableOpacity
-                                    onPress={() => { setSelectedImage(message.extraInformation.imageUrl); setImageViewVisible(true); }}
-                                    style={{ borderRadius: 5, overflow: 'hidden', marginBottom: 8 }}
-                                >
-                                    {/* Image with overlay */}
-                                    <View style={{ width: 300, height: 300, borderRadius: 20, borderTopLeftRadius: isUser ? 20: 5, borderTopRightRadius: !isUser ? 20: 5, marginTop: 5, overflow: 'hidden', position: 'relative' }}>
-                                        <Image
-                                            source={{ uri: message.extraInformation.imageUrl }}
-                                            style={{
-                                                width: '100%',
-                                                height: '100%',
-                                                borderTopLeftRadius: isUser ? 20 : 5,
-                                                borderTopRightRadius: !isUser ? 20 : 5,
-                                                opacity: message.hidden ? 0.5 : 1,
-                                            }}
-                                            resizeMode="cover"
-                                        />
-
-                                        {message.hidden && (
-                                            <View
-                                                style={{
-                                                    position: 'absolute',
-                                                    top: 0, left: 0, right: 0, bottom: 0,
-                                                    backgroundColor: 'rgba(0,0,0,0.85)',
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center',
-                                                }}
-                                            >
-                                                {isUser && (
-                                                    <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(16) }}>
-                                                        Photo Hidden
-                                                    </AppText>
-                                                )}
-                                            </View>
+                                        {message.senderId !== user.id && user.plans.find(p => p.sourcePlanId === message.extraInformation.planId) === undefined ? (
+                                            <AnimatedButton
+                                                onPress={() => handleMealPlanSave(message.extraInformation.planId, message.senderId)}
+                                                title="Save Plan"
+                                                style={styles.savePlanButton}
+                                                textStyle={styles.savePlanButtonText}
+                                            />
+                                        ) : (
+                                            user.id !== message.senderId && (
+                                                <View style={styles.savedPlanContainer}>
+                                                    <Image source={Images.checkMark} style={styles.checkMark} />
+                                                    <AppText style={styles.savedPlanText}>Plan Saved</AppText>
+                                                </View>
+                                            )
                                         )}
                                     </View>
+                                );
 
-                                    {/* Download Button */}
+                                const renderImageMessage = () => (
                                     <TouchableOpacity
-                                        onPress={() => downloadAsset(
-                                            message.extraInformation.imageUrl,
-                                            `The_Kratos_Hub_Chat_${roomId}_image_${Date.now()}.jpg`
-                                        )}
-                                        style={{
-                                            position: 'absolute',
-                                            bottom: 0,
-                                            right: 0,
-                                            left: 0,
-                                            borderBottomLeftRadius: 20,
-                                            borderBottomRightRadius: 20,
-                                            paddingVertical: 15,
-                                            backgroundColor: 'rgba(0,0,0,0.5)',
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                        }}
+                                        onPress={() => { setSelectedImage(message.extraInformation.imageUrl); setImageViewVisible(true); }}
+                                        style={{ borderRadius: 5, overflow: 'hidden', marginBottom: 8 }}
                                     >
-                                        <Image
-                                            source={Images.arrow}
-                                            style={{ width: 18, height: 18, tintColor: 'white', transform: [{ rotate: '90deg' }], marginTop: 3 }}
-                                        />
-                                    </TouchableOpacity>
+                                        {/* Image with overlay */}
+                                        <View style={{ width: 300, height: 300, borderRadius: 20, borderTopLeftRadius: isUser ? 20 : 5, borderTopRightRadius: !isUser ? 20 : 5, marginTop: 5, overflow: 'hidden', position: 'relative' }}>
+                                            <Image
+                                                source={{ uri: message.extraInformation.imageUrl }}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    borderTopLeftRadius: isUser ? 20 : 5,
+                                                    borderTopRightRadius: !isUser ? 20 : 5,
+                                                    opacity: message.hidden ? 0.5 : 1,
+                                                }}
+                                                resizeMode="cover"
+                                            />
 
-                                    {/* Hide/Unhide Button */}
-                                    {isUser && (
+                                            {message.hidden && (
+                                                <View
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: 0, left: 0, right: 0, bottom: 0,
+                                                        backgroundColor: 'rgba(0,0,0,0.85)',
+                                                        justifyContent: 'center',
+                                                        alignItems: 'center',
+                                                    }}
+                                                >
+                                                    {isUser && (
+                                                        <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(16) }}>
+                                                            Photo Hidden
+                                                        </AppText>
+                                                    )}
+                                                </View>
+                                            )}
+                                        </View>
+
+                                        {/* Download Button */}
                                         <TouchableOpacity
-                                            onPress={() => handleMessageUpdate(message.id, message.hidden ? 'unhide' : 'hide')}
+                                            onPress={() => downloadAsset(
+                                                message.extraInformation.imageUrl,
+                                                `The_Kratos_Hub_Chat_${roomId}_image_${Date.now()}.jpg`
+                                            )}
                                             style={{
                                                 position: 'absolute',
-                                                top: 15,
-                                                right: 10,
-                                                padding: 7,
-                                                borderRadius: 5,
-                                                backgroundColor: colorWithOpacity(colors.cardBackground, 16),
+                                                bottom: 0,
+                                                right: 0,
+                                                left: 0,
+                                                borderBottomLeftRadius: 20,
+                                                borderBottomRightRadius: 20,
+                                                paddingVertical: 15,
+                                                backgroundColor: 'rgba(0,0,0,0.5)',
                                                 justifyContent: 'center',
                                                 alignItems: 'center',
                                             }}
                                         >
                                             <Image
-                                                source={message.hidden ? Images.unHide : Images.hide}
-                                                style={{ width: 18, height: 18, tintColor: 'white' }}
+                                                source={Images.arrow}
+                                                style={{ width: 18, height: 18, tintColor: 'white', transform: [{ rotate: '90deg' }], marginTop: 3 }}
                                             />
                                         </TouchableOpacity>
-                                    )}
-                                </TouchableOpacity>
-                            );
 
-                            const renderDocument = () => (
-                                <TouchableOpacity
-                                    style={styles.documentContainer}
-                                    onPress={() => Linking.openURL(message.extraInformation.documentUrl)}
-                                >
-                                    <Image source={Images.doc} style={styles.documentIcon} />
-                                    <AppText style={styles.documentName}>
-                                        {message.extraInformation.documentName || 'Document'}
-                                    </AppText>
-                                </TouchableOpacity>
-                            );
-
-                            const renderInvite = () => (
-                                <TouchableOpacity
-                                    style={styles.documentContainer}
-                                    onPress={() => message.senderId !== user.id && Linking.openURL(message.extraInformation.inviteUrl)}
-                                >
-                                    <Image source={Images.whatsappTwo} style={[styles.documentIcon, { tintColor: '#25D366' }]} />
-                                    <AppText style={styles.documentName}>
-                                        {message.extraInformation.inviteUrl}
-                                    </AppText>
-                                </TouchableOpacity>
-                            );
-
-                            const renderMainMessage = () => {
-                                const ctx = message.extraInformation?.context;
-
-                                if (ctx === 'mealplan') return renderMealPlan();
-                                if (ctx === 'image') return renderImageMessage();
-                                if (ctx === 'document') return renderDocument();
-                                if (ctx === 'invite/whatsapp') return renderInvite();
-
-                                // Default text message
-                                return message.message && (
-                                    <AppText style={[styles.messageText, { marginTop: ctx === 'mealplan' ? 10 : 0 }]}>
-                                        {message.message}
-                                    </AppText>
+                                        {/* Hide/Unhide Button */}
+                                        {isUser && (
+                                            <TouchableOpacity
+                                                onPress={() => handleMessageUpdate(message.id, message.hidden ? 'unhide' : 'hide')}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: 15,
+                                                    right: 10,
+                                                    padding: 7,
+                                                    borderRadius: 5,
+                                                    backgroundColor: colorWithOpacity(colors.cardBackground, 16),
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                }}
+                                            >
+                                                <Image
+                                                    source={message.hidden ? Images.unHide : Images.hide}
+                                                    style={{ width: 18, height: 18, tintColor: 'white' }}
+                                                />
+                                            </TouchableOpacity>
+                                        )}
+                                    </TouchableOpacity>
                                 );
-                            };
 
-                            return (
-                                <View key={index}>
-                                    {showDateDivider && (
-                                        <View style={styles.dateDivider}>
-                                            <View style={styles.dateDividerLine} />
-                                            <AppText style={styles.dateDividerText}>{dayLabel}</AppText>
-                                            <View style={styles.dateDividerLine} />
-                                        </View>
-                                    )}
-
-                                    {showUnreadDivider && renderDivider('Unread Messages', styles.unreadDividerText, styles.unreadDivider)}
-
-                                    <Pressable
-                                        onLongPress={() => handleMessageLongPress(message)}
-                                        delayLongPress={350}
+                                const renderDocument = () => (
+                                    <TouchableOpacity
+                                        style={styles.documentContainer}
+                                        onPress={() => Linking.openURL(message.extraInformation.documentUrl)}
                                     >
-                                        <View style={[styles.messageContainer, isUser ? styles.userMessageContainer : styles.theirMessageContainer]}>
-                                            {message.hidden ?
-                                                ((message.extraInformation.context === 'image' && isUser) ?
-                                                    <View style={[styles.messageBubble, bubbleStyle, isUser ? styles.userMessageBubble : styles.theirMessageBubble]}>
-                                                        {renderMainMessage()}
-                                                        {renderTime()}
-                                                    </View>
+                                        <Image source={Images.doc} style={styles.documentIcon} />
+                                        <AppText style={styles.documentName}>
+                                            {message.extraInformation.documentName || 'Document'}
+                                        </AppText>
+                                    </TouchableOpacity>
+                                );
+
+                                const renderInvite = () => (
+                                    <TouchableOpacity
+                                        style={styles.documentContainer}
+                                        onPress={() => message.senderId !== user.id && Linking.openURL(message.extraInformation.inviteUrl)}
+                                    >
+                                        <Image source={Images.whatsappTwo} style={[styles.documentIcon, { tintColor: '#25D366' }]} />
+                                        <AppText style={styles.documentName}>
+                                            {message.extraInformation.inviteUrl}
+                                        </AppText>
+                                    </TouchableOpacity>
+                                );
+
+                                const renderMainMessage = () => {
+                                    const ctx = message.extraInformation?.context;
+
+                                    if (ctx === 'mealplan') return renderMealPlan();
+                                    if (ctx === 'image') return renderImageMessage();
+                                    if (ctx === 'document') return renderDocument();
+                                    if (ctx === 'invite/whatsapp') return renderInvite();
+
+                                    // Default text message
+                                    return message.message && (
+                                        <AppText style={[styles.messageText, { marginTop: ctx === 'mealplan' ? 10 : 0 }]}>
+                                            {message.message}
+                                        </AppText>
+                                    );
+                                };
+
+                                return (
+                                    <View key={index}>
+                                        {showDateDivider && (
+                                            <View style={styles.dateDivider}>
+                                                <View style={styles.dateDividerLine} />
+                                                <AppText style={styles.dateDividerText}>{dayLabel}</AppText>
+                                                <View style={styles.dateDividerLine} />
+                                            </View>
+                                        )}
+
+                                        {showUnreadDivider && renderDivider('Unread Messages', styles.unreadDividerText, styles.unreadDivider)}
+
+                                        <Pressable
+                                            onLongPress={() => handleMessageLongPress(message)}
+                                            delayLongPress={350}
+                                        >
+                                            <View style={[styles.messageContainer, isUser ? styles.userMessageContainer : styles.theirMessageContainer]}>
+                                                {message.hidden ?
+                                                    ((message.extraInformation.context === 'image' && isUser) ?
+                                                        <View style={[styles.messageBubble, bubbleStyle, isUser ? styles.userMessageBubble : styles.theirMessageBubble]}>
+                                                            {renderMainMessage()}
+                                                            {renderTime()}
+                                                        </View>
+                                                        : (
+                                                            <View style={[styles.messageBubble, bubbleStyle, isUser ? styles.userMessageBubble : styles.theirMessageBubble]}>
+                                                                {renderHiddenNotice(`${user.id === message.senderId ? 'You are hiding' : additionalContexts.chattingFriendProfile.firstname + ' is hiding'} this message`)}
+                                                                <View style={{ flexDirection: 'row', marginTop: 5, justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
+                                                                    <Image source={Images.hide} style={{ width: 15, height: 15, tintColor: colors.mutedText, marginEnd: 5 }} />
+                                                                    {renderTime()}
+                                                                </View>
+                                                            </View>
+                                                        ))
                                                     : (
                                                         <View style={[styles.messageBubble, bubbleStyle, isUser ? styles.userMessageBubble : styles.theirMessageBubble]}>
-                                                            {renderHiddenNotice(`${user.id === message.senderId ? 'You are hiding' : additionalContexts.chattingFriendProfile.firstname + ' is hiding'} this message`)}
-                                                            <View style={{ flexDirection: 'row', marginTop: 5, justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
-                                                                <Image source={Images.hide} style={{ width: 15, height: 15, tintColor: colors.mutedText, marginEnd: 5 }} />
-                                                                {renderTime()}
-                                                            </View>
+                                                            {renderMainMessage()}
+                                                            {renderTime()}
                                                         </View>
-                                                    ))
-                                                : (
-                                                    <View style={[styles.messageBubble, bubbleStyle, isUser ? styles.userMessageBubble : styles.theirMessageBubble]}>
-                                                        {renderMainMessage()}
-                                                        {renderTime()}
-                                                    </View>
-                                                )}
-                                        </View>
-                                    </Pressable>
-                                </View>
-                            );
-                        })}
-                    </AppScroll>
-                </View>
+                                                    )}
+                                            </View>
+                                        </Pressable>
+                                    </View>
+                                );
+                            })}
+                        </AppScroll>
+                    </View>
+                }
             </View>
         </>
     );
