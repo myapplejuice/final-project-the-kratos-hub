@@ -198,12 +198,12 @@ export default function Chat() {
 
             const lastMessageDetails = messagesRef.current[messagesRef.current.length - 1];
             if (lastMessageDetails) {
-                const { message: lastMessage, dateTimeSent: lastMessageTime, senderId: lastMessageSenderId } = lastMessageDetails;
+                const { id: lastMessageId, message: lastMessage, dateTimeSent: lastMessageTime, senderId: lastMessageSenderId, hidden: lastMessageHidden, discarded: lastMessageDiscarded } = lastMessageDetails;
                 setUser(prev => ({
                     ...prev,
                     friends: prev.friends.map(f =>
                         f.chatRoomId === chatRoomId
-                            ? { ...f, lastMessage, lastMessageTime, unreadCount: 0, lastMessageSenderId }
+                            ? { ...f, lastMessageId, lastMessage, lastMessageTime, unreadCount: 0, lastMessageSenderId, lastMessageHidden, lastMessageDiscarded }
                             : f
                     )
                 }));
@@ -697,152 +697,198 @@ export default function Chat() {
                                             styles.messageContainer,
                                             isUser ? styles.userMessageContainer : styles.theirMessageContainer
                                         ]}>
-                                            <View style={[
-                                                styles.messageBubble,
-                                                bubbleStyle,
-                                                isUser ? styles.userMessageBubble : styles.theirMessageBubble
-                                            ]}>
-                                                {Object.keys(message?.extraInformation)?.length > 0 &&
-                                                    message.extraInformation?.context === 'mealplan' ? (
-                                                    <View style={styles.mealPlanContainer}>
-                                                        <AppText style={styles.mealPlanTitle}>
-                                                            {message.extraInformation.planLabel}
+                                            {(message.hidden && user.id !== message.senderId) ?
+                                                <View style={[
+                                                    styles.messageBubble,
+                                                    bubbleStyle,
+                                                    isUser ? styles.userMessageBubble : styles.theirMessageBubble
+                                                ]}>
+                                                    <AppText style={[
+                                                        styles.messageText,
+                                                        { marginTop: message.extraInformation?.context === 'mealplan' ? 10 : 0, color: colors.mutedText }
+                                                    ]}>
+                                                        {additionalContexts.chattingFriendProfile.firstname} has hidden this message
+                                                    </AppText>
+                                                    <View style={{ flexDirection: 'row', alignSelf: 'flex-end', alignItems: 'center', marginTop: 4, }}>
+                                                        <Image source={Images.hide} style={{ width: 15, height: 15, tintColor: colors.mutedText, marginEnd: 5 }} />
+                                                        <AppText style={styles.messageTime}>
+                                                            {timeDisplay}
                                                         </AppText>
-                                                        <AppText style={styles.mealPlanDescription}>
-                                                            {message.extraInformation.planDescription}
-                                                        </AppText>
-                                                        {message.senderId !== user.id &&
-                                                            user.plans.find(p => p.sourcePlanId === message.extraInformation.planId) === undefined ?
-                                                            <AnimatedButton
-                                                                onPress={() => handleMealPlanSave(message.extraInformation.planId, message.senderId)}
-                                                                title={'Save Plan'}
-                                                                style={styles.savePlanButton}
-                                                                textStyle={styles.savePlanButtonText} />
-                                                            :
-                                                            user.id !== message.senderId &&
-                                                            <View style={styles.savedPlanContainer}>
-                                                                <Image source={Images.checkMark} style={styles.checkMark} />
-                                                                <AppText style={styles.savedPlanText}>
-                                                                    Plan Saved
-                                                                </AppText>
-                                                            </View>
-                                                        }
                                                     </View>
-                                                ) : message.extraInformation?.context === 'image' ? (
-                                                    <TouchableOpacity onPress={() => { setSelectedImage(message.extraInformation.imageUrl), setImageViewVisible(true) }} style={{ borderRadius: 5, overflow: 'hidden' }}>
-                                                        <Image
-                                                            source={{ uri: message.extraInformation.imageUrl }}
-                                                            style={[{
-                                                                width: 300, height: 300, borderRadius: 20, marginTop: 5,
-                                                                borderTopLeftRadius: message.senderId === user.id ? 20 : 5, borderTopRightRadius: message.senderId !== user.id ? 20 : 5, backgroundColor: 'transparent'
-                                                            }]}
-                                                            resizeMode="cover"
-                                                        />
+                                                </View>
+                                                :
+                                                <View style={[
+                                                    styles.messageBubble,
+                                                    bubbleStyle,
+                                                    isUser ? styles.userMessageBubble : styles.theirMessageBubble
+                                                ]}>
 
-                                                        {message.hidden && message.senderId === user.id &&
+                                                    {Object.keys(message?.extraInformation)?.length > 0 &&
+                                                        message.extraInformation?.context === 'mealplan' ? (
+                                                        <View style={styles.mealPlanContainer}>
+                                                            <AppText style={styles.mealPlanTitle}>
+                                                                {message.extraInformation.planLabel}
+                                                            </AppText>
+                                                            <AppText style={styles.mealPlanDescription}>
+                                                                {message.extraInformation.planDescription}
+                                                            </AppText>
+                                                            {message.senderId !== user.id &&
+                                                                user.plans.find(p => p.sourcePlanId === message.extraInformation.planId) === undefined ?
+                                                                <AnimatedButton
+                                                                    onPress={() => handleMealPlanSave(message.extraInformation.planId, message.senderId)}
+                                                                    title={'Save Plan'}
+                                                                    style={styles.savePlanButton}
+                                                                    textStyle={styles.savePlanButtonText} />
+                                                                :
+                                                                user.id !== message.senderId &&
+                                                                <View style={styles.savedPlanContainer}>
+                                                                    <Image source={Images.checkMark} style={styles.checkMark} />
+                                                                    <AppText style={styles.savedPlanText}>
+                                                                        Plan Saved
+                                                                    </AppText>
+                                                                </View>
+                                                            }
+                                                        </View>
+                                                    ) : message.extraInformation?.context === 'image' ? (
+                                                        <TouchableOpacity onPress={() => { setSelectedImage(message.extraInformation.imageUrl), setImageViewVisible(true) }} style={{ borderRadius: 5, overflow: 'hidden' }}>
                                                             <View
+                                                                style={{
+                                                                    width: 300,
+                                                                    height: 300,
+                                                                    borderRadius: 20,
+                                                                    marginTop: 5,
+                                                                    overflow: 'hidden',
+                                                                    position: 'relative',
+                                                                }}
+                                                            >
+                                                                <Image
+                                                                    source={{ uri: message.extraInformation.imageUrl }}
+                                                                    style={{
+                                                                        width: '100%',
+                                                                        height: '100%',
+                                                                        borderTopLeftRadius: message.senderId === user.id ? 20 : 5,
+                                                                        borderTopRightRadius: message.senderId !== user.id ? 20 : 5,
+                                                                        opacity: message.hidden ? 0.5 : 1,
+                                                                    }}
+                                                                    resizeMode="cover"
+                                                                />
+
+                                                                {message.hidden && (
+                                                                    <View
+                                                                        style={{
+                                                                            position: 'absolute',
+                                                                            top: 0,
+                                                                            left: 0,
+                                                                            right: 0,
+                                                                            bottom: 0,
+                                                                            backgroundColor: 'rgba(0,0,0,0.85)',
+                                                                            justifyContent: 'center',
+                                                                            alignItems: 'center',
+                                                                        }}
+                                                                    >
+                                                                        {message.senderId === user.id && (
+                                                                            <AppText
+                                                                                style={{
+                                                                                    color: 'white',
+                                                                                    fontWeight: 'bold',
+                                                                                    fontSize: scaleFont(16),
+                                                                                }}
+                                                                            >
+                                                                                Photo Hidden
+                                                                            </AppText>
+                                                                        )}
+                                                                    </View>
+                                                                )}
+                                                            </View>
+                                                            <TouchableOpacity
+                                                                onPress={() => downloadAsset(message.extraInformation.imageUrl, `The_Kratos_Hub_Chat_${roomId}_image_${Date.now()}.jpg`)}
                                                                 style={{
                                                                     position: 'absolute',
                                                                     bottom: 0,
                                                                     right: 0,
                                                                     left: 0,
-                                                                    top: 0,
+                                                                    borderBottomLeftRadius: 20,
+                                                                    borderBottomRightRadius: 20,
                                                                     paddingVertical: 15,
-                                                                    backgroundColor: 'rgba(0,0,0,0.9)',
+                                                                    backgroundColor: 'rgba(0,0,0,0.5)',
                                                                     justifyContent: 'center',
                                                                     alignItems: 'center'
                                                                 }}
                                                             >
-                                                                <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(16) }}>Message Hidden</AppText>
-                                                            </View>
-                                                        }
-                                                        <TouchableOpacity
-                                                            onPress={() => downloadAsset(message.extraInformation.imageUrl, `The_Kratos_Hub_Chat_${roomId}_image_${Date.now()}.jpg`)}
-                                                            style={{
-                                                                position: 'absolute',
-                                                                bottom: 0,
-                                                                right: 0,
-                                                                left: 0,
-                                                                borderBottomLeftRadius: 20,
-                                                                borderBottomRightRadius: 20,
-                                                                paddingVertical: 15,
-                                                                backgroundColor: 'rgba(0,0,0,0.5)',
-                                                                justifyContent: 'center',
-                                                                alignItems: 'center'
-                                                            }}
-                                                        >
-                                                            <Image
-                                                                source={Images.arrow}
-                                                                style={{ width: 18, height: 18, tintColor: 'white', transform: [{ rotate: '90deg' }], marginTop: 3 }}
-                                                            />
+                                                                <Image
+                                                                    source={Images.arrow}
+                                                                    style={{ width: 18, height: 18, tintColor: 'white', transform: [{ rotate: '90deg' }], marginTop: 3 }}
+                                                                />
+                                                            </TouchableOpacity>
+
+                                                            {message.senderId === user.id &&
+                                                                <>
+                                                                    <TouchableOpacity
+                                                                        onPress={() => handleMessageUpdate(message.id, message.hidden ? 'unhide' : 'hide')}
+                                                                        style={{
+                                                                            position: 'absolute',
+                                                                            top: 15,
+                                                                            right: 10,
+                                                                            padding: 7,
+                                                                            borderRadius: 10,
+                                                                            backgroundColor: colorWithOpacity(colors.cardBackground, 16),
+                                                                            justifyContent: 'center',
+                                                                            alignItems: 'center'
+                                                                        }}
+                                                                    >
+                                                                        <Image
+                                                                            source={message.hidden ? Images.unHide : Images.hide}
+                                                                            style={{ width: 18, height: 18, tintColor: 'white' }}
+                                                                        />
+                                                                    </TouchableOpacity>
+                                                                </>
+                                                            }
                                                         </TouchableOpacity>
 
-                                                        {message.senderId === user.id &&
-                                                            <>
-                                                                <TouchableOpacity
-                                                                    onPress={() => handleMessageUpdate(message.id, message.hidden ? 'unhide' : 'hide')}
-                                                                    style={{
-                                                                        position: 'absolute',
-                                                                        top: 15,
-                                                                        right: 10,
-                                                                        padding: 7,
-                                                                        borderRadius: 10,
-                                                                        backgroundColor: colorWithOpacity(colors.cardBackground, 16),
-                                                                        justifyContent: 'center',
-                                                                        alignItems: 'center'
-                                                                    }}
-                                                                >
-                                                                    <Image
-                                                                        source={message.hidden ? Images.unHide : Images.hide}
-                                                                        style={{ width: 18, height: 18, tintColor: 'white' }}
-                                                                    />
-                                                                </TouchableOpacity>
-                                                            </>
-                                                        }
-                                                    </TouchableOpacity>
-
-                                                ) :
-                                                    message.extraInformation?.context === 'document' ? (
-                                                        <TouchableOpacity
-                                                            style={styles.documentContainer}
-                                                            onPress={() => Linking.openURL(message.extraInformation.documentUrl)}
-                                                        >
-                                                            <Image source={Images.doc} style={styles.documentIcon} />
-                                                            <AppText style={styles.documentName}>
-                                                                {message.extraInformation.documentName || "Document"}
-                                                            </AppText>
-                                                        </TouchableOpacity>
                                                     ) :
-                                                        message.extraInformation?.context === 'invite/whatsapp' &&
-                                                        (
-                                                            <>
+                                                        message.extraInformation?.context === 'document' ? (
+                                                            <TouchableOpacity
+                                                                style={styles.documentContainer}
+                                                                onPress={() => Linking.openURL(message.extraInformation.documentUrl)}
+                                                            >
+                                                                <Image source={Images.doc} style={styles.documentIcon} />
+                                                                <AppText style={styles.documentName}>
+                                                                    {message.extraInformation.documentName || "Document"}
+                                                                </AppText>
+                                                            </TouchableOpacity>
+                                                        ) :
+                                                            message.extraInformation?.context === 'invite/whatsapp' &&
+                                                            (
+                                                                <>
 
-                                                                <TouchableOpacity
-                                                                    style={[styles.documentContainer]}
-                                                                    onPress={() => message.senderId !== user.id && Linking.openURL(message.extraInformation.inviteUrl)}
-                                                                >
-                                                                    <Image source={Images.whatsappTwo} style={[styles.documentIcon, { tintColor: '#25D366' }]} />
-                                                                    <View >
-                                                                        <AppText style={styles.documentName}>
-                                                                            {message.extraInformation.inviteUrl}
-                                                                        </AppText>
-                                                                    </View>
-                                                                </TouchableOpacity>
-                                                            </>
-                                                        )}
-                                                {Object.keys(message?.extraInformation)?.length === 0 &&
-                                                    message.message &&
-                                                    <AppText style={[
-                                                        styles.messageText,
-                                                        { marginTop: message.extraInformation?.context === 'mealplan' ? 10 : 0 }
-                                                    ]}>
-                                                        {message.message}
+                                                                    <TouchableOpacity
+                                                                        style={[styles.documentContainer]}
+                                                                        onPress={() => message.senderId !== user.id && Linking.openURL(message.extraInformation.inviteUrl)}
+                                                                    >
+                                                                        <Image source={Images.whatsappTwo} style={[styles.documentIcon, { tintColor: '#25D366' }]} />
+                                                                        <View >
+                                                                            <AppText style={styles.documentName}>
+                                                                                {message.extraInformation.inviteUrl}
+                                                                            </AppText>
+                                                                        </View>
+                                                                    </TouchableOpacity>
+                                                                </>
+                                                            )}
+
+                                                    {Object.keys(message?.extraInformation)?.length === 0 &&
+                                                        message.message &&
+                                                        <AppText style={[
+                                                            styles.messageText,
+                                                            { marginTop: message.extraInformation?.context === 'mealplan' ? 10 : 0 }
+                                                        ]}>
+                                                            {message.message}
+                                                        </AppText>
+                                                    }
+                                                    <AppText style={[styles.messageTime, { alignSelf: message.senderId === user.id ? 'flex-start' : 'flex-end' }]}>
+                                                        {timeDisplay}
                                                     </AppText>
-                                                }
-                                                <AppText style={styles.messageTime}>
-                                                    {timeDisplay}
-                                                </AppText>
-                                            </View>
+                                                </View>
+                                            }
                                         </View>
                                     </View>
                                 );
@@ -958,9 +1004,8 @@ const styles = StyleSheet.create({
     },
     messageTime: {
         color: 'rgba(255, 255, 255, 0.4)',
-        alignSelf: 'flex-end',
-        marginTop: 4,
         fontSize: scaleFont(10),
+        marginTop: 5
     },
 
     // Date and Unread Dividers

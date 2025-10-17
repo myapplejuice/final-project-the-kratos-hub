@@ -55,6 +55,8 @@ export default class ChatDBService {
                    m.Message,
                    m.ExtraInformation,
                    m.SeenBy,
+                   m.Hidden,
+                   m.Discarded,
                    m.DateTimeSent
             FROM UserChatRooms ucr
             INNER JOIN Messages m ON ucr.ChatRoomId = m.ChatRoomId
@@ -216,8 +218,8 @@ export default class ChatDBService {
             lm.SenderId AS LastMessageSenderId,
             lm.DateTimeSent AS LastMessageTime,
             ISNULL(uc.UnreadCount, 0) AS UnreadCount,
-            lm.Hidden,
-            lm.Discarded
+          lm.Hidden AS LastMessageHidden,
+lm.Discarded AS LastMessageDiscarded
         FROM UserChatRooms ucr
         INNER JOIN UserChatRooms ucr2 
             ON ucr.ChatRoomId = ucr2.ChatRoomId AND ucr2.UserId != ucr.UserId
@@ -236,12 +238,6 @@ export default class ChatDBService {
                 for (const key in raw) {
                     mapped[ObjectMapper.toCamelCase(key)] = raw[key];
                 }
-
-                mapped.lastMessageHidden = mapped.hidden === 1;
-                mapped.lastMessageDiscarded = mapped.discarded === 1;
-
-                delete mapped.hidden;
-                delete mapped.discarded;
 
                 return mapped;
             });
@@ -292,8 +288,8 @@ export default class ChatDBService {
             lm.SenderId AS LastMessageSenderId,
             lm.DateTimeSent AS LastMessageTime,
             ISNULL(uc.UnreadCount, 0) AS UnreadCount,
-            lm.Hidden,
-            lm.Discarded
+            lm.Hidden AS LastMessageHidden,
+            lm.Discarded AS LastMessageDiscarded
         FROM UserChatRooms ucr
         INNER JOIN UserChatRooms ucr2 
             ON ucr.ChatRoomId = ucr2.ChatRoomId AND ucr2.UserId != ucr.UserId
@@ -314,12 +310,6 @@ export default class ChatDBService {
             for (const key in raw) {
                 mapped[ObjectMapper.toCamelCase(key)] = raw[key];
             }
-
-            mapped.lastMessageHidden = mapped.hidden === 1;
-            mapped.lastMessageDiscarded = mapped.discarded === 1;
-
-            delete mapped.hidden;
-            delete mapped.discarded;
 
             return mapped;
         } catch (err) {

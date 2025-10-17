@@ -76,7 +76,7 @@ export default class UserController {
             profile.friends.map(async (friend) => {
                 const summary = friendMessageSummaries.find(s => s.friendId === friend.friendId);
                 const trainerProfile = await UserTrainerProfileDBService.fetchTrainerProfile(friend.friendId);
-
+console.log(summary)
                 return {
                     ...friend,
                     trainerProfile,

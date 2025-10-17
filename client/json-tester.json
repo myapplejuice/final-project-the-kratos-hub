@@ -1,0 +1,15 @@
+{
+    "chatRoomId": 2,
+    "dateTimeSent": "2025-10-17T11:15:31.543Z",
+    "extraInformation": {
+        "context": "image",
+        "imageUrl": "https://res.cloudinary.com/dkujdjk2d/image/upload/v1760699731/chat_images/n4tqdltjdabcvtkjwafp.jpg"
+    },
+    "id": 449,
+    "message": "https://res.cloudinary.com/dkujdjk2d/image/upload/v1760699731/chat_images/n4tqdltjdabcvtkjwafp.jpg",
+    "receiverId": "F77573BB-FABE-4B45-A8F8-51285DB7ABE1",
+    "seenBy": [
+        "204EFF41-FF71-4636-9425-14DBB383E2BA"
+    ],
+    "senderId": "204EFF41-FF71-4636-9425-14DBB383E2BA"
+}

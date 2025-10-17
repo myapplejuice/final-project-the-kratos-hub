@@ -60,7 +60,6 @@ export default class SocketService {
 
     static hook(setUser) {
         function handleMessage(msg) {
-            console.log(msg)
             setUser(prev => ({
                 ...prev,
                 friends: prev.friends.map(f =>
