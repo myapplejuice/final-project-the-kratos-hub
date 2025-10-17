@@ -65,6 +65,7 @@ export default function Friends() {
         const idList = user.friends.filter(friend => friend.status === selectedList).map(friend => friend.friendId);
         const filtered = friendsList.filter(profile => idList.includes(profile.id));
         setVisibleList(filtered);
+        setSearchQuery('');
     }, [selectedList, user.friends]);
 
     useEffect(() => {
