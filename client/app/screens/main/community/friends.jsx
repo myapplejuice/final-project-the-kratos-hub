@@ -32,7 +32,6 @@ export default function Friends() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedList, setSelectedList] = useState('active');
-    const [visibleList, setVisibleList] = useState([]);
 
     useEffect(() => {
         async function fetchFriendsProfiles() {
@@ -48,9 +47,7 @@ export default function Friends() {
                     }
                 }
 
-                const activeIds = user.friends.filter(friend => friend.status === 'active').map(friend => friend.friendId);
                 setFriendsList(profiles);
-                setVisibleList(profiles.filter(profile => activeIds.includes(profile.id)));
             } catch (error) {
                 console.log(error);
             } finally {
@@ -60,28 +57,6 @@ export default function Friends() {
 
         fetchFriendsProfiles();
     }, []);
-
-    useEffect(() => {
-        const idList = user.friends.filter(friend => friend.status === selectedList).map(friend => friend.friendId);
-        const filtered = friendsList.filter(profile => idList.includes(profile.id));
-        setVisibleList(filtered);
-        setSearchQuery('');
-    }, [selectedList, user.friends]);
-
-    useEffect(() => {
-        const idList = user.friends.filter(friend => friend.status === selectedList).map(friend => friend.friendId);
-
-        if (searchQuery === '') {
-            setVisibleList(friendsList.filter(profile => idList.includes(profile.id)));
-            return;
-        }
-
-        const query = searchQuery.trim().toLowerCase();
-        const filtered = friendsList.filter(profile =>
-            (profile.firstname + ' ' + profile.lastname).toLowerCase().startsWith(query) && idList.includes(profile.id)
-        );
-        setVisibleList(filtered);
-    }, [searchQuery]);
 
     function handleProfilePress(profile) {
         router.push({
@@ -102,6 +77,20 @@ export default function Friends() {
         setAdditionalContexts({ chattingFriendProfile, friendStatus: status });
         router.push(routes.CHAT)
     }
+
+    const filteredIds = user.friends
+        .filter(f => f.status === selectedList)
+        .map(f => f.friendId);
+
+    const filteredVisibleList = friendsList
+        .filter(profile => filteredIds.includes(profile.id))
+        .filter(profile => {
+            if (searchQuery.trim() === '') return true;
+            return (profile.firstname + ' ' + profile.lastname)
+                .toLowerCase()
+                .startsWith(searchQuery.trim().toLowerCase());
+        });
+
 
     return (
         <AppScroll extraBottom={loading ? 0 : 150} avoidKeyboard={false}>
@@ -146,9 +135,9 @@ export default function Friends() {
                         </View>
                         :
                         <>
-                            {visibleList.length > 0 ? (
+                            {filteredVisibleList.length > 0 ? (
                                 <View>
-                                    {visibleList.map((friend, i) => {
+                                    {filteredVisibleList.map((friend, i) => {
                                         const friendship = user.friends.find(f => f.friendId === friend.id) || {};
                                         const sender = friendship.lastMessageSenderId === user.id ? 'You: ' : '';
                                         const displayMessage = friendship.lastMessageHidden ? 'Hidden message' : friendship.lastMessage || 'No messages yet';
