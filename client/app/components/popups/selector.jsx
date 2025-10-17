@@ -80,9 +80,9 @@ export default function Selector({
         pressableContainer: {
             marginVertical: 15,
             backgroundColor: colors.main,
-            width: '48%',
-            height: 50,
-            borderRadius: 20,
+            width: optionAText !== null && optionBText !== null ? '48%' : '100%',
+            padding: 15,
+            borderRadius: 15,
             justifyContent: 'center'
         },
         pressable: {
@@ -93,8 +93,8 @@ export default function Selector({
         cancelContainer: {
             backgroundColor: 'rgb(255, 58, 48)',
             borderColor: colors.main,
-            height: 50,
-            borderRadius: 20,
+      padding: 15,
+            borderRadius: 15,
             justifyContent: 'center'
         },
         cancelPressable: {
@@ -116,12 +116,16 @@ export default function Selector({
                     <AppText style={styles.title}>{title}</AppText>
                     <AppText style={styles.text}>{text}</AppText>
                     <View style={styles.pressablesWrapper}>
-                        <TouchableOpacity style={styles.pressableContainer} onPress={onPressA}>
-                            <AppText style={styles.pressable}>{optionAText}</AppText>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.pressableContainer} onPress={onPressB}>
-                            <AppText style={styles.pressable}>{optionBText}</AppText>
-                        </TouchableOpacity>
+                        {optionAText !== null && onPressA !== null &&
+                            <TouchableOpacity style={styles.pressableContainer} onPress={onPressA}>
+                                <AppText style={styles.pressable}>{optionAText}</AppText>
+                            </TouchableOpacity>
+                        }
+                        {optionBText !== null && onPressA !== null &&
+                            <TouchableOpacity style={styles.pressableContainer} onPress={onPressB}>
+                                <AppText style={styles.pressable}>{optionBText}</AppText>
+                            </TouchableOpacity>
+                        }
                     </View>
                     <TouchableOpacity style={styles.cancelContainer} onPress={onCancel}>
                         <AppText style={styles.cancelPressable}>{cancelText}</AppText>

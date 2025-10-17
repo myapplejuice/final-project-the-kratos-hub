@@ -114,15 +114,19 @@ export default function Notifications() {
                         const newFriendshipId = result.data.id;
                         const chatRoomId = result.data.chatRoomId;
 
-                        createToast({ message: `Friend request ${reply}` });
-
                         setUser(prev => ({
                             ...prev,
                             pendingFriends: prev.pendingFriends.map(f =>
                                 f.id === request.id ? { ...f, status: reply } : f
                             ),
                             friends: reply === 'accepted'
-                                ? [...prev.friends, { id: newFriendshipId, friendId: request.adderId, status: 'active', lastMessage: null, lastMessageTime: null, unreadCount: 0, chatRoomId }]
+                                ? [...prev.friends, {
+                                    id: newFriendshipId, friendId: request.adderId,
+                                    status: 'active', lastMessage: null, lastMessageTime: null,
+                                    lastMessageSenderId: null, lastMessageId: null,
+                                    lastMessageHidden: false, lastMessageDiscarded: false,
+                                    unreadCount: 0, chatRoomId
+                                }]
                                 : prev.friends
                         }));
 
@@ -218,7 +222,7 @@ export default function Notifications() {
                                                     <View style={{ marginEnd: 15 }}>
                                                         <Image
                                                             source={{ uri: profile.imageURL } || Images.profilePic}
-                                                              cachePolicy="disk"   
+                                                            cachePolicy="disk"
                                                             style={{ width: 50, height: 50, borderRadius: 25 }}
                                                         />
                                                     </View>
