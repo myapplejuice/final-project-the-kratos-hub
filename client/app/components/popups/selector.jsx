@@ -68,7 +68,6 @@ export default function Selector({
         text: {
             alignSelf: "flex-start",
             marginTop: 10,
-            marginBottom: 15,
             color: "white",
             fontSize: scaleFont(12),
         },
@@ -76,6 +75,7 @@ export default function Selector({
             flexDirection: "row",
             justifyContent: "space-between",
             width: "100%",
+            marginTop: 15,
         },
         pressableContainer: {
             marginVertical: 15,
@@ -93,7 +93,7 @@ export default function Selector({
         cancelContainer: {
             backgroundColor: 'rgb(255, 58, 48)',
             borderColor: colors.main,
-      padding: 15,
+            padding: 15,
             borderRadius: 15,
             justifyContent: 'center'
         },
@@ -114,7 +114,9 @@ export default function Selector({
             <Animated.View style={[styles.alertBox, { transform: [{ translateY }] }]}>
                 <SafeAreaView edges={["bottom"]}>
                     <AppText style={styles.title}>{title}</AppText>
-                    <AppText style={styles.text}>{text}</AppText>
+                    {text &&
+                        <AppText style={styles.text}>{text}</AppText>
+                    }
                     <View style={styles.pressablesWrapper}>
                         {optionAText !== null && onPressA !== null &&
                             <TouchableOpacity style={styles.pressableContainer} onPress={onPressA}>

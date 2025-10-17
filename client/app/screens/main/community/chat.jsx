@@ -432,11 +432,12 @@ export default function Chat() {
     }
 
     function handleMessageLongPress(message) {
-        if ((message.senderId !== user.id && message.hidden) || message.extraInformation.context === 'image') return;
-        
+        if (message.extraInformation.context === 'image') return;
+        if (message.senderId !== user.id && message.hidden) return;
+
         createSelector({
-            title: "Profile Picture",
-            text: "Do you want to take a photo using camera or upload an image?",
+            title: "Message Actions",
+            text: null,
             optionAText: message.senderId === user.id ? message.hidden ? "Unhide Message" : "Hide Message" : null,
             optionBText: "Copy Message",
             cancelText: "Cancel",
@@ -737,7 +738,7 @@ export default function Chat() {
                                     style={{ borderRadius: 5, overflow: 'hidden', marginBottom: 8 }}
                                 >
                                     {/* Image with overlay */}
-                                    <View style={{ width: 300, height: 300, borderRadius: 20, marginTop: 5, overflow: 'hidden', position: 'relative' }}>
+                                    <View style={{ width: 300, height: 300, borderRadius: 20, borderTopLeftRadius: isUser ? 20: 5, borderTopRightRadius: !isUser ? 20: 5, marginTop: 5, overflow: 'hidden', position: 'relative' }}>
                                         <Image
                                             source={{ uri: message.extraInformation.imageUrl }}
                                             style={{
@@ -803,7 +804,7 @@ export default function Chat() {
                                                 top: 15,
                                                 right: 10,
                                                 padding: 7,
-                                                borderRadius: 10,
+                                                borderRadius: 5,
                                                 backgroundColor: colorWithOpacity(colors.cardBackground, 16),
                                                 justifyContent: 'center',
                                                 alignItems: 'center',
@@ -875,20 +876,27 @@ export default function Chat() {
                                         delayLongPress={350}
                                     >
                                         <View style={[styles.messageContainer, isUser ? styles.userMessageContainer : styles.theirMessageContainer]}>
-                                            {message.hidden ? (
-                                                <View style={[styles.messageBubble, bubbleStyle, isUser ? styles.userMessageBubble : styles.theirMessageBubble]}>
-                                                    {renderHiddenNotice(`${user.id === message.senderId ? 'You are hiding' : additionalContexts.chattingFriendProfile.firstname + ' is hiding'} this message`)}
-                                                    <View style={{ flexDirection: 'row', marginTop: 5, justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
-                                                        <Image source={Images.hide} style={{ width: 15, height: 15, tintColor: colors.mutedText, marginEnd: 5 }} />
+                                            {message.hidden ?
+                                                ((message.extraInformation.context === 'image' && isUser) ?
+                                                    <View style={[styles.messageBubble, bubbleStyle, isUser ? styles.userMessageBubble : styles.theirMessageBubble]}>
+                                                        {renderMainMessage()}
                                                         {renderTime()}
                                                     </View>
-                                                </View>
-                                            ) : (
-                                                <View style={[styles.messageBubble, bubbleStyle, isUser ? styles.userMessageBubble : styles.theirMessageBubble]}>
-                                                    {renderMainMessage()}
-                                                    {renderTime()}
-                                                </View>
-                                            )}
+                                                    : (
+                                                        <View style={[styles.messageBubble, bubbleStyle, isUser ? styles.userMessageBubble : styles.theirMessageBubble]}>
+                                                            {renderHiddenNotice(`${user.id === message.senderId ? 'You are hiding' : additionalContexts.chattingFriendProfile.firstname + ' is hiding'} this message`)}
+                                                            <View style={{ flexDirection: 'row', marginTop: 5, justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
+                                                                <Image source={Images.hide} style={{ width: 15, height: 15, tintColor: colors.mutedText, marginEnd: 5 }} />
+                                                                {renderTime()}
+                                                            </View>
+                                                        </View>
+                                                    ))
+                                                : (
+                                                    <View style={[styles.messageBubble, bubbleStyle, isUser ? styles.userMessageBubble : styles.theirMessageBubble]}>
+                                                        {renderMainMessage()}
+                                                        {renderTime()}
+                                                    </View>
+                                                )}
                                         </View>
                                     </Pressable>
                                 </View>

@@ -68,14 +68,16 @@ export default function Friends() {
     }, [selectedList, user.friends]);
 
     useEffect(() => {
+        const idList = user.friends.filter(friend => friend.status === selectedList).map(friend => friend.friendId);
+
         if (searchQuery === '') {
-            setVisibleList(friendsList);
+            setVisibleList(friendsList.filter(profile => idList.includes(profile.id)));
             return;
         }
 
         const query = searchQuery.trim().toLowerCase();
         const filtered = friendsList.filter(profile =>
-            (profile.firstname + ' ' + profile.lastname).toLowerCase().startsWith(query)
+            (profile.firstname + ' ' + profile.lastname).toLowerCase().startsWith(query) && idList.includes(profile.id)
         );
         setVisibleList(filtered);
     }, [searchQuery]);
@@ -126,146 +128,147 @@ export default function Friends() {
                         </View>
                     </View>
                     <Divider orientation='horizontal' style={{ marginVertical: 25 }} />
-                    {visibleList.length > 0 ? (
-                        <View>
-                            {visibleList.map((friend, i) => {
-                                const friendship = user.friends.find(f => f.friendId === friend.id) || {};
-                                const sender = friendship.lastMessageSenderId === user.id ? 'You: ' : '';
-                                const displayMessage = friendship.lastMessageHidden ? 'Hidden message' : friendship.lastMessage || 'No messages yet';
+                    {friendsList.length === 0 ?
+                        <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, margin: 15 }}>
+                            <Image source={Images.sad} style={{ width: 100, height: 100, tintColor: colors.mutedText + '40' }} />
+                            <AppText style={{ color: colors.mutedText + '60', fontWeight: 'bold', fontSize: scaleFont(25), marginTop: 15, textAlign: 'center' }}>
+                                Your friends list is empty
+                            </AppText>
+                            <AppText style={{ color: colors.mutedText, fontSize: scaleFont(15), marginTop: 5, textAlign: 'center' }}>
+                                Explore the app, contribute to the community, make new friends, and grow your network.
+                            </AppText>
+                            <AnimatedButton
+                                title="Community Hub"
+                                onPress={() => console.log('replace with hub later')}
+                                style={{ marginTop: 20, padding: 15, borderRadius: 20, width: 200, backgroundColor: colors.main }}
+                            />
+                        </View>
+                        :
+                        <>
+                            {visibleList.length > 0 ? (
+                                <View>
+                                    {visibleList.map((friend, i) => {
+                                        const friendship = user.friends.find(f => f.friendId === friend.id) || {};
+                                        const sender = friendship.lastMessageSenderId === user.id ? 'You: ' : '';
+                                        const displayMessage = friendship.lastMessageHidden ? 'Hidden message' : friendship.lastMessage || 'No messages yet';
 
-                                const messageTimeDetails = new Date(friendship.lastMessageTime);
-                                const displayTime = (() => {
-                                    if (!friendship.lastMessageTime) return '';
+                                        const messageTimeDetails = new Date(friendship.lastMessageTime);
+                                        const displayTime = (() => {
+                                            if (!friendship.lastMessageTime) return '';
 
-                                    const now = new Date();
-                                    const diffMs = now - messageTimeDetails;
-                                    const diffMinutes = Math.floor(diffMs / 60000);
+                                            const now = new Date();
+                                            const diffMs = now - messageTimeDetails;
+                                            const diffMinutes = Math.floor(diffMs / 60000);
 
-                                    if (diffMinutes < 1) return 'Just now';
-                                    if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''} ago`;
+                                            if (diffMinutes < 1) return 'Just now';
+                                            if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''} ago`;
 
-                                    // Only check day comparisons if not recent
-                                    const { isToday, isYesterday } = getDayComparisons(messageTimeDetails);
+                                            // Only check day comparisons if not recent
+                                            const { isToday, isYesterday } = getDayComparisons(messageTimeDetails);
 
-                                    if (isToday) {
-                                        return formatTime(messageTimeDetails, { format: user.preferences.timeFormat.key });
-                                    } else if (isYesterday) {
-                                        return 'Yesterday';
-                                    } else {
-                                        return formatDate(messageTimeDetails, { format: user.preferences.dateFormat.key });
-                                    }
-                                })();
+                                            if (isToday) {
+                                                return formatTime(messageTimeDetails, { format: user.preferences.timeFormat.key });
+                                            } else if (isYesterday) {
+                                                return 'Yesterday';
+                                            } else {
+                                                return formatDate(messageTimeDetails, { format: user.preferences.dateFormat.key });
+                                            }
+                                        })();
 
-                                const isUnread = friendship.unreadCount > 0;
+                                        const isUnread = friendship.unreadCount > 0;
 
-                                return (
-                                    <TouchableOpacity
-                                        onPress={() => handleFriendClick(friend, friendship.status)}
-                                        style={{
-                                            flexDirection: 'row',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            marginBottom: 15,
-                                            backgroundColor: colors.cardBackground + '80',
-                                            padding: 10,
-                                            borderRadius: 15,
-                                            borderWidth: isUnread ? 2 : 0,
-                                            borderColor: isUnread ? colors.mutedText : 'transparent',
-                                        }}
-                                        key={i}
-                                    >
-                                        {/* LEFT SIDE: Avatar + Name + Message */}
-                                        <View style={{ flexDirection: 'row', flex: 1, marginRight: 10 }}>
+                                        return (
                                             <TouchableOpacity
-                                                onPress={() => handleProfilePress(friend)}
-                                                style={styles.imageWrapper}
+                                                onPress={() => handleFriendClick(friend, friendship.status)}
+                                                style={{
+                                                    flexDirection: 'row',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+                                                    marginBottom: 15,
+                                                    backgroundColor: colors.cardBackground + '80',
+                                                    padding: 10,
+                                                    borderRadius: 15,
+                                                    borderWidth: isUnread ? 2 : 0,
+                                                    borderColor: isUnread ? colors.mutedText : 'transparent',
+                                                }}
+                                                key={i}
                                             >
-                                                <Image
-                                                    source={{ uri: friend.imageURL }}
-                                                    cachePolicy="disk"
-                                                    style={{ width: 50, height: 50, borderRadius: 25 }}
-                                                />
+                                                {/* LEFT SIDE: Avatar + Name + Message */}
+                                                <View style={{ flexDirection: 'row', flex: 1, marginRight: 10 }}>
+                                                    <TouchableOpacity
+                                                        onPress={() => handleProfilePress(friend)}
+                                                        style={styles.imageWrapper}
+                                                    >
+                                                        <Image
+                                                            source={{ uri: friend.imageURL }}
+                                                            cachePolicy="disk"
+                                                            style={{ width: 50, height: 50, borderRadius: 25 }}
+                                                        />
+                                                    </TouchableOpacity>
+
+                                                    <View style={{ marginStart: 15, justifyContent: 'center', flex: 1 }}>
+                                                        <AppText
+                                                            style={[
+                                                                styles.cardLabel,
+                                                                { fontWeight: 'bold', fontSize: scaleFont(15) },
+                                                            ]}
+                                                            numberOfLines={1}
+                                                            ellipsizeMode="tail"
+                                                        >
+                                                            {friend.firstname} {friend.lastname}
+                                                        </AppText>
+
+                                                        <AppText
+                                                            numberOfLines={1}
+                                                            ellipsizeMode="tail"
+                                                            style={{
+                                                                color: isUnread ? 'white' : colors.mutedText,
+                                                                fontSize: scaleFont(12),
+                                                            }}
+                                                        >
+                                                            {sender + displayMessage}
+                                                        </AppText>
+                                                    </View>
+                                                </View>
+
+                                                {/* RIGHT SIDE: Timestamp */}
+                                                <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
+                                                    <AppText
+                                                        style={{
+                                                            color: isUnread ? 'white' : colors.mutedText,
+                                                            fontSize: scaleFont(11),
+                                                        }}
+                                                        numberOfLines={1}
+                                                    >
+                                                        {displayTime}
+                                                    </AppText>
+                                                </View>
                                             </TouchableOpacity>
 
-                                            <View style={{ marginStart: 15, justifyContent: 'center', flex: 1 }}>
-                                                <AppText
-                                                    style={[
-                                                        styles.cardLabel,
-                                                        { fontWeight: 'bold', fontSize: scaleFont(15) },
-                                                    ]}
-                                                    numberOfLines={1}
-                                                    ellipsizeMode="tail"
-                                                >
-                                                    {friend.firstname} {friend.lastname}
-                                                </AppText>
+                                        );
+                                    })}
+                                </View>
 
-                                                <AppText
-                                                    numberOfLines={1}
-                                                    ellipsizeMode="tail"
-                                                    style={{
-                                                        color: isUnread ? 'white' : colors.mutedText,
-                                                        fontSize: scaleFont(12),
-                                                    }}
-                                                >
-                                                    {sender + displayMessage}
-                                                </AppText>
-                                            </View>
-                                        </View>
-
-                                        {/* RIGHT SIDE: Timestamp */}
-                                        <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
-                                            <AppText
-                                                style={{
-                                                    color: isUnread ? 'white' : colors.mutedText,
-                                                    fontSize: scaleFont(11),
-                                                }}
-                                                numberOfLines={1}
-                                            >
-                                                {displayTime}
-                                            </AppText>
-                                        </View>
-                                    </TouchableOpacity>
-
-                                );
-                            })}
-                        </View>
-
-                    ) : (
-                        visibleList.length > 0 ? (
-                            <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, margin: 15 }}>
-                                <Image source={Images.noProfile} style={{ width: 100, height: 100, tintColor: colors.mutedText + '40' }} />
-                                <AppText style={{ color: colors.mutedText + '60', fontWeight: 'bold', fontSize: scaleFont(25), marginTop: 15 }}>
-                                    User not found
-                                </AppText>
-                                <AppText style={{ color: colors.mutedText, fontSize: scaleFont(15), marginTop: 5, textAlign: 'center' }}>
-                                    Try a again and make sure your friend is in your friends list
-                                </AppText>
-                            </View>
-                        ) :
-                            selectedList === 'inactive' ? (
+                            ) : (
                                 <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, margin: 15 }}>
                                     <Image source={Images.noProfile} style={{ width: 100, height: 100, tintColor: colors.mutedText + '40' }} />
-                                    <AppText style={{ color: colors.mutedText + '60', fontWeight: 'bold', fontSize: scaleFont(25), textAlign: 'center' }}>
-                                        You have no terminated or blocked friends
-                                    </AppText>
-                                </View>
-                            ) : friendsList.length === 0 && (
-                                <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, margin: 15 }}>
-                                    <Image source={Images.sad} style={{ width: 100, height: 100, tintColor: colors.mutedText + '40' }} />
                                     <AppText style={{ color: colors.mutedText + '60', fontWeight: 'bold', fontSize: scaleFont(25), marginTop: 15, textAlign: 'center' }}>
-                                        Your friends list is empty
+                                        {
+                                            searchQuery.length > 0 ? "User not found" :
+                                                (friendsList.length > 0 && selectedList === 'active') ? "All your friends are blocked by you or have blocked you" :
+                                                    (friendsList.length > 0 && selectedList === 'inactive') ? "You have no terminated or blocked friends" :
+                                                        ""
+                                        }
                                     </AppText>
-                                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(15), marginTop: 5, textAlign: 'center' }}>
-                                        Explore the app, contribute to the community, make new friends, and grow your network.
-                                    </AppText>
-                                    <AnimatedButton
-                                        title="Community Hub"
-                                        onPress={() => console.log('replace with hub later')}
-                                        style={{ marginTop: 20, padding: 15, borderRadius: 20, width: 200, backgroundColor: colors.main }}
-                                    />
+                                    {searchQuery.length > 0 &&
+                                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(15), marginTop: 5, textAlign: 'center' }}>
+                                            Try a again and make sure your friend is in your friends list
+                                        </AppText>
+                                    }
                                 </View>
-                            )
-                    )}
+                            )}
+                        </>
+                    }
                 </View>
             ) : (
                 <View style={{ marginTop: 15 }}>

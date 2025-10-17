@@ -1,15 +1,38 @@
-{
-    "chatRoomId": 2,
-    "dateTimeSent": "2025-10-17T11:15:31.543Z",
-    "extraInformation": {
-        "context": "image",
-        "imageUrl": "https://res.cloudinary.com/dkujdjk2d/image/upload/v1760699731/chat_images/n4tqdltjdabcvtkjwafp.jpg"
+[
+    {
+        "age": 33,
+        "dateOfCreation": "2025-10-12T13:18:05.467Z",
+        "email": "David1@gmail.com",
+        "firstname": "David",
+        "gender": "male",
+        "id": "F77573BB-FABE-4B45-A8F8-51285DB7ABE1",
+        "imageURL": "https://res.cloudinary.com/dkujdjk2d/image/upload/v1760553576/profile_images/hk05sqdaj4dxnlueo5mh.jpg",
+        "lastname": "Alaba",
+        "phone": "050848464",
+        "trainerProfile": {}
     },
-    "id": 449,
-    "message": "https://res.cloudinary.com/dkujdjk2d/image/upload/v1760699731/chat_images/n4tqdltjdabcvtkjwafp.jpg",
-    "receiverId": "F77573BB-FABE-4B45-A8F8-51285DB7ABE1",
-    "seenBy": [
-        "204EFF41-FF71-4636-9425-14DBB383E2BA"
-    ],
-    "senderId": "204EFF41-FF71-4636-9425-14DBB383E2BA"
-}
+    {
+        "age": 33,
+        "dateOfCreation": "2025-10-07T13:00:48.250Z",
+        "email": "rawda1@gmail.com",
+        "firstname": "Rawda",
+        "gender": "female",
+        "id": "9660511F-B551-4970-9160-D193B735723B",
+        "imageURL": "https://res.cloudinary.com/dkujdjk2d/image/upload/v1760445047/profile-pic_xhxuvd.jpg",
+        "lastname": "Abu Shah",
+        "phone": "0564848166",
+        "trainerProfile": {}
+    },
+    {
+        "age": 22,
+        "dateOfCreation": "2025-10-12T18:55:51.658Z",
+        "email": "Doki1@gmail.com",
+        "firstname": "Doki",
+        "gender": "female",
+        "id": "4F440C37-1901-4155-ADCC-F3F49DC11E54",
+        "imageURL": "https://res.cloudinary.com/dkujdjk2d/image/upload/v1760445047/profile-pic_xhxuvd.jpg",
+        "lastname": "Dojus",
+        "phone": "056787756",
+        "trainerProfile": {}
+    }
+]
