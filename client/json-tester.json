@@ -1,38 +1,19 @@
-[
-    {
-        "age": 33,
-        "dateOfCreation": "2025-10-12T13:18:05.467Z",
-        "email": "David1@gmail.com",
-        "firstname": "David",
-        "gender": "male",
-        "id": "F77573BB-FABE-4B45-A8F8-51285DB7ABE1",
-        "imageURL": "https://res.cloudinary.com/dkujdjk2d/image/upload/v1760553576/profile_images/hk05sqdaj4dxnlueo5mh.jpg",
-        "lastname": "Alaba",
-        "phone": "050848464",
-        "trainerProfile": {}
-    },
-    {
-        "age": 33,
-        "dateOfCreation": "2025-10-07T13:00:48.250Z",
-        "email": "rawda1@gmail.com",
-        "firstname": "Rawda",
-        "gender": "female",
-        "id": "9660511F-B551-4970-9160-D193B735723B",
-        "imageURL": "https://res.cloudinary.com/dkujdjk2d/image/upload/v1760445047/profile-pic_xhxuvd.jpg",
-        "lastname": "Abu Shah",
-        "phone": "0564848166",
-        "trainerProfile": {}
-    },
-    {
-        "age": 22,
-        "dateOfCreation": "2025-10-12T18:55:51.658Z",
-        "email": "Doki1@gmail.com",
-        "firstname": "Doki",
-        "gender": "female",
-        "id": "4F440C37-1901-4155-ADCC-F3F49DC11E54",
-        "imageURL": "https://res.cloudinary.com/dkujdjk2d/image/upload/v1760445047/profile-pic_xhxuvd.jpg",
-        "lastname": "Dojus",
-        "phone": "056787756",
-        "trainerProfile": {}
-    }
-]
+{
+    "biography": "I have years of experience training many famous athletes such as cristiano ronaldo",
+    "images": [
+        {
+            "fileName": "fd3052bb-08e3-4861-b044-4250ae1d10a9.jpg",
+            "type": "image/jpeg",
+            "url": "https://res.cloudinary.com/dkujdjk2d/image/upload/v1760466495/user_trainer_profile_images/xcbaidyi9snjjbfnkqau.jpg"
+        },
+        {
+            "fileName": "ed116a91-25bf-4e10-bf78-c95d850526dc.jpeg",
+            "type": "image",
+            "url": "https://res.cloudinary.com/dkujdjk2d/image/upload/v1760466496/user_trainer_profile_images/g9ibkvz9z7q9ccrjhhio.jpg"
+        }
+    ],
+    "isVerified": true,
+    "trainerStatus": "active",
+    "userId": "204EFF41-FF71-4636-9425-14DBB383E2BA",
+    "yearsOfExperience": "6+ Years"
+}

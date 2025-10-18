@@ -2,7 +2,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Animated, Easing, Keyboard, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Animated, Easing, Keyboard, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import BuildFooter from "../../components/layout-comps/build-footer";
 import AppText from "../../components/screen-comps/app-text";
 import { Images } from '../../common/settings/assets';
@@ -30,7 +30,7 @@ export default function Community() {
     const [friendsList, setFriendsList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedList, setSelectedList] = useState('active');
+    const [selectedPosts, setSelectedPosts] = useState('Any');
 
     const fadeAnim = useRef(new Animated.Value(0.3)).current;
 
@@ -51,7 +51,7 @@ export default function Community() {
                 }),
             ])
         );
-
+        console.log(user.trainerProfile)
         animation.start();
 
         setTimeout(() => {
@@ -81,15 +81,61 @@ export default function Community() {
 
     return (
         <AppScroll hideNavBarOnScroll={true} hideTopBarOnScroll={true} extraBottom={100}>
-            <View style={{ marginTop: 15 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Image source={{ uri: user.imageURL }} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15 }} />
-                    <View style={{ justifyContent: 'center' }}>
-                        <Animated.View style={{ width: 90, height: 10, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5}} />
-                        <Animated.View style={{ width: 60, height: 7, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5 }} />
+            <View style={{ marginTop: 15, height: 60 }}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 10, alignItems: 'center' }}>
+                    {["Any", "Tips", "Trainer Ad", "Need Trainer", "Moments", "Inquiry"].map((opt, idx) => {
+                        return (
+                            <TouchableOpacity
+                                key={idx}
+                                onPress={() => setSelectedPosts(opt)}
+                                style={{
+                                    paddingHorizontal: 15,
+                                    paddingVertical: 8,
+                                    borderRadius: 20,
+                                    backgroundColor: selectedPosts === opt ? colors.main : colors.cardBackground,
+                                    marginRight: 10,
+                                }}
+                            >
+                                <AppText style={{ color: 'white', fontSize: 14 }}>{opt}</AppText>
+                            </TouchableOpacity>
+                        )
+                    })}
+                </ScrollView>
+            </View>
+
+            <Divider orientation='horizontal' style={{ marginVertical: 15 }} />
+
+            <View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginStart: 15, alignItems: 'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <TouchableOpacity onPress={() => console.log('route to user profile')} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={{ uri: user.imageURL }} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardBackground }} />
+
+                            <View style={{ justifyContent: 'center', marginStart: 15 }}>
+                                <AppText style={{ color: 'white', fontWeight: 'bold' }}>{user.firstname} {user.lastname}</AppText>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <AppText style={{ color: colors.mutedText, fontWeight: 'bold', fontSize: scaleFont(10) }}>{user.gender === 'male' ? 'M' : 'F'}, {user.age}</AppText>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginStart: 10 }}>
+                            {user.trainerProfile.trainerStatus === 'active' && !user.trainerProfile.isVerified &&
+                                <TouchableOpacity onPress={() => router.push(routes.PERSONAL_TRAINING_EXPLANATION)} style={{ height: 20, width: 20, borderRadius: 10, backgroundColor: colors.main, justifyContent: 'center', alignItems: 'center', marginEnd: 5 }}>
+                                    <Image source={Images.personalTrainer} style={{ width: 12, height: 12, tintColor: 'white' }} />
+                                </TouchableOpacity>
+                            }
+                            {user.trainerProfile.isVerified &&
+                                <TouchableOpacity onPress={() => router.push(routes.SHIELD_OF_TRUST)} style={{ height: 20, width: 20, borderRadius: 10, backgroundColor: colors.main, justifyContent: 'center', alignItems: 'center' }}>
+                                    <Image source={Images.shield} style={{ width: 12, height: 12, tintColor: 'white' }} />
+                                </TouchableOpacity>
+                            }
+                        </View>
                     </View>
+                    <TouchableOpacity onPress={() => console.log('options')} style={{ padding: 15 }}>
+                        <Image source={Images.options} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                    </TouchableOpacity>
                 </View>
-                <Animated.View style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 15, borderRadius: 10 }} />
+                <Image source={Images.profilePic} style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 10 }} resizeMode='contain' />
             </View>
         </AppScroll>
     );

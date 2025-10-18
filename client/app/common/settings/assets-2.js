@@ -144,7 +144,7 @@ export const Images_2 = {
     xTwoOutline: require('../../../assets/images/x-2-outline.png'),
     credibilityThree: require('../../../assets/images/credibility-3.png'),
     rocket: require('../../../assets/images/rocket.png'),
- hide: require('../../../assets/images/hide.png'),
+    hide: require('../../../assets/images/hide.png'),
     hideOutline: require('../../../assets/images/hide-outline.png'),
     unHide: require('../../../assets/images/unhide.png'),
     unHideOutline: require('../../../assets/images/unhide-outline.png'),
@@ -153,4 +153,6 @@ export const Images_2 = {
     shareOutline: require('../../../assets/images/share-outline.png'),
     community: require('../../../assets/images/community.png'),
     communityOutline: require('../../../assets/images/community-outline.png'),
+    options: require('../../../assets/images/options.png'),
+    optionsOutline: require('../../../assets/images/options-outline.png'),
 };
