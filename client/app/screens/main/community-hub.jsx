@@ -28,13 +28,11 @@ import CommunityPost from '../../components/screen-comps/community-post';
 import FloatingActionMenu from '../../components/screen-comps/floating-action-menu';
 
 export default function Community() {
-    const { user, setAdditionalContexts } = useContext(UserContext);
+    const { user } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
     const [fabVisible, setFabVisible] = useState(true);
-    const [friendsList, setFriendsList] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
     const [selectedPosts, setSelectedPosts] = useState('Any');
 
     const fadeAnim = useRef(new Animated.Value(0.3)).current;
@@ -89,8 +87,8 @@ export default function Community() {
             <FloatingActionMenu
                 overlayColor="rgba(0, 0, 0, 0.8)"
                 actions={[
-                    { icon: Images.list3, title: 'Saved Posts', onPress: () => console.log('something'), closeOnAction: true, delayClosure: true },
-                    { icon: Images.meals, title: 'My Posts', onPress: () => router.push(routes.USER_POSTS), closeOnAction: true },
+                    { icon: Images.bookmark, title: 'Saved Posts', onPress: () => console.log('something'), closeOnAction: true },
+                    { icon: Images.posts, title: 'My Posts', onPress: () => router.push(routes.USER_POSTS), closeOnAction: true },
                 ]}
                 visible={fabVisible}
                 position={{ bottom: insets.bottom + 70, right: 20 }}

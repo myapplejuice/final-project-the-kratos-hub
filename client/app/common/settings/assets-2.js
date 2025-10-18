@@ -164,4 +164,8 @@ export const Images_2 = {
     bookmarkOutline: require('../../../assets/images/bookmark-outline.png'),
     comment: require('../../../assets/images/comment.png'),
     commentOutline: require('../../../assets/images/comment-outline.png'),
+    post: require('../../../assets/images/post.png'),
+    postOutline: require('../../../assets/images/post-outline.png'),
+    posts: require('../../../assets/images/posts.png'),
+    postsOutline: require('../../../assets/images/posts-outline.png'),
 };

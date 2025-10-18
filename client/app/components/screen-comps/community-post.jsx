@@ -9,6 +9,7 @@ import { formatDate, formatTime, getDayComparisons } from '../../common/utils/da
 import { UserContext } from '../../common/contexts/user-context';
 import { routes } from '../../common/settings/constants';
 import ProgressDots from './progress-dots';
+import AppImageBackground from './app-image-background';
 
 export default function CommunityPost({ post, isLikedByUser = false, isSavedByUser = false, isUserPost = false }) {
     const { user } = useContext(UserContext);
@@ -42,9 +43,9 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
         <View style={{
             marginBottom: 25,
             backgroundColor: 'rgba(30, 30, 30, 0.7)',
-            borderRadius: 16,
+            borderRadius: 15,
             overflow: 'hidden',
-            marginHorizontal: 12,
+            marginHorizontal: 10,
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.3,
@@ -56,43 +57,46 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 padding: 16,
-                alignItems: 'flex-start',
+                alignItems: 'center',
                 borderBottomWidth: 0.5,
                 borderBottomColor: 'rgba(255,255,255,0.1)'
             }}>
                 <View style={{ flexDirection: 'row', alignItems: 'flex-start', flex: 1 }}>
-                    <TouchableOpacity
-                        onPress={handleUserPress}
-                        style={{ flexDirection: 'row', alignItems: 'flex-start', flex: 1 }}
-                    >
-                        <Image
-                            source={{ uri: postUser.imageURL }}
-                            style={{
-                                width: 44,
-                                height: 44,
-                                borderRadius: 22,
-                                backgroundColor: colors.cardBackground,
-                                borderWidth: 2,
-                                borderColor: 'rgba(255,255,255,0.1)'
-                            }}
-                        />
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-start', flex: 1, alignItems: 'center' }}>
+                        <TouchableOpacity
+                            onPress={handleUserPress}>
+                            <Image
+                                source={{ uri: postUser.imageURL }}
+                                style={{
+                                    width: 44,
+                                    height: 44,
+                                    borderRadius: 22,
+                                    backgroundColor: colors.cardBackground,
+                                    borderWidth: 2,
+                                    borderColor: 'rgba(255,255,255,0.1)'
+                                }}
+                            />
+                        </TouchableOpacity>
                         <View style={{ justifyContent: 'center', marginStart: 12, flex: 1 }}>
                             {/* Name + Status */}
-                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                                <AppText style={{
-                                    color: 'white',
-                                    fontWeight: '700',
-                                    fontSize: scaleFont(14),
-                                }}>
-                                    {postUser.firstname} {postUser.lastname}
-                                </AppText>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <TouchableOpacity
+                                    onPress={handleUserPress}>
+                                    <AppText style={{
+                                        color: 'white',
+                                        fontWeight: '700',
+                                        fontSize: scaleFont(14),
+                                    }}>
+                                        {postUser.firstname} {postUser.lastname}
+                                    </AppText>
+                                </TouchableOpacity>
 
-                                {postUser.trainerProfile?.trainerStatus === 'active' && !postUser.trainerProfile?.isVerified && (
+                                {postUser.trainerProfile?.trainerStatus === 'active' && (
                                     <TouchableOpacity
                                         onPress={() => router.push(routes.PERSONAL_TRAINING_EXPLANATION)}
                                         style={{
-                                            height: 20,
-                                            width: 20,
+                                            height: 14,
+                                            width: 14,
                                             borderRadius: 10,
                                             backgroundColor: colors.main,
                                             justifyContent: 'center',
@@ -113,8 +117,8 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                                         <Image
                                             source={Images.shieldFour}
                                             style={{
-                                                width: 16,
-                                                height: 16,
+                                                width: 17,
+                                                height: 17,
                                             }}
                                         />
                                     </TouchableOpacity>
@@ -132,7 +136,7 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                                 </AppText>
                             </View>
                         </View>
-                    </TouchableOpacity>
+                    </View>
                 </View>
 
                 {isUserPost && (
@@ -141,7 +145,6 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                         style={{
                             padding: 8,
                             borderRadius: 20,
-                            backgroundColor: 'rgba(255,255,255,0.05)'
                         }}
                     >
                         <Image
@@ -175,10 +178,9 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
             {/* IMAGE SECTION */}
             {imagesURLS && imagesURLS.length > 0 && (
                 <View style={{ position: 'relative' }}>
-                    <ImageBackground
+                    <AppImageBackground
                         source={{ uri: imagesURLS[currentImage] }}
                         style={{
-                            backgroundColor: colors.cardBackground,
                             height: 320,
                             width: '100%',
                         }}
@@ -205,6 +207,7 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                                         style={{
                                             width: 18,
                                             height: 18,
+                                            marginEnd: 2,
                                             tintColor: 'white',
                                             transform: [{ rotate: '180deg' }],
                                         }}
@@ -230,13 +233,14 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                                         style={{
                                             width: 18,
                                             height: 18,
+                                            marginStart: 2,
                                             tintColor: 'white'
                                         }}
                                     />
                                 </TouchableOpacity>
                             </>
                         )}
-                    </ImageBackground>
+                    </AppImageBackground>
 
                     {imagesURLS.length > 1 && (
                         <View style={{

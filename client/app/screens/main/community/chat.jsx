@@ -28,6 +28,7 @@ import { LibraryContext } from "../../../common/contexts/library-context";
 import { CameraContext } from "../../../common/contexts/camera-context";
 import { colorWithOpacity } from "../../../common/utils/random-functions";
 import Divider from "../../../components/screen-comps/divider";
+import AppImage from "../../../components/screen-comps/app-image";
 
 export default function Chat() {
     const { createOptions, createDialog, createToast, showSpinner, hideSpinner, createSelector } = usePopups();
@@ -739,7 +740,7 @@ export default function Chat() {
                                     >
                                         {/* Image with overlay */}
                                         <View style={{ width: 300, height: 300, borderRadius: 20, borderTopLeftRadius: isUser ? 20 : 5, borderTopRightRadius: !isUser ? 20 : 5, marginTop: 5, overflow: 'hidden', position: 'relative' }}>
-                                            <Image
+                                            <AppImage
                                                 source={{ uri: message.extraInformation.imageUrl }}
                                                 style={{
                                                     width: '100%',
