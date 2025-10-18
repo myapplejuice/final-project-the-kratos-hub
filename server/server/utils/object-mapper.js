@@ -117,7 +117,13 @@ export default class ObjectMapper {
             LastMessage: 'lastMessage',
             LastMessageTime: 'lastMessageTime',
             LastMessageHidden: 'lastMessageHidden',
-            LastMessageDiscarded: 'lastMessageDiscarded'
+            LastMessageDiscarded: 'lastMessageDiscarded',
+            ImagesURLS: 'imagesURLS',
+            Caption: 'caption',
+            LikeCount: 'likeCount',
+            ShareCount: 'shareCount',
+            PostId: 'postId',
+
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -172,7 +178,6 @@ export default class ObjectMapper {
             name: 'Name',
             mealLogId: 'MealLogId',
             creator: 'Creator',
-            type: 'Type',
             category: 'Category',
             servingAmount: 'ServingAmount',
             energyKcal: 'EnergyKcal',
@@ -240,7 +245,12 @@ export default class ObjectMapper {
             lastMessageSenderId: 'LastMessageSenderId',
             lastMessageTime: 'LastMessageTime',
             lastMessage: 'LastMessage',
-            
+            imagesURLS: 'ImagesURLS',
+            caption: 'Caption',
+            type: 'Type',
+            likeCount: 'LikeCount',
+            shareCount: 'ShareCount',
+            postId: 'PostId',
         };
         return map[key] || key;
     }

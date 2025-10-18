@@ -25,9 +25,13 @@ import Invert from '../../components/effects/invert';
 import ExpandInOut from '../../components/effects/expand-in-out';
 import AppTextInput from '../../components/screen-comps/app-text-input';
 import CommunityPost from '../../components/screen-comps/community-post';
+import FloatingActionMenu from '../../components/screen-comps/floating-action-menu';
 
 export default function Community() {
     const { user, setAdditionalContexts } = useContext(UserContext);
+    const insets = useSafeAreaInsets();
+
+    const [fabVisible, setFabVisible] = useState(true);
     const [friendsList, setFriendsList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -81,52 +85,141 @@ export default function Community() {
     }
 
     return (
-        <AppScroll hideNavBarOnScroll={true} hideTopBarOnScroll={true} extraBottom={100}>
-            <View style={{ height: 60 }}>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
-                    {["Any", "Tips", "Trainer Ad", "Need Trainer", "Moments", "Inquiry"].map((opt, idx) => {
-                        return (
-                            <TouchableOpacity
-                                key={idx}
-                                onPress={() => setSelectedPosts(opt)}
-                                style={{
-                                    paddingHorizontal: 15,
-                                    paddingVertical: 8,
-                                    borderRadius: 20,
-                                    backgroundColor: selectedPosts === opt ? colors.main : colors.cardBackground,
-                                    marginStart: idx === 0 ? 10 : 5,
-                                    marginEnd: idx === 5 ? 10 : 5
-                                }}
-                            >
-                                <AppText style={{ color: 'white', fontSize: 14 }}>{opt}</AppText>
-                            </TouchableOpacity>
-                        )
-                    })}
-                </ScrollView>
-            </View>
+        <>
+            <FloatingActionMenu
+                overlayColor="rgba(0, 0, 0, 0.8)"
+                actions={[
+                    { icon: Images.list3, title: 'Import Plan', onPress: () => console.log('something'), closeOnAction: true, delayClosure: true },
+                    { icon: Images.meals, title: 'Add Meal', onPress: () => console.log('something'), closeOnAction: true },
+                ]}
+                visible={fabVisible}
+                position={{ bottom: insets.bottom + 70, right: 20 }}
+                icon={Images.plus}
+            />
 
-            <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
+            <AppScroll onScrollSetStates={setFabVisible} hideNavBarOnScroll={true} hideTopBarOnScroll={true} extraBottom={100}>
+                <View style={{ height: 60 }}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
+                        {["Any", "Tips", "Trainer Ad", "Need Trainer", "Moments", "Inquiry"].map((opt, idx) => {
+                            return (
+                                <TouchableOpacity
+                                    key={idx}
+                                    onPress={() => setSelectedPosts(opt)}
+                                    style={{
+                                        paddingHorizontal: 15,
+                                        paddingVertical: 8,
+                                        borderRadius: 20,
+                                        backgroundColor: selectedPosts === opt ? colors.main : colors.cardBackground,
+                                        marginStart: idx === 0 ? 10 : 5,
+                                        marginEnd: idx === 5 ? 10 : 5
+                                    }}
+                                >
+                                    <AppText style={{ color: 'white', fontSize: 14 }}>{opt}</AppText>
+                                </TouchableOpacity>
+                            )
+                        })}
+                    </ScrollView>
+                </View>
 
-            <CommunityPost
-                post={{
-                    user: {
-                        id: 'u1',
-                        firstname: 'John',
-                        lastname: 'Doe',
-                        imageURL: user.imageURL,
-                        trainerProfile: {
-                            trainerStatus: 'active',
-                            isVerified: true,
+                <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
+
+                <CommunityPost
+                    post={{
+                        postUser: {
+                            id: 'u1',
+                            firstname: 'John',
+                            lastname: 'Doe',
+                            imageURL: user.imageURL,
+                            trainerProfile: {
+                                trainerStatus: 'active',
+                                isVerified: true,
+                            },
                         },
-                    },
-                    imageURL: 'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
-                    caption: 'Feeling strong today 💪',
-                    likes: 140, //array instead of num
-                    shares: 2,
-                    time: '10:00 AM',
-                    type: 'Trainer Ad',
-                }} />
-        </AppScroll>
+                        imagesURLS: [
+                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
+                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760553576/profile_images/hk05sqdaj4dxnlueo5mh.jpg',
+                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760466496/user_trainer_profile_images/g9ibkvz9z7q9ccrjhhio.jpg'
+                        ],
+                        caption: 'Feeling strong today 💪',
+                        likeCount: 140, //array instead of num
+                        shareCount: 2,
+                        dateOfCreation: new Date(),
+                        type: 'Trainer Ad',
+                    }} />
+
+                <Divider orientation='horizontal' style={{ marginBottom: 10, borderRadius: 0 }} thickness={10} color='black' />
+                <CommunityPost
+                    post={{
+                        postUser: {
+                            id: 'u1',
+                            firstname: 'John',
+                            lastname: 'Doe',
+                            imageURL: user.imageURL,
+                            trainerProfile: {
+                                trainerStatus: 'active',
+                                isVerified: true,
+                            },
+                        },
+                        imagesURLS: [
+                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
+                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760553576/profile_images/hk05sqdaj4dxnlueo5mh.jpg',
+                        ],
+                        caption: 'Feeling strong today 💪',
+                        likeCount: 140, //array instead of num
+                        shareCount: 2,
+                        dateOfCreation: new Date(),
+                        type: 'Trainer Ad',
+                    }} />
+
+                <Divider orientation='horizontal' style={{ marginBottom: 10, borderRadius: 0 }} thickness={10} color='black' />
+                <CommunityPost
+                    post={{
+                        postUser: {
+                            id: 'u1',
+                            firstname: 'John',
+                            lastname: 'Doe',
+                            imageURL: user.imageURL,
+                            trainerProfile: {
+                                trainerStatus: 'active',
+                                isVerified: true,
+                            },
+                        },
+                        imagesURLS: [
+                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
+                        ],
+                        caption: 'Feeling strong today 💪',
+                        likeCount: 140, //array instead of num
+                        shareCount: 2,
+                        dateOfCreation: new Date(),
+                        type: 'Trainer Ad',
+                    }} />
+
+                <Divider orientation='horizontal' style={{ marginBottom: 10, borderRadius: 0 }} thickness={10} color='black' />
+                  <CommunityPost
+                    post={{
+                        postUser: {
+                            id: 'u1',
+                            firstname: 'John',
+                            lastname: 'Doe',
+                            imageURL: user.imageURL,
+                            trainerProfile: {
+                                trainerStatus: 'active',
+                                isVerified: true,
+                            },
+                        },
+                        imagesURLS: [
+                         
+                        ],
+                        caption: 'Feeling strong today 💪',
+                        likeCount: 140, //array instead of num
+                        shareCount: 2,
+                        dateOfCreation: new Date(),
+                        type: 'Trainer Ad',
+                    }} />
+
+                <Divider orientation='horizontal' style={{ marginBottom: 10, borderRadius: 0 }} thickness={10} color='black' />
+            </AppScroll>
+        </>
     );
 }
 

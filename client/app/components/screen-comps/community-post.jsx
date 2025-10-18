@@ -1,33 +1,57 @@
-import React from 'react';
+import React, { use, useContext, useState } from 'react';
 import { View, TouchableOpacity, Image, ImageBackground } from 'react-native';
 import { useRouter } from 'expo-router';
 import AppText from './app-text';
 import { scaleFont } from '../../common/utils/scale-fonts';
 import { Images } from '../../common/settings/assets';
-import { colors } from '../../common/settings/styling'; 
+import { colors } from '../../common/settings/styling';
+import { formatDate, formatTime, getDayComparisons } from '../../common/utils/date-time';
+import { UserContext } from '../../common/contexts/user-context';
+import { routes } from '../../common/settings/constants';
+import ProgressDots from './progress-dots';
 
 export default function CommunityPost({ post }) {
+    const { user } = useContext(UserContext);
     const router = useRouter();
-    const { user, imageURL, caption, likes, shares, type, time } = post;
+    const { postUser, imagesURLS, caption, likeCount, shareCount, type, dateOfCreation } = post;
+    const [currentImage, setCurrentImage] = useState(0);
+
+    const dateTimeComparisons = getDayComparisons(dateOfCreation);
+    const isToday = dateTimeComparisons.isToday;
+    const isYesterday = dateTimeComparisons.isYesterday;
+    const isPast = dateTimeComparisons.isPast;
+
+    const day = isPast ? isYesterday ? 'Yesterday' : formatDate(dateOfCreation, { format: 'DD MMM' }) : '';
+    const time = (isToday || isYesterday) ? formatTime(dateOfCreation, { format: user.preferences.timeFormat.key }) : '';
+    const timeDisplay = `${day} ${time}`.trim();
+
+    function handleUserPress() {
+        router.push({
+            pathname: routes.USER_PROFILE,
+            params: {
+                userId: postUser.id
+            }
+        });
+    }
 
     return (
         <View style={{ marginBottom: 25 }}>
             {/* HEADER */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginStart: 15, alignItems: 'center' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <TouchableOpacity onPress={() => router.push(`${routes.USER_PROFILE}/${user.id}`)} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <TouchableOpacity onPress={() => handleUserPress()} style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Image
-                            source={{ uri: user.imageURL }}
+                            source={{ uri: postUser.imageURL }}
                             style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardBackground }}
                         />
                         <View style={{ justifyContent: 'center', marginStart: 15 }}>
                             {/* Name + Status */}
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <AppText style={{ color: 'white', fontWeight: 'bold' }}>
-                                    {user.firstname} {user.lastname}
+                                    {postUser.firstname} {postUser.lastname}
                                 </AppText>
 
-                                {user.trainerProfile?.trainerStatus === 'active' && !user.trainerProfile?.isVerified && (
+                                {postUser.trainerProfile?.trainerStatus === 'active' && !postUser.trainerProfile?.isVerified && (
                                     <TouchableOpacity
                                         onPress={() => router.push(routes.PERSONAL_TRAINING_EXPLANATION)}
                                         style={{
@@ -46,7 +70,7 @@ export default function CommunityPost({ post }) {
                                     </TouchableOpacity>
                                 )}
 
-                                {user.trainerProfile?.isVerified && (
+                                {postUser.trainerProfile?.isVerified && (
                                     <TouchableOpacity
                                         onPress={() => router.push(routes.SHIELD_OF_TRUST)}
                                         style={{ justifyContent: 'center', alignItems: 'center', marginStart: 5 }}>
@@ -62,7 +86,7 @@ export default function CommunityPost({ post }) {
                                         fontWeight: 'bold',
                                         fontSize: scaleFont(9),
                                     }}>
-                                    {time}  •  {type}
+                                    {timeDisplay}  •  {type}
                                 </AppText>
                             </View>
                         </View>
@@ -75,9 +99,9 @@ export default function CommunityPost({ post }) {
             </View>
 
             {/* IMAGE SECTION */}
-            {imageURL && (
+            {imagesURLS && imagesURLS.length > 0 && (
                 <ImageBackground
-                    source={{ uri: imageURL }}
+                    source={{ uri: imagesURLS[currentImage] }}
                     style={{
                         backgroundColor: colors.cardBackground,
                         height: 300,
@@ -89,40 +113,55 @@ export default function CommunityPost({ post }) {
                     }}
                     resizeMode="contain"
                 >
-                    <TouchableOpacity
-                        style={{
-                            height: 50,
-                            width: 50,
-                            borderRadius: 25,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            backgroundColor: 'rgba(0,0,0,0.5)',
-                            marginStart: 15,
-                        }}>
-                        <Image
-                            source={Images.arrow}
-                            style={{
-                                width: 20,
-                                height: 20,
-                                tintColor: 'white',
-                                transform: [{ rotate: '180deg' }],
-                            }}
-                        />
-                    </TouchableOpacity>
+                    {imagesURLS.length > 1 && (
+                        <>
+                            <TouchableOpacity
+                                onPress={() => setCurrentImage((prev) => (prev === 0 ? imagesURLS.length - 1 : prev - 1))}
+                                style={{
+                                    height: 50,
+                                    width: 50,
+                                    borderRadius: 25,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    backgroundColor: 'rgba(0,0,0,0.5)',
+                                    marginStart: 15,
+                                }}>
+                                <Image
+                                    source={Images.arrow}
+                                    style={{
+                                        width: 20,
+                                        height: 20,
+                                        tintColor: 'white',
+                                        transform: [{ rotate: '180deg' }],
+                                    }}
+                                />
+                            </TouchableOpacity>
 
-                    <TouchableOpacity
-                        style={{
-                            height: 50,
-                            width: 50,
-                            borderRadius: 25,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            backgroundColor: 'rgba(0,0,0,0.5)',
-                            marginEnd: 15,
-                        }}>
-                        <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                    </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => setCurrentImage((prev) => (prev === imagesURLS.length - 1 ? 0 : prev + 1))}
+                                style={{
+                                    height: 50,
+                                    width: 50,
+                                    borderRadius: 25,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    backgroundColor: 'rgba(0,0,0,0.5)',
+                                    marginEnd: 15,
+                                }}>
+                                <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                            </TouchableOpacity>
+                        </>
+                    )}
                 </ImageBackground>
+            )}
+
+            {imagesURLS.length > 1 && (
+                <ProgressDots
+                    steps={Array.from(imagesURLS, (_, i) => i === currentImage)}
+                    activeColor={colors.main}
+                    inactiveColor="rgb(82, 82, 82)"
+                    containerStyle={{ marginVertical: 5 }}
+                />
             )}
 
             {/* ACTION BAR */}
@@ -137,8 +176,8 @@ export default function CommunityPost({ post }) {
                     </TouchableOpacity>
 
                     <View style={{ alignItems: 'center', justifyContent: 'center', marginStart: 15 }}>
-                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>{likes} Likes</AppText>
-                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>{shares} Shares</AppText>
+                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>{likeCount} Likes</AppText>
+                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>{shareCount} Shares</AppText>
                     </View>
                 </View>
 
