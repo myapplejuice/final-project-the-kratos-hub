@@ -147,6 +147,7 @@ export default function UserPosts() {
 
                 <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
 
+{}
                 {posts.map((post, idx) => (
                     <CommunityPost
                         key={idx}
