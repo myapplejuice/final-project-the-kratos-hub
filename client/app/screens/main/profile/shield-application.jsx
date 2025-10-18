@@ -300,7 +300,7 @@ export default function ShieldApplication() {
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <AppText style={styles.sectionTitle}>Images</AppText>
-                        <AppText style={styles.sectionSubtitle}>
+                        <AppText style={styles.inputHint}>
                             Your work, certificates and achievements to support your application
                         </AppText>
                     </View>
@@ -354,7 +354,7 @@ export default function ShieldApplication() {
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <AppText style={styles.sectionTitle}>Social Media</AppText>
-                        <AppText style={styles.sectionSubtitle}>
+                        <AppText style={styles.inputHint}>
                             Link your social media profiles if any...
                         </AppText>
                     </View>

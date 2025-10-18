@@ -82,7 +82,7 @@ export default class CommunityDBService {
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, details.userId);
             Database.addInput(request, 'ImagesURLS', sql.NVarChar(sql.MAX), JSON.stringify(details.imagesURLS || []));
             Database.addInput(request, 'Caption', sql.NVarChar(sql.MAX), details.caption || '');
-            Database.addInput(request, 'DateOfCreation', sql.DateTime2, Date.now());
+            Database.addInput(request, 'DateOfCreation', sql.DateTime2, details.dateOfCreation || Date.now());
             Database.addInput(request, 'Type', sql.VarChar(20), details.type || 'general');
 
             const insertQuery = `

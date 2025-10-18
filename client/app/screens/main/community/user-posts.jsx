@@ -96,47 +96,57 @@ export default function UserPosts() {
             />
 
             <AppScroll onScrollSetStates={setFabVisible} hideNavBarOnScroll={true} extraBottom={100}>
-                <View style={{ height: 60 }}>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
-                        {["Any", "Tips", "Trainer Ad", "Need Trainer", "Moments", "Inquiry"].map((opt, idx) => {
-                            return (
-                                <TouchableOpacity
-                                    key={idx}
-                                    onPress={() => setSelectedPosts(opt)}
-                                    style={{
-                                        paddingHorizontal: 15,
-                                        paddingVertical: 8,
-                                        borderRadius: 20,
-                                        backgroundColor: selectedPosts === opt ? colors.main : colors.cardBackground,
-                                        marginStart: idx === 0 ? 10 : 5,
-                                        marginEnd: idx === 5 ? 10 : 5
-                                    }}
-                                >
-                                    <AppText style={{ color: 'white', fontSize: 14 }}>{opt}</AppText>
-                                </TouchableOpacity>
-                            )
-                        })}
-                    </ScrollView>
-                </View>
+                {posts.length > 0 && (
+                    <>
+                        <View style={{ height: 60 }}>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
+                                {["Any", "Tips", "Trainer Ad", "Need Trainer", "Moments", "Inquiry"].map((opt, idx) => {
+                                    return (
+                                        <TouchableOpacity
+                                            key={idx}
+                                            onPress={() => setSelectedPosts(opt)}
+                                            style={{
+                                                paddingHorizontal: 15,
+                                                paddingVertical: 8,
+                                                borderRadius: 20,
+                                                backgroundColor: selectedPosts === opt ? colors.main : colors.cardBackground,
+                                                marginStart: idx === 0 ? 10 : 5,
+                                                marginEnd: idx === 5 ? 10 : 5
+                                            }}
+                                        >
+                                            <AppText style={{ color: 'white', fontSize: 14 }}>{opt}</AppText>
+                                        </TouchableOpacity>
+                                    )
+                                })}
+                            </ScrollView>
+                        </View>
 
-                <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
+                        <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
 
-                <Gallery
-                    sources={posts.map(post =>
-                        post.imagesURLS?.length > 0
-                            ? { uri: post.imagesURLS[0] }
-                            : Images.missingImage
-                    )}
+                        <Gallery
+                            sources={posts.map(post =>
+                                post.imagesURLS?.length > 0
+                                    ? { uri: post.imagesURLS[0] }
+                                    : Images.missingImage
+                            )}
 
-                    sourcesOnPress={posts.map((post) => () => {
-                        router.push({
-                            pathname: routes.USER_POST,
-                            params: {
-                                post: JSON.stringify(post)
-                            }
-                        })
-                    })}
-                />
+                            sourcesOnPress={posts.map((post) => () => {
+                                router.push({
+                                    pathname: routes.USER_POST,
+                                    params: {
+                                        post: JSON.stringify(post)
+                                    }
+                                })
+                            })}
+                        /></>
+                )}
+                {posts.length === 0 && (
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <Image source={Images.msisingImageTwo} style={{ width: 100, height: 100, marginBottom: 15, tintColor: colors.mutedText }} />
+                        <AppText style={{ fontSize: scaleFont(14), color: colors.mutedText, fontWeight: 'bold' }}>You have nothing posted to the community yet</AppText>
+                        <AppText style={{ fontSize: scaleFont(13), color: 'white', marginTop: 5 }}>Tap below to create a new post</AppText>
+                    </View>
+                )}
             </AppScroll>
         </>
     );

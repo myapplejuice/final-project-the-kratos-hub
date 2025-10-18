@@ -38,14 +38,8 @@ export default function PostCreator() {
     const [selectedImage, setSelectedImage] = useState({});
     const [imagePreviewVisible, setImagePreviewVisible] = useState(false);
 
-    const [summary, setSummary] = useState('');
-    const [education, setEducation] = useState('');
+    const [caption, setCaption] = useState('');
     const [images, setImages] = useState([]);
-
-    const [instagramLink, setInstagramLink] = useState('');
-    const [facebookLink, setFacebookLink] = useState('');
-    const [tikTokLink, setTikTokLink] = useState('');
-    const [xLink, setXLink] = useState('');
 
     async function handleNewImage(asset) {
         const payload = {
@@ -56,166 +50,19 @@ export default function PostCreator() {
         setImages(prev => [...prev, payload]);
     }
 
-    async function handleSocialMediaLink(platform) {
-        platform = platform.trim();
-
-        const platformMap = {
-            Instagram: {
-                getUrl: handle => `https://www.instagram.com/${handle}`,
-                link: instagramLink,
-                setter: setInstagramLink,
-            },
-            Facebook: {
-                getUrl: handle => `https://www.facebook.com/${handle}`,
-                link: facebookLink,
-                setter: setFacebookLink,
-            },
-            TikTok: {
-                getUrl: handle => `https://www.tiktok.com/@${handle}`,
-                link: tikTokLink,
-                setter: setTikTokLink,
-            },
-            X: {
-                getUrl: handle => `https://x.com/${handle}`,
-                link: xLink,
-                setter: setXLink,
-            },
-        };
-
-        const link = platformMap[platform];
-        if (!link) return;
-
-        const cleanHandle = handle =>
-            handle.replace(/^https?:\/\/(www\.)?(instagram\.com|facebook\.com|tiktok\.com|x\.com|twitter\.com)\/@?/, '');
-
-        if (!link.link) {
-            createInput({
-                title: 'Social Media Link',
-                confirmText: 'Ok',
-                text: `Enter your ${platform} handle (e.g. ${user.firstname}.${user.lastname})`,
-                placeholders: [platform],
-                onSubmit: async ([handle]) => {
-                    if (!handle) return;
-                    link.setter(link.getUrl(cleanHandle(handle.trim())));
-                },
-            });
-            return;
+    async function handleSubmittion() {
+        const payload = {
+            userId: user.id,
+            type: selectedTopic.toLowerCase(),
+            caption,
+            imagesURLS: imagesURLS
         }
 
-        createDialog({
-            title: 'Social Media Link',
-            text: `Do you wish to change your ${platform} link or test it?`,
-            confirmText: 'Change Link',
-            abortText: 'Go To Link',
-            onConfirm: () => {
-                createInput({
-                    title: 'Social Media Link',
-                    confirmText: 'Ok',
-                    text: `Enter your ${platform} handle (e.g. ${user.firstname}.${user.lastname})`,
-                    placeholders: [platform],
-                    onSubmit: async ([handle]) => {
-                        if (!handle) return;
-                        link.setter(link.getUrl(cleanHandle(handle.trim())));
-                    },
-                });
-            },
-            onAbort: async () => {
-                await Linking.openURL(link.link).catch(err =>
-                    console.warn('Failed to open link', err)
-                );
-            },
-        });
-    }
-
-    function handleSocialMediaReset() {
-        createDialog({
-            title: 'Reset Links',
-            text: 'Are you sure you want to reset your social media links?',
-            confirmText: 'Reset',
-            confirmButtonStyle: { backgroundColor: colors.negativeRed, borderColor: colors.negativeRed },
-            onConfirm: () => {
-                setInstagramLink('');
-                setFacebookLink('');
-                setTikTokLink('');
-                setXLink('');
-            },
-        })
-    }
-
-    async function handleSubmittion() {
-        const formFillCount = [
-            summary.trim() !== '',
-            education.trim() !== '',
-            images.length > 0,
-            instagramLink.trim() !== '',
-            facebookLink.trim() !== '',
-            tikTokLink.trim() !== '',
-            xLink.trim() !== '',
-        ].filter(Boolean).length;
-
-        if (formFillCount < 2) return createToast({ message: 'Please fill out at least 2 sections before submitting' });
-
-        createDialog({
-            title: 'Submit Application',
-            text: 'Are you sure you want to submit your application?',
-            confirmText: 'Submit',
-            onConfirm: async () => {
-                try {
-                    showSpinner();
-
-                    const uploadedImages = await Promise.all(
-                        images.map(async (image) => {
-                            if (image.url?.includes("res.cloudinary.com")) {
-                                return image;
-                            }
-
-                            try {
-                                const url = await APIService.uploadImageToCloudinary({
-                                    uri: image.url || image.uri,
-                                    folder: "verification_application_images",
-                                    fileName: `user${user.id}_${Date.now()}_${image.fileName}.jpg`,
-                                });
-
-                                return { ...image, url };
-                            } catch (err) {
-                                console.error(`Failed to upload image ${image.fileName}:`, err);
-                                return image;
-                            }
-                        })
-                    );
-
-                    setImages(uploadedImages);
-
-                    const payload = {
-                        userId: user.id,
-                        status: 'pending',
-                        summary,
-                        education,
-                        images: uploadedImages,
-                        links: [
-                            instagramLink || '',
-                            facebookLink || '',
-                            tikTokLink || '',
-                            xLink || '',
-                        ]
-                    }
-
-                    const result = await APIService.verification.apply(payload);
-                    console.log('result', result)
-                    if (result.success) {
-                        createAlert({ title: 'Success', text: 'Your application has been submitted!\n\nYou will be notified when we review your application.', onPress: () => router.replace(routes.SHIELD_APPLICATIONS) });
-                    } else {
-                        createToast({ message: "Failed to update profile." });
-                    }
-                }
-                catch (err) {
-                    console.error("Image upload failed:", err);
-                } finally {
-                    hideSpinner();
-                }
-            }
-        })
-
+        const result = await APIService.community.create(payload);
+        if (result.success) {
+            createToast('Post created successfully!', 'success');
+            router.back();
+        }
     }
 
     return (
@@ -237,8 +84,8 @@ export default function PostCreator() {
             </FadeInOut>
 
             <FloatingActionButton
-                icon={Images.shield}
-                label={"Submit Application"}
+                icon={Images.post}
+                label={"Share Post"}
                 iconSize={18}
                 labelStyle={{ fontSize: scaleFont(14) }}
                 style={{ width: '100%', height: 50, backgroundColor: colors.accentGreen }}
@@ -250,12 +97,12 @@ export default function PostCreator() {
             <AppScroll extraBottom={200} onScrollSetStates={setFabVisible}>
                 <View style={styles.section}>
                     <AppText style={styles.sectionTitle}>Topic</AppText>
-                     <AppText style={styles.inputHint}>
+                    <AppText style={styles.inputHint}>
                         Main topic of the post (e.g. You have a question, Advertising your work...)
                     </AppText>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
 
-                        {["General", "Tips", "Trainer Ad",].map((opt, idx) => {
+                        {["General", "Trainer Lookup", "Trainer Ad",].map((opt, idx) => {
                             return (
                                 <TouchableOpacity
                                     key={idx}
@@ -269,13 +116,13 @@ export default function PostCreator() {
                                         backgroundColor: selectedTopic === opt ? colors.main : colors.cardBackground,
                                     }}
                                 >
-                                    <AppText style={{ color: 'white', fontSize: 14 }}>{opt}</AppText>
+                                    <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{opt}</AppText>
                                 </TouchableOpacity>
                             )
                         })}
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
-                        {["Need Trainer", "Moments", "Inquiry"].map((opt, idx) => {
+                        {["Tips", "Inquiry", "Moments"].map((opt, idx) => {
                             return (
                                 <TouchableOpacity
                                     key={idx}
@@ -289,7 +136,7 @@ export default function PostCreator() {
                                         backgroundColor: selectedTopic === opt ? colors.main : colors.cardBackground
                                     }}
                                 >
-                                    <AppText style={{ color: 'white', fontSize: 14 }}>{opt}</AppText>
+                                    <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{opt}</AppText>
                                 </TouchableOpacity>
                             )
                         })}
@@ -303,8 +150,8 @@ export default function PostCreator() {
                     </AppText>
                     <AppTextInput
                         multiline
-                        value={summary}
-                        onChangeText={setSummary}
+                        value={caption}
+                        onChangeText={setCaption}
                         style={styles.bioInput}
                         placeholder='Share your thoughts...'
                         placeholderTextColor={colors.mutedText}
@@ -316,31 +163,12 @@ export default function PostCreator() {
                     />
                 </View>
 
-                <View style={styles.section}>
-                    <AppText style={styles.sectionTitle}>Education</AppText>
-                    <AppText style={styles.inputHint}>
-                        Write about your educational background
-                    </AppText>
-                    <AppTextInput
-                        multiline
-                        value={education}
-                        onChangeText={setEducation}
-                        style={styles.bioInput}
-                        placeholder='College, university, or other educational or academic institution...'
-                        placeholderTextColor={colors.mutedText}
-                        textAlignVertical='top'
-                        textAlign='left'
-                        fontSize={14}
-                        color='white'
-                        fontWeight='normal'
-                    />
-                </View>
 
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <AppText style={styles.sectionTitle}>Images</AppText>
-                        <AppText style={styles.sectionSubtitle}>
-                            Your work, certificates and achievements to support your application
+                        <AppText style={styles.inputHint}>
+                            Images about the post
                         </AppText>
                     </View>
 
@@ -389,61 +217,6 @@ export default function PostCreator() {
                         </View>
                     </TouchableOpacity>
                 </View>
-
-                <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <AppText style={styles.sectionTitle}>Social Media</AppText>
-                        <AppText style={styles.sectionSubtitle}>
-                            Link your social media profiles if any...
-                        </AppText>
-                    </View>
-
-
-                    <TouchableOpacity onPress={() => handleSocialMediaLink('Instagram')} style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.cardBackground, padding: 12, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.instagram} style={{ width: 30, height: 30 }} />
-                            <AppText style={{ color: 'white', marginStart: 10, fontWeight: 'bold', fontSize: scaleFont(12) }}>{instagramLink || 'Not Linked'}</AppText>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                        </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => handleSocialMediaLink('Facebook')} style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.cardBackground, padding: 12, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.facebook} style={{ width: 30, height: 30 }} />
-                            <AppText style={{ color: 'white', marginStart: 10, fontWeight: 'bold', fontSize: scaleFont(12) }}>{facebookLink || 'Not Linked'}</AppText>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                        </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => handleSocialMediaLink('TikTok')} style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.cardBackground, padding: 12, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.tiktokTwo} style={{ width: 30, height: 30 }} />
-                            <AppText style={{ color: 'white', marginStart: 10, fontWeight: 'bold', fontSize: scaleFont(12) }}>{tikTokLink || 'Not Linked'}</AppText>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                        </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => handleSocialMediaLink('X')} style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.cardBackground, padding: 12, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.xTwo} style={{ width: 30, height: 30, tintColor: 'white' }} />
-                            <AppText style={{ color: 'white', marginStart: 10, fontWeight: 'bold', fontSize: scaleFont(12) }}>{xLink || 'Not Linked'}</AppText>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                        </View>
-                    </TouchableOpacity>
-                </View>
-
-                <TouchableOpacity onPress={handleSocialMediaReset} style={{ width: 150, alignSelf: 'center', backgroundColor: colors.negativeRed, padding: 15, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
-                    <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12) }}>Reset Links</AppText>
-                </TouchableOpacity>
-
             </AppScroll>
         </>
     );
