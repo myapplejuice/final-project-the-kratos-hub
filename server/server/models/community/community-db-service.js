@@ -3,7 +3,7 @@ import Database from '../database/database.js';
 import ObjectMapper from '../../utils/object-mapper.js';
 
 export default class CommunityDBService {
-    static async fetchPosts(userId, page = 1, pageSize = 10, type = null) {
+    static async fetchPosts(forUser = false, userId, page = 1, pageSize = 10, type = null) {
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
@@ -23,7 +23,7 @@ export default class CommunityDBService {
             LEFT JOIN UserTrainerProfile t ON t.UserId = u.Id
             LEFT JOIN Likes l ON l.PostId = p.Id AND l.UserId = @UserId
             LEFT JOIN SavedPosts s ON s.PostId = p.Id AND s.UserId = @UserId
-            WHERE p.UserId != @UserId
+            WHERE p.UserId ${forUser ? '=' : '!='} @UserId
         `;
 
             if (type) {

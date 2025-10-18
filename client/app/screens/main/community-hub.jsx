@@ -124,6 +124,7 @@ export default function Community() {
                 <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
 
                 <CommunityPost
+                    isUserPost={false}
                     post={{
                         postUser: {
                             id: 'u1',
@@ -150,76 +151,6 @@ export default function Community() {
                     isSavedByUser={true}/>
 
                 <Divider orientation='horizontal' style={{ marginBottom: 25, borderRadius: 0 }} thickness={10} color='black' />
-                <CommunityPost
-                    post={{
-                        postUser: {
-                            id: 'u1',
-                            firstname: 'John',
-                            lastname: 'Doe',
-                            imageURL: user.imageURL,
-                            trainerProfile: {
-                                trainerStatus: 'active',
-                                isVerified: true,
-                            },
-                        },
-                        imagesURLS: [
-                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
-                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760553576/profile_images/hk05sqdaj4dxnlueo5mh.jpg',
-                        ],
-                        caption: 'Feeling strong today 💪',
-                        likeCount: 140, //array instead of num
-                        shareCount: 2,
-                        dateOfCreation: new Date(),
-                        type: 'Trainer Ad',
-                    }} />
-
-                <Divider orientation='horizontal' style={{ marginBottom: 10, borderRadius: 0 }} thickness={10} color='black' />
-                <CommunityPost
-                    post={{
-                        postUser: {
-                            id: 'u1',
-                            firstname: 'John',
-                            lastname: 'Doe',
-                            imageURL: user.imageURL,
-                            trainerProfile: {
-                                trainerStatus: 'active',
-                                isVerified: true,
-                            },
-                        },
-                        imagesURLS: [
-                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
-                        ],
-                        caption: 'Feeling strong today 💪',
-                        likeCount: 140, //array instead of num
-                        shareCount: 2,
-                        dateOfCreation: new Date(),
-                        type: 'Trainer Ad',
-                    }} />
-
-                <Divider orientation='horizontal' style={{ marginBottom: 10, borderRadius: 0 }} thickness={10} color='black' />
-                <CommunityPost
-                    post={{
-                        postUser: {
-                            id: user.id,
-                            firstname: 'John',
-                            lastname: 'Doe',
-                            imageURL: user.imageURL,
-                            trainerProfile: {
-                                trainerStatus: 'active',
-                                isVerified: true,
-                            },
-                        },
-                        imagesURLS: [
-
-                        ],
-                        caption: 'Feeling strong today 💪',
-                        likeCount: 140, //array instead of num
-                        shareCount: 2,
-                        dateOfCreation: new Date(),
-                        type: 'Trainer Ad',
-                    }} />
-
-                <Divider orientation='horizontal' style={{ marginBottom: 10, borderRadius: 0 }} thickness={10} color='black' />
             </AppScroll>
         </>
     );

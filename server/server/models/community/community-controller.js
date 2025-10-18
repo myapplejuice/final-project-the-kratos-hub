@@ -2,9 +2,9 @@ import PostsDBService from "./community-db-service.js";
 
 export default class CommunityController {
     static async getPosts(req, res) {
-        const { userId, page, type } = req.body;
+        const { userId, page, type, forUser } = req.body;
 
-        const response = await PostsDBService.fetchPosts(userId, page || 1, 10, type || null);
+        const response = await PostsDBService.fetchPosts(forUser, userId, page || 1, 10, type || null);
 
         return res.status(200).json({
             success: true,

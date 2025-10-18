@@ -26,6 +26,7 @@ import ExpandInOut from '../../../components/effects/expand-in-out';
 import AppTextInput from '../../../components/screen-comps/app-text-input';
 import CommunityPost from '../../../components/screen-comps/community-post';
 import FloatingActionMenu from '../../../components/screen-comps/floating-action-menu';
+import FloatingActionButton from '../../../components/screen-comps/floating-action-button';
 
 export default function UserPosts() {
     const { user, setAdditionalContexts } = useContext(UserContext);
@@ -65,6 +66,30 @@ export default function UserPosts() {
         }, 1000);
     }, []);
 
+    const posts = [
+        {
+            postUser: {
+                id: 'u1',
+                firstname: 'John',
+                lastname: 'Doe',
+                imageURL: user.imageURL,
+                trainerProfile: {
+                    trainerStatus: 'active',
+                    isVerified: true,
+                },
+            },
+            imagesURLS: [
+                'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
+                'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760553576/profile_images/hk05sqdaj4dxnlueo5mh.jpg',
+                'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760466496/user_trainer_profile_images/g9ibkvz9z7q9ccrjhhio.jpg'
+            ],
+            caption: 'Feeling strong today 💪',
+            likeCount: 140, //array instead of num
+            shareCount: 2,
+            dateOfCreation: new Date(),
+            type: 'Trainer Ad',
+        }]
+
     if (loading) {
         return (
             <View style={{ backgroundColor: colors.background, flex: 1, paddingTop: 75 }}>
@@ -86,14 +111,13 @@ export default function UserPosts() {
 
     return (
         <>
-            <FloatingActionMenu
+            <FloatingActionButton
                 overlayColor="rgba(0, 0, 0, 0.8)"
-                actions={[
-                    { icon: Images.list3, title: 'Saved Posts', onPress: () => console.log('something'), closeOnAction: true, delayClosure: true },
-                    { icon: Images.meals, title: 'My Posts', onPress: () => console.log('something'), closeOnAction: true },
-                ]}
+                style={{ backgroundColor: colors.accentGreen, width: '100%', height: 50, }}
+                label='Create New Post'
+                onPress={() => console.log('do something')}
                 visible={fabVisible}
-                position={{ bottom: insets.bottom + 70, right: 20 }}
+                position={{ bottom: insets.bottom + 20, right: 20, left: 20 }}
                 icon={Images.plus}
             />
 
@@ -123,103 +147,16 @@ export default function UserPosts() {
 
                 <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
 
-                <CommunityPost
-                    post={{
-                        postUser: {
-                            id: 'u1',
-                            firstname: 'John',
-                            lastname: 'Doe',
-                            imageURL: user.imageURL,
-                            trainerProfile: {
-                                trainerStatus: 'active',
-                                isVerified: true,
-                            },
-                        },
-                        imagesURLS: [
-                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
-                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760553576/profile_images/hk05sqdaj4dxnlueo5mh.jpg',
-                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760466496/user_trainer_profile_images/g9ibkvz9z7q9ccrjhhio.jpg'
-                        ],
-                        caption: 'Feeling strong today 💪',
-                        likeCount: 140, //array instead of num
-                        shareCount: 2,
-                        dateOfCreation: new Date(),
-                        type: 'Trainer Ad',
-                    }} 
-                    isLikedByUser={true}
-                    isSavedByUser={true}/>
+                {posts.map((post, idx) => (
+                    <CommunityPost
+                        key={idx}
+                        isUserPost={true}
+                        post={post}
+                        isLikedByUser={true}
+                        isSavedByUser={true}
+                    />
+                ))}
 
-                <Divider orientation='horizontal' style={{ marginBottom: 25, borderRadius: 0 }} thickness={10} color='black' />
-                <CommunityPost
-                    post={{
-                        postUser: {
-                            id: 'u1',
-                            firstname: 'John',
-                            lastname: 'Doe',
-                            imageURL: user.imageURL,
-                            trainerProfile: {
-                                trainerStatus: 'active',
-                                isVerified: true,
-                            },
-                        },
-                        imagesURLS: [
-                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
-                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760553576/profile_images/hk05sqdaj4dxnlueo5mh.jpg',
-                        ],
-                        caption: 'Feeling strong today 💪',
-                        likeCount: 140, //array instead of num
-                        shareCount: 2,
-                        dateOfCreation: new Date(),
-                        type: 'Trainer Ad',
-                    }} />
-
-                <Divider orientation='horizontal' style={{ marginBottom: 10, borderRadius: 0 }} thickness={10} color='black' />
-                <CommunityPost
-                    post={{
-                        postUser: {
-                            id: 'u1',
-                            firstname: 'John',
-                            lastname: 'Doe',
-                            imageURL: user.imageURL,
-                            trainerProfile: {
-                                trainerStatus: 'active',
-                                isVerified: true,
-                            },
-                        },
-                        imagesURLS: [
-                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
-                        ],
-                        caption: 'Feeling strong today 💪',
-                        likeCount: 140, //array instead of num
-                        shareCount: 2,
-                        dateOfCreation: new Date(),
-                        type: 'Trainer Ad',
-                    }} />
-
-                <Divider orientation='horizontal' style={{ marginBottom: 10, borderRadius: 0 }} thickness={10} color='black' />
-                <CommunityPost
-                    post={{
-                        postUser: {
-                            id: user.id,
-                            firstname: 'John',
-                            lastname: 'Doe',
-                            imageURL: user.imageURL,
-                            trainerProfile: {
-                                trainerStatus: 'active',
-                                isVerified: true,
-                            },
-                        },
-                        imagesURLS: [
-
-                        ],
-                        caption: 'Feeling strong today 💪',
-                        likeCount: 140, //array instead of num
-                        shareCount: 2,
-                        dateOfCreation: new Date(),
-                        type: 'Trainer Ad',
-                    }} />
-
-                <Divider orientation='horizontal' style={{ marginBottom: 10, borderRadius: 0 }} thickness={10} color='black' />
             </AppScroll>
         </>
     );
