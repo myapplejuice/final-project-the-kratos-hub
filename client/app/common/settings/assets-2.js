@@ -151,4 +151,6 @@ export const Images_2 = {
     unHideTwo: require('../../../assets/images/unhide-2.png'),
     share: require('../../../assets/images/share.png'),
     shareOutline: require('../../../assets/images/share-outline.png'),
+    community: require('../../../assets/images/community.png'),
+    communityOutline: require('../../../assets/images/community-outline.png'),
 };

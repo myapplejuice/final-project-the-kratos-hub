@@ -31,6 +31,7 @@ export default function NavigationBar({ visible }) {
     const navItems = [
         { key: "home", route: routes.HOMEPAGE, icon: Images.home, iconInactive: Images.noHome },
         { key: "goals", route: routes.GOALS, icon: Images.goals, iconInactive: Images.noGoals },
+        { key: "community", route: routes.COMMUNITY, icon: Images.community, iconInactive: Images.communityOutline },
         { key: "meals", route: routes.NUTRITION_HUB, icon: Images.nutrition, iconInactive: Images.nutritionOutline },
         { key: "workouts", route: routes.TRAINING_HUB, icon: Images.workouts, iconInactive: Images.noWorkouts },
     ];

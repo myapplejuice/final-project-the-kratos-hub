@@ -46,7 +46,6 @@ function Layout() {
 
     useEffect(() => {
         const handlers = {
-            // Temporary until i find solution for library asset function
             replace: () => {
                 if (screen === routes.PERSONAL_TRAINING_PROFILE || screen === routes.SHIELD_APPLICATIONS)
                     router.replace(routes.PROFILE);
@@ -115,6 +114,7 @@ function Layout() {
                                             {/* MAIN */}
                                             <Stack.Screen name="screens/main/profile" />
                                             <Stack.Screen name="screens/main/homepage" />
+                                            <Stack.Screen name="screens/main/community-hub" />
                                             <Stack.Screen name="screens/main/goals" />
                                             <Stack.Screen name="screens/main/nutrition-hub" />
                                             <Stack.Screen name="screens/main/training-hub" />

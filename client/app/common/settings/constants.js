@@ -20,6 +20,7 @@ export const routes = {
     USER_PROFILE: '/screens/main/community/user-profile',
     USER_TRAINER_PROFILE: '/screens/main/community/user-trainer-profile',
     USER_FOODS: '/screens/main/community/user-foods',
+    COMMUNITY: '/screens/main/community-hub',
 
     /* HOMEPAGE CHILDREN */
     LEAN_BODY_MASS: '/screens/main/homepage/lean-body-mass',
@@ -65,6 +66,7 @@ export const routes = {
 export const mainScreens = [
     routes.HOMEPAGE,
     routes.GOALS,
+    routes.COMMUNITY,
     routes.NUTRITION_HUB,
     routes.TRAINING_HUB
 ]

@@ -55,7 +55,8 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         screen === routes.HOMEPAGE ||
         screen === routes.TRAINING_HUB ||
         screen === routes.NUTRITION_HUB ||
-        screen === routes.GOALS
+        screen === routes.GOALS ||
+        screen === routes.COMMUNITY
     )
 
     const screenNames = {
@@ -98,7 +99,8 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.SHIELD_APPLICATIONS]: "My Shield Applications",
         [routes.SHIELD_APPLICATION_REVIEW]: "Shield Application Review",
         [routes.USER_TRAINER_PROFILE]: "Trainer",
-        [routes.USER_FOODS]: "User Foods"
+        [routes.USER_FOODS]: "User Foods",
+        [routes.COMMUNITY]: "Community Hub",
     };
 
     function handleUserProfilePress() {
@@ -112,6 +114,17 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         });
     }
 
+    function handleNavBack() {
+        if (screen === routes.PERSONAL_TRAINING_PROFILE || screen === routes.SHIELD_APPLICATIONS)
+            router.replace(routes.PROFILE);
+        else if (screen === routes.SHIELD_APPLICATION_REVIEW || screen === routes.SHIELD_APPLICATION)
+            router.replace(routes.SHIELD_APPLICATIONS);
+        else if (screen === routes.SHIELD_APPLICATIONS)
+            router.replace(routes.PROFILE);
+        else
+            router.back();
+    }
+
     return (
         <View style={styles.wrapper}>
             {!hideInsetOnScroll && <View style={[styles.inset, { height: insets.top }]} />}
@@ -120,7 +133,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
                 {hideInsetOnScroll && <View style={[styles.inset, { height: insets.top }]} />}
                 <View style={styles.left}>
                     {!inMain && (
-                        <TouchableOpacity onPress={() => router.back()}>
+                        <TouchableOpacity onPress={handleNavBack}>
                             <Image style={styles.arrow} source={Images.backArrow} />
                         </TouchableOpacity>
                     )}
