@@ -101,7 +101,9 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.USER_TRAINER_PROFILE]: "Trainer",
         [routes.USER_FOODS]: "User Foods",
         [routes.COMMUNITY]: "Community Hub",
-        [routes.USER_POSTS]: "My Post",
+        [routes.USER_POSTS]: "My Posts",
+        [routes.USER_POST]: "My Posts",
+
     };
 
     function handleUserProfilePress() {

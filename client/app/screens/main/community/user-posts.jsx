@@ -33,6 +33,8 @@ export default function UserPosts() {
     const { user, setAdditionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
+    const [galleryVisible, setGalleryVisible] = useState(true);
+    const [post, setPost] = useState({});
     const [fabVisible, setFabVisible] = useState(true);
     const [friendsList, setFriendsList] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -80,27 +82,58 @@ export default function UserPosts() {
                 },
             },
             imagesURLS: [
-                'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
-                'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760553576/profile_images/hk05sqdaj4dxnlueo5mh.jpg',
-                'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760466496/user_trainer_profile_images/g9ibkvz9z7q9ccrjhhio.jpg'
             ],
             caption: 'Feeling strong today 💪',
-            likeCount: 140, //array instead of num
+            likeCount: 140,
             shareCount: 2,
             dateOfCreation: new Date(),
             type: 'Trainer Ad',
-        }]
+        },
+        {
+            postUser: {
+                id: 'u1',
+                firstname: 'John',
+                lastname: 'Doe',
+                imageURL: user.imageURL,
+                trainerProfile: {
+                    trainerStatus: 'active',
+                    isVerified: true,
+                },
+            },
+            imagesURLS: [
+                'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760553576/profile_images/hk05sqdaj4dxnlueo5mh.jpg',
+                'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760466496/user_trainer_profile_images/g9ibkvz9z7q9ccrjhhio.jpg'
+            ],
+            caption: 'Feeling strong aaaaqaatoday 💪',
+            likeCount: 140,
+            shareCount: 2,
+            dateOfCreation: new Date(),
+            type: 'Trainer Ad',
+        },
+        {
+            postUser: {
+                id: 'u1',
+                firstname: 'John',
+                lastname: 'Doe',
+                imageURL: user.imageURL,
+                trainerProfile: {
+                    trainerStatus: 'active',
+                    isVerified: true,
+                },
+            },
+            imagesURLS: [
+                'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
+                'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760553576/profile_images/hk05sqdaj4dxnlueo5mh.jpg',
+            ],
+            caption: 'Feeling strongqd23d2qadzs today 💪',
+            likeCount: 140,
+            shareCount: 2,
+            dateOfCreation: new Date(),
+            type: 'Trainer Ad',
+        }
+    ]
 
-    /* { }
-             {posts.map((post, idx) => (
-                 <CommunityPost
-                     key={idx}
-                     isUserPost={true}
-                     post={post}
-                     isLikedByUser={true}
-                     isSavedByUser={true}
-                 />
-             ))}*/
+
 
     if (loading) {
         return (
@@ -180,22 +213,22 @@ export default function UserPosts() {
 
                 <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
 
-                <Gallery
-                    sources={[
-                        { uri: 'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile' },
-                        { uri: 'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg' },
-                        { uri: 'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg' },
-                        { uri: 'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg' },
-                        { uri: 'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg' }
-                    ]}
-                    sourcesOnPress={[
-                        () => console.log('Image 0 pressed'),
-                        () => console.log('Image 1 pressed'),
-                        () => console.log('Image 2 pressed'),
-                        () => console.log('Image 3 pressed'),
-                    ]}
-                />
+                    <Gallery
+                        sources={posts.map(post =>
+                            post.imagesURLS?.length > 0
+                                ? { uri: post.imagesURLS[0] }
+                                : Images.missingImage
+                        )}
 
+                        sourcesOnPress={posts.map((post) => () => {
+                            router.push({
+                                pathname: routes.USER_POST,
+                                params: {
+                                    post: JSON.stringify(post)
+                                }
+                            })
+                        })}
+                    />
             </AppScroll>
         </>
     );

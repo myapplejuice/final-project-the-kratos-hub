@@ -109,6 +109,34 @@ export function getDayComparisons(compareDate, now = new Date()) {
     };
 }
 
+export function getDayComparisonsSafe(compareDate, now = new Date()) {
+    if (!compareDate) return { isToday: false, isPast: false, isTomorrow: false, isYesterday: false };
+
+    const compare = new Date(compareDate); // safely handle string or Date
+
+    if (isNaN(compare.getTime())) {
+        console.warn("Invalid date passed to getDayComparisons:", compareDate);
+        return { isToday: false, isPast: false, isTomorrow: false, isYesterday: false };
+    }
+
+    const pageDay = new Date(compare);
+    pageDay.setHours(0, 0, 0, 0);
+
+    const currentDay = new Date(now);
+    currentDay.setHours(0, 0, 0, 0);
+
+    return {
+        isToday:
+            compare.getFullYear() === now.getFullYear() &&
+            compare.getMonth() === now.getMonth() &&
+            compare.getDate() === now.getDate(),
+        isPast: pageDay.getTime() < currentDay.getTime(),
+        isTomorrow: pageDay.getTime() === currentDay.getTime() + 86400000,
+        isYesterday: pageDay.getTime() === currentDay.getTime() - 86400000,
+    };
+}
+
+
 export function getHoursComparisons(compareDate, now = new Date()) {
     const diffMs = now.getTime() - compareDate.getTime(); // difference in milliseconds
     const diffMinutes = diffMs / (1000 * 60);

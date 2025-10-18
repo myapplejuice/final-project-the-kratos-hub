@@ -5,19 +5,19 @@ import AppText from './app-text';
 import { scaleFont } from '../../common/utils/scale-fonts';
 import { Images } from '../../common/settings/assets';
 import { colors } from '../../common/settings/styling';
-import { formatDate, formatTime, getDayComparisons } from '../../common/utils/date-time';
+import { formatDate, formatTime, getDayComparisons, getDayComparisonsSafe } from '../../common/utils/date-time';
 import { UserContext } from '../../common/contexts/user-context';
 import { routes } from '../../common/settings/constants';
 import ProgressDots from './progress-dots';
 import AppImageBackground from './app-image-background';
 
-export default function CommunityPost({ post, isLikedByUser = false, isSavedByUser = false, isUserPost = false }) {
+export default function CommunityPost({ post, isLikedByUser = false, isSavedByUser = false, isUserPost = false, onDeletePress, onEditPress }) {
     const { user } = useContext(UserContext);
     const router = useRouter();
     const { postUser, imagesURLS, caption, likeCount, shareCount, type, dateOfCreation } = post;
     const [currentImage, setCurrentImage] = useState(0);
 
-    const dateTimeComparisons = getDayComparisons(dateOfCreation);
+    const dateTimeComparisons = getDayComparisonsSafe(dateOfCreation);
     const isToday = dateTimeComparisons.isToday;
     const isYesterday = dateTimeComparisons.isYesterday;
     const isPast = dateTimeComparisons.isPast;
@@ -140,22 +140,43 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                 </View>
 
                 {isUserPost && (
-                    <TouchableOpacity
-                        onPress={() => console.log('options')}
-                        style={{
-                            padding: 8,
-                            borderRadius: 20,
-                        }}
-                    >
-                        <Image
-                            source={Images.options}
+                    <>
+                        <TouchableOpacity
+                            onPress={onDeletePress}
                             style={{
-                                width: 18,
-                                height: 18,
-                                tintColor: colors.mutedText
+                                padding: 8,
+                                borderRadius: 10,
+                                backgroundColor: colors.backgroundTop,
+                                marginEnd: 10
                             }}
-                        />
-                    </TouchableOpacity>
+                        >
+                            <Image
+                                source={Images.trash}
+                                style={{
+                                    width: 18,
+                                    height: 18,
+                                    tintColor: colors.negativeRed
+                                }}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={onEditPress}
+                            style={{
+                                padding: 8,
+                                borderRadius: 10,
+                                backgroundColor: colors.backgroundTop
+                            }}
+                        >
+                            <Image
+                                source={Images.edit}
+                                style={{
+                                    width: 18,
+                                    height: 18,
+                                    tintColor: 'white'
+                                }}
+                            />
+                        </TouchableOpacity>
+                    </>
                 )}
             </View>
 
