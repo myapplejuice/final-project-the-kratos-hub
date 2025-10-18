@@ -30,110 +30,19 @@ import FloatingActionButton from '../../../components/screen-comps/floating-acti
 import Gallery from '../../../components/screen-comps/gallery';
 
 export default function UserPosts() {
-    const { user, setAdditionalContexts } = useContext(UserContext);
+    const { user } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
-    const [galleryVisible, setGalleryVisible] = useState(true);
-    const [post, setPost] = useState({});
+    const [posts, setPosts] = useState([]);
     const [fabVisible, setFabVisible] = useState(true);
-    const [friendsList, setFriendsList] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
     const [selectedPosts, setSelectedPosts] = useState('Any');
 
-    const fadeAnim = useRef(new Animated.Value(0.3)).current;
-
     useEffect(() => {
-        const animation = Animated.loop(
-            Animated.sequence([
-                Animated.timing(fadeAnim, {
-                    toValue: 1,
-                    duration: 600,
-                    useNativeDriver: true,
-                    easing: Easing.inOut(Easing.ease),
-                }),
-                Animated.timing(fadeAnim, {
-                    toValue: 0.3,
-                    duration: 600,
-                    useNativeDriver: true,
-                    easing: Easing.inOut(Easing.ease),
-                }),
-            ])
-        );
-        console.log(user.trainerProfile)
-        animation.start();
-
         setTimeout(() => {
             setLoading(false);
-            animation.stop();
         }, 1000);
     }, []);
-
-    const posts = [
-        {
-            postUser: {
-                id: 'u1',
-                firstname: 'John',
-                lastname: 'Doe',
-                imageURL: user.imageURL,
-                trainerProfile: {
-                    trainerStatus: 'active',
-                    isVerified: true,
-                },
-            },
-            imagesURLS: [
-            ],
-            caption: 'Feeling strong today 💪',
-            likeCount: 140,
-            shareCount: 2,
-            dateOfCreation: new Date(),
-            type: 'Trainer Ad',
-        },
-        {
-            postUser: {
-                id: 'u1',
-                firstname: 'John',
-                lastname: 'Doe',
-                imageURL: user.imageURL,
-                trainerProfile: {
-                    trainerStatus: 'active',
-                    isVerified: true,
-                },
-            },
-            imagesURLS: [
-                'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760553576/profile_images/hk05sqdaj4dxnlueo5mh.jpg',
-                'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760466496/user_trainer_profile_images/g9ibkvz9z7q9ccrjhhio.jpg'
-            ],
-            caption: 'Feeling strong aaaaqaatoday 💪',
-            likeCount: 140,
-            shareCount: 2,
-            dateOfCreation: new Date(),
-            type: 'Trainer Ad',
-        },
-        {
-            postUser: {
-                id: 'u1',
-                firstname: 'John',
-                lastname: 'Doe',
-                imageURL: user.imageURL,
-                trainerProfile: {
-                    trainerStatus: 'active',
-                    isVerified: true,
-                },
-            },
-            imagesURLS: [
-                'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
-                'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760553576/profile_images/hk05sqdaj4dxnlueo5mh.jpg',
-            ],
-            caption: 'Feeling strongqd23d2qadzs today 💪',
-            likeCount: 140,
-            shareCount: 2,
-            dateOfCreation: new Date(),
-            type: 'Trainer Ad',
-        }
-    ]
-
-
 
     if (loading) {
         return (
@@ -142,16 +51,16 @@ export default function UserPosts() {
                     <View key={idx} style={{ marginTop: 15 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 10 }}>
                             <View style={{ justifyContent: 'center' }}>
-                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5, opacity: fadeAnim }} />
+                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5 }} />
                             </View>
                             <View style={{ justifyContent: 'center' }}>
-                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5, opacity: fadeAnim }} />
+                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5 }} />
                             </View>
                             <View style={{ justifyContent: 'center' }}>
-                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5, opacity: fadeAnim }} />
+                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5 }} />
                             </View>
                             <View style={{ justifyContent: 'center' }}>
-                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5, opacity: fadeAnim }} />
+                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5 }} />
                             </View>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15, marginHorizontal: 10 }}>
@@ -163,12 +72,11 @@ export default function UserPosts() {
                                         height: Dimensions.get('window').width * 0.32,
                                         width: '32%',
                                         borderRadius: 10,
-                                        opacity: fadeAnim,
                                     }}
                                 />
                             ))}
                         </View>
-                        <Animated.View style={{ backgroundColor: colors.cardBackground, height: 300, marginTop: 15, opacity: fadeAnim, borderRadius: 10, marginHorizontal: 10 }} />
+                        <Animated.View style={{ backgroundColor: colors.cardBackground, height: 300, marginTop: 15, borderRadius: 10, marginHorizontal: 10 }} />
                     </View>
                 ))}
             </View>
@@ -213,22 +121,22 @@ export default function UserPosts() {
 
                 <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
 
-                    <Gallery
-                        sources={posts.map(post =>
-                            post.imagesURLS?.length > 0
-                                ? { uri: post.imagesURLS[0] }
-                                : Images.missingImage
-                        )}
+                <Gallery
+                    sources={posts.map(post =>
+                        post.imagesURLS?.length > 0
+                            ? { uri: post.imagesURLS[0] }
+                            : Images.missingImage
+                    )}
 
-                        sourcesOnPress={posts.map((post) => () => {
-                            router.push({
-                                pathname: routes.USER_POST,
-                                params: {
-                                    post: JSON.stringify(post)
-                                }
-                            })
-                        })}
-                    />
+                    sourcesOnPress={posts.map((post) => () => {
+                        router.push({
+                            pathname: routes.USER_POST,
+                            params: {
+                                post: JSON.stringify(post)
+                            }
+                        })
+                    })}
+                />
             </AppScroll>
         </>
     );

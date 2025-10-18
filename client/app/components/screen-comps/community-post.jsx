@@ -15,6 +15,7 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
     const { user } = useContext(UserContext);
     const router = useRouter();
     const { postUser, imagesURLS, caption, likeCount, shareCount, type, dateOfCreation } = post;
+    console.log(dateOfCreation)
     const [currentImage, setCurrentImage] = useState(0);
 
     const dateTimeComparisons = getDayComparisonsSafe(dateOfCreation);

@@ -33,15 +33,7 @@ export default function UserPost() {
     const { user, setAdditionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
     const params = useLocalSearchParams();
-    let post = null;
-
-    try {
-        const raw = Array.isArray(params.post) ? params.post[0] : params.post;
-        post = raw ? JSON.parse(decodeURIComponent(raw)) : null;
-    } catch (e) {
-        console.warn("Failed to parse post param:", e);
-        post = null;
-    }
+    let post = JSON.parse(params.post);
 
     return (
         <>

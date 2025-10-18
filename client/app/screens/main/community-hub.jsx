@@ -35,31 +35,9 @@ export default function Community() {
     const [loading, setLoading] = useState(true);
     const [selectedPosts, setSelectedPosts] = useState('Any');
 
-    const fadeAnim = useRef(new Animated.Value(0.3)).current;
-
     useEffect(() => {
-        const animation = Animated.loop(
-            Animated.sequence([
-                Animated.timing(fadeAnim, {
-                    toValue: 1,
-                    duration: 600,
-                    useNativeDriver: true,
-                    easing: Easing.inOut(Easing.ease),
-                }),
-                Animated.timing(fadeAnim, {
-                    toValue: 0.3,
-                    duration: 600,
-                    useNativeDriver: true,
-                    easing: Easing.inOut(Easing.ease),
-                }),
-            ])
-        );
-        console.log(user.trainerProfile)
-        animation.start();
-
         setTimeout(() => {
             setLoading(false);
-            animation.stop();
         }, 1000);
     }, []);
 
@@ -69,13 +47,13 @@ export default function Community() {
                 {[...Array(2)].map((_, idx) => (
                     <View key={idx} style={{ marginTop: 15 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Animated.View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, opacity: fadeAnim }} />
+                            <Animated.View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15 }} />
                             <View style={{ justifyContent: 'center' }}>
-                                <Animated.View style={{ width: 90, height: 10, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5, opacity: fadeAnim }} />
-                                <Animated.View style={{ width: 60, height: 7, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5, opacity: fadeAnim }} />
+                                <Animated.View style={{ width: 90, height: 10, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5 }} />
+                                <Animated.View style={{ width: 60, height: 7, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5}} />
                             </View>
                         </View>
-                        <Animated.View style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 15, opacity: fadeAnim, borderRadius: 10 }} />
+                        <Animated.View style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 15, borderRadius: 10 }} />
                     </View>
                 ))}
             </View>
