@@ -168,4 +168,7 @@ export const Images_2 = {
     postOutline: require('../../../assets/images/post-outline.png'),
     posts: require('../../../assets/images/posts.png'),
     postsOutline: require('../../../assets/images/posts-outline.png'),
+    missingImage: require('../../../assets/images/missing-image.jpg'),
+    missingImagePNG: require('../../../assets/images/missing-image.png'),
+    msisingImageTwo: require('../../../assets/images/missing-image-2.png'),
 };

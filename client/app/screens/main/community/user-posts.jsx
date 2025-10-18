@@ -2,7 +2,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Animated, Easing, Keyboard, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Animated, Dimensions, Easing, Keyboard, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import BuildFooter from "../../../components/layout-comps/build-footer";
 import AppText from "../../../components/screen-comps/app-text";
 import { Images } from '../../../common/settings/assets';
@@ -27,6 +27,7 @@ import AppTextInput from '../../../components/screen-comps/app-text-input';
 import CommunityPost from '../../../components/screen-comps/community-post';
 import FloatingActionMenu from '../../../components/screen-comps/floating-action-menu';
 import FloatingActionButton from '../../../components/screen-comps/floating-action-button';
+import Gallery from '../../../components/screen-comps/gallery';
 
 export default function UserPosts() {
     const { user, setAdditionalContexts } = useContext(UserContext);
@@ -90,19 +91,51 @@ export default function UserPosts() {
             type: 'Trainer Ad',
         }]
 
+    /* { }
+             {posts.map((post, idx) => (
+                 <CommunityPost
+                     key={idx}
+                     isUserPost={true}
+                     post={post}
+                     isLikedByUser={true}
+                     isSavedByUser={true}
+                 />
+             ))}*/
+
     if (loading) {
         return (
             <View style={{ backgroundColor: colors.background, flex: 1, paddingTop: 75 }}>
-                {[...Array(2)].map((_, idx) => (
+                {[...Array(1)].map((_, idx) => (
                     <View key={idx} style={{ marginTop: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Animated.View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, opacity: fadeAnim }} />
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 10 }}>
                             <View style={{ justifyContent: 'center' }}>
-                                <Animated.View style={{ width: 90, height: 10, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5, opacity: fadeAnim }} />
-                                <Animated.View style={{ width: 60, height: 7, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5, opacity: fadeAnim }} />
+                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5, opacity: fadeAnim }} />
+                            </View>
+                            <View style={{ justifyContent: 'center' }}>
+                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5, opacity: fadeAnim }} />
+                            </View>
+                            <View style={{ justifyContent: 'center' }}>
+                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5, opacity: fadeAnim }} />
+                            </View>
+                            <View style={{ justifyContent: 'center' }}>
+                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5, opacity: fadeAnim }} />
                             </View>
                         </View>
-                        <Animated.View style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 15, opacity: fadeAnim, borderRadius: 10 }} />
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15, marginHorizontal: 10 }}>
+                            {Array(3).fill(0).map((_, idx) => (
+                                <Animated.View
+                                    key={idx}
+                                    style={{
+                                        backgroundColor: colors.cardBackground,
+                                        height: Dimensions.get('window').width * 0.32,
+                                        width: '32%',
+                                        borderRadius: 10,
+                                        opacity: fadeAnim,
+                                    }}
+                                />
+                            ))}
+                        </View>
+                        <Animated.View style={{ backgroundColor: colors.cardBackground, height: 300, marginTop: 15, opacity: fadeAnim, borderRadius: 10, marginHorizontal: 10 }} />
                     </View>
                 ))}
             </View>
@@ -147,16 +180,21 @@ export default function UserPosts() {
 
                 <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
 
-                { }
-                {posts.map((post, idx) => (
-                    <CommunityPost
-                        key={idx}
-                        isUserPost={true}
-                        post={post}
-                        isLikedByUser={true}
-                        isSavedByUser={true}
-                    />
-                ))}
+                <Gallery
+                    sources={[
+                        { uri: 'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile' },
+                        { uri: 'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg' },
+                        { uri: 'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg' },
+                        { uri: 'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg' },
+                        { uri: 'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg' }
+                    ]}
+                    sourcesOnPress={[
+                        () => console.log('Image 0 pressed'),
+                        () => console.log('Image 1 pressed'),
+                        () => console.log('Image 2 pressed'),
+                        () => console.log('Image 3 pressed'),
+                    ]}
+                />
 
             </AppScroll>
         </>
