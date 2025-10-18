@@ -13,6 +13,7 @@ export const routes = {
     NUTRITION_HUB: '/screens/main/nutrition-hub',
     TRAINING_HUB: '/screens/main/training-hub',
     NOTIFICATIONS: '/screens/main/notifications',
+    COMMUNITY: '/screens/main/community-hub',
 
     /* COMMUNITY */
     CHAT: '/screens/main/community/chat',
@@ -20,7 +21,7 @@ export const routes = {
     USER_PROFILE: '/screens/main/community/user-profile',
     USER_TRAINER_PROFILE: '/screens/main/community/user-trainer-profile',
     USER_FOODS: '/screens/main/community/user-foods',
-    COMMUNITY: '/screens/main/community-hub',
+    USER_POSTS: '/screens/main/community/user-posts',
 
     /* HOMEPAGE CHILDREN */
     LEAN_BODY_MASS: '/screens/main/homepage/lean-body-mass',

@@ -3,31 +3,31 @@ import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Animated, Easing, Keyboard, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import BuildFooter from "../../components/layout-comps/build-footer";
-import AppText from "../../components/screen-comps/app-text";
-import { Images } from '../../common/settings/assets';
-import { UserContext } from "../../common/contexts/user-context";
-import { formatDate, formatTime, getDayComparisons, getHoursComparisons } from '../../common/utils/date-time';
-import usePopups from "../../common/hooks/use-popups";
-import { scaleFont } from "../../common/utils/scale-fonts";
-import DeviceStorageService from '../../common/services/device-storage-service';
-import APIService from '../../common/services/api-service';
-import { routes } from "../../common/settings/constants";
-import { colors } from "../../common/settings/styling";
-import Divider from '../../components/screen-comps/divider';
-import AppScroll from '../../components/screen-comps/app-scroll'
-import ImageCapture from '../../components/screen-comps/image-capture';
-import { CameraContext } from '../../common/contexts/camera-context';
-import { LibraryContext } from '../../common/contexts/library-context';
-import AnimatedButton from '../../components/screen-comps/animated-button';
+import BuildFooter from "../../../components/layout-comps/build-footer";
+import AppText from "../../../components/screen-comps/app-text";
+import { Images } from '../../../common/settings/assets';
+import { UserContext } from "../../../common/contexts/user-context";
+import { formatDate, formatTime, getDayComparisons, getHoursComparisons } from '../../../common/utils/date-time';
+import usePopups from "../../../common/hooks/use-popups";
+import { scaleFont } from "../../../common/utils/scale-fonts";
+import DeviceStorageService from '../../../common/services/device-storage-service';
+import APIService from '../../../common/services/api-service';
+import { routes } from "../../../common/settings/constants";
+import { colors } from "../../../common/settings/styling";
+import Divider from '../../../components/screen-comps/divider';
+import AppScroll from '../../../components/screen-comps/app-scroll'
+import ImageCapture from '../../../components/screen-comps/image-capture';
+import { CameraContext } from '../../../common/contexts/camera-context';
+import { LibraryContext } from '../../../common/contexts/library-context';
+import AnimatedButton from '../../../components/screen-comps/animated-button';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Invert from '../../components/effects/invert';
-import ExpandInOut from '../../components/effects/expand-in-out';
-import AppTextInput from '../../components/screen-comps/app-text-input';
-import CommunityPost from '../../components/screen-comps/community-post';
-import FloatingActionMenu from '../../components/screen-comps/floating-action-menu';
+import Invert from '../../../components/effects/invert';
+import ExpandInOut from '../../../components/effects/expand-in-out';
+import AppTextInput from '../../../components/screen-comps/app-text-input';
+import CommunityPost from '../../../components/screen-comps/community-post';
+import FloatingActionMenu from '../../../components/screen-comps/floating-action-menu';
 
-export default function Community() {
+export default function UserPosts() {
     const { user, setAdditionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
@@ -90,7 +90,7 @@ export default function Community() {
                 overlayColor="rgba(0, 0, 0, 0.8)"
                 actions={[
                     { icon: Images.list3, title: 'Saved Posts', onPress: () => console.log('something'), closeOnAction: true, delayClosure: true },
-                    { icon: Images.meals, title: 'My Posts', onPress: () => router.push(routes.USER_POSTS), closeOnAction: true },
+                    { icon: Images.meals, title: 'My Posts', onPress: () => console.log('something'), closeOnAction: true },
                 ]}
                 visible={fabVisible}
                 position={{ bottom: insets.bottom + 70, right: 20 }}

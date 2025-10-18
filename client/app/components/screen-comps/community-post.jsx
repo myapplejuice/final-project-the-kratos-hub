@@ -38,7 +38,7 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
         });
     }
 
-   return (
+    return (
         <View style={{
             marginBottom: 25,
             backgroundColor: 'rgba(30, 30, 30, 0.7)',
@@ -61,8 +61,8 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                 borderBottomColor: 'rgba(255,255,255,0.1)'
             }}>
                 <View style={{ flexDirection: 'row', alignItems: 'flex-start', flex: 1 }}>
-                    <TouchableOpacity 
-                        onPress={handleUserPress} 
+                    <TouchableOpacity
+                        onPress={handleUserPress}
                         style={{ flexDirection: 'row', alignItems: 'flex-start', flex: 1 }}
                     >
                         <Image
@@ -110,12 +110,12 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                                     <TouchableOpacity
                                         onPress={() => router.push(routes.SHIELD_OF_TRUST)}
                                         style={{ justifyContent: 'center', alignItems: 'center', marginStart: 6 }}>
-                                        <Image 
-                                            source={Images.shieldFour} 
-                                            style={{ 
-                                                width: 16, 
+                                        <Image
+                                            source={Images.shieldFour}
+                                            style={{
+                                                width: 16,
                                                 height: 16,
-                                            }} 
+                                            }}
                                         />
                                     </TouchableOpacity>
                                 )}
@@ -135,33 +135,35 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                     </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity 
-                    onPress={() => console.log('options')} 
-                    style={{ 
-                        padding: 8,
-                        borderRadius: 20,
-                        backgroundColor: 'rgba(255,255,255,0.05)'
-                    }}
-                >
-                    <Image 
-                        source={Images.options} 
-                        style={{ 
-                            width: 18, 
-                            height: 18, 
-                            tintColor: colors.mutedText 
-                        }} 
-                    />
-                </TouchableOpacity>
+                {user.id === postUser.id && (
+                    <TouchableOpacity
+                        onPress={() => console.log('options')}
+                        style={{
+                            padding: 8,
+                            borderRadius: 20,
+                            backgroundColor: 'rgba(255,255,255,0.05)'
+                        }}
+                    >
+                        <Image
+                            source={Images.options}
+                            style={{
+                                width: 18,
+                                height: 18,
+                                tintColor: colors.mutedText
+                            }}
+                        />
+                    </TouchableOpacity>
+                )}
             </View>
 
             {!!caption && (
-                <View style={{ 
-                    paddingHorizontal: 16, 
+                <View style={{
+                    paddingHorizontal: 16,
                     marginVertical: 12,
                     paddingBottom: imagesURLS?.length > 0 ? 8 : 0
                 }}>
-                    <AppText style={{ 
-                        color: 'rgba(255,255,255,0.9)', 
+                    <AppText style={{
+                        color: 'rgba(255,255,255,0.9)',
                         fontSize: scaleFont(14),
                         lineHeight: 20
                     }}>
@@ -223,19 +225,19 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                                         alignItems: 'center',
                                         backgroundColor: 'rgba(0,0,0,0.6)',
                                     }}>
-                                    <Image 
-                                        source={Images.arrow} 
-                                        style={{ 
-                                            width: 18, 
-                                            height: 18, 
-                                            tintColor: 'white' 
-                                        }} 
+                                    <Image
+                                        source={Images.arrow}
+                                        style={{
+                                            width: 18,
+                                            height: 18,
+                                            tintColor: 'white'
+                                        }}
                                     />
                                 </TouchableOpacity>
                             </>
                         )}
                     </ImageBackground>
-                    
+
                     {imagesURLS.length > 1 && (
                         <View style={{
                             position: 'absolute',
@@ -257,9 +259,9 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
             )}
 
             {/* ACTION BAR */}
-            <View style={{ 
-                flexDirection: 'row', 
-                justifyContent: 'space-between', 
+            <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
                 alignItems: 'center',
                 paddingHorizontal: 16,
                 paddingVertical: 12,
@@ -268,48 +270,48 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
             }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <TouchableOpacity 
-                            style={{ 
+                        <TouchableOpacity
+                            style={{
                                 padding: 8,
                             }}
                         >
-                            <Image 
-                                source={isLikedByUser ? Images.like : Images.likeOutline} 
-                                style={{ 
-                                    width: 22, 
-                                    height: 22, 
-                                    tintColor: colors.mutedText 
-                                }} 
+                            <Image
+                                source={isLikedByUser ? Images.like : Images.likeOutline}
+                                style={{
+                                    width: 22,
+                                    height: 22,
+                                    tintColor: colors.mutedText
+                                }}
                             />
                         </TouchableOpacity>
 
-                        <TouchableOpacity 
-                            style={{ 
+                        <TouchableOpacity
+                            style={{
                                 padding: 8,
                                 marginEnd: 5
                             }}
                         >
-                            <Image 
-                                source={Images.shareOutline} 
-                                style={{ 
-                                    width: 22, 
-                                    height: 22, 
-                                    tintColor: colors.mutedText 
-                                }} 
+                            <Image
+                                source={Images.shareOutline}
+                                style={{
+                                    width: 22,
+                                    height: 22,
+                                    tintColor: colors.mutedText
+                                }}
                             />
                         </TouchableOpacity>
                     </View>
 
                     <View style={{ alignItems: 'flex-start' }}>
-                        <AppText style={{ 
-                            color: colors.mutedText, 
+                        <AppText style={{
+                            color: colors.mutedText,
                             fontSize: scaleFont(11),
                             fontWeight: '500'
                         }}>
                             {likeCount} Likes
                         </AppText>
-                        <AppText style={{ 
-                            color: colors.mutedText, 
+                        <AppText style={{
+                            color: colors.mutedText,
                             fontSize: scaleFont(11),
                             fontWeight: '500'
                         }}>
@@ -318,18 +320,18 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                     </View>
                 </View>
 
-                <TouchableOpacity 
-                    style={{ 
+                <TouchableOpacity
+                    style={{
                         padding: 8,
                     }}
                 >
-                    <Image 
-                        source={isSavedByUser ? Images.bookmark:Images.bookmarkOutline} 
-                        style={{ 
-                            width: 22, 
-                            height: 22, 
-                            tintColor: colors.mutedText 
-                        }} 
+                    <Image
+                        source={isSavedByUser ? Images.bookmark : Images.bookmarkOutline}
+                        style={{
+                            width: 22,
+                            height: 22,
+                            tintColor: colors.mutedText
+                        }}
                     />
                 </TouchableOpacity>
             </View>
