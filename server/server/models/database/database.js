@@ -4,6 +4,7 @@ import { userTablesQuery } from './user-tables-query.js';
 import { nutritionTablesQuery } from './nutrition-tables-query.js';
 import { chatTablesQuery } from './chat-tables-query.js';
 import { adminQuery } from './admin-query.js';
+import { communityTablesQuery } from './community-tables-query.js';
 
 dotenv.config();
 
@@ -36,7 +37,7 @@ export default class Database {
             }
 
             // Ensuring The_Kratos_Hub tables exist
-            const queryString = userTablesQuery() + "\n" + nutritionTablesQuery() + "\n" + chatTablesQuery() + "\n" + adminQuery();
+            const queryString = userTablesQuery() + "\n" + nutritionTablesQuery() + "\n" + chatTablesQuery() + "\n" + adminQuery() + "\n" + communityTablesQuery();
             await Database.pool.request().query(queryString);
 
             // Return connection info

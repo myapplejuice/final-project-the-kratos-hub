@@ -87,7 +87,7 @@ export default function CommunityPost({ post }) {
                         justifyContent: 'space-between',
                         alignItems: 'center',
                     }}
-                    resizeMode="cover"
+                    resizeMode="contain"
                 >
                     <TouchableOpacity
                         style={{

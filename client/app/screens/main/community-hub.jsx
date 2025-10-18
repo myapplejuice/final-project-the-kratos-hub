@@ -121,7 +121,7 @@ export default function Community() {
                     },
                     imageURL: 'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
                     caption: 'Feeling strong today 💪',
-                    likes: 140,
+                    likes: 140, //array instead of num
                     shares: 2,
                     time: '10:00 AM',
                     type: 'Trainer Ad',
