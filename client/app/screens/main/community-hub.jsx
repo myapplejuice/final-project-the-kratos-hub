@@ -1,5 +1,5 @@
 import * as FileSystem from 'expo-file-system/legacy';
-import { Image } from "expo-image";
+import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Animated, Easing, Keyboard, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
@@ -81,8 +81,8 @@ export default function Community() {
 
     return (
         <AppScroll hideNavBarOnScroll={true} hideTopBarOnScroll={true} extraBottom={100}>
-            <View style={{ marginTop: 15, height: 60 }}>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 10, alignItems: 'center' }}>
+            <View style={{ height: 60 }}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
                     {["Any", "Tips", "Trainer Ad", "Need Trainer", "Moments", "Inquiry"].map((opt, idx) => {
                         return (
                             <TouchableOpacity
@@ -93,7 +93,8 @@ export default function Community() {
                                     paddingVertical: 8,
                                     borderRadius: 20,
                                     backgroundColor: selectedPosts === opt ? colors.main : colors.cardBackground,
-                                    marginRight: 10,
+                                    marginStart: idx === 0 ? 10: 5,
+                                    marginEnd: idx === 5 ? 10: 5
                                 }}
                             >
                                 <AppText style={{ color: 'white', fontSize: 14 }}>{opt}</AppText>
@@ -103,7 +104,7 @@ export default function Community() {
                 </ScrollView>
             </View>
 
-            <Divider orientation='horizontal' style={{ marginVertical: 15 }} />
+            <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
 
             <View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginStart: 15, alignItems: 'center' }}>
@@ -112,30 +113,67 @@ export default function Community() {
                             <Image source={{ uri: user.imageURL }} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardBackground }} />
 
                             <View style={{ justifyContent: 'center', marginStart: 15 }}>
-                                <AppText style={{ color: 'white', fontWeight: 'bold' }}>{user.firstname} {user.lastname}</AppText>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <AppText style={{ color: colors.mutedText, fontWeight: 'bold', fontSize: scaleFont(10) }}>{user.gender === 'male' ? 'M' : 'F'}, {user.age}</AppText>
+                                    <AppText style={{ color: 'white', fontWeight: 'bold' }}>{user.firstname} {user.lastname}</AppText>
+                                    {user.trainerProfile.trainerStatus === 'active' && !user.trainerProfile.isVerified &&
+                                        <TouchableOpacity onPress={() => router.push(routes.PERSONAL_TRAINING_EXPLANATION)} style={{ height: 20, width: 20, borderRadius: 10, backgroundColor: colors.main, justifyContent: 'center', alignItems: 'center', marginStart: 5 }}>
+                                            <Image source={Images.personalTrainer} style={{ width: 12, height: 12, tintColor: 'white' }} />
+                                        </TouchableOpacity>
+                                    }
+                                    {user.trainerProfile.isVerified &&
+                                        <TouchableOpacity onPress={() => router.push(routes.SHIELD_OF_TRUST)} style={{ justifyContent: 'center', alignItems: 'center', marginStart: 5 }}>
+                                            <Image source={Images.shieldFour} style={{ width: 15, height: 15 }} />
+                                        </TouchableOpacity>
+                                    }
+                                </View>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <AppText style={{ color: colors.mutedText, fontWeight: 'bold', fontSize: scaleFont(9) }}>10:00 AM  •  Trainer Ad</AppText>
                                 </View>
                             </View>
                         </TouchableOpacity>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginStart: 10 }}>
-                            {user.trainerProfile.trainerStatus === 'active' && !user.trainerProfile.isVerified &&
-                                <TouchableOpacity onPress={() => router.push(routes.PERSONAL_TRAINING_EXPLANATION)} style={{ height: 20, width: 20, borderRadius: 10, backgroundColor: colors.main, justifyContent: 'center', alignItems: 'center', marginEnd: 5 }}>
-                                    <Image source={Images.personalTrainer} style={{ width: 12, height: 12, tintColor: 'white' }} />
-                                </TouchableOpacity>
-                            }
-                            {user.trainerProfile.isVerified &&
-                                <TouchableOpacity onPress={() => router.push(routes.SHIELD_OF_TRUST)} style={{ height: 20, width: 20, borderRadius: 10, backgroundColor: colors.main, justifyContent: 'center', alignItems: 'center' }}>
-                                    <Image source={Images.shield} style={{ width: 12, height: 12, tintColor: 'white' }} />
-                                </TouchableOpacity>
-                            }
-                        </View>
+
                     </View>
                     <TouchableOpacity onPress={() => console.log('options')} style={{ padding: 15 }}>
                         <Image source={Images.options} style={{ width: 20, height: 20, tintColor: 'white' }} />
                     </TouchableOpacity>
                 </View>
-                <Image source={Images.profilePic} style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 10 }} resizeMode='contain' />
+
+                <ImageBackground source={Images.profilePic} style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} resizeMode='contain'>
+                    <TouchableOpacity style={{ height: 50, width: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)', marginStart: 15 }}>
+                        <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white', transform: [{ rotate: '180deg' }] }} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{ height: 50, width: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)', marginEnd: 15 }}>
+                        <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                    </TouchableOpacity>
+                </ImageBackground>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <View style={{ flexDirection: 'row' }}>
+                        <TouchableOpacity style={{ paddingStart: 15, paddingEnd: 5, paddingVertical: 15 }}>
+                            <Image source={Images.likeOutline} style={{ width: 23, height: 23, tintColor: 'white' }} />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{ paddingHorizontal: 5, paddingVertical: 15 }}>
+                            <Image source={Images.shareOutline} style={{ width: 23, height: 23, tintColor: 'white' }} />
+                        </TouchableOpacity>
+                        <View style={{ alignItems: 'center', justifyContent: 'center', marginStart: 15 }}>
+                            <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>140 Likes</AppText>
+                            <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>2 Shares</AppText>
+                        </View>
+                    </View>
+                    <TouchableOpacity style={{ padding: 15 }}>
+                        <Image source={Images.bookmarkOutline} style={{ width: 23, height: 23, tintColor: 'white' }} />
+                    </TouchableOpacity>
+                </View>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <AppText style={{ marginHorizontal: 15 }}>
+                        <AppText style={{ color: 'white', fontWeight: 'bold' }}>Lorem ipsum dolor sit amet consectetur adipisicing elit. </AppText>
+                        <AppText style={{ color: 'white' }}>Lorem ipsum dolor sit amet consectetur adipisicing elit. </AppText>
+                        <AppText style={{ color: 'white' }}>Lorem ipsum dolor sit amet consectetur adipisicing elit. </AppText>
+                        <AppText style={{ color: 'white' }}>Lorem ipsum dolor sit amet consectetur adipisicing elit. </AppText>
+                    </AppText>
+                </View>
+
             </View>
         </AppScroll>
     );

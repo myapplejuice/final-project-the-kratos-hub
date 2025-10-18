@@ -155,4 +155,13 @@ export const Images_2 = {
     communityOutline: require('../../../assets/images/community-outline.png'),
     options: require('../../../assets/images/options.png'),
     optionsOutline: require('../../../assets/images/options-outline.png'),
+    shieldTwo: require('../../../assets/images/shield-2.png'),
+    shieldThree: require('../../../assets/images/shield-3.png'),
+    shieldFour: require('../../../assets/images/shield-4.png'),
+    like: require('../../../assets/images/like.png'),
+    likeOutline: require('../../../assets/images/like-outline.png'),
+    bookmark: require('../../../assets/images/bookmark.png'),
+    bookmarkOutline: require('../../../assets/images/bookmark-outline.png'),
+    comment: require('../../../assets/images/comment.png'),
+    commentOutline: require('../../../assets/images/comment-outline.png'),
 };
