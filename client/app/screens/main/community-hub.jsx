@@ -24,6 +24,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Invert from '../../components/effects/invert';
 import ExpandInOut from '../../components/effects/expand-in-out';
 import AppTextInput from '../../components/screen-comps/app-text-input';
+import CommunityPost from '../../components/screen-comps/community-post';
 
 export default function Community() {
     const { user, setAdditionalContexts } = useContext(UserContext);
@@ -93,8 +94,8 @@ export default function Community() {
                                     paddingVertical: 8,
                                     borderRadius: 20,
                                     backgroundColor: selectedPosts === opt ? colors.main : colors.cardBackground,
-                                    marginStart: idx === 0 ? 10: 5,
-                                    marginEnd: idx === 5 ? 10: 5
+                                    marginStart: idx === 0 ? 10 : 5,
+                                    marginEnd: idx === 5 ? 10 : 5
                                 }}
                             >
                                 <AppText style={{ color: 'white', fontSize: 14 }}>{opt}</AppText>
@@ -106,75 +107,25 @@ export default function Community() {
 
             <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
 
-            <View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginStart: 15, alignItems: 'center' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <TouchableOpacity onPress={() => console.log('route to user profile')} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={{ uri: user.imageURL }} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardBackground }} />
-
-                            <View style={{ justifyContent: 'center', marginStart: 15 }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <AppText style={{ color: 'white', fontWeight: 'bold' }}>{user.firstname} {user.lastname}</AppText>
-                                    {user.trainerProfile.trainerStatus === 'active' && !user.trainerProfile.isVerified &&
-                                        <TouchableOpacity onPress={() => router.push(routes.PERSONAL_TRAINING_EXPLANATION)} style={{ height: 20, width: 20, borderRadius: 10, backgroundColor: colors.main, justifyContent: 'center', alignItems: 'center', marginStart: 5 }}>
-                                            <Image source={Images.personalTrainer} style={{ width: 12, height: 12, tintColor: 'white' }} />
-                                        </TouchableOpacity>
-                                    }
-                                    {user.trainerProfile.isVerified &&
-                                        <TouchableOpacity onPress={() => router.push(routes.SHIELD_OF_TRUST)} style={{ justifyContent: 'center', alignItems: 'center', marginStart: 5 }}>
-                                            <Image source={Images.shieldFour} style={{ width: 15, height: 15 }} />
-                                        </TouchableOpacity>
-                                    }
-                                </View>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <AppText style={{ color: colors.mutedText, fontWeight: 'bold', fontSize: scaleFont(9) }}>10:00 AM  •  Trainer Ad</AppText>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-
-                    </View>
-                    <TouchableOpacity onPress={() => console.log('options')} style={{ padding: 15 }}>
-                        <Image source={Images.options} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                    </TouchableOpacity>
-                </View>
-
-                <ImageBackground source={Images.profilePic} style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} resizeMode='contain'>
-                    <TouchableOpacity style={{ height: 50, width: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)', marginStart: 15 }}>
-                        <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white', transform: [{ rotate: '180deg' }] }} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{ height: 50, width: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)', marginEnd: 15 }}>
-                        <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                    </TouchableOpacity>
-                </ImageBackground>
-
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <View style={{ flexDirection: 'row' }}>
-                        <TouchableOpacity style={{ paddingStart: 15, paddingEnd: 5, paddingVertical: 15 }}>
-                            <Image source={Images.likeOutline} style={{ width: 23, height: 23, tintColor: 'white' }} />
-                        </TouchableOpacity>
-                        <TouchableOpacity style={{ paddingHorizontal: 5, paddingVertical: 15 }}>
-                            <Image source={Images.shareOutline} style={{ width: 23, height: 23, tintColor: 'white' }} />
-                        </TouchableOpacity>
-                        <View style={{ alignItems: 'center', justifyContent: 'center', marginStart: 15 }}>
-                            <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>140 Likes</AppText>
-                            <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>2 Shares</AppText>
-                        </View>
-                    </View>
-                    <TouchableOpacity style={{ padding: 15 }}>
-                        <Image source={Images.bookmarkOutline} style={{ width: 23, height: 23, tintColor: 'white' }} />
-                    </TouchableOpacity>
-                </View>
-
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <AppText style={{ marginHorizontal: 15 }}>
-                        <AppText style={{ color: 'white', fontWeight: 'bold' }}>Lorem ipsum dolor sit amet consectetur adipisicing elit. </AppText>
-                        <AppText style={{ color: 'white' }}>Lorem ipsum dolor sit amet consectetur adipisicing elit. </AppText>
-                        <AppText style={{ color: 'white' }}>Lorem ipsum dolor sit amet consectetur adipisicing elit. </AppText>
-                        <AppText style={{ color: 'white' }}>Lorem ipsum dolor sit amet consectetur adipisicing elit. </AppText>
-                    </AppText>
-                </View>
-
-            </View>
+            <CommunityPost
+                post={{
+                    user: {
+                        id: 'u1',
+                        firstname: 'John',
+                        lastname: 'Doe',
+                        imageURL: user.imageURL,
+                        trainerProfile: {
+                            trainerStatus: 'active',
+                            isVerified: true,
+                        },
+                    },
+                    imageURL: 'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
+                    caption: 'Feeling strong today 💪',
+                    likes: 140,
+                    shares: 2,
+                    time: '10:00 AM',
+                    type: 'Trainer Ad',
+                }} />
         </AppScroll>
     );
 }
