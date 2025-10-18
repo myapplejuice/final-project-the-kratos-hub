@@ -23,6 +23,7 @@ export const routes = {
     USER_FOODS: '/screens/main/community/user-foods',
     USER_POSTS: '/screens/main/community/user-posts',
     USER_POST: '/screens/main/community/user-post',
+    POST_CREATOR: '/screens/main/community/post-creator',
 
     /* HOMEPAGE CHILDREN */
     LEAN_BODY_MASS: '/screens/main/homepage/lean-body-mass',

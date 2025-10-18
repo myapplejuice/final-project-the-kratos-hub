@@ -103,6 +103,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.COMMUNITY]: "Community Hub",
         [routes.USER_POSTS]: "My Posts",
         [routes.USER_POST]: "My Posts",
+        [routes.POST_CREATOR]: "Create Post",
 
     };
 

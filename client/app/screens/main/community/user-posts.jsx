@@ -89,7 +89,7 @@ export default function UserPosts() {
                 overlayColor="rgba(0, 0, 0, 0.8)"
                 style={{ backgroundColor: colors.accentGreen, width: '100%', height: 50, }}
                 label='Create New Post'
-                onPress={() => console.log('do something')}
+                onPress={() => router.push(routes.POST_CREATOR)}
                 visible={fabVisible}
                 position={{ bottom: insets.bottom + 20, right: 20, left: 20 }}
                 icon={Images.plus}
