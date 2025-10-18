@@ -368,7 +368,7 @@ export default function Goals() {
     }
 
     return (
-        <AppScroll hideNavBarOnScroll={true} hideTopBarOnScroll={true} extraBottom={100} topPadding={false}>
+        <AppScroll hideNavBarOnScroll={true} extraBottom={100} topPadding={false}>
             <View style={[styles.card, { margin: 0, borderTopEndRadius: 0, borderTopStartRadius: 0, paddingTop: 90, marginBottom: 15, borderRadius: 30 }]}>
                 <View style={styles.metricRow}>
                     <TouchableOpacity onPress={handleHeightChange} style={styles.metricItem}>

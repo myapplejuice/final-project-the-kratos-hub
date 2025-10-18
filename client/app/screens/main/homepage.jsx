@@ -59,7 +59,7 @@ export default function Homepage() {
     }, []);
 
     return (
-        <AppScroll paddingColor={colors.background} topPadding={false} extraBottom={100} hideNavBarOnScroll={true} hideTopBarOnScroll={true}>
+        <AppScroll paddingColor={colors.background} topPadding={false} extraBottom={100} hideNavBarOnScroll={true}>
             <View style={{ paddingHorizontal: 20, paddingTop: 50 + 65, paddingBottom: 30, margin: 0, backgroundColor: colors.main, borderBottomEndRadius: 30, borderBottomStartRadius: 30, overflow: 'hidden', marginBottom: 60 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignContent: 'center' }}>
                     <DateDisplay styles={{ textAlign: 'center' }} dateStyle={{ color: 'white' }} dayStyle={{ color: 'white' }} />

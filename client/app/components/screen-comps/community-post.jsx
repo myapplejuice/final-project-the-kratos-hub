@@ -10,7 +10,7 @@ import { UserContext } from '../../common/contexts/user-context';
 import { routes } from '../../common/settings/constants';
 import ProgressDots from './progress-dots';
 
-export default function CommunityPost({ post }) {
+export default function CommunityPost({ post, isLikedByUser = false, isSavedByUser = false }) {
     const { user } = useContext(UserContext);
     const router = useRouter();
     const { postUser, imagesURLS, caption, likeCount, shareCount, type, dateOfCreation } = post;
@@ -26,6 +26,10 @@ export default function CommunityPost({ post }) {
     const timeDisplay = `${day} ${time}`.trim();
 
     function handleUserPress() {
+        if (postUser.id === user.id) {
+            router.push(routes.PROFILE);
+            return;
+        }
         router.push({
             pathname: routes.USER_PROFILE,
             params: {
@@ -34,20 +38,52 @@ export default function CommunityPost({ post }) {
         });
     }
 
-    return (
-        <View style={{ marginBottom: 25 }}>
+   return (
+        <View style={{
+            marginBottom: 25,
+            backgroundColor: 'rgba(30, 30, 30, 0.7)',
+            borderRadius: 16,
+            overflow: 'hidden',
+            marginHorizontal: 12,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 8,
+        }}>
             {/* HEADER */}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginStart: 15, alignItems: 'center' }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <TouchableOpacity onPress={() => handleUserPress()} style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                padding: 16,
+                alignItems: 'flex-start',
+                borderBottomWidth: 0.5,
+                borderBottomColor: 'rgba(255,255,255,0.1)'
+            }}>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', flex: 1 }}>
+                    <TouchableOpacity 
+                        onPress={handleUserPress} 
+                        style={{ flexDirection: 'row', alignItems: 'flex-start', flex: 1 }}
+                    >
                         <Image
                             source={{ uri: postUser.imageURL }}
-                            style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardBackground }}
+                            style={{
+                                width: 44,
+                                height: 44,
+                                borderRadius: 22,
+                                backgroundColor: colors.cardBackground,
+                                borderWidth: 2,
+                                borderColor: 'rgba(255,255,255,0.1)'
+                            }}
                         />
-                        <View style={{ justifyContent: 'center', marginStart: 15 }}>
+                        <View style={{ justifyContent: 'center', marginStart: 12, flex: 1 }}>
                             {/* Name + Status */}
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <AppText style={{ color: 'white', fontWeight: 'bold' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                                <AppText style={{
+                                    color: 'white',
+                                    fontWeight: '700',
+                                    fontSize: scaleFont(14),
+                                }}>
                                     {postUser.firstname} {postUser.lastname}
                                 </AppText>
 
@@ -61,11 +97,11 @@ export default function CommunityPost({ post }) {
                                             backgroundColor: colors.main,
                                             justifyContent: 'center',
                                             alignItems: 'center',
-                                            marginStart: 5,
+                                            marginStart: 6,
                                         }}>
                                         <Image
                                             source={Images.personalTrainer}
-                                            style={{ width: 12, height: 12, tintColor: 'white' }}
+                                            style={{ width: 10, height: 10, tintColor: 'white' }}
                                         />
                                     </TouchableOpacity>
                                 )}
@@ -73,8 +109,14 @@ export default function CommunityPost({ post }) {
                                 {postUser.trainerProfile?.isVerified && (
                                     <TouchableOpacity
                                         onPress={() => router.push(routes.SHIELD_OF_TRUST)}
-                                        style={{ justifyContent: 'center', alignItems: 'center', marginStart: 5 }}>
-                                        <Image source={Images.shieldFour} style={{ width: 15, height: 15 }} />
+                                        style={{ justifyContent: 'center', alignItems: 'center', marginStart: 6 }}>
+                                        <Image 
+                                            source={Images.shieldFour} 
+                                            style={{ 
+                                                width: 16, 
+                                                height: 16,
+                                            }} 
+                                        />
                                     </TouchableOpacity>
                                 )}
                             </View>
@@ -83,8 +125,8 @@ export default function CommunityPost({ post }) {
                                 <AppText
                                     style={{
                                         color: colors.mutedText,
-                                        fontWeight: 'bold',
-                                        fontSize: scaleFont(9),
+                                        fontWeight: '500',
+                                        fontSize: scaleFont(11),
                                     }}>
                                     {timeDisplay}  •  {type}
                                 </AppText>
@@ -93,107 +135,204 @@ export default function CommunityPost({ post }) {
                     </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity onPress={() => console.log('options')} style={{ padding: 15 }}>
-                    <Image source={Images.options} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                </TouchableOpacity>
-            </View>
-
-            {/* IMAGE SECTION */}
-            {imagesURLS && imagesURLS.length > 0 && (
-                <ImageBackground
-                    source={{ uri: imagesURLS[currentImage] }}
-                    style={{
-                        backgroundColor: colors.cardBackground,
-                        height: 300,
-                        width: '100%',
-                        marginTop: 10,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
+                <TouchableOpacity 
+                    onPress={() => console.log('options')} 
+                    style={{ 
+                        padding: 8,
+                        borderRadius: 20,
+                        backgroundColor: 'rgba(255,255,255,0.05)'
                     }}
-                    resizeMode="contain"
                 >
-                    {imagesURLS.length > 1 && (
-                        <>
-                            <TouchableOpacity
-                                onPress={() => setCurrentImage((prev) => (prev === 0 ? imagesURLS.length - 1 : prev - 1))}
-                                style={{
-                                    height: 50,
-                                    width: 50,
-                                    borderRadius: 25,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    backgroundColor: 'rgba(0,0,0,0.5)',
-                                    marginStart: 15,
-                                }}>
-                                <Image
-                                    source={Images.arrow}
-                                    style={{
-                                        width: 20,
-                                        height: 20,
-                                        tintColor: 'white',
-                                        transform: [{ rotate: '180deg' }],
-                                    }}
-                                />
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                onPress={() => setCurrentImage((prev) => (prev === imagesURLS.length - 1 ? 0 : prev + 1))}
-                                style={{
-                                    height: 50,
-                                    width: 50,
-                                    borderRadius: 25,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    backgroundColor: 'rgba(0,0,0,0.5)',
-                                    marginEnd: 15,
-                                }}>
-                                <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                            </TouchableOpacity>
-                        </>
-                    )}
-                </ImageBackground>
-            )}
-
-            {imagesURLS.length > 1 && (
-                <ProgressDots
-                    steps={Array.from(imagesURLS, (_, i) => i === currentImage)}
-                    activeColor={colors.main}
-                    inactiveColor="rgb(82, 82, 82)"
-                    containerStyle={{ marginVertical: 5 }}
-                />
-            )}
-
-            {/* ACTION BAR */}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <View style={{ flexDirection: 'row' }}>
-                    <TouchableOpacity style={{ paddingStart: 15, paddingEnd: 5, paddingVertical: 15 }}>
-                        <Image source={Images.likeOutline} style={{ width: 23, height: 23, tintColor: 'white' }} />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={{ paddingHorizontal: 5, paddingVertical: 15 }}>
-                        <Image source={Images.shareOutline} style={{ width: 23, height: 23, tintColor: 'white' }} />
-                    </TouchableOpacity>
-
-                    <View style={{ alignItems: 'center', justifyContent: 'center', marginStart: 15 }}>
-                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>{likeCount} Likes</AppText>
-                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(9) }}>{shareCount} Shares</AppText>
-                    </View>
-                </View>
-
-                <TouchableOpacity style={{ padding: 15 }}>
-                    <Image source={Images.bookmarkOutline} style={{ width: 23, height: 23, tintColor: 'white' }} />
+                    <Image 
+                        source={Images.options} 
+                        style={{ 
+                            width: 18, 
+                            height: 18, 
+                            tintColor: colors.mutedText 
+                        }} 
+                    />
                 </TouchableOpacity>
             </View>
 
-            {/* CAPTION */}
             {!!caption && (
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <AppText style={{ marginHorizontal: 15 }}>
-                        <AppText style={{ color: 'white', fontWeight: 'bold' }}>{caption}</AppText>
+                <View style={{ 
+                    paddingHorizontal: 16, 
+                    marginVertical: 12,
+                    paddingBottom: imagesURLS?.length > 0 ? 8 : 0
+                }}>
+                    <AppText style={{ 
+                        color: 'rgba(255,255,255,0.9)', 
+                        fontSize: scaleFont(14),
+                        lineHeight: 20
+                    }}>
+                        {caption}
                     </AppText>
                 </View>
             )}
+
+            {/* IMAGE SECTION */}
+            {imagesURLS && imagesURLS.length > 0 && (
+                <View style={{ position: 'relative' }}>
+                    <ImageBackground
+                        source={{ uri: imagesURLS[currentImage] }}
+                        style={{
+                            backgroundColor: colors.cardBackground,
+                            height: 320,
+                            width: '100%',
+                        }}
+                        resizeMode="contain"
+                    >
+                        {imagesURLS.length > 1 && (
+                            <>
+                                <TouchableOpacity
+                                    onPress={() => setCurrentImage((prev) => (prev === 0 ? imagesURLS.length - 1 : prev - 1))}
+                                    style={{
+                                        position: 'absolute',
+                                        left: 12,
+                                        top: '50%',
+                                        transform: [{ translateY: -25 }],
+                                        height: 44,
+                                        width: 44,
+                                        borderRadius: 22,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        backgroundColor: 'rgba(0,0,0,0.6)',
+                                    }}>
+                                    <Image
+                                        source={Images.arrow}
+                                        style={{
+                                            width: 18,
+                                            height: 18,
+                                            tintColor: 'white',
+                                            transform: [{ rotate: '180deg' }],
+                                        }}
+                                    />
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    onPress={() => setCurrentImage((prev) => (prev === imagesURLS.length - 1 ? 0 : prev + 1))}
+                                    style={{
+                                        position: 'absolute',
+                                        right: 12,
+                                        top: '50%',
+                                        transform: [{ translateY: -25 }],
+                                        height: 44,
+                                        width: 44,
+                                        borderRadius: 22,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        backgroundColor: 'rgba(0,0,0,0.6)',
+                                    }}>
+                                    <Image 
+                                        source={Images.arrow} 
+                                        style={{ 
+                                            width: 18, 
+                                            height: 18, 
+                                            tintColor: 'white' 
+                                        }} 
+                                    />
+                                </TouchableOpacity>
+                            </>
+                        )}
+                    </ImageBackground>
+                    
+                    {imagesURLS.length > 1 && (
+                        <View style={{
+                            position: 'absolute',
+                            bottom: 12,
+                            left: 0,
+                            right: 0,
+                            alignItems: 'center'
+                        }}>
+                            <ProgressDots
+                                steps={Array.from(imagesURLS, (_, i) => i === currentImage)}
+                                activeColor={colors.main}
+                                inactiveColor="rgba(255,255,255,0.4)"
+                                containerStyle={{ marginVertical: 0 }}
+                                dotSize={6}
+                            />
+                        </View>
+                    )}
+                </View>
+            )}
+
+            {/* ACTION BAR */}
+            <View style={{ 
+                flexDirection: 'row', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                paddingHorizontal: 16,
+                paddingVertical: 12,
+                borderTopWidth: 0.5,
+                borderTopColor: 'rgba(255,255,255,0.1)'
+            }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <TouchableOpacity 
+                            style={{ 
+                                padding: 8,
+                            }}
+                        >
+                            <Image 
+                                source={isLikedByUser ? Images.like : Images.likeOutline} 
+                                style={{ 
+                                    width: 22, 
+                                    height: 22, 
+                                    tintColor: colors.mutedText 
+                                }} 
+                            />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            style={{ 
+                                padding: 8,
+                                marginEnd: 5
+                            }}
+                        >
+                            <Image 
+                                source={Images.shareOutline} 
+                                style={{ 
+                                    width: 22, 
+                                    height: 22, 
+                                    tintColor: colors.mutedText 
+                                }} 
+                            />
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={{ alignItems: 'flex-start' }}>
+                        <AppText style={{ 
+                            color: colors.mutedText, 
+                            fontSize: scaleFont(11),
+                            fontWeight: '500'
+                        }}>
+                            {likeCount} Likes
+                        </AppText>
+                        <AppText style={{ 
+                            color: colors.mutedText, 
+                            fontSize: scaleFont(11),
+                            fontWeight: '500'
+                        }}>
+                            {shareCount} Shares
+                        </AppText>
+                    </View>
+                </View>
+
+                <TouchableOpacity 
+                    style={{ 
+                        padding: 8,
+                    }}
+                >
+                    <Image 
+                        source={isSavedByUser ? Images.bookmark:Images.bookmarkOutline} 
+                        style={{ 
+                            width: 22, 
+                            height: 22, 
+                            tintColor: colors.mutedText 
+                        }} 
+                    />
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };

@@ -97,7 +97,7 @@ export default function Community() {
                 icon={Images.plus}
             />
 
-            <AppScroll onScrollSetStates={setFabVisible} hideNavBarOnScroll={true} hideTopBarOnScroll={true} extraBottom={100}>
+            <AppScroll onScrollSetStates={setFabVisible} hideNavBarOnScroll={true} extraBottom={100}>
                 <View style={{ height: 60 }}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
                         {["Any", "Tips", "Trainer Ad", "Need Trainer", "Moments", "Inquiry"].map((opt, idx) => {
@@ -145,9 +145,11 @@ export default function Community() {
                         shareCount: 2,
                         dateOfCreation: new Date(),
                         type: 'Trainer Ad',
-                    }} />
+                    }} 
+                    isLikedByUser={true}
+                    isSavedByUser={true}/>
 
-                <Divider orientation='horizontal' style={{ marginBottom: 10, borderRadius: 0 }} thickness={10} color='black' />
+                <Divider orientation='horizontal' style={{ marginBottom: 25, borderRadius: 0 }} thickness={10} color='black' />
                 <CommunityPost
                     post={{
                         postUser: {
@@ -195,10 +197,10 @@ export default function Community() {
                     }} />
 
                 <Divider orientation='horizontal' style={{ marginBottom: 10, borderRadius: 0 }} thickness={10} color='black' />
-                  <CommunityPost
+                <CommunityPost
                     post={{
                         postUser: {
-                            id: 'u1',
+                            id: user.id,
                             firstname: 'John',
                             lastname: 'Doe',
                             imageURL: user.imageURL,
@@ -208,7 +210,7 @@ export default function Community() {
                             },
                         },
                         imagesURLS: [
-                         
+
                         ],
                         caption: 'Feeling strong today 💪',
                         likeCount: 140, //array instead of num
