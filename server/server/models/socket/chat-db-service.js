@@ -122,7 +122,7 @@ export default class ChatDBService {
             Database.addInput(request, 'SenderId', sql.UniqueIdentifier, details.senderId);
             Database.addInput(request, 'ChatRoomId', sql.Int, details.chatRoomId);
             Database.addInput(request, 'Message', sql.NVarChar(sql.MAX), details.message);
-            Database.addInput(request, 'ExtraInformation', sql.VarChar(300), details.extraInformation ? JSON.stringify(details.extraInformation) : {});
+            Database.addInput(request, 'ExtraInformation', sql.NVarChar(600), details.extraInformation ? JSON.stringify(details.extraInformation) : {});
             Database.addInput(request, 'DateTimeSent', sql.DateTime2, details.dateTimeSent || new Date());
 
             const insertQuery = `

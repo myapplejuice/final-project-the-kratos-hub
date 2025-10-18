@@ -132,8 +132,8 @@ export default class NutritionMealPlansDBService {
                 coachId: sourcePlan.coachId || null,
                 label: `${sourcePlan.label}`,
                 description: sourcePlan.description !== 'No description provided' ? 
-                sourcePlan.description + "\n\nImported from " + sourcePlanUsername :
-                    "Cloned plan - Imported from " + sourcePlanUsername,
+                sourcePlan.description + "\n\nImported by " + sourcePlanUsername :
+                    "Cloned plan - Imported by " + sourcePlanUsername,
             });
 
             if (!newPlan || !newPlan.id) throw new Error("Failed to create new plan");

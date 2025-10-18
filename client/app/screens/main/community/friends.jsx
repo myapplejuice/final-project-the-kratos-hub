@@ -26,7 +26,6 @@ import ExpandInOut from '../../../components/effects/expand-in-out';
 import AppTextInput from '../../../components/screen-comps/app-text-input';
 
 export default function Friends() {
-    const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
     const { user, setAdditionalContexts } = useContext(UserContext);
     const [friendsList, setFriendsList] = useState([]);
     const [loading, setLoading] = useState(true);

@@ -50,6 +50,7 @@
     "expo-web-browser": "~15.0.7",
     "install": "^0.13.0",
     "lodash": "^4.17.21",
+    "mime-types": "^3.0.1",
     "npm": "^11.6.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

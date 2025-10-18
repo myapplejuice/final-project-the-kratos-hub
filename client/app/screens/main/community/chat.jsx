@@ -5,6 +5,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system/legacy';
 import AppText from "../../../components/screen-comps/app-text";
+import MediaLibrary from 'expo-media-library';
 import { Images } from '../../../common/settings/assets';
 import { UserContext } from "../../../common/contexts/user-context";
 import { formatDate, formatTime, getDayComparisons, getHoursComparisons } from '../../../common/utils/date-time';
@@ -26,6 +27,7 @@ import ImageCapture from "../../../components/screen-comps/image-capture";
 import { LibraryContext } from "../../../common/contexts/library-context";
 import { CameraContext } from "../../../common/contexts/camera-context";
 import { colorWithOpacity } from "../../../common/utils/random-functions";
+import Divider from "../../../components/screen-comps/divider";
 
 export default function Chat() {
     const { createOptions, createDialog, createToast, showSpinner, hideSpinner, createSelector } = usePopups();
@@ -47,11 +49,7 @@ export default function Chat() {
     const [uploadOptionsVisible, setUploadOptionsVisible] = useState(false);
     const [fabVisible, setFabVisible] = useState(false);
     const [isLoadingMessages, setIsLoadingMessages] = useState(false);
-    const rotate = useRef(new Animated.Value(0)).current;
-    const spin = rotate.interpolate({
-        inputRange: [0, 1],
-        outputRange: ["0deg", "360deg"],
-    });
+
 
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [keyboardOpen, setKeyboardOpen] = useState(false);
@@ -63,27 +61,6 @@ export default function Chat() {
     const [message, setMessage] = useState('');
     const [messageHeight, setMessageHeight] = useState(50);
     const messagesRef = useRef(messages);
-
-    useEffect(() => {
-        if (cameraActive || libraryActive) {
-            setUploadOptionsVisible(false);
-            setChatBarVisible(false);
-        } else {
-            setChatBarVisible(true);
-        }
-    }, [cameraActive, libraryActive]);
-
-    useEffect(() => {
-        if (!initialScrollDone.current && messages.length > 0) {
-            initialScrollDone.current = true;
-
-            setTimeout(() => {
-                scrollRef.current?.scrollToBottom({ animated: false });
-            }, 0);
-        }
-
-        messagesRef.current = messages;
-    }, [messages]);
 
     useEffect(() => {
         const profile = additionalContexts.chattingFriendProfile;
@@ -136,8 +113,6 @@ export default function Chat() {
         SocketService.on("new-message", handleNewMessage);
         SocketService.on("updated-message", handleUpdatedMessage);
 
-        // messages and keyboard funcs
-
         async function fetchMessages() {
             showSpinner();
             const friendId = additionalContexts.chattingFriendProfile.id;
@@ -158,16 +133,6 @@ export default function Chat() {
                 setLoading(false);
             }
         }
-
-        const rotationAnimation = Animated.loop(
-            Animated.timing(rotate, {
-                toValue: 1,
-                duration: 800,
-                easing: Easing.linear,
-                useNativeDriver: true,
-            })
-        );
-        rotationAnimation.start();
 
         const showListener = Keyboard.addListener(
             Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
@@ -196,7 +161,6 @@ export default function Chat() {
             SocketService.off("updated-message", handleUpdatedMessage);
             showListener.remove();
             hideListener.remove();
-            rotationAnimation.stop();
 
             const lastMessageDetails = messagesRef.current[messagesRef.current.length - 1];
             if (lastMessageDetails) {
@@ -212,6 +176,27 @@ export default function Chat() {
             }
         };
     }, []);
+
+    useEffect(() => {
+        if (cameraActive || libraryActive) {
+            setUploadOptionsVisible(false);
+            setChatBarVisible(false);
+        } else {
+            setChatBarVisible(true);
+        }
+    }, [cameraActive, libraryActive]);
+
+    useEffect(() => {
+        if (!initialScrollDone.current && messages.length > 0) {
+            initialScrollDone.current = true;
+
+            setTimeout(() => {
+                scrollRef.current?.scrollToBottom({ animated: false });
+            }, 0);
+        }
+
+        messagesRef.current = messages;
+    }, [messages]);
 
     async function fetchMoreMessages() {
         if (morePages.current === false || isLoadingMessages) return;
@@ -295,6 +280,7 @@ export default function Chat() {
     }
 
     async function handleImportPlan() {
+        Keyboard.dismiss();
         const userPlans = user.plans;
 
         createOptions({
@@ -374,6 +360,7 @@ export default function Chat() {
     }
 
     async function handleDocumentUpload() {
+        Keyboard.dismiss();
         try {
             const result = await DocumentPicker.getDocumentAsync({
                 type: '*/*',
@@ -383,6 +370,7 @@ export default function Chat() {
 
             if (!result.canceled && result.assets.length > 0) {
                 const file = result.assets[0];
+
                 showSpinner();
                 const url = await APIService.uploadDocumentToCloudinary({
                     uri: file.uri,
@@ -390,8 +378,6 @@ export default function Chat() {
                     fileName: `chat_room${roomId}_user${user.id}_${Date.now()}_${file.name}`,
                     type: file.mimeType || 'application/octet-stream'
                 });
-
-                console.log("Document URL:", url);
 
                 handleMessageSend({
                     context: "document",
@@ -406,22 +392,34 @@ export default function Chat() {
         }
     }
 
-    async function downloadAsset(url, fileName) {
-        showSpinner();
+    async function downloadFile(url) {
         try {
-            const fileUri = FileSystem.documentDirectory + fileName;
-            const { uri } = await FileSystem.downloadAsync(url, fileUri);
-
-            await Sharing.shareAsync(uri);
-            createToast({ message: 'Saved to device' });
+            if (await Linking.canOpenURL(url))
+                await Linking.openURL(url);
+            else
+                createToast({ message: 'Download failed' });
         } catch (err) {
-            console.error('download failed:', err);
-        } finally {
-            hideSpinner();
+            createToast({ message: 'Download failed' });
+        }
+    }
+
+    async function shareFile(url) {
+        try {
+            let extension = url.split('.').pop().split('?')[0].toLowerCase();
+            if (!extension.match(/^[a-z0-9]+$/)) extension = 'dat';
+
+            const fileUri = FileSystem.documentDirectory + `The_Kratos_Hub_Chat_${roomId}_image_${Date.now()}.${extension}`;
+            await FileSystem.downloadAsync(url, fileUri);
+
+            if (await Sharing.isAvailableAsync())
+                await Sharing.shareAsync(fileUri);
+        } catch (err) {
+            createToast({ message: 'Sharing failed' });
         }
     }
 
     async function handleWhatsAppInvite() {
+        Keyboard.dismiss();
         const phoneNumber = user.phone.replace(/\+/g, '');
         const url = `https://wa.me/${phoneNumber}`;
 
@@ -534,7 +532,7 @@ export default function Chat() {
                         <AppText style={{ color: 'white', fontSize: scaleFont(9), fontWeight: '600', marginTop: 5 }}>Meal plan</AppText>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => setCameraActive(true)} style={{ padding: 15, alignItems: 'center', width: '25%' }}>
+                    <TouchableOpacity onPress={() => { Keyboard.dismiss(), setCameraActive(true) }} style={{ padding: 15, alignItems: 'center', width: '25%' }}>
                         <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(199, 184, 52, 0.2)' }]}>
                             <Image source={Images.camera} style={{ width: 24, height: 24, tintColor: '#eef136ff' }} />
                         </View>
@@ -542,7 +540,7 @@ export default function Chat() {
                     </TouchableOpacity>
 
                     {/* Bottom row: 4 icons */}
-                    <TouchableOpacity onPress={() => setLibraryActive(true)} style={{ padding: 15, alignItems: 'center', width: '25%' }}>
+                    <TouchableOpacity onPress={() => { Keyboard.dismiss(), setLibraryActive(true) }} style={{ padding: 15, alignItems: 'center', width: '25%' }}>
                         <View style={[styles.uploadOptionIcon, { backgroundColor: 'rgba(255, 149, 0, 0.2)' }]}>
                             <Image source={Images.image} style={{ width: 24, height: 24, tintColor: '#FF9500' }} />
                         </View>
@@ -633,9 +631,8 @@ export default function Chat() {
                 </View>
             </FadeInOut>
 
-            {/* Loading Spinner */}
             <FadeInOut visible={isLoadingMessages} style={{ position: 'absolute', top: 100, alignSelf: 'center', zIndex: 9999 }}>
-                <Animated.View style={[styles.spinner, { transform: [{ rotate: spin }] }]} />
+                <AppText style={{ padding: 8, backgroundColor: 'rgba(0, 0, 0, 0.75)', color: 'white', borderRadius: 10, fontSize: scaleFont(17), fontWeight: 'bold' }}>Loading</AppText>
             </FadeInOut>
 
             {additionalContexts.friendStatus === 'inactive' && noMessageWarningVisible && (
@@ -773,32 +770,24 @@ export default function Chat() {
                                             )}
                                         </View>
 
-                                        {/* Download Button */}
-                                        <TouchableOpacity
-                                            onPress={() => downloadAsset(
-                                                message.extraInformation.imageUrl,
-                                                `The_Kratos_Hub_Chat_${roomId}_image_${Date.now()}.jpg`
-                                            )}
-                                            style={{
-                                                position: 'absolute',
-                                                bottom: 0,
-                                                right: 0,
-                                                left: 0,
-                                                borderBottomLeftRadius: 20,
-                                                borderBottomRightRadius: 20,
-                                                paddingVertical: 15,
-                                                backgroundColor: 'rgba(0,0,0,0.5)',
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                            }}
-                                        >
-                                            <Image
-                                                source={Images.arrow}
-                                                style={{ width: 18, height: 18, tintColor: 'white', transform: [{ rotate: '90deg' }], marginTop: 3 }}
-                                            />
-                                        </TouchableOpacity>
+                                        <View style={{
+                                            position: 'absolute', bottom: 0, right: 0, left: 0, borderBottomLeftRadius: 20, borderBottomRightRadius: 20, flexDirection: 'row',
+                                            justifyContent: 'space-around', backgroundColor: 'rgba(0,0,0,0.5)', paddingVertical: 15, alignItems: 'center'
+                                        }}>
+                                            <TouchableOpacity onPress={() => downloadFile(message.extraInformation.imageUrl)} style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                                                <Image source={Images.arrow} style={{ width: 18, height: 18, tintColor: 'white', transform: [{ rotate: '90deg' }], marginTop: 3 }} />
+                                                <AppText style={{ color: 'white', marginTop: 5 }}>Download</AppText>
+                                            </TouchableOpacity>
+                                            
+                                            <Divider orientation="vertical" color="white" />
 
-                                        {/* Hide/Unhide Button */}
+                                            <TouchableOpacity onPress={() => shareFile(message.extraInformation.imageUrl)} style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                                                <Image source={Images.shareOutline} style={{ width: 18, height: 18, tintColor: 'white', marginTop: 3 }} />
+                                                <AppText style={{ color: 'white', marginTop: 5 }}>Share</AppText>
+                                            </TouchableOpacity>
+
+                                        </View>
+
                                         {isUser && (
                                             <TouchableOpacity
                                                 onPress={() => handleMessageUpdate(message.id, message.hidden ? 'unhide' : 'hide')}
@@ -877,6 +866,11 @@ export default function Chat() {
                                         <Pressable
                                             onLongPress={() => handleMessageLongPress(message)}
                                             delayLongPress={350}
+                                            style={({ pressed }) => [
+                                                {
+                                                    backgroundColor: pressed ? 'rgba(0,0,0,0.7)' : 'transparent',
+                                                }
+                                            ]}
                                         >
                                             <View style={[styles.messageContainer, isUser ? styles.userMessageContainer : styles.theirMessageContainer]}>
                                                 {message.hidden ?

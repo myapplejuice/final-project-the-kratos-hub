@@ -149,4 +149,6 @@ export const Images_2 = {
     unHide: require('../../../assets/images/unhide.png'),
     unHideOutline: require('../../../assets/images/unhide-outline.png'),
     unHideTwo: require('../../../assets/images/unhide-2.png'),
+    share: require('../../../assets/images/share.png'),
+    shareOutline: require('../../../assets/images/share-outline.png'),
 };

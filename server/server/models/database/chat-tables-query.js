@@ -28,7 +28,7 @@ export function chatTablesQuery() {
                     SenderId UNIQUEIDENTIFIER NOT NULL,
                     ChatRoomId INT NOT NULL,
                     Message NVARCHAR(MAX) NOT NULL,
-                    ExtraInformation VARCHAR(300) NULL, --JSON, a json listing things like image references and app stuff like meal plans ids to reference to the chat
+                    ExtraInformation NVARCHAR(600) NULL, --JSON, a json listing things like image references and app stuff like meal plans ids to reference to the chat
                     SeenBy VARCHAR(300) NULL, --JSON, a json listing who saw it 
                     Hidden BIT NOT NULL DEFAULT 0,
                     Discarded BIT NOT NULL DEFAULT 0,
