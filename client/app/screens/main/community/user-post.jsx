@@ -31,6 +31,7 @@ import Gallery from '../../../components/screen-comps/gallery';
 import { useBackHandlerContext } from '../../../common/contexts/back-handler-context';
 import FadeInOut from '../../../components/effects/fade-in-out';
 import AppView from '../../../components/screen-comps/app-view';
+import LikersModal from '../../../components/screen-comps/likers-modal';
 
 export default function UserPost() {
     const { setLibraryActive } = useContext(LibraryContext);
@@ -50,6 +51,9 @@ export default function UserPost() {
     const [topic, setTopic] = useState(post.topic);
     const [caption, setCaption] = useState(post.caption);
     const [imagesURLS, setImagesURLS] = useState(post.imagesURLS);
+
+    const [likers, setLikers] = useState([]);
+    const [likersVisible, setLikersVisible] = useState(false);
 
     useEffect(() => {
         setBackHandler(() => {
@@ -139,10 +143,33 @@ export default function UserPost() {
             }
         })
     }
+        async function handlerViewLikersPress(postId) {
+            try {
+                showSpinner();
+                const result = await APIService.community.likers({ postId });
+    
+                if (result.success) {
+                    const likers = result.data.likers;
+                    setLikers(likers);
+                    setLikersVisible(true);
+                } else {
+                    createToast({ message: result.message });
+                }
+            } catch (err) {
+                console.error("Failed to fetch likers:", err);
+            } finally {
+                hideSpinner();
+            }
+        }
+    
 
     return (
         <>
+
+            <LikersModal visible={likersVisible} likers={likers} onClose={() => setLikersVisible(false)} />
+
             <ImageCapture onConfirm={async (image) => setImagesURLS(prev => [...prev, image.uri])} />
+
             <FadeInOut visible={imagePreviewVisible} style={{ position: 'absolute', zIndex: 9999, top: 0, left: 0, bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.8)' }}>
                 <TouchableOpacity onPress={() => { setImagePreviewVisible(false), setSelectedImage('') }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(30), marginBottom: 15 }}>Tap anywhere to dismiss</AppText>
@@ -175,6 +202,7 @@ export default function UserPost() {
                             post={post}
                             onDeletePress={handleDeletePost}
                             onEditPress={() => setIsEditing(true)}
+                            onViewLikersPress={() => handlerViewLikersPress(post.id)}
                         />
                     )
                     :
