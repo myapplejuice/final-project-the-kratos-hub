@@ -179,7 +179,7 @@ export default function UserPosts() {
                         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                             <Image source={Images.msisingImageTwo} style={{ width: 100, height: 100, marginBottom: 15, tintColor: colors.mutedText }} />
                             <AppText style={{ fontSize: scaleFont(14), color: colors.mutedText, fontWeight: 'bold' }}>You have nothing posted to the community yet</AppText>
-                            <AppText style={{ fontSize: scaleFont(13), color: 'white', marginTop: 5 }}>Tap below to create a new post</AppText>
+                            <AppText style={{ fontSize: scaleFont(13), color: 'white', marginTop: 5,  textAlign: 'center' }}>Tap below to create a new post</AppText>
                         </View>
                     )}
                 </AppScroll>

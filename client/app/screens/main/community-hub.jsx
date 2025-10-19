@@ -32,6 +32,9 @@ export default function Community() {
     const insets = useSafeAreaInsets();
 
     const [page, setPage] = useState(1);
+    const [loadingPosts, setLoadingPosts] = useState(false);
+    const [posts, setPosts] = useState([]);
+    const [hasMore, setHasMore] = useState(true);
     const [fabVisible, setFabVisible] = useState(true);
     const [loading, setLoading] = useState(true);
     const [selectedPosts, setSelectedPosts] = useState('Any');
@@ -46,6 +49,23 @@ export default function Community() {
                     limit: 25,
                 }
 
+                try {
+                    const result = await APIService.community.posts(payload)
+
+                    if (result.success) {
+                        const posts = result.data.posts;
+                        const hasMore = result.data.hasMore;
+
+                        console.log(posts)
+                        setPage(1);
+                        setHasMore(hasMore);
+                        setPosts(posts);
+                    }
+                } catch (error) {
+                    console.log(error);
+                } finally {
+                    setLoading(false);
+                }
             } catch (error) {
                 console.log(error);
             } finally {
@@ -89,34 +109,79 @@ export default function Community() {
                 icon={Images.plus}
             />
 
-            <AppScroll onScrollSetStates={setFabVisible} hideNavBarOnScroll={true} extraBottom={100}>
-                <View style={{ height: 60 }}>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
-                        {["Any", "Trainer Ad", "Trainer Lookup", "Inquiry", "Tips", "Moments"].map((opt, idx) => {
-                            return (
-                                <TouchableOpacity
+            {!loading && posts.length > 0 ? (
+                <AppScroll onScrollSetStates={setFabVisible} hideNavBarOnScroll={true} extraBottom={100}>
+                    <View style={{ height: 60 }}>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
+                            {["Any", "Trainer Ad", "Trainer Lookup", "Inquiry", "Tips", "Moments"].map((opt, idx) => {
+                                return (
+                                    <TouchableOpacity
+                                        key={idx}
+                                        onPress={() => setSelectedPosts(opt)}
+                                        style={{
+                                            paddingHorizontal: 15,
+                                            paddingVertical: 8,
+                                            borderRadius: 20,
+                                            backgroundColor: selectedPosts === opt ? colors.main : colors.cardBackground,
+                                            marginStart: idx === 0 ? 10 : 5,
+                                            marginEnd: idx === 5 ? 10 : 5
+                                        }}
+                                    >
+                                        <AppText style={{ color: 'white', fontSize: 14 }}>{opt}</AppText>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                        </ScrollView>
+                    </View>
+
+                    <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
+
+                    {posts.map((post, idx) => {
+                        return (
+                            <>
+                                <CommunityPost
                                     key={idx}
-                                    onPress={() => setSelectedPosts(opt)}
-                                    style={{
-                                        paddingHorizontal: 15,
-                                        paddingVertical: 8,
-                                        borderRadius: 20,
-                                        backgroundColor: selectedPosts === opt ? colors.main : colors.cardBackground,
-                                        marginStart: idx === 0 ? 10 : 5,
-                                        marginEnd: idx === 5 ? 10 : 5
-                                    }}
-                                >
-                                    <AppText style={{ color: 'white', fontSize: 14 }}>{opt}</AppText>
-                                </TouchableOpacity>
-                            )
-                        })}
-                    </ScrollView>
-                </View>
+                                    post={post}
+                                    isLikedByUser={post.isLikedByUser}
+                                    isSavedByUser={post.isSavedByUser}
+                                    isUserPost={false}
+                                    onLikePress={() => { }}
+                                    onSharePress={() => { }}
+                                    onSavePress={() => { }}
+                                />;
 
-                <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
+                                {idx < posts.length - 1 && <Divider orientation='horizontal' style={{ marginBottom: 25, borderRadius: 0 }} thickness={10} color='black' />}
+                            </>
+                        )
+                    })}
 
-                <Divider orientation='horizontal' style={{ marginBottom: 25, borderRadius: 0 }} thickness={10} color='black' />
-            </AppScroll>
+                </AppScroll>
+            ) :
+                loading ? (
+                    <View style={{ backgroundColor: colors.background, flex: 1, paddingTop: 75 }}>
+                        {[...Array(2)].map((_, idx) => (
+                            <View key={idx} style={{ marginTop: 15 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Animated.View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15 }} />
+                                    <View style={{ justifyContent: 'center' }}>
+                                        <Animated.View style={{ width: 90, height: 10, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5 }} />
+                                        <Animated.View style={{ width: 60, height: 7, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5 }} />
+                                    </View>
+                                </View>
+                                <Animated.View style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 15, borderRadius: 10 }} />
+                            </View>
+                        ))}
+                    </View>
+                ) : (
+                    <View style={{ backgroundColor: colors.background, flex: 1, paddingTop: 75 }}>
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                            <Image source={Images.communityOutline} style={{ width: 100, height: 100, marginBottom: 15, tintColor: colors.mutedText, alignItems: 'center' }} />
+                            <AppText style={{ fontSize: scaleFont(14), color: colors.mutedText, fontWeight: 'bold' }}>Community is empty of any posts</AppText>
+                            <AppText style={{ fontSize: scaleFont(13), color: 'white', marginTop: 5, textAlign: 'center' }}>You can be amongst the first to create the foundation of our community, tap below</AppText>
+                        </View>
+                    </View>
+                )}
+
         </>
     );
 }
