@@ -1,4 +1,4 @@
-import PostsDBService from "./community-db-service.js";
+import CommunityDBService from "./community-db-service.js";
 import SocketController from "../socket/socket-controller.js";
 import NotificationsDBService from "../notifications/notifications-db-service.js";
 
@@ -7,17 +7,17 @@ export default class CommunityController {
         const { postId } = req.body;
         const id = req.params.id;
 
-        const post = await PostsDBService.fetchPostById(id, postId);
+        const post = await CommunityDBService.fetchPostById(id, postId);
         if(!post)
             return res.status(400).json({ success: false, message: 'Post not found' });
-        
+
         return res.status(200).json({ success: true, post });
     }
 
     static async getPosts(req, res) {
         const { forUser, userId, page, topic, limit } = req.body;
 
-        const response = await PostsDBService.fetchPosts(forUser, userId, page || 1, limit, topic || null);
+        const response = await CommunityDBService.fetchPosts(forUser, userId, page || 1, limit, topic || null);
 
         return res.status(200).json({
             success: true,
@@ -30,7 +30,7 @@ export default class CommunityController {
     static async createPost(req, res) {
         const details = req.body;
 
-        const result = await PostsDBService.createPost(details);
+        const result = await CommunityDBService.createPost(details);
         if (!result.success) return res.status(400).json({ message: result.message });
 
         return res.status(200).json(result);
@@ -39,7 +39,7 @@ export default class CommunityController {
     static async updatePost(req, res) {
         const details = req.body;
 
-        const result = await PostsDBService.updatePost(details);
+        const result = await CommunityDBService.updatePost(details);
         if (!result.success) return res.status(400).json({ message: result.message });
 
         return res.status(200).json(result);
@@ -48,7 +48,7 @@ export default class CommunityController {
     static async deletePost(req, res) {
         const { postId } = req.body;
 
-        const result = await PostsDBService.deletePost(postId);
+        const result = await CommunityDBService.deletePost(postId);
         if (!result.success) return res.status(400).json({ message: result.message });
 
         return res.status(200).json(result);
@@ -64,7 +64,7 @@ export default class CommunityController {
             postImageURL,
         } = req.body;
 
-        const result = await PostsDBService.likePost(userId, postId);
+        const result = await CommunityDBService.likePost(userId, postId);
         if (!result.success) return res.status(400).json({ message: result.message });
 
         if (result.liked) {
@@ -92,7 +92,7 @@ export default class CommunityController {
     static async savePost(req, res) {
         const { userId, postId } = req.body;
 
-        const result = await PostsDBService.savePost(userId, postId);
+        const result = await CommunityDBService.savePost(userId, postId);
         if (!result.success) return res.status(400).json({ message: result.message });
 
         return res.status(200).json(result);
@@ -101,7 +101,16 @@ export default class CommunityController {
     static async sharePost(req, res) {
         const { postId } = req.body;
 
-        const result = await PostsDBService.sharePost(postId);
+        const result = await CommunityDBService.sharePost(postId);
+        if (!result.success) return res.status(400).json({ message: result.message });
+
+        return res.status(200).json(result);
+    }
+
+    static async fetchPostLikers(req, res) {
+        const { postId } = req.body;
+
+        const result = await CommunityDBService.fetchPostLikers(postId);
         if (!result.success) return res.status(400).json({ message: result.message });
 
         return res.status(200).json(result);

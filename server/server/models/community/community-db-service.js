@@ -318,4 +318,43 @@ export default class CommunityDBService {
             return { success: false, message: 'Failed to share post' };
         }
     }
+    
+    static async fetchPostLikers(postId) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'PostId', sql.Int, postId);
+
+            const query = `
+            SELECT 
+                u.Id,
+                u.Firstname,
+                u.Lastname,
+                u.ImageURL,
+                u.Gender,
+                u.Age
+            FROM Users u
+            INNER JOIN Likes l ON u.Id = l.UserId
+            WHERE l.PostId = @PostId
+        `;
+
+            const result = await request.query(query);
+
+            return {
+                success: true,
+                message: 'Post likers fetched successfully',
+                likers: result.recordset.map(liker => ({
+                    id: liker.Id,
+                    firstname: liker.Firstname,
+                    lastname: liker.Lastname,
+                    imageURL: liker.ImageURL,
+                    gender: liker.Gender,
+                    age: liker.Age
+                }))
+            };
+        } catch (err) {
+            console.error('fetchPostLikers error:', err);
+            return { success: false, message: 'Failed to fetch post likers' };
+        }
+    }
+
 }
