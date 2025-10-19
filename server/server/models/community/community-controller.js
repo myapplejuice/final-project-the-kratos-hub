@@ -1,5 +1,6 @@
 import PostsDBService from "./community-db-service.js";
 import SocketController from "../socket/socket-controller.js";
+import NotificationsDBService from "../notifications/notifications-db-service.js";
 
 export default class CommunityController {
     static async getPosts(req, res) {
@@ -56,15 +57,19 @@ export default class CommunityController {
         if (!result.success) return res.status(400).json({ message: result.message });
 
         const payload = {
-            userId: details.friendId,
+            userId: posterId,
             notification: `${userFirstname} ${userLastname} liked one of your posts`,
             seen: false,
             clickable: true,
-            clickableInfo: { postId, postImageURL },
+            clickableInfo: JSON.stringify({ postId, postImageURL }),
             clickableDestination: 'user-post',
             sentiment: "positive",
             dateOfCreation: new Date()
         }
+        
+        const id = await NotificationsDBService.pushNotification(payload);
+        payload.id = id;
+        payload.clickableInfo = JSON.parse(payload.clickableInfo);
         SocketController.emitNotification(posterId, payload);
 
         return res.status(200).json(result);

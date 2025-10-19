@@ -79,11 +79,11 @@ export default function Community() {
     }, []);
 
     useEffect(() => {
-        if(selectedPosts === 'Any')
+        if (selectedPosts === 'Any')
             setVisiblePosts(posts);
         else
             setVisiblePosts(posts.filter(p => p.topic === selectedPosts));
-    },[selectedPosts, posts]);
+    }, [selectedPosts, posts]);
 
     async function handleMorePosts() {
         if (!hasMore || loadingPosts) return;
@@ -115,12 +115,20 @@ export default function Community() {
         }
     }
 
-    async function handleLikePress(postId) {
+    async function handleLikePress(postId, posterId, postImageURL) {
         try {
             const post = posts.find(p => p.id === postId);
             if (!post) return;
 
-            const result = await APIService.community.like({ userId: user.id, postId });
+            const payload = {
+                userId: user.id,
+                postId,
+                userFirstname: user.firstname,
+                userLastname: user.lastname,
+                posterId,
+                postImageURL
+            }
+            const result = await APIService.community.like(payload);
 
             if (result.success) {
                 const liked = result.data.liked;
@@ -186,20 +194,19 @@ export default function Community() {
 
                     {visiblePosts.map((post, idx) => {
                         return (
-                            <>
+                            <View key={idx}>
                                 <CommunityPost
-                                    key={idx}
                                     post={post}
                                     isLikedByUser={post.isLikedByUser}
                                     isSavedByUser={post.isSavedByUser}
                                     isUserPost={false}
-                                    onLikePress={() => handleLikePress(post.id)}
+                                    onLikePress={() => handleLikePress(post.id, post.postUser.id, post.imagesURLS[0])}
                                     onSharePress={() => handleSharePress(post.id)}
                                     onSavePress={() => handleSavePress(post.id)}
                                 />
 
                                 {idx < visiblePosts.length - 1 && <Divider orientation='horizontal' style={{ marginBottom: 25, borderRadius: 0 }} thickness={10} color='black' />}
-                            </>
+                            </View>
                         )
                     })}
 
