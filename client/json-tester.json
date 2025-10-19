@@ -1,9 +1,21 @@
-{
-    "caption": "Eosjshs",
-    "imagesURLS": [
-        "file:///data/user/0/host.exp.exponent/cache/ImagePicker/ca5fd9b2-4c70-434d-9695-423186d8dc2f.jpeg",
-        "file:///data/user/0/host.exp.exponent/cache/ImagePicker/461a774e-1232-4d6e-b5c9-a9274d7c28c3.jpeg"
-    ],
-    "type": "Trainer Ad",
-    "userId": "204EFF41-FF71-4636-9425-14DBB383E2BA"
-}
+[
+    {
+        "caption": "This is some of my work with my xlients",
+        "dateOfCreation": "2025-10-19T00:11:41.820Z",
+        "imagesURLS": "[\"https://res.cloudinary.com/dkujdjk2d/image/upload/v1760832701/verification_application_images/jiaowg8vw7l3mnfimqpg.jpg\",\"https://res.cloudinary.com/dkujdjk2d/image/upload/v1760832701/verification_application_images/tbpxnvxjwoczxt4v6rpz.jpg\"]",
+        "isLikedByUser": false,
+        "isSavedByUser": false,
+        "likeCount": 0,
+        "postUser": {
+            "firstname": "Ibrahem ",
+            "id": [Array
+            ],
+            "imageURL": "https://res.cloudinary.com/dkujdjk2d/image/upload/v1760467009/profile_images/wah9wlha1s7ynfwiswsg.jpg",
+            "lastname": "Abu Shah",
+            "trainerProfile": [Object
+            ]
+        },
+        "shareCount": 0,
+        "type": "trainer ad"
+    }
+]

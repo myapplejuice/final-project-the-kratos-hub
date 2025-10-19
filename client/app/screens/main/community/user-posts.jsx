@@ -1,7 +1,7 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import { Image, ImageBackground } from "expo-image";
-import { router } from "expo-router";
-import { useContext, useEffect, useRef, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Animated, Dimensions, Easing, Keyboard, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import BuildFooter from "../../../components/layout-comps/build-footer";
 import AppText from "../../../components/screen-comps/app-text";
@@ -34,15 +34,43 @@ export default function UserPosts() {
     const insets = useSafeAreaInsets();
 
     const [posts, setPosts] = useState([]);
+    const [hasMore, setHasMore] = useState(false);
+    const [page, setPage] = useState(1);
     const [fabVisible, setFabVisible] = useState(true);
     const [loading, setLoading] = useState(true);
     const [selectedPosts, setSelectedPosts] = useState('Any');
 
-    useEffect(() => {
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            async function fetchPosts() {
+                const payload = {
+                    userId: user.id,
+                    forUser: true,
+                    page: page,
+                    limit: 25
+                }
+
+                try {
+                    const result = await APIService.community.posts(payload)
+
+                    if (result.success) {
+                        const posts = result.data.posts;
+                        const hasMore = result.data.hasMore;
+
+                        console.log(posts)
+                        setHasMore(hasMore);
+                        setPosts(posts);
+                    }
+                } catch (error) {
+                    console.log(error);
+                } finally {
+                    setLoading(false);
+                }
+            }
+
+            fetchPosts();
+        }, [])
+    );
 
     if (loading) {
         return (
@@ -138,7 +166,8 @@ export default function UserPosts() {
                                     }
                                 })
                             })}
-                        /></>
+                        />
+                    </>
                 )}
                 {posts.length === 0 && (
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

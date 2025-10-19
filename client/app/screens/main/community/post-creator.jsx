@@ -51,17 +51,47 @@ export default function PostCreator() {
     }
 
     async function handleSubmittion() {
-        const payload = {
-            userId: user.id,
-            type: selectedTopic.toLowerCase(),
-            caption,
-            imagesURLS: imagesURLS
-        }
+        try {
+            showSpinner();
 
-        const result = await APIService.community.create(payload);
-        if (result.success) {
-            createToast('Post created successfully!', 'success');
-            router.back();
+            const uploadedImages = await Promise.all(
+                images.map(async (image) => {
+                    if (image.url?.includes("res.cloudinary.com")) {
+                        return image;
+                    }
+
+                    try {
+                        const url = await APIService.uploadImageToCloudinary({
+                            uri: image.url || image.uri,
+                            folder: "verification_application_images",
+                            fileName: `user${user.id}_${Date.now()}_${image.fileName}.jpg`,
+                        });
+
+                        return { ...image, url };
+                    } catch (err) {
+                        console.error(`Failed to upload image ${image.fileName}:`, err);
+                        return image;
+                    }
+                })
+            );
+
+            setImages(uploadedImages);
+
+            const payload = {
+                userId: user.id,
+                type: selectedTopic.toLowerCase(),
+                caption,
+                imagesURLS: uploadedImages.map(i => i.url)
+            }
+
+            const result = await APIService.community.create(payload);
+            if (result.success) {
+                createAlert({ title: 'Success', text: 'Post created!', onPress: () => router.back() });
+            }
+        } catch (error) {
+            createToast({ message: 'There was an error creating your post' + error.message });
+        } finally {
+            hideSpinner();
         }
     }
 

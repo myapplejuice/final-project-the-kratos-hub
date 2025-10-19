@@ -12,8 +12,6 @@ export default class CommunityDBService {
 
             let query = `
             SELECT p.*,
-                   p.LikeCount,
-                   p.ShareCount,
                    u.Id AS UserId, u.Firstname, u.Lastname, u.ImageURL,
                    t.IsVerified, t.TrainerStatus,
                    CASE WHEN l.Id IS NOT NULL THEN 1 ELSE 0 END AS IsLikedByUser,
@@ -40,28 +38,47 @@ export default class CommunityDBService {
             const result = await request.query(query);
 
             const posts = result.recordset.map(row => {
-                const post = {};
+                // Use camelCase keys
+                const mappedRow = {};
                 for (const key in row) {
                     let value = row[key];
-                    if (key === 'ImagesURLS') value = value ? JSON.parse(value) : [];
-                    post[ObjectMapper.toCamelCase(key)] = value;
+
+                    // Fix ImagesURLS to be an array
+                    if (key.toLowerCase() === 'imagesurls') {
+                        try {
+                            value = value ? JSON.parse(value) : [];
+                        } catch {
+                            value = [];
+                        }
+                    }
+
+                    mappedRow[ObjectMapper.toCamelCase(key)] = value;
                 }
 
-                post.user = {
-                    id: row.UserId,
-                    firstname: row.Firstname,
-                    lastname: row.Lastname,
-                    imageURL: row.ImageURL,
-                    trainerProfile: {
-                        trainerStatus: row.TrainerStatus || 'inactive',
-                        isVerified: !!row.IsVerified,
+                return {
+                    postUser: {
+                        id: Array.isArray(mappedRow.userId) ? mappedRow.userId[0] : mappedRow.userId,
+                        firstname: mappedRow.firstname,
+                        lastname: mappedRow.lastname,
+                        imageURL: mappedRow.imageURL,
+                        trainerProfile: {
+                            trainerStatus: mappedRow.trainerStatus || 'inactive',
+                            isVerified: !!mappedRow.isVerified,
+                        },
                     },
+                    imagesURLS: mappedRow.imagesURLS || [],
+                    caption: mappedRow.caption || '',
+                    likeCount: Array.isArray(mappedRow.likeCount)
+                        ? mappedRow.likeCount.reduce((a, b) => a + b, 0)
+                        : mappedRow.likeCount || 0,
+                    shareCount: Array.isArray(mappedRow.shareCount)
+                        ? mappedRow.shareCount.reduce((a, b) => a + b, 0)
+                        : mappedRow.shareCount || 0,
+                    dateOfCreation: mappedRow.dateOfCreation,
+                    type: mappedRow.type || '',
+                    isLikedByUser: !!mappedRow.isLikedByUser,
+                    isSavedByUser: !!mappedRow.isSavedByUser,
                 };
-
-                post.isLikedByUser = !!row.IsLikedByUser;
-                post.isSavedByUser = !!row.IsSavedByUser;
-
-                return post;
             });
 
             return {
@@ -82,7 +99,7 @@ export default class CommunityDBService {
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, details.userId);
             Database.addInput(request, 'ImagesURLS', sql.NVarChar(sql.MAX), JSON.stringify(details.imagesURLS || []));
             Database.addInput(request, 'Caption', sql.NVarChar(sql.MAX), details.caption || '');
-            Database.addInput(request, 'DateOfCreation', sql.DateTime2, details.dateOfCreation || Date.now());
+            Database.addInput(request, 'DateOfCreation', sql.DateTime2, new Date());
             Database.addInput(request, 'Type', sql.VarChar(20), details.type || 'general');
 
             const insertQuery = `
