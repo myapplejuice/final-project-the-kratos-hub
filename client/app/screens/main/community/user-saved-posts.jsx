@@ -29,7 +29,7 @@ import FloatingActionMenu from '../../../components/screen-comps/floating-action
 import FloatingActionButton from '../../../components/screen-comps/floating-action-button';
 import Gallery from '../../../components/screen-comps/gallery';
 
-export default function UserPosts() {
+export default function UserSavedPosts() {
     const { user } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
@@ -46,13 +46,12 @@ export default function UserPosts() {
             async function fetchPosts() {
                 const payload = {
                     userId: user.id,
-                    forUser: true,
                     page: 1,
                     limit: 25
                 }
 
                 try {
-                    const result = await APIService.community.posts(payload)
+                    const result = await APIService.community.savedPosts(payload)
 
                     if (result.success) {
                         const posts = result.data.posts;
@@ -80,13 +79,12 @@ export default function UserPosts() {
 
         const payload = {
             userId: user.id,
-            forUser: true,
             page: page + 1,
             limit: 25
         }
 
         try {
-            const result = await APIService.community.posts(payload)
+            const result = await APIService.community.savedPosts(payload)
 
             if (result.success) {
                 const posts = result.data.posts;
@@ -111,16 +109,6 @@ export default function UserPosts() {
 
     return (
         <>
-            <FloatingActionButton
-                overlayColor="rgba(0, 0, 0, 0.8)"
-                style={{ backgroundColor: colors.accentGreen, width: '100%', height: 50, }}
-                label='Create New Post'
-                onPress={() => router.push(routes.POST_CREATOR)}
-                visible={fabVisible}
-                position={{ bottom: insets.bottom + 20, right: 20, left: 20 }}
-                icon={Images.plus}
-            />
-
             {!loading ? (
                 <AppScroll onScrollSetStates={setFabVisible} hideNavBarOnScroll={true} extraBottom={200} >
                     {posts.length > 0 && (
@@ -159,7 +147,7 @@ export default function UserPosts() {
 
                                 sourcesOnPress={visibleList.map((post) => () => {
                                     router.push({
-                                        pathname: routes.USER_POST,
+                                        pathname: routes.POST,
                                         params: {
                                             post: JSON.stringify(post)
                                         }

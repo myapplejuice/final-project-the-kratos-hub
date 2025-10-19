@@ -13,6 +13,7 @@ export default class CommunityRouter {
 
         this.communityRouter.post('/post/:id', tokenAuthorization, userAuthorization, asyncHandler(CommunityController.getPost));
         this.communityRouter.post('/posts/:id', tokenAuthorization, userAuthorization, asyncHandler(CommunityController.getPosts));
+        this.communityRouter.post('/saved-posts/:id', tokenAuthorization, userAuthorization, asyncHandler(CommunityController.getSavedPosts));
         this.communityRouter.post('/create/:id', tokenAuthorization, userAuthorization, asyncHandler(CommunityController.createPost));
         this.communityRouter.post('/like/:id', tokenAuthorization, userAuthorization, asyncHandler(CommunityController.likePost));
         this.communityRouter.post('/save/:id', tokenAuthorization, userAuthorization, asyncHandler(CommunityController.savePost));

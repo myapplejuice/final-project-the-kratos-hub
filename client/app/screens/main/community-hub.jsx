@@ -170,7 +170,6 @@ export default function Community() {
         } catch (err) {
             console.log(err);
         }
-
     }
 
     async function handlerViewLikersPress(postId) {

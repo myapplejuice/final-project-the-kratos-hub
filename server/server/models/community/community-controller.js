@@ -115,4 +115,13 @@ export default class CommunityController {
 
         return res.status(200).json(result);
     }
+
+    static async getSavedPosts(req, res){
+        const { userId, page, limit } = req.body;
+
+        const result = await CommunityDBService.fetchUserSavedPosts(userId, page, limit);
+        if (!result.success) return res.status(400).json({ message: result.message });
+
+        return res.status(200).json(result);
+    }
 }

@@ -138,6 +138,7 @@ export default class APIService {
     static community = {
         post: (payload) => APIService.request(`/community/post/${APIService.USER_ID}`, 'POST', payload),
         posts: (payload) => APIService.request(`/community/posts/${APIService.USER_ID}`, 'POST', payload),
+        savedPosts: (payload) => APIService.request(`/community/saved-posts/${APIService.USER_ID}`, 'POST', payload),
         create: (payload) => APIService.request(`/community/create/${APIService.USER_ID}`, 'POST', payload),
         update: (payload) => APIService.request(`/community/update/${APIService.USER_ID}`, 'PUT', payload),
         delete: (payload) => APIService.request(`/community/delete/${APIService.USER_ID}`, 'DELETE', payload),
