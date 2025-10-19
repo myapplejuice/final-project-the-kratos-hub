@@ -158,17 +158,22 @@ export default function Notifications() {
                     userId: notification.clickableInfo.userId
                 }
             })
-        }else if (notification.clickableDestination === 'user-post') {
-            const result = await APIService.community.post({postId: notification.clickableInfo.postId});
-            const post = result.data.post;
+        } else if (notification.clickableDestination === 'user-post') {
+            const result = await APIService.community.post({ postId: notification.clickableInfo.postId });
 
-            console.log(post)
-            router.push({
-                pathname: routes.USER_POST,
-                params: {
-                    post: JSON.stringify(post)
-                }
-            })
+            if (result.success) {
+                const post = result.data.post;
+
+                console.log(post)
+                router.push({
+                    pathname: routes.USER_POST,
+                    params: {
+                        post: JSON.stringify(post)
+                    }
+                })
+            } else {
+                createToast({ message: result.message });
+            }
         }
     }
 
@@ -372,7 +377,7 @@ export default function Notifications() {
                                                 <TouchableOpacity style={{ marginBottom: 25, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} onPress={() => notification.clickable && handleNotificationPress(notification)}>
                                                     <View style={{
                                                         borderStartColor: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white',
-                                                        borderStartWidth: 2, paddingStart: 15, width:  notification.clickableDestination === 'user-post' ? '80%' : '100%'
+                                                        borderStartWidth: 2, paddingStart: 15, width: notification.clickableDestination === 'user-post' ? '80%' : '100%'
                                                     }}>
                                                         <AppText style={{ fontSize: scaleFont(13), fontWeight: '600', color: notification.seen ? colors.mutedText : 'white' }}>
                                                             {notification.notification}
@@ -383,7 +388,7 @@ export default function Notifications() {
                                                     </View>
                                                     {notification.clickableDestination === 'user-post' && notification.clickableInfo.postImageURL &&
                                                         <View style={{ width: '20%', justifyContent: 'center', alignItems: 'center' }}>
-                                                            <AppImage source={{uri: notification.clickableInfo.postImageURL}} style={{ width: 60, height: 60, borderRadius: 10 }} resizeMode='contain' />
+                                                            <AppImage source={{ uri: notification.clickableInfo.postImageURL }} style={{ width: 60, height: 60, borderRadius: 10 }} resizeMode='contain' />
                                                         </View>
                                                     }
                                                 </TouchableOpacity>

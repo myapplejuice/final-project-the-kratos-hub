@@ -8,7 +8,9 @@ export default class CommunityController {
         const id = req.params.id;
 
         const post = await PostsDBService.fetchPostById(id, postId);
-        console.log(post)
+        if(!post)
+            return res.status(400).json({ success: false, message: 'Post not found' });
+        
         return res.status(200).json({ success: true, post });
     }
 

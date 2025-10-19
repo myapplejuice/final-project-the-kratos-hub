@@ -29,6 +29,7 @@ import FloatingActionMenu from '../../components/screen-comps/floating-action-me
 
 export default function Community() {
     const { user } = useContext(UserContext);
+    const {createToast} = usePopups();
     const insets = useSafeAreaInsets();
 
     const [page, setPage] = useState(1);
@@ -130,6 +131,7 @@ export default function Community() {
             }
             const result = await APIService.community.like(payload);
 
+            console.log(result)
             if (result.success) {
                 const liked = result.data.liked;
                 setPosts(prev =>
@@ -139,6 +141,8 @@ export default function Community() {
                         isLikedByUser: liked,
                     } : p)
                 );
+            } else {
+              createToast({ message: 'Post not found, it may have been deleted' });
             }
         } catch (err) {
             console.log(err);
