@@ -47,18 +47,17 @@ export default function UserPost() {
 
     const [isChange, setIsChange] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
-    const [selectedTopic, setSelectedTopic] = useState(post.topic);
+    const [topic, setTopic] = useState(post.topic);
     const [caption, setCaption] = useState(post.caption);
-    const [images, setImages] = useState(post.imagesURLS);
+    const [imagesURLS, setImagesURLS] = useState(post.imagesURLS);
 
     useEffect(() => {
-        console.log(post)
         setBackHandler(() => {
             if (isEditing) {
                 setIsEditing(false);
-                setSelectedTopic(post.topic);
+                setTopic(post.topic);
                 setCaption(post.caption);
-                setImages(post.imagesURLS);
+                setImagesURLS(post.imagesURLS);
                 return true;
             } else {
                 return false;
@@ -76,9 +75,9 @@ export default function UserPost() {
         };
 
         const changes = {
-            topic: selectedTopic,
-            caption: caption,
-            imagesURLS: images
+            topic,
+            caption,
+            imagesURLS
         };
 
         if (JSON.stringify(original) !== JSON.stringify(changes)) {
@@ -86,7 +85,7 @@ export default function UserPost() {
         } else {
             setIsChange(false);
         }
-    }, [selectedTopic, caption, images]);
+    }, [topic, caption, imagesURLS]);
 
     async function handleDeletePost() {
         createDialog({
@@ -115,16 +114,42 @@ export default function UserPost() {
         })
     }
 
+    async function handleUpdatePost(){
+       createDialog({
+           title: "Update Post",
+           text: "Are you sure you want to update this post?",
+           confirmText: "Update",
+           onConfirm: async () => {
+               try {
+                   showSpinner();
+
+                   const result = await APIService.community.update({ postId: post.id, topic, caption, imagesURLS });
+                   if (result.success) {
+                       createAlert({ title: "Success", text: "Post updated", onPress: () => router.back() });
+                   } else {
+                       createToast({ message: result.message });
+                   }
+               } catch (err) {
+                   console.error("Failed to update post:", err);
+                   createToast({ message: "Server error " + err });
+               }
+               finally {
+                   hideSpinner();
+               }
+           }
+       })
+    }
+
     return (
         <>
-            <ImageCapture onConfirm={async (image) => setImages(prev => [...prev, image.uri])} />
+            <ImageCapture onConfirm={async (image) => setImagesURLS(prev => [...prev, image.uri])} />
             <FadeInOut visible={imagePreviewVisible} style={{ position: 'absolute', zIndex: 9999, top: 0, left: 0, bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.8)' }}>
                 <TouchableOpacity onPress={() => { setImagePreviewVisible(false), setSelectedImage(''), setFabVisible(true) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(30), marginBottom: 15 }}>Tap anywhere to dismiss</AppText>
                     <Image source={{ uri: selectedImage }} style={{ width: 500, height: 500, alignSelf: 'center' }} resizeMode='contain' />
                     <AnimatedButton
                         title={'Delete Photo'}
-                        onPress={() => { setImagePreviewVisible(false), setSelectedImage(''), setImages(images.filter(i => i !== selectedImage)), setFabVisible(true) }}
+                        onPress={() => { setImagePreviewVisible(false), setSelectedImage(''), setImagesURLS(imagesURLS.filter(i => i !== selectedImage)), setFabVisible(true) }}
                         style={{ backgroundColor: colors.negativeRed, padding: 15, borderRadius: 30, width: '90%', marginTop: 15 }}
                         textStyle={{ fontSize: scaleFont(15) }}
                         leftImage={Images.trash}
@@ -136,7 +161,7 @@ export default function UserPost() {
                 overlayColor="rgba(0, 0, 0, 0.8)"
                 style={{ backgroundColor: colors.accentGreen, width: '100%', height: 50, }}
                 label='Confirm Changes'
-                onPress={() => router.push(routes.POST_CREATOR)}
+                onPress={handleUpdatePost}
                 visible={fabVisible && isEditing && isChange}
                 position={{ bottom: insets.bottom + 20, right: 20, left: 20 }}
                 icon={Images.plus}
@@ -163,14 +188,14 @@ export default function UserPost() {
                                         return (
                                             <TouchableOpacity
                                                 key={idx}
-                                                onPress={() => setSelectedTopic(opt)}
+                                                onPress={() => setTopic(opt)}
                                                 style={{
                                                     height: 30,
                                                     width: '31%',
                                                     borderRadius: 20,
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
-                                                    backgroundColor: selectedTopic === opt ? colors.main : colors.cardBackground,
+                                                    backgroundColor: topic === opt ? colors.main : colors.cardBackground,
                                                 }}
                                             >
                                                 <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{opt}</AppText>
@@ -183,14 +208,14 @@ export default function UserPost() {
                                         return (
                                             <TouchableOpacity
                                                 key={idx}
-                                                onPress={() => setSelectedTopic(opt)}
+                                                onPress={() => setTopic(opt)}
                                                 style={{
                                                     height: 30,
                                                     width: '31%',
                                                     borderRadius: 20,
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
-                                                    backgroundColor: selectedTopic === opt ? colors.main : colors.cardBackground
+                                                    backgroundColor: topic === opt ? colors.main : colors.cardBackground
                                                 }}
                                             >
                                                 <AppText style={{ color: 'white', fontSize: scaleFont(12) }}>{opt}</AppText>
@@ -223,9 +248,9 @@ export default function UserPost() {
                                     <AppText style={styles.sectionTitle}>Images</AppText>
                                 </View>
 
-                                {images.length > 0 && (
+                                {imagesURLS.length > 0 && (
                                     <>
-                                        {images.map((image, index) => (
+                                        {imagesURLS.map((image, index) => (
                                             <TouchableOpacity onPress={() => { setSelectedImage(image), setImagePreviewVisible(true) }} key={index}
                                                 style={[{
                                                     flexDirection: 'row', justifyContent: 'space-between', width: '100%', padding: 20, backgroundColor: colors.cardBackground,
