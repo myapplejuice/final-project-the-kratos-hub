@@ -1,4 +1,5 @@
 import PostsDBService from "./community-db-service.js";
+import SocketController from "../socket/socket-controller.js";
 
 export default class CommunityController {
     static async getPosts(req, res) {
@@ -42,11 +43,29 @@ export default class CommunityController {
     }
 
     static async likePost(req, res) {
-        const { userId, postId } = req.body;
+        const {
+            userId,
+            postId,
+            userFirstname,
+            userLastname,
+            posterId,
+            postImageURL,
+        } = req.body;
 
         const result = await PostsDBService.likePost(userId, postId);
-        console.log(result);
         if (!result.success) return res.status(400).json({ message: result.message });
+
+        const payload = {
+            userId: details.friendId,
+            notification: `${userFirstname} ${userLastname} liked one of your posts`,
+            seen: false,
+            clickable: true,
+            clickableInfo: { postId, postImageURL },
+            clickableDestination: 'user-post',
+            sentiment: "positive",
+            dateOfCreation: new Date()
+        }
+        SocketController.emitNotification(posterId, payload);
 
         return res.status(200).json(result);
     }
