@@ -24,6 +24,7 @@ export const routes = {
     USER_POSTS: '/screens/main/community/user-posts',
     USER_POST: '/screens/main/community/user-post',
     POST_CREATOR: '/screens/main/community/post-creator',
+    USER_SAVED_POSTS: '/screens/main/community/user-saved-posts',
 
     /* HOMEPAGE CHILDREN */
     LEAN_BODY_MASS: '/screens/main/homepage/lean-body-mass',

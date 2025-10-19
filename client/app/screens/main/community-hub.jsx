@@ -152,11 +152,8 @@ export default function Community() {
         }
     }
 
-
-    async function handleSharePress(postId) {
-    }
-
     async function handleSavePress(postId) {
+
     }
 
     async function handlerViewLikersPress(postId) {
@@ -178,13 +175,15 @@ export default function Community() {
         }
     }
 
+     async function handleSharePress(postId) {
+    }
 
     return (
         <>
             <FloatingActionMenu
                 overlayColor="rgba(0, 0, 0, 0.8)"
                 actions={[
-                    { icon: Images.bookmark, title: 'Saved Posts', onPress: () => console.log('something'), closeOnAction: true },
+                    { icon: Images.bookmark, title: 'Saved Posts', onPress: () => router.push(routes.USER_SAVED_POSTS), closeOnAction: true },
                     { icon: Images.posts, title: 'My Posts', onPress: () => router.push(routes.USER_POSTS), closeOnAction: true },
                 ]}
                 visible={fabVisible}

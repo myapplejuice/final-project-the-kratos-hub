@@ -104,6 +104,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.USER_POSTS]: "My Posts",
         [routes.USER_POST]: "My Posts",
         [routes.POST_CREATOR]: "Create Post",
+        [routes.USER_SAVED_POSTS]: "Saved Posts",
 
     };
 
