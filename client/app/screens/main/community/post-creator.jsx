@@ -33,12 +33,12 @@ export default function PostCreator() {
     const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
-    const [selectedTopic, setSelectedTopic] = useState('');
+    const [selectedTopic, setSelectedTopic] = useState('None');
     const [fabVisible, setFabVisible] = useState(true);
     const [selectedImage, setSelectedImage] = useState({});
     const [imagePreviewVisible, setImagePreviewVisible] = useState(false);
 
-    const [caption, setCaption] = useState('None');
+    const [caption, setCaption] = useState('');
     const [images, setImages] = useState([]);
 
     async function handleNewImage(asset) {
@@ -82,7 +82,7 @@ export default function PostCreator() {
 
             const payload = {
                 userId: user.id,
-                type: selectedTopic === 'None' ? '' : selectedTopic || '',
+                topic: selectedTopic,
                 caption,
                 imagesURLS: uploadedImages.map(i => i.url)
             }

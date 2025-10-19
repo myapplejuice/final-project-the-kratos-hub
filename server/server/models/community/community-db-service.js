@@ -3,7 +3,7 @@ import Database from '../database/database.js';
 import ObjectMapper from '../../utils/object-mapper.js';
 
 export default class CommunityDBService {
-    static async fetchPosts(forUser = false, userId, page = 1, pageSize = 10, type = null) {
+    static async fetchPosts(forUser = false, userId, page = 1, pageSize = 10, topic = null) {
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
@@ -24,9 +24,9 @@ export default class CommunityDBService {
             WHERE p.UserId ${forUser ? '=' : '!='} @UserId
         `;
 
-            if (type) {
-                Database.addInput(request, 'Type', sql.VarChar(20), type);
-                query += ` AND p.Type = @Type`;
+            if (topic) {
+                Database.addInput(request, 'Topic', sql.VarChar(20), topic);
+                query += ` AND p.Topic = @Topic`;
             }
 
             query += `
@@ -76,7 +76,7 @@ export default class CommunityDBService {
                         ? mappedRow.shareCount.reduce((a, b) => a + b, 0)
                         : mappedRow.shareCount || 0,
                     dateOfCreation: mappedRow.dateOfCreation,
-                    type: mappedRow.type || '',
+                    topic: mappedRow.topic || '',
                     isLikedByUser: !!mappedRow.isLikedByUser,
                     isSavedByUser: !!mappedRow.isSavedByUser,
                 };
@@ -101,12 +101,12 @@ export default class CommunityDBService {
             Database.addInput(request, 'ImagesURLS', sql.NVarChar(sql.MAX), JSON.stringify(details.imagesURLS || []));
             Database.addInput(request, 'Caption', sql.NVarChar(sql.MAX), details.caption || '');
             Database.addInput(request, 'DateOfCreation', sql.DateTime2, new Date());
-            Database.addInput(request, 'Type', sql.VarChar(20), details.type);
+            Database.addInput(request, 'Topic', sql.VarChar(20), details.topic || '');
 
             const insertQuery = `
-                INSERT INTO Posts (UserId, ImagesURLS, Caption, DateOfCreation, Type)
+                INSERT INTO Posts (UserId, ImagesURLS, Caption, DateOfCreation, Topic)
                 OUTPUT inserted.Id
-                VALUES (@UserId, @ImagesURLS, @Caption, @DateOfCreation, @Type)
+                VALUES (@UserId, @ImagesURLS, @Caption, @DateOfCreation, @Topic)
             `;
 
             const result = await request.query(insertQuery);
@@ -126,13 +126,13 @@ export default class CommunityDBService {
             Database.addInput(request, 'Id', sql.Int, details.postId);
             Database.addInput(request, 'ImagesURLS', sql.NVarChar(sql.MAX), JSON.stringify(details.imagesURLS || []));
             Database.addInput(request, 'Caption', sql.NVarChar(sql.MAX), details.caption || '');
-            Database.addInput(request, 'Type', sql.VarChar(20), details.type || 'general');
+            Database.addInput(request, 'Topic', sql.VarChar(20), details.topic || '');
 
             const updateQuery = `
                 UPDATE Posts
                 SET ImagesURLS = @ImagesURLS,
                     Caption = @Caption,
-                    Type = @Type
+                    Topic = @Topic
                 WHERE Id = @Id
             `;
 

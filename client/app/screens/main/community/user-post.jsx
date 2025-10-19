@@ -47,17 +47,18 @@ export default function UserPost() {
 
     const [isChange, setIsChange] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
-    const [selectedTopic, setSelectedTopic] = useState(post.topic || 'None');
-    const [caption, setCaption] = useState(post.caption || '');
-    const [images, setImages] = useState(post.imagesURLS || []);
+    const [selectedTopic, setSelectedTopic] = useState(post.topic);
+    const [caption, setCaption] = useState(post.caption);
+    const [images, setImages] = useState(post.imagesURLS);
 
     useEffect(() => {
+        console.log(post)
         setBackHandler(() => {
             if (isEditing) {
                 setIsEditing(false);
-                setSelectedTopic(post.topic || 'None');
-                setCaption(post.caption || '');
-                setImages(post.imagesURLS || []);
+                setSelectedTopic(post.topic);
+                setCaption(post.caption);
+                setImages(post.imagesURLS);
                 return true;
             } else {
                 return false;
@@ -75,7 +76,7 @@ export default function UserPost() {
         };
 
         const changes = {
-            topic: selectedTopic === 'None' ? '' : selectedTopic,
+            topic: selectedTopic,
             caption: caption,
             imagesURLS: images
         };

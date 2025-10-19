@@ -75,7 +75,7 @@ export default function UserPosts() {
     if (selectedPosts === 'Any')
         visibleList = posts;
     else
-        visibleList = posts.filter(post => post.type === selectedPosts);
+        visibleList = posts.filter(post => post.topic === selectedPosts);
 
     return (
         <>

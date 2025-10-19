@@ -14,7 +14,7 @@ import AppImageBackground from './app-image-background';
 export default function CommunityPost({ post, isLikedByUser = false, isSavedByUser = false, isUserPost = false, onDeletePress, onEditPress }) {
     const { user } = useContext(UserContext);
     const router = useRouter();
-    const { postUser, imagesURLS, caption, likeCount, shareCount, type, dateOfCreation } = post;
+    const { postUser, imagesURLS, caption, likeCount, shareCount, topic, dateOfCreation } = post;
     const [currentImage, setCurrentImage] = useState(0);
 
     const dateTimeComparisons = getDayComparisonsSafe(dateOfCreation);
@@ -132,7 +132,7 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                                         fontWeight: '500',
                                         fontSize: scaleFont(11),
                                     }}>
-                                    {timeDisplay}  {type ? `•  ${type}` : ''}
+                                    {timeDisplay}  {topic !== 'None' ? `•  ${topic}` : ''}
                                 </AppText>
                             </View>
                         </View>
