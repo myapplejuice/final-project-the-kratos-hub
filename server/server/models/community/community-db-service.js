@@ -56,6 +56,7 @@ export default class CommunityDBService {
                 }
 
                 return {
+                    id: mappedRow.id,
                     postUser: {
                         id: Array.isArray(mappedRow.userId) ? mappedRow.userId[0] : mappedRow.userId,
                         firstname: mappedRow.firstname,

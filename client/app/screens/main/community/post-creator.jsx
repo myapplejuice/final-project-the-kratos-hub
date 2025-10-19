@@ -38,7 +38,7 @@ export default function PostCreator() {
     const [selectedImage, setSelectedImage] = useState({});
     const [imagePreviewVisible, setImagePreviewVisible] = useState(false);
 
-    const [caption, setCaption] = useState('');
+    const [caption, setCaption] = useState('None');
     const [images, setImages] = useState([]);
 
     async function handleNewImage(asset) {
@@ -254,6 +254,7 @@ export default function PostCreator() {
         </>
     );
 }
+
 const styles = StyleSheet.create({
     main: {
         flex: 1,

@@ -57,7 +57,6 @@ export default function UserPosts() {
                         const posts = result.data.posts;
                         const hasMore = result.data.hasMore;
 
-                        console.log(posts)
                         setHasMore(hasMore);
                         setPosts(posts);
                     }
@@ -72,47 +71,8 @@ export default function UserPosts() {
         }, [])
     );
 
-    if (loading) {
-        return (
-            <View style={{ backgroundColor: colors.background, flex: 1, paddingTop: 75 }}>
-                {[...Array(1)].map((_, idx) => (
-                    <View key={idx} style={{ marginTop: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 10 }}>
-                            <View style={{ justifyContent: 'center' }}>
-                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5 }} />
-                            </View>
-                            <View style={{ justifyContent: 'center' }}>
-                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5 }} />
-                            </View>
-                            <View style={{ justifyContent: 'center' }}>
-                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5 }} />
-                            </View>
-                            <View style={{ justifyContent: 'center' }}>
-                                <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5 }} />
-                            </View>
-                        </View>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15, marginHorizontal: 10 }}>
-                            {Array(3).fill(0).map((_, idx) => (
-                                <Animated.View
-                                    key={idx}
-                                    style={{
-                                        backgroundColor: colors.cardBackground,
-                                        height: Dimensions.get('window').width * 0.32,
-                                        width: '32%',
-                                        borderRadius: 10,
-                                    }}
-                                />
-                            ))}
-                        </View>
-                        <Animated.View style={{ backgroundColor: colors.cardBackground, height: 300, marginTop: 15, borderRadius: 10, marginHorizontal: 10 }} />
-                    </View>
-                ))}
-            </View>
-        );
-    }
-
     let visibleList;
-    if(selectedPosts === 'Any')
+    if (selectedPosts === 'Any')
         visibleList = posts;
     else
         visibleList = posts.filter(post => post.type === selectedPosts);
@@ -129,60 +89,98 @@ export default function UserPosts() {
                 icon={Images.plus}
             />
 
-            <AppScroll onScrollSetStates={setFabVisible} hideNavBarOnScroll={true} extraBottom={100}>
-                {posts.length > 0 && (
-                    <>
-                        <View style={{ height: 60 }}>
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
-                                {["Any",  "Trainer Ad", "Trainer Lookup", "Inquiry", "Tips", "Moments"].map((opt, idx) => {
-                                    return (
-                                        <TouchableOpacity
-                                            key={idx}
-                                            onPress={() => setSelectedPosts(opt)}
-                                            style={{
-                                                paddingHorizontal: 15,
-                                                paddingVertical: 8,
-                                                borderRadius: 20,
-                                                backgroundColor: selectedPosts === opt ? colors.main : colors.cardBackground,
-                                                marginStart: idx === 0 ? 10 : 5,
-                                                marginEnd: idx === 5 ? 10 : 5
-                                            }}
-                                        >
-                                            <AppText style={{ color: 'white', fontSize: 14 }}>{opt}</AppText>
-                                        </TouchableOpacity>
-                                    )
+            {!loading ? (
+                <AppScroll onScrollSetStates={setFabVisible} hideNavBarOnScroll={true} extraBottom={100}>
+                    {posts.length > 0 && (
+                        <>
+                            <View style={{ height: 60 }}>
+                                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
+                                    {["Any", "Trainer Ad", "Trainer Lookup", "Inquiry", "Tips", "Moments"].map((opt, idx) => {
+                                        return (
+                                            <TouchableOpacity
+                                                key={idx}
+                                                onPress={() => setSelectedPosts(opt)}
+                                                style={{
+                                                    paddingHorizontal: 15,
+                                                    paddingVertical: 8,
+                                                    borderRadius: 20,
+                                                    backgroundColor: selectedPosts === opt ? colors.main : colors.cardBackground,
+                                                    marginStart: idx === 0 ? 10 : 5,
+                                                    marginEnd: idx === 5 ? 10 : 5
+                                                }}
+                                            >
+                                                <AppText style={{ color: 'white', fontSize: 14 }}>{opt}</AppText>
+                                            </TouchableOpacity>
+                                        )
+                                    })}
+                                </ScrollView>
+                            </View>
+
+                            <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
+
+                            <Gallery
+                                sources={visibleList.map(post =>
+                                    post.imagesURLS?.length > 0
+                                        ? { uri: post.imagesURLS[0] }
+                                        : Images.missingImage
+                                )}
+
+                                sourcesOnPress={visibleList.map((post) => () => {
+                                    router.push({
+                                        pathname: routes.USER_POST,
+                                        params: {
+                                            post: JSON.stringify(post)
+                                        }
+                                    })
                                 })}
-                            </ScrollView>
+                            />
+                        </>
+                    )}
+                    {posts.length === 0 && (
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                            <Image source={Images.msisingImageTwo} style={{ width: 100, height: 100, marginBottom: 15, tintColor: colors.mutedText }} />
+                            <AppText style={{ fontSize: scaleFont(14), color: colors.mutedText, fontWeight: 'bold' }}>You have nothing posted to the community yet</AppText>
+                            <AppText style={{ fontSize: scaleFont(13), color: 'white', marginTop: 5 }}>Tap below to create a new post</AppText>
                         </View>
-
-                        <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
-
-                        <Gallery
-                            sources={visibleList.map(post =>
-                                post.imagesURLS?.length > 0
-                                    ? { uri: post.imagesURLS[0] }
-                                    : Images.missingImage
-                            )}
-
-                            sourcesOnPress={visibleList.map((post) => () => {
-                                router.push({
-                                    pathname: routes.USER_POST,
-                                    params: {
-                                        post: JSON.stringify(post)
-                                    }
-                                })
-                            })}
-                        />
-                    </>
-                )}
-                {posts.length === 0 && (
-                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <Image source={Images.msisingImageTwo} style={{ width: 100, height: 100, marginBottom: 15, tintColor: colors.mutedText }} />
-                        <AppText style={{ fontSize: scaleFont(14), color: colors.mutedText, fontWeight: 'bold' }}>You have nothing posted to the community yet</AppText>
-                        <AppText style={{ fontSize: scaleFont(13), color: 'white', marginTop: 5 }}>Tap below to create a new post</AppText>
+                    )}
+                </AppScroll>
+            ) :
+                (
+                    <View style={{ backgroundColor: colors.background, flex: 1, paddingTop: 75 }}>
+                        {[...Array(1)].map((_, idx) => (
+                            <View key={idx} style={{ marginTop: 15 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 10 }}>
+                                    <View style={{ justifyContent: 'center' }}>
+                                        <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5 }} />
+                                    </View>
+                                    <View style={{ justifyContent: 'center' }}>
+                                        <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5 }} />
+                                    </View>
+                                    <View style={{ justifyContent: 'center' }}>
+                                        <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5 }} />
+                                    </View>
+                                    <View style={{ justifyContent: 'center' }}>
+                                        <Animated.View style={{ width: 80, height: 30, borderRadius: 20, backgroundColor: colors.cardBackground, marginVertical: 5 }} />
+                                    </View>
+                                </View>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15, marginHorizontal: 10 }}>
+                                    {Array(3).fill(0).map((_, idx) => (
+                                        <Animated.View
+                                            key={idx}
+                                            style={{
+                                                backgroundColor: colors.cardBackground,
+                                                height: Dimensions.get('window').width * 0.32,
+                                                width: '32%',
+                                                borderRadius: 10,
+                                            }}
+                                        />
+                                    ))}
+                                </View>
+                                <Animated.View style={{ backgroundColor: colors.cardBackground, height: 300, marginTop: 15, borderRadius: 10, marginHorizontal: 10 }} />
+                            </View>
+                        ))}
                     </View>
                 )}
-            </AppScroll>
         </>
     );
 }
