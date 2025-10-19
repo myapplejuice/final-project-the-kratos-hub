@@ -31,14 +31,30 @@ export default function Community() {
     const { user } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
+    const [page, setPage] = useState(1);
     const [fabVisible, setFabVisible] = useState(true);
     const [loading, setLoading] = useState(true);
     const [selectedPosts, setSelectedPosts] = useState('Any');
 
     useEffect(() => {
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
+        async function fetchPosts() {
+            try {
+                const payload = {
+                    userId: user.id,
+                    forUser: false,
+                    page: page,
+                    limit: 25,
+                }
+
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setLoading(false);
+            }
+
+        }
+
+        fetchPosts();
     }, []);
 
     if (loading) {
@@ -50,7 +66,7 @@ export default function Community() {
                             <Animated.View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15 }} />
                             <View style={{ justifyContent: 'center' }}>
                                 <Animated.View style={{ width: 90, height: 10, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5 }} />
-                                <Animated.View style={{ width: 60, height: 7, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5}} />
+                                <Animated.View style={{ width: 60, height: 7, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5 }} />
                             </View>
                         </View>
                         <Animated.View style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 15, borderRadius: 10 }} />
@@ -76,7 +92,7 @@ export default function Community() {
             <AppScroll onScrollSetStates={setFabVisible} hideNavBarOnScroll={true} extraBottom={100}>
                 <View style={{ height: 60 }}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
-                        {["Any",  "Trainer Ad", "Trainer Lookup", "Inquiry", "Tips", "Moments"].map((opt, idx) => {
+                        {["Any", "Trainer Ad", "Trainer Lookup", "Inquiry", "Tips", "Moments"].map((opt, idx) => {
                             return (
                                 <TouchableOpacity
                                     key={idx}
@@ -98,10 +114,6 @@ export default function Community() {
                 </View>
 
                 <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
-
-                <CommunityPost
-                
-                />
 
                 <Divider orientation='horizontal' style={{ marginBottom: 25, borderRadius: 0 }} thickness={10} color='black' />
             </AppScroll>

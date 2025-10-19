@@ -2,7 +2,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import { Image, ImageBackground } from "expo-image";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { Animated, Dimensions, Easing, Keyboard, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Animated, Dimensions, Easing, Keyboard, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import BuildFooter from "../../../components/layout-comps/build-footer";
 import AppText from "../../../components/screen-comps/app-text";
 import { Images } from '../../../common/settings/assets';
@@ -33,8 +33,9 @@ export default function UserPosts() {
     const { user } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
+    const [loadingPosts, setLoadingPosts] = useState(false);
     const [posts, setPosts] = useState([]);
-    const [hasMore, setHasMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
     const [fabVisible, setFabVisible] = useState(true);
     const [loading, setLoading] = useState(true);
@@ -46,7 +47,7 @@ export default function UserPosts() {
                 const payload = {
                     userId: user.id,
                     forUser: true,
-                    page: page,
+                    page: 1,
                     limit: 25
                 }
 
@@ -56,7 +57,8 @@ export default function UserPosts() {
                     if (result.success) {
                         const posts = result.data.posts;
                         const hasMore = result.data.hasMore;
-
+          
+                        setPage(1);
                         setHasMore(hasMore);
                         setPosts(posts);
                     }
@@ -70,6 +72,36 @@ export default function UserPosts() {
             fetchPosts();
         }, [])
     );
+
+    async function handleMorePosts() {
+        if (!hasMore || loadingPosts) return;
+
+        setLoadingPosts(true);
+
+        const payload = {
+            userId: user.id,
+            forUser: true,
+            page: page + 1,
+            limit: 25
+        }
+
+        try {
+            const result = await APIService.community.posts(payload)
+
+            if (result.success) {
+                const posts = result.data.posts;
+                const hasMore = result.data.hasMore;
+
+                setHasMore(hasMore);
+                setPage(prev => prev + 1);
+                setPosts(prev => [...prev, ...posts]);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoadingPosts(false);
+        }
+    }
 
     let visibleList;
     if (selectedPosts === 'Any')
@@ -90,7 +122,7 @@ export default function UserPosts() {
             />
 
             {!loading ? (
-                <AppScroll onScrollSetStates={setFabVisible} hideNavBarOnScroll={true} extraBottom={100}>
+                <AppScroll onScrollSetStates={setFabVisible} hideNavBarOnScroll={true} extraBottom={200} >
                     {posts.length > 0 && (
                         <>
                             <View style={{ height: 60 }}>
@@ -134,6 +166,13 @@ export default function UserPosts() {
                                     })
                                 })}
                             />
+
+                            {hasMore &&
+                                <TouchableOpacity onPress={handleMorePosts} style={{ alignItems: 'center', marginTop: 15, borderWidth: !loadingPosts ? 1 : 0, borderColor: colors.mutedText, borderRadius: 20, padding: 15, alignSelf: 'center' }}>
+                                    {!loadingPosts && <AppText style={{ color: 'white', fontSize: 14, fontWeight: 'bold' }}>Load More</AppText>}
+                                    {loadingPosts && <ActivityIndicator color='white' size='large' />}
+                                </TouchableOpacity>
+                            }
                         </>
                     )}
                     {posts.length === 0 && (
