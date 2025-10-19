@@ -34,6 +34,7 @@ export default function Community() {
     const [page, setPage] = useState(1);
     const [loadingPosts, setLoadingPosts] = useState(false);
     const [posts, setPosts] = useState([]);
+    const [visiblePosts, setVisiblePosts] = useState([]);
     const [hasMore, setHasMore] = useState(true);
     const [fabVisible, setFabVisible] = useState(true);
     const [loading, setLoading] = useState(true);
@@ -56,10 +57,10 @@ export default function Community() {
                         const posts = result.data.posts;
                         const hasMore = result.data.hasMore;
 
-                        console.log(posts)
                         setPage(1);
                         setHasMore(hasMore);
                         setPosts(posts);
+                        setVisiblePosts(posts);
                     }
                 } catch (error) {
                     console.log(error);
@@ -77,23 +78,70 @@ export default function Community() {
         fetchPosts();
     }, []);
 
-    if (loading) {
-        return (
-            <View style={{ backgroundColor: colors.background, flex: 1, paddingTop: 75 }}>
-                {[...Array(2)].map((_, idx) => (
-                    <View key={idx} style={{ marginTop: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Animated.View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15 }} />
-                            <View style={{ justifyContent: 'center' }}>
-                                <Animated.View style={{ width: 90, height: 10, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5 }} />
-                                <Animated.View style={{ width: 60, height: 7, borderRadius: 20, backgroundColor: colors.cardBackground, marginStart: 15, marginVertical: 5 }} />
-                            </View>
-                        </View>
-                        <Animated.View style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 15, borderRadius: 10 }} />
-                    </View>
-                ))}
-            </View>
-        );
+    useEffect(() => {
+        if(selectedPosts === 'Any')
+            setVisiblePosts(posts);
+        else
+            setVisiblePosts(posts.filter(p => p.topic === selectedPosts));
+    },[selectedPosts, posts]);
+
+    async function handleMorePosts() {
+        if (!hasMore || loadingPosts) return;
+
+        setLoadingPosts(true);
+
+        const payload = {
+            userId: user.id,
+            forUser: false,
+            page: page + 1,
+            limit: 25
+        }
+
+        try {
+            const result = await APIService.community.posts(payload)
+
+            if (result.success) {
+                const posts = result.data.posts;
+                const hasMore = result.data.hasMore;
+
+                setHasMore(hasMore);
+                setPage(prev => prev + 1);
+                setPosts(prev => [...prev, ...posts]);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoadingPosts(false);
+        }
+    }
+
+    async function handleLikePress(postId) {
+        try {
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+
+            const result = await APIService.community.like({ userId: user.id, postId });
+
+            if (result.success) {
+                const liked = result.data.liked;
+                setPosts(prev =>
+                    prev.map(p => p.id === postId ? {
+                        ...p,
+                        likeCount: liked ? p.likeCount + 1 : Math.max(p.likeCount - 1, 0),
+                        isLikedByUser: liked,
+                    } : p)
+                );
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+
+    async function handleSharePress(postId) {
+    }
+
+    async function handleSavePress(postId) {
     }
 
     return (
@@ -136,7 +184,7 @@ export default function Community() {
 
                     <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
 
-                    {posts.map((post, idx) => {
+                    {visiblePosts.map((post, idx) => {
                         return (
                             <>
                                 <CommunityPost
@@ -145,16 +193,22 @@ export default function Community() {
                                     isLikedByUser={post.isLikedByUser}
                                     isSavedByUser={post.isSavedByUser}
                                     isUserPost={false}
-                                    onLikePress={() => { }}
-                                    onSharePress={() => { }}
-                                    onSavePress={() => { }}
-                                />;
+                                    onLikePress={() => handleLikePress(post.id)}
+                                    onSharePress={() => handleSharePress(post.id)}
+                                    onSavePress={() => handleSavePress(post.id)}
+                                />
 
-                                {idx < posts.length - 1 && <Divider orientation='horizontal' style={{ marginBottom: 25, borderRadius: 0 }} thickness={10} color='black' />}
+                                {idx < visiblePosts.length - 1 && <Divider orientation='horizontal' style={{ marginBottom: 25, borderRadius: 0 }} thickness={10} color='black' />}
                             </>
                         )
                     })}
 
+                    {hasMore &&
+                        <TouchableOpacity onPress={handleMorePosts} style={{ alignItems: 'center', marginTop: 15, borderWidth: !loadingPosts ? 1 : 0, borderColor: colors.mutedText, borderRadius: 20, padding: 15, alignSelf: 'center' }}>
+                            {!loadingPosts && <AppText style={{ color: 'white', fontSize: 14, fontWeight: 'bold' }}>Load More</AppText>}
+                            {loadingPosts && <ActivityIndicator color='white' size='large' />}
+                        </TouchableOpacity>
+                    }
                 </AppScroll>
             ) :
                 loading ? (

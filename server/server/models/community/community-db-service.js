@@ -167,33 +167,36 @@ export default class CommunityDBService {
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
             Database.addInput(request, 'PostId', sql.Int, postId);
 
-            // Check if already liked
             const checkQuery = `SELECT Id FROM Likes WHERE UserId = @UserId AND PostId = @PostId`;
             const existing = await request.query(checkQuery);
+
             if (existing.recordset.length > 0) {
-                // Already liked, maybe unlike?
-                return { success: false, message: 'Post already liked' };
-            }
+                const deleteQuery = `DELETE FROM Likes WHERE UserId = @UserId AND PostId = @PostId`;
+                await request.query(deleteQuery);
 
-            const insertQuery = `
-                INSERT INTO Likes (UserId, PostId)
-                VALUES (@UserId, @PostId)
-            `;
-            await request.query(insertQuery);
-
-            const updateQuery = `
+                const decrementQuery = `
                 UPDATE Posts
-                SET LikeCount = LikeCount + 1
+                SET LikeCount = CASE WHEN LikeCount > 0 THEN LikeCount - 1 ELSE 0 END
                 WHERE Id = @PostId
             `;
-            await request.query(updateQuery);
+                await request.query(decrementQuery);
 
-            return { success: true, message: 'Post liked successfully' };
+                return { success: true, liked: false, message: 'Post unliked successfully' };
+            } else {
+                const insertQuery = `INSERT INTO Likes (UserId, PostId) VALUES (@UserId, @PostId)`;
+                await request.query(insertQuery);
+
+                const incrementQuery = `UPDATE Posts SET LikeCount = LikeCount + 1 WHERE Id = @PostId`;
+                await request.query(incrementQuery);
+
+                return { success: true, liked: true, message: 'Post liked successfully' };
+            }
         } catch (err) {
-            console.error('likePost error:', err);
-            return { success: false, message: 'Failed to like post' };
+            console.error('toggleLikePost error:', err);
+            return { success: false, message: 'Failed to toggle like' };
         }
     }
+
 
     static async savePost(userId, postId) {
         try {

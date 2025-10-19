@@ -11,7 +11,12 @@ import { routes } from '../../common/settings/constants';
 import ProgressDots from './progress-dots';
 import AppImageBackground from './app-image-background';
 
-export default function CommunityPost({ post, isLikedByUser = false, isSavedByUser = false, isUserPost = false, onDeletePress, onEditPress }) {
+export default function CommunityPost({
+    post, isLikedByUser = false, isSavedByUser = false, isUserPost = false,
+    onDeletePress = () => { }, onEditPress = () => { }, onLikePress = () => { },
+    onSharePress = () => { }, onImagePress = () => { }, onSavePress = () => { }
+}) {
+
     const { user } = useContext(UserContext);
     const router = useRouter();
     const { postUser, imagesURLS, caption, likeCount, shareCount, topic, dateOfCreation } = post;
@@ -298,6 +303,7 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
 
                             <TouchableOpacity
+                                onPress={onLikePress}
                                 style={{
                                     padding: 8,
                                 }}
@@ -313,6 +319,7 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                             </TouchableOpacity>
 
                             <TouchableOpacity
+                                onPress={onSharePress}
                                 style={{
                                     padding: 8,
                                     marginEnd: 5
@@ -362,6 +369,7 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
 
                 {!isUserPost && (
                     <TouchableOpacity
+                        onPress={onSavePress}
                         style={{
                             padding: 8,
                         }}

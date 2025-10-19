@@ -45,6 +45,7 @@ export default class CommunityController {
         const { userId, postId } = req.body;
 
         const result = await PostsDBService.likePost(userId, postId);
+        console.log(result);
         if (!result.success) return res.status(400).json({ message: result.message });
 
         return res.status(200).json(result);
