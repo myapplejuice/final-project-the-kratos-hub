@@ -81,6 +81,35 @@
           ]
         }
       ]
+    },
+    {
+      "sessionId": "c9c422f1-bc44-4a01-9b95-4d940b9c2fcb",
+      "userId": "9660511F-B551-4970-9160-D193B735723B",
+      "exercises": [
+        {
+          "exerciseId": "40024b33-0151-4c93-a8cb-188e0eb84781",
+          "name": "Bench Press",
+          "isTimerOnly": false,
+          "sets": []
+        }
+      ]
+    },
+    {
+      "sessionId": "59d6b421-9c4f-4333-ba49-2bb0512c4b72",
+      "userId": "9660511F-B551-4970-9160-D193B735723B",
+      "exercises": [
+        {
+          "exerciseId": "8950e5e5-8fd0-4b75-bf5f-46ebd8594426",
+          "name": "Bench Press",
+          "isTimerOnly": false,
+          "sets": []
+        }
+      ]
+    },
+    {
+      "sessionId": "8530714c-7c5e-45b2-af6f-48f025aa3dfd",
+      "userId": "9660511F-B551-4970-9160-D193B735723B",
+      "exercises": []
     }
   ]
 }
