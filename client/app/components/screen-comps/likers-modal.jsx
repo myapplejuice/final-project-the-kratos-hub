@@ -7,11 +7,16 @@ import AppImage from './app-image';
 import { router } from 'expo-router';
 import { routes } from '../../common/settings/constants';
 import Divider from './divider';
+import { useContext } from 'react';
+import { UserContext } from '../../common/contexts/user-context';
 
 const { width, height } = Dimensions.get('window');
 
 export default function LikersModal({ visible, likers = [], onClose }) {
+    const {user} = useContext(UserContext);
     function handleToUserPress(id) {
+        if (id === user.id) return;
+        
         router.push({
             pathname: routes.USER_PROFILE,
             params: {
@@ -47,11 +52,13 @@ export default function LikersModal({ visible, likers = [], onClose }) {
                                 <AppImage source={{ uri: item.imageURL }} style={styles.avatar} />
                                 <View style={{ flex: 1 }}>
                                     <AppText style={styles.name}>
-                                        {item.firstname} {item.lastname}
+                                        {item.id === user.id ? 'You' : item.firstname + ' ' + item.lastname}
                                     </AppText>
-                                    <AppText style={styles.subtext}>
+                                   {user.id !== item.id &&
+                                     <AppText style={styles.subtext}>
                                         {item.gender === 'male' ? 'M' : 'F'}, {item.age}
                                     </AppText>
+                                    }
                                 </View>
                             </TouchableOpacity>
                         ))

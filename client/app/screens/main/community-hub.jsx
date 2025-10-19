@@ -134,7 +134,6 @@ export default function Community() {
             }
             const result = await APIService.community.like(payload);
 
-            console.log(result)
             if (result.success) {
                 const liked = result.data.liked;
                 setPosts(prev =>
@@ -153,6 +152,24 @@ export default function Community() {
     }
 
     async function handleSavePress(postId) {
+        try {
+            const result = await APIService.community.save({ userId: user.id, postId });
+
+            if (result.success) {
+                const saved = result.data.isSaved;
+
+                setPosts(prev =>
+                    prev.map(p => p.id === postId ? {
+                        ...p,
+                        isSavedByUser: saved
+                    } : p)
+                );
+            } else {
+                createToast({ message: 'Post not found, it may have been deleted' });
+            }
+        } catch (err) {
+            console.log(err);
+        }
 
     }
 
@@ -175,7 +192,7 @@ export default function Community() {
         }
     }
 
-     async function handleSharePress(postId) {
+    async function handleSharePress(postId) {
     }
 
     return (

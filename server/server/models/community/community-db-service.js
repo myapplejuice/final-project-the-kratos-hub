@@ -281,22 +281,33 @@ export default class CommunityDBService {
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
             Database.addInput(request, 'PostId', sql.Int, postId);
 
-            const checkQuery = `SELECT Id FROM SavedPosts WHERE UserId = @UserId AND PostId = @PostId`;
+            const checkQuery = `
+            SELECT Id 
+            FROM SavedPosts 
+            WHERE UserId = @UserId AND PostId = @PostId
+        `;
             const existing = await request.query(checkQuery);
-            if (existing.recordset.length > 0) {
-                return { success: false, message: 'Post already saved' };
-            }
 
-            const insertQuery = `
+            if (existing.recordset.length > 0) {
+                // Post is already saved → unsave it
+                const deleteQuery = `
+                DELETE FROM SavedPosts 
+                WHERE UserId = @UserId AND PostId = @PostId
+            `;
+                await request.query(deleteQuery);
+                return { success: true, message: 'Post unsaved', isSaved: false };
+            } else {
+                // Post not saved → save it
+                const insertQuery = `
                 INSERT INTO SavedPosts (UserId, PostId)
                 VALUES (@UserId, @PostId)
             `;
-            await request.query(insertQuery);
-
-            return { success: true, message: 'Post saved successfully' };
+                await request.query(insertQuery);
+                return { success: true, message: 'Post saved', isSaved: true };
+            }
         } catch (err) {
             console.error('savePost error:', err);
-            return { success: false, message: 'Failed to save post' };
+            return { success: false, message: 'Failed to toggle save status' };
         }
     }
 
@@ -318,7 +329,7 @@ export default class CommunityDBService {
             return { success: false, message: 'Failed to share post' };
         }
     }
-    
+
     static async fetchPostLikers(postId) {
         try {
             const request = Database.getRequest();
