@@ -100,31 +100,8 @@ export default function Community() {
                 <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
 
                 <CommunityPost
-                    isUserPost={false}
-                    post={{
-                        postUser: {
-                            id: 'u1',
-                            firstname: 'John',
-                            lastname: 'Doe',
-                            imageURL: user.imageURL,
-                            trainerProfile: {
-                                trainerStatus: 'active',
-                                isVerified: true,
-                            },
-                        },
-                        imagesURLS: [
-                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760458605/profile_images/wcntywjjocrff0kegi53.jpg',
-                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760553576/profile_images/hk05sqdaj4dxnlueo5mh.jpg',
-                            'https://res.cloudinary.com/dkujdjk2d/image/upload/v1760466496/user_trainer_profile_images/g9ibkvz9z7q9ccrjhhio.jpg'
-                        ],
-                        caption: 'Feeling strong today 💪',
-                        likeCount: 140, //array instead of num
-                        shareCount: 2,
-                        dateOfCreation: new Date(),
-                        topic: 'Trainer Ad',
-                    }} 
-                    isLikedByUser={true}
-                    isSavedByUser={true}/>
+                
+                />
 
                 <Divider orientation='horizontal' style={{ marginBottom: 25, borderRadius: 0 }} thickness={10} color='black' />
             </AppScroll>
