@@ -26,12 +26,15 @@ import ExpandInOut from '../../components/effects/expand-in-out';
 import AppTextInput from '../../components/screen-comps/app-text-input';
 import CommunityPost from '../../components/screen-comps/community-post';
 import FloatingActionMenu from '../../components/screen-comps/floating-action-menu';
+import LikersModal from '../../components/screen-comps/likers-modal';
 
 export default function Community() {
     const { user } = useContext(UserContext);
-    const {createToast} = usePopups();
+    const { createToast, showSpinner, hideSpinner } = usePopups();
     const insets = useSafeAreaInsets();
 
+    const [likers, setLikers] = useState([]);
+    const [likersVisible, setLikersVisible] = useState(false);
     const [page, setPage] = useState(1);
     const [loadingPosts, setLoadingPosts] = useState(false);
     const [posts, setPosts] = useState([]);
@@ -142,7 +145,7 @@ export default function Community() {
                     } : p)
                 );
             } else {
-              createToast({ message: 'Post not found, it may have been deleted' });
+                createToast({ message: 'Post not found, it may have been deleted' });
             }
         } catch (err) {
             console.log(err);
@@ -156,6 +159,26 @@ export default function Community() {
     async function handleSavePress(postId) {
     }
 
+    async function handlerViewLikersPress(postId) {
+        try {
+            showSpinner();
+            const result = await APIService.community.likers({ postId });
+
+            if (result.success) {
+                const likers = result.data.likers;
+                setLikers(likers);
+                setLikersVisible(true);
+            } else {
+                createToast({ message: result.message });
+            }
+        } catch (err) {
+            console.error("Failed to fetch likers:", err);
+        } finally {
+            hideSpinner();
+        }
+    }
+
+
     return (
         <>
             <FloatingActionMenu
@@ -168,6 +191,8 @@ export default function Community() {
                 position={{ bottom: insets.bottom + 70, right: 20 }}
                 icon={Images.plus}
             />
+
+            <LikersModal visible={likersVisible} likers={likers} onClose={() => setLikersVisible(false)} />
 
             {!loading && posts.length > 0 ? (
                 <AppScroll onScrollSetStates={setFabVisible} hideNavBarOnScroll={true} extraBottom={100}>
@@ -198,7 +223,7 @@ export default function Community() {
 
                     {visiblePosts.map((post, idx) => {
                         return (
-                            <View key={idx}>
+                            <View style={{ flex: 1 }} key={idx}>
                                 <CommunityPost
                                     post={post}
                                     isLikedByUser={post.isLikedByUser}
@@ -207,6 +232,7 @@ export default function Community() {
                                     onLikePress={() => handleLikePress(post.id, post.postUser.id, post.imagesURLS[0])}
                                     onSharePress={() => handleSharePress(post.id)}
                                     onSavePress={() => handleSavePress(post.id)}
+                                    onViewLikersPress={() => handlerViewLikersPress(post.id)}
                                 />
 
                                 {idx < visiblePosts.length - 1 && <Divider orientation='horizontal' style={{ marginBottom: 25, borderRadius: 0 }} thickness={10} color='black' />}

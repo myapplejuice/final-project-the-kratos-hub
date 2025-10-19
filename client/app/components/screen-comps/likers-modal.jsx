@@ -1,5 +1,4 @@
-import React from 'react';
-import { View, Modal, FlatList, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, FlatList, TouchableOpacity, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import AppText from './app-text';
 import { colors } from '../../common/settings/styling';
 import FadeInOut from '../effects/fade-in-out';
@@ -7,6 +6,7 @@ import { scaleFont } from '../../common/utils/scale-fonts';
 import AppImage from './app-image';
 import { router } from 'expo-router';
 import { routes } from '../../common/settings/constants';
+import Divider from './divider';
 
 const { width, height } = Dimensions.get('window');
 
@@ -20,7 +20,7 @@ export default function LikersModal({ visible, likers = [], onClose }) {
         });
     }
 
-    return ( 
+    return (
         <FadeInOut visible={visible} style={styles.overlay}>
             <View style={styles.card}>
                 <View style={styles.header}>
@@ -30,31 +30,33 @@ export default function LikersModal({ visible, likers = [], onClose }) {
                     </TouchableOpacity>
                 </View>
 
-                <FlatList
-                    data={likers}
-                    keyExtractor={(item) => item.id.toString()}
+                <Divider orientation='horizontal' style={{ marginVertical: 15 }} />
+                <ScrollView
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ paddingVertical: 10 }}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity onPress={() => handleToUserPress(item.id)} style={styles.likerRow}>
-                            <AppImage
-                                source={{ uri: item.imageURL }}
-                                style={styles.avatar}
-                            />
-                            <View style={{ flex: 1 }}>
-                                <AppText style={styles.name}>
-                                    {item.firstname} {item.lastname}
-                                </AppText>
-                                <AppText style={styles.subtext}>
-                                    {item.gender === 'male' ? 'M' : 'F'}, {item.age}
-                                </AppText>
-                            </View>
-                        </TouchableOpacity>
-                    )}
-                    ListEmptyComponent={
+                >
+                    {likers.length === 0 ? (
                         <AppText style={styles.emptyText}>No likes</AppText>
-                    }
-                />
+                    ) : (
+                        likers.map((item) => (
+                            <TouchableOpacity
+                                key={item.id}
+                                onPress={() => handleToUserPress(item.id)}
+                                style={styles.likerRow}
+                            >
+                                <AppImage source={{ uri: item.imageURL }} style={styles.avatar} />
+                                <View style={{ flex: 1 }}>
+                                    <AppText style={styles.name}>
+                                        {item.firstname} {item.lastname}
+                                    </AppText>
+                                    <AppText style={styles.subtext}>
+                                        {item.gender === 'male' ? 'M' : 'F'}, {item.age}
+                                    </AppText>
+                                </View>
+                            </TouchableOpacity>
+                        ))
+                    )}
+                </ScrollView>
             </View>
         </FadeInOut>
     );
@@ -63,7 +65,7 @@ export default function LikersModal({ visible, likers = [], onClose }) {
 const styles = StyleSheet.create({
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 9999,
@@ -79,12 +81,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 10,
     },
     headerText: {
         fontSize: scaleFont(16),
         fontWeight: '600',
-        color: colors.textPrimary || 'white',
+        color: 'white',
     },
     closeText: {
         fontSize: scaleFont(16),
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 15,
-
+        marginBottom: 15
     },
     avatar: {
         width: 45,
