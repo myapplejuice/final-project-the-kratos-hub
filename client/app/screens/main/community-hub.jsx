@@ -121,7 +121,7 @@ export default function Community() {
                         likeCount: 140, //array instead of num
                         shareCount: 2,
                         dateOfCreation: new Date(),
-                        type: 'Trainer Ad',
+                        topic: 'Trainer Ad',
                     }} 
                     isLikedByUser={true}
                     isSavedByUser={true}/>

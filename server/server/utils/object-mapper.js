@@ -123,7 +123,7 @@ export default class ObjectMapper {
             LikeCount: 'likeCount',
             ShareCount: 'shareCount',
             PostId: 'postId',
-
+            Topic: 'topic'
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -251,6 +251,7 @@ export default class ObjectMapper {
             likeCount: 'LikeCount',
             shareCount: 'ShareCount',
             postId: 'PostId',
+            topic: 'Topic',
         };
         return map[key] || key;
     }
