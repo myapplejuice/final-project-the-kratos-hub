@@ -144,6 +144,7 @@ export default class APIService {
         like: (payload) => APIService.request(`/community/like/${APIService.USER_ID}`, 'POST', payload),
         save: (payload) => APIService.request(`/community/save/${APIService.USER_ID}`, 'POST', payload),
         share: (payload) => APIService.request(`/community/share/${APIService.USER_ID}`, 'POST', payload),
+        likers: (payload) => APIService.request(`/community/likers/${APIService.USER_ID}`, 'POST', payload),
     }
 
     static verification = {

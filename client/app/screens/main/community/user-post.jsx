@@ -30,6 +30,7 @@ import FloatingActionButton from '../../../components/screen-comps/floating-acti
 import Gallery from '../../../components/screen-comps/gallery';
 import { useBackHandlerContext } from '../../../common/contexts/back-handler-context';
 import FadeInOut from '../../../components/effects/fade-in-out';
+import AppView from '../../../components/screen-comps/app-view';
 
 export default function UserPost() {
     const { setLibraryActive } = useContext(LibraryContext);
@@ -43,7 +44,6 @@ export default function UserPost() {
 
     const [selectedImage, setSelectedImage] = useState('');
     const [imagePreviewVisible, setImagePreviewVisible] = useState(false);
-    const [fabVisible, setFabVisible] = useState(true);
 
     const [isChange, setIsChange] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -114,42 +114,42 @@ export default function UserPost() {
         })
     }
 
-    async function handleUpdatePost(){
-       createDialog({
-           title: "Update Post",
-           text: "Are you sure you want to update this post?",
-           confirmText: "Update",
-           onConfirm: async () => {
-               try {
-                   showSpinner();
+    async function handleUpdatePost() {
+        createDialog({
+            title: "Update Post",
+            text: "Are you sure you want to update this post?",
+            confirmText: "Update",
+            onConfirm: async () => {
+                try {
+                    showSpinner();
 
-                   const result = await APIService.community.update({ postId: post.id, topic, caption, imagesURLS });
-                   if (result.success) {
-                       createAlert({ title: "Success", text: "Post updated", onPress: () => router.back() });
-                   } else {
-                       createToast({ message: result.message });
-                   }
-               } catch (err) {
-                   console.error("Failed to update post:", err);
-                   createToast({ message: "Server error " + err });
-               }
-               finally {
-                   hideSpinner();
-               }
-           }
-       })
+                    const result = await APIService.community.update({ postId: post.id, topic, caption, imagesURLS });
+                    if (result.success) {
+                        createAlert({ title: "Success", text: "Post updated", onPress: () => router.back() });
+                    } else {
+                        createToast({ message: result.message });
+                    }
+                } catch (err) {
+                    console.error("Failed to update post:", err);
+                    createToast({ message: "Server error " + err });
+                }
+                finally {
+                    hideSpinner();
+                }
+            }
+        })
     }
 
     return (
         <>
             <ImageCapture onConfirm={async (image) => setImagesURLS(prev => [...prev, image.uri])} />
             <FadeInOut visible={imagePreviewVisible} style={{ position: 'absolute', zIndex: 9999, top: 0, left: 0, bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.8)' }}>
-                <TouchableOpacity onPress={() => { setImagePreviewVisible(false), setSelectedImage(''), setFabVisible(true) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <TouchableOpacity onPress={() => { setImagePreviewVisible(false), setSelectedImage('') }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(30), marginBottom: 15 }}>Tap anywhere to dismiss</AppText>
                     <Image source={{ uri: selectedImage }} style={{ width: 500, height: 500, alignSelf: 'center' }} resizeMode='contain' />
                     <AnimatedButton
                         title={'Delete Photo'}
-                        onPress={() => { setImagePreviewVisible(false), setSelectedImage(''), setImagesURLS(imagesURLS.filter(i => i !== selectedImage)), setFabVisible(true) }}
+                        onPress={() => { setImagePreviewVisible(false), setSelectedImage(''), setImagesURLS(imagesURLS.filter(i => i !== selectedImage)) }}
                         style={{ backgroundColor: colors.negativeRed, padding: 15, borderRadius: 30, width: '90%', marginTop: 15 }}
                         textStyle={{ fontSize: scaleFont(15) }}
                         leftImage={Images.trash}
@@ -162,12 +162,12 @@ export default function UserPost() {
                 style={{ backgroundColor: colors.accentGreen, width: '100%', height: 50, }}
                 label='Confirm Changes'
                 onPress={handleUpdatePost}
-                visible={fabVisible && isEditing && isChange}
+                visible={isEditing && isChange}
                 position={{ bottom: insets.bottom + 20, right: 20, left: 20 }}
                 icon={Images.plus}
             />
 
-            <AppScroll hideNavBarOnScroll={true} extraBottom={100} extraTop={60} onScrollSetStates={setFabVisible}>
+            <AppView extraTop={60}>
                 {!isEditing ?
                     (
                         <CommunityPost
@@ -295,7 +295,7 @@ export default function UserPost() {
                             </View>
                         </>
                     )}
-            </AppScroll>
+            </AppView>
         </>
     );
 }

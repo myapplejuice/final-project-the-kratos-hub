@@ -10,18 +10,23 @@ import { UserContext } from '../../common/contexts/user-context';
 import { routes } from '../../common/settings/constants';
 import ProgressDots from './progress-dots';
 import AppImageBackground from './app-image-background';
+import LikersModal from './likers-modal';
+import usePopups from '../../common/hooks/use-popups';
+import APIService from '../../common/services/api-service';
 
 export default function CommunityPost({
     post, isLikedByUser = false, isSavedByUser = false, isUserPost = false,
     onDeletePress = () => { }, onEditPress = () => { }, onLikePress = () => { },
     onSharePress = () => { }, onImagePress = () => { }, onSavePress = () => { }
 }) {
-
+    const { hideSpinner, showSpinner, createToast } = usePopups();
     const { width, height } = Dimensions.get('window');
     const { user } = useContext(UserContext);
     const router = useRouter();
     const { postUser, imagesURLS, caption, likeCount, shareCount, topic, dateOfCreation } = post;
     const [currentImage, setCurrentImage] = useState(0);
+    const [likers, setLikers] = useState([]);
+    const [likersVisible, setLikersVisible] = useState(false);
 
     const dateTimeComparisons = getDayComparisonsSafe(dateOfCreation);
     const isToday = dateTimeComparisons.isToday;
@@ -45,13 +50,28 @@ export default function CommunityPost({
         });
     }
 
+    async function handleFetchLikers() {
+        try {
+            showSpinner();
+            const result = await APIService.community.likers({ postId: post.id });
+
+            if (result.success) {
+                const likers = result.data.likers;
+                setLikers(likers);
+                setLikersVisible(true);
+            }else {
+                createToast({ message: result.message });
+            }
+        } catch (err) {
+            console.error("Failed to fetch likers:", err);
+        } finally {
+            hideSpinner();
+        }
+    }
+
     return (
         <>
-            <View style={{ ...StyleSheet.absoluteFillObject, top: 0, bottom: 0, left: 0, right: 0, width: width, height: height, position: 'absolute', zIndex: 9999, justifyContent: 'center', alignItems: 'center' }}>
-                <View style={{ width: '80%', height: 400, backgroundColor: 'rgba(0, 0, 0, 0.61)' }}>
-
-                </View>
-            </View>
+            <LikersModal visible={likersVisible} likers={likers} onClose={() => setLikersVisible(false)} />
 
             <View style={{
                 marginBottom: 25,
@@ -346,13 +366,13 @@ export default function CommunityPost({
                         )}
 
                         <View style={{ alignItems: 'flex-start', flexDirection: isUserPost ? 'row' : 'column' }}>
-                            <AppText style={{
-                                color: colors.mutedText,
-                                fontSize: scaleFont(11),
-                                fontWeight: '500'
-                            }}>
-                                {likeCount} Likes
-                            </AppText>
+                            <TouchableOpacity onPress={handleFetchLikers}>
+                                <AppText style={{
+                                    color: colors.mutedText,
+                                    fontSize: scaleFont(11),
+                                    fontWeight: '500'
+                                }}>{likeCount} Likes</AppText>
+                            </TouchableOpacity>
                             {
                                 isUserPost && (
                                     <AppText style={{

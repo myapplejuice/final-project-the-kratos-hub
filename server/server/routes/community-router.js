@@ -17,6 +17,7 @@ export default class CommunityRouter {
         this.communityRouter.post('/like/:id', tokenAuthorization, userAuthorization, asyncHandler(CommunityController.likePost));
         this.communityRouter.post('/save/:id', tokenAuthorization, userAuthorization, asyncHandler(CommunityController.savePost));
         this.communityRouter.post('/share/:id', tokenAuthorization, userAuthorization, asyncHandler(CommunityController.sharePost));
+        this.communityRouter.post('/likers/:id', tokenAuthorization, userAuthorization, asyncHandler(CommunityController.fetchPostLikers));
 
         this.communityRouter.put('/update/:id', tokenAuthorization, userAuthorization, asyncHandler(CommunityController.updatePost));
         this.communityRouter.delete('/delete/:id', tokenAuthorization, userAuthorization, asyncHandler(CommunityController.deletePost));
