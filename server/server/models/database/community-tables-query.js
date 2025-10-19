@@ -9,7 +9,7 @@ export function communityTablesQuery() {
                 ImagesURLS NVARCHAR(MAX) NULL DEFAULT '[]',
                 Caption NVARCHAR(MAX) NULL DEFAULT '',
                 DateOfCreation DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
-                Type VARCHAR(20) NOT NULL,
+                Topic VARCHAR(20) NOT NULL,
 
                 LikeCount INT NOT NULL DEFAULT 0,
                 ShareCount INT NOT NULL DEFAULT 0,
