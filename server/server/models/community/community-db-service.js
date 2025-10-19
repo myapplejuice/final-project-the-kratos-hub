@@ -100,7 +100,7 @@ export default class CommunityDBService {
             Database.addInput(request, 'ImagesURLS', sql.NVarChar(sql.MAX), JSON.stringify(details.imagesURLS || []));
             Database.addInput(request, 'Caption', sql.NVarChar(sql.MAX), details.caption || '');
             Database.addInput(request, 'DateOfCreation', sql.DateTime2, new Date());
-            Database.addInput(request, 'Type', sql.VarChar(20), details.type || 'general');
+            Database.addInput(request, 'Type', sql.VarChar(20), details.type);
 
             const insertQuery = `
                 INSERT INTO Posts (UserId, ImagesURLS, Caption, DateOfCreation, Type)

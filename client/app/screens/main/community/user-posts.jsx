@@ -111,6 +111,12 @@ export default function UserPosts() {
         );
     }
 
+    let visibleList;
+    if(selectedPosts === 'Any')
+        visibleList = posts;
+    else
+        visibleList = posts.filter(post => post.type === selectedPosts);
+
     return (
         <>
             <FloatingActionButton
@@ -128,7 +134,7 @@ export default function UserPosts() {
                     <>
                         <View style={{ height: 60 }}>
                             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
-                                {["Any", "Tips", "Trainer Ad", "Need Trainer", "Moments", "Inquiry"].map((opt, idx) => {
+                                {["Any",  "Trainer Ad", "Trainer Lookup", "Inquiry", "Tips", "Moments"].map((opt, idx) => {
                                     return (
                                         <TouchableOpacity
                                             key={idx}
@@ -152,13 +158,13 @@ export default function UserPosts() {
                         <Divider orientation='horizontal' style={{ marginBottom: 15 }} />
 
                         <Gallery
-                            sources={posts.map(post =>
+                            sources={visibleList.map(post =>
                                 post.imagesURLS?.length > 0
                                     ? { uri: post.imagesURLS[0] }
                                     : Images.missingImage
                             )}
 
-                            sourcesOnPress={posts.map((post) => () => {
+                            sourcesOnPress={visibleList.map((post) => () => {
                                 router.push({
                                     pathname: routes.USER_POST,
                                     params: {

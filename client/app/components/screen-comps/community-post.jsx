@@ -133,7 +133,7 @@ export default function CommunityPost({ post, isLikedByUser = false, isSavedByUs
                                         fontWeight: '500',
                                         fontSize: scaleFont(11),
                                     }}>
-                                    {timeDisplay}  •  {type}
+                                    {timeDisplay}  {type ? `•  ${type}` : ''}
                                 </AppText>
                             </View>
                         </View>

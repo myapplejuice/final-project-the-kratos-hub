@@ -51,6 +51,9 @@ export default function PostCreator() {
     }
 
     async function handleSubmittion() {
+        if (images.length === 0 && !caption)
+            return createToast({ message: 'The post must include atleast a caption or atleast one image' });
+        
         try {
             showSpinner();
 
@@ -79,7 +82,7 @@ export default function PostCreator() {
 
             const payload = {
                 userId: user.id,
-                type: selectedTopic.toLowerCase(),
+                type: selectedTopic === 'None' ? '' : selectedTopic || '',
                 caption,
                 imagesURLS: uploadedImages.map(i => i.url)
             }
@@ -132,7 +135,7 @@ export default function PostCreator() {
                     </AppText>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
 
-                        {["General", "Trainer Lookup", "Trainer Ad",].map((opt, idx) => {
+                        {["None", "Trainer Lookup", "Trainer Ad",].map((opt, idx) => {
                             return (
                                 <TouchableOpacity
                                     key={idx}

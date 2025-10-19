@@ -76,7 +76,7 @@ export default function Community() {
             <AppScroll onScrollSetStates={setFabVisible} hideNavBarOnScroll={true} extraBottom={100}>
                 <View style={{ height: 60 }}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
-                        {["Any", "Tips", "Trainer Ad", "Need Trainer", "Moments", "Inquiry"].map((opt, idx) => {
+                        {["Any",  "Trainer Ad", "Trainer Lookup", "Inquiry", "Tips", "Moments"].map((opt, idx) => {
                             return (
                                 <TouchableOpacity
                                     key={idx}

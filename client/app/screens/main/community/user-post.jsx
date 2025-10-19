@@ -30,10 +30,10 @@ import FloatingActionButton from '../../../components/screen-comps/floating-acti
 import Gallery from '../../../components/screen-comps/gallery';
 
 export default function UserPost() {
-    const { user, setAdditionalContexts } = useContext(UserContext);
-    const insets = useSafeAreaInsets();
     const params = useLocalSearchParams();
     let post = JSON.parse(params.post);
+
+    
 
     return (
         <>
