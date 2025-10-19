@@ -3,6 +3,15 @@ import SocketController from "../socket/socket-controller.js";
 import NotificationsDBService from "../notifications/notifications-db-service.js";
 
 export default class CommunityController {
+    static async getPost(req, res) {
+        const { postId } = req.body;
+        const id = req.params.id;
+
+        const post = await PostsDBService.fetchPostById(id, postId);
+        console.log(post)
+        return res.status(200).json({ success: true, post });
+    }
+
     static async getPosts(req, res) {
         const { forUser, userId, page, topic, limit } = req.body;
 

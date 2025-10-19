@@ -3,6 +3,82 @@ import Database from '../database/database.js';
 import ObjectMapper from '../../utils/object-mapper.js';
 
 export default class CommunityDBService {
+    static async fetchPostById(userId, postId) {
+        try {
+            const request = Database.getRequest();
+
+            Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
+            Database.addInput(request, 'PostId', sql.Int, postId);
+
+            const query = `
+            SELECT p.*,
+                   u.Id AS UserId, u.Firstname, u.Lastname, u.ImageURL,
+                   t.IsVerified, t.TrainerStatus,
+                   CASE WHEN l.Id IS NOT NULL THEN 1 ELSE 0 END AS IsLikedByUser,
+                   CASE WHEN s.Id IS NOT NULL THEN 1 ELSE 0 END AS IsSavedByUser
+            FROM Posts p
+            INNER JOIN Users u ON u.Id = p.UserId
+            LEFT JOIN UserTrainerProfile t ON t.UserId = u.Id
+            LEFT JOIN Likes l ON l.PostId = p.Id AND l.UserId = @UserId
+            LEFT JOIN SavedPosts s ON s.PostId = p.Id AND s.UserId = @UserId
+            WHERE p.Id = @PostId;
+        `;
+
+            const result = await request.query(query);
+
+            if (!result.recordset.length) return null;
+
+            const row = result.recordset[0];
+            const mappedRow = {};
+            for (const key in row) {
+                let value = row[key];
+
+                if (key.toLowerCase() === 'imagesurls') {
+                    try {
+                        value = value ? JSON.parse(value) : [];
+                    } catch {
+                        value = [];
+                    }
+                }
+
+                mappedRow[ObjectMapper.toCamelCase(key)] = value;
+            }
+
+            const post = {
+                id: mappedRow.id,
+                postUser: {
+                    id: Array.isArray(mappedRow.userId) ? mappedRow.userId[0] : mappedRow.userId,
+                    firstname: mappedRow.firstname,
+                    lastname: mappedRow.lastname,
+                    imageURL: mappedRow.imageURL,
+                    trainerProfile: {
+                        trainerStatus: mappedRow.trainerStatus || 'inactive',
+                        isVerified: !!mappedRow.isVerified,
+                    },
+                },
+                imagesURLS: mappedRow.imagesURLS || [],
+                caption: mappedRow.caption || '',
+                likeCount: Array.isArray(mappedRow.likeCount)
+                    ? mappedRow.likeCount.reduce((a, b) => a + b, 0)
+                    : mappedRow.likeCount || 0,
+                shareCount: Array.isArray(mappedRow.shareCount)
+                    ? mappedRow.shareCount.reduce((a, b) => a + b, 0)
+                    : mappedRow.shareCount || 0,
+                dateOfCreation: mappedRow.dateOfCreation,
+                topic: mappedRow.topic || '',
+                isLikedByUser: !!mappedRow.isLikedByUser,
+                isSavedByUser: !!mappedRow.isSavedByUser,
+            };
+
+            return post;
+
+        } catch (err) {
+            console.error('fetchPostById error:', err);
+            return null;
+        }
+    }
+
+
     static async fetchPosts(forUser = false, userId, page = 1, pageSize = 10, topic = null) {
         try {
             const request = Database.getRequest();

@@ -23,6 +23,7 @@ import AnimatedButton from '../../components/screen-comps/animated-button';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Invert from '../../components/effects/invert';
 import ExpandInOut from '../../components/effects/expand-in-out';
+import AppImage from '../../components/screen-comps/app-image';
 
 export default function Notifications() {
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert } = usePopups();
@@ -149,12 +150,23 @@ export default function Notifications() {
         });
     }
 
-    function handleNotificationPress(notification) {
+    async function handleNotificationPress(notification) {
         if (notification.clickableDestination === 'profile') {
             router.push({
                 pathname: routes.USER_PROFILE,
                 params: {
                     userId: notification.clickableInfo.userId
+                }
+            })
+        }else if (notification.clickableDestination === 'user-post') {
+            const result = await APIService.community.post({postId: notification.clickableInfo.postId});
+            const post = result.data.post;
+
+            console.log(post)
+            router.push({
+                pathname: routes.USER_POST,
+                params: {
+                    post: JSON.stringify(post)
                 }
             })
         }
@@ -357,15 +369,23 @@ export default function Notifications() {
 
                                         return (
                                             <View key={notification.id}>
-                                                <TouchableOpacity style={{ marginBottom: 25 }} onPress={() => notification.clickable && handleNotificationPress(notification)}>
-                                                    <View style={{ borderStartColor: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white', borderStartWidth: 2, paddingHorizontal: 15 }}>
-                                                        <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: notification.seen ? colors.mutedText : 'white' }}>
+                                                <TouchableOpacity style={{ marginBottom: 25, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} onPress={() => notification.clickable && handleNotificationPress(notification)}>
+                                                    <View style={{
+                                                        borderStartColor: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white',
+                                                        borderStartWidth: 2, paddingStart: 15, width:  notification.clickableDestination === 'user-post' ? '80%' : '100%'
+                                                    }}>
+                                                        <AppText style={{ fontSize: scaleFont(13), fontWeight: '600', color: notification.seen ? colors.mutedText : 'white' }}>
                                                             {notification.notification}
                                                         </AppText>
-                                                        <AppText style={{ fontSize: scaleFont(12), fontWeight: '600', color: colors.mutedText, marginTop: 5, alignSelf: 'flex-end' }}>
+                                                        <AppText style={{ fontSize: scaleFont(11), fontWeight: '600', color: colors.mutedText, marginTop: 5, alignSelf: 'flex-start' }}>
                                                             {displayTime}
                                                         </AppText>
                                                     </View>
+                                                    {notification.clickableDestination === 'user-post' && notification.clickableInfo.postImageURL &&
+                                                        <View style={{ width: '20%', justifyContent: 'center', alignItems: 'center' }}>
+                                                            <AppImage source={{uri: notification.clickableInfo.postImageURL}} style={{ width: 60, height: 60, borderRadius: 10 }} resizeMode='contain' />
+                                                        </View>
+                                                    }
                                                 </TouchableOpacity>
                                                 {isLastUnseen && seenNotificationsExist && <Divider orientation='horizontal' style={{ marginVertical: 15 }} />}
                                             </View>
