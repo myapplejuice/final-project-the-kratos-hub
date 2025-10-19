@@ -56,21 +56,24 @@ export default class CommunityController {
         const result = await PostsDBService.likePost(userId, postId);
         if (!result.success) return res.status(400).json({ message: result.message });
 
-        const payload = {
-            userId: posterId,
-            notification: `${userFirstname} ${userLastname} liked one of your posts`,
-            seen: false,
-            clickable: true,
-            clickableInfo: JSON.stringify({ postId, postImageURL }),
-            clickableDestination: 'user-post',
-            sentiment: "positive",
-            dateOfCreation: new Date()
+        if (result.liked) {
+            const payload = {
+                userId: posterId,
+                notification: `${userFirstname} ${userLastname} liked one of your posts`,
+                seen: false,
+                clickable: true,
+                clickableInfo: JSON.stringify({ postId, postImageURL }),
+                clickableDestination: 'user-post',
+                sentiment: "positive",
+                dateOfCreation: new Date()
+            }
+
+
+            const id = await NotificationsDBService.pushNotification(payload);
+            payload.id = id;
+            payload.clickableInfo = JSON.parse(payload.clickableInfo);
+            SocketController.emitNotification(posterId, payload);
         }
-        
-        const id = await NotificationsDBService.pushNotification(payload);
-        payload.id = id;
-        payload.clickableInfo = JSON.parse(payload.clickableInfo);
-        SocketController.emitNotification(posterId, payload);
 
         return res.status(200).json(result);
     }
