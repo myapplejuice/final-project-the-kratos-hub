@@ -172,6 +172,9 @@ function Layout() {
                                             <Stack.Screen name="screens/main/nutrition/food-profile" />
                                             <Stack.Screen name="screens/main/nutrition/foods" />
 
+                                            {/* TRAINING CIHLDREN */}
+                                            <Stack.Screen name="screens/main/training/exercises" />
+
                                         </Stack>
                                     </View>
                                     {bars && <NavigationBar visible={navBarVisibility} />}

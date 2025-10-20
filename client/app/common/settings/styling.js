@@ -90,3 +90,27 @@ export const nutritionColors = {
   goal2: "#E6FF33",
   goal3: "#F0FF66",
 };
+
+export const muscleGroupColors = {
+  'Chest': '#FF6B6B',
+  'Upper Chest': '#FF5252',
+  'Back': '#4ECDC4',
+  'Lats': '#45B7AF',
+  'Quads': '#77DD77',
+  'Hamstrings': '#6BC46B',
+  'Glutes': '#83C783',
+  'Calves': '#8FD18F',
+  'Shoulders': '#A78BFA',
+  'Front Delts': '#9D7AF2',
+  'Lateral Delts': '#B399FF',
+  'Rear Delts': '#8E6CEF',
+  'Biceps': '#FFB74D',
+  'Triceps': '#FFA726',
+  'Forearms': '#FF9800',
+  'Abs': '#FFD93D',
+  'Core': '#FFD54F',
+  'Obliques': '#FFCA28',
+  'Full Body': 'linear-gradient(135deg, #FF6B6B, #4ECDC4, #77DD77)',
+  'Cardio': '#26C6DA',
+  'default': '#94A3B8'
+};

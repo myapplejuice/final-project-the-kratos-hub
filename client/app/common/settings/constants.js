@@ -66,6 +66,10 @@ export const routes = {
     FOOD_PROFILE: '/screens/main/nutrition/food-profile',
     FOODS: '/screens/main/nutrition/foods',
 
+
+    /* TRAINING CHILDREN */
+    EXERCISES: '/screens/main/training/exercises',
+
 }
 
 export const mainScreens = [
