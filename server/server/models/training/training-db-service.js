@@ -82,15 +82,44 @@ export default class TrainingDBService {
             Database.addInput(request, 'Description', sql.VarChar(1000), details.description);
             Database.addInput(request, 'BodyPart', sql.VarChar(100), details.bodyPart);
             Database.addInput(request, 'Image', sql.NVarChar(sql.MAX), details.image);
-            Database.addInput(request, 'Sets', sql.NVarChar(sql.MAX), JSON.stringify(details.sets));
 
             const query = `
                 UPDATE dbo.Exercises
                 SET Label = @Label,
                     Description = @Description,
                     BodyPart = @BodyPart,
-                    Image = @Image,
-                    Sets = @Sets
+                    Image = @Image
+                OUTPUT INSERTED.*
+                WHERE Id = @Id
+            `;
+
+            const result = await request.query(query);
+            if (!result.recordset[0]) return null;
+
+            const exercise = {};
+            for (const key in result.recordset[0]) {
+                if (key === 'Sets')
+                    exercise[ObjectMapper.toCamelCase(key)] = JSON.parse(result.recordset[0][key]);
+                else
+                    exercise[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
+            }
+
+            return exercise;
+        } catch (err) {
+            console.error('updateExercise error:', err);
+            return null;
+        }
+    }
+
+    static async updateExerciseSets(details) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'Id', sql.Int, details.exerciseId);
+            Database.addInput(request, 'Sets', sql.NVarChar(sql.MAX), JSON.stringify(details.sets));
+
+            const query = `
+                UPDATE dbo.Exercises
+                SET Sets = @Sets
                 OUTPUT INSERTED.*
                 WHERE Id = @Id
             `;

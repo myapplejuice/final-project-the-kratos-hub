@@ -29,9 +29,8 @@ export default function TrainingHub() {
     const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
+    const [expandedExercises, setExpandedExercises] = useState([]);
     const [fabVisible, setFabVisible] = useState(true);
-    const [totalEnergy, setTotalEnergy] = useState(0);
-    const [totalExercises, setTotalExercises] = useState(0);
     const [date, setDate] = useState(new Date());
     const [exercises, setExercises] = useState([]);
     const [dateExercises, setDateExercises] = useState([]);
@@ -42,8 +41,10 @@ export default function TrainingHub() {
 
             if (result.success) {
                 const exercises = result.data.exercises;
-                setExercises(result.data.exercises);
-                setDateExercises(exercises.filter(exercise => formatDate(exercise.date, { format: 'YYYY-MM-DD' }) === formatDate(date, { format: 'YYYY-MM-DD' })));
+                setExercises(exercises);
+
+                const filtered = exercises.filter(exercise => formatDate(exercise.date, { format: 'YYYY-MM-DD' }) === formatDate(date, { format: 'YYYY-MM-DD' })).sort((a, b) => a.id - b.id);
+                setDateExercises(filtered);
             }
         }
 
@@ -51,7 +52,9 @@ export default function TrainingHub() {
     }, []);
 
     useEffect(() => {
-        setDateExercises(exercises.filter(exercise => formatDate(exercise.date, { format: 'YYYY-MM-DD' }) === formatDate(date, { format: 'YYYY-MM-DD' })));
+        const filtered = exercises.filter(exercise => formatDate(exercise.date, { format: 'YYYY-MM-DD' }) === formatDate(date, { format: 'YYYY-MM-DD' })).sort((a, b) => a.id - b.id);
+        setDateExercises(filtered);
+        setExpandedExercises([filtered[0]?.id || null]);
     }, [date]);
 
     async function handleDate(val) {
@@ -75,6 +78,7 @@ export default function TrainingHub() {
             initialValues: [``, ``, ``],
             onSubmit: async (vals) => {
                 try {
+                    showSpinner();
                     const [label, description, bodyPart] = vals;
 
                     if (!label)
@@ -84,8 +88,8 @@ export default function TrainingHub() {
                         userId: user.id,
                         date: new Date(),
                         label,
-                        description: description || "No description",
-                        bodyPart: bodyPart || "Unknown Body Part",
+                        description: description || "",
+                        bodyPart: bodyPart || "",
                         image: "",
                         sets: [],
                     }
@@ -107,21 +111,181 @@ export default function TrainingHub() {
         });
     }
 
-    async function handleEditExercise() {
+    async function handleEditExercise(exercise) {
+        createInput({
+            title: "Edit Exercise",
+            confirmText: "Confirm Edit",
+            text: `Enter the details you want to change`,
+            placeholders: [`Label`, `Description`, `Body Part`],
+            initialValues: [exercise.label || '', exercise.description || '', exercise.bodyPart || ''],
+            onSubmit: async (vals) => {
+                try {
+                    showSpinner();
+                    const [label, description, bodyPart] = vals;
 
+                    if (!label)
+                        return createToast({ message: "Label is required" });
+
+                    const payload = {
+                        id: exercise.id,
+                        userId: user.id,
+                        date: exercise.date,
+                        label,
+                        description: description || "",
+                        bodyPart: bodyPart || "",
+                        image: exercise.image,
+                    }
+
+                    const result = await APIService.training.update(payload);
+
+                    if (result.success) {
+                        const exercise = result.data.exercise;
+
+                        setExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
+                        setDateExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
+                    }
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    hideSpinner();
+                }
+            }
+        });
     }
 
-    async function handleDeleteExercise() {
+    async function handleDeleteExercise(exerciseId) {
+        createDialog({
+            title: "Delete Exercise",
+            confirmText: "Delete",
+            text: `Are you sure you want to delete this exercise?\n\nThis action cannot be undone`,
+            confirmButtonStyle: { backgroundColor: colors.negativeRed, borderColor: colors.negativeRed },
+            onConfirm: async () => {
+                try {
+                    showSpinner();
 
+                    const result = await APIService.training.delete({ exerciseId });
+                    if (result.success) {
+                        setExercises(prev => prev.filter(e => e.id !== exerciseId));
+                        setDateExercises(prev => prev.filter(e => e.id !== exerciseId));
+                    }
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    hideSpinner();
+                }
+            }
+        });
     }
 
-    async function handleAddSet() {
+    async function handleAddSet(exercise) {
+        createInput({
+            title: "New Set",
+            confirmText: "Add",
+            text: `Enter repetitions, weight in ${user.preferences.weightUnit.label} and energy burned in ${user.preferences.energyUnit.label}`,
+            placeholders: [`Repetitions`, `Weight (${user.preferences.weightUnit.field})`, `Energy burned (${user.preferences.energyUnit.field})`],
+            initialValues: [``, ``, ``],
+            extraConfigs: [{ keyboardType: "numeric" }, { keyboardType: "numeric" }, { keyboardType: "numeric" }],
+            onSubmit: async (vals) => {
+                try {
+                    showSpinner();
+                    const [reps, weight, energy] = vals;
 
+                    if (!reps || !weight|| !energy)
+                        return createToast({ message: "Both fields must be filled" });
+
+                    const id = Math.floor(100000 + Math.random() * 900000);
+                    const payload = {
+                        exerciseId: exercise.id,
+                        sets: [...exercise.sets, { id, reps: Number(reps), weight: Number(weight), energy: Number(energy) }]
+                    }
+
+                    const result = await APIService.training.updateSets(payload);
+
+                    if (result.success) {
+                        const exercise = result.data.exercise;
+
+                        setExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
+                        setDateExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
+                    }
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    hideSpinner();
+                }
+            }
+        });
     }
 
-    async function handleEditSet(){
-        
+    async function handleEditSet(exercise, set) {
+        createInput({
+            title: "Edit Set",
+            confirmText: "Confirm Edit",
+            text: `Enter new repetitions, weight in ${user.preferences.weightUnit.label} and energy burned in ${user.preferences.energyUnit.label}`,
+            placeholders: [`Repetitions`, `Weight (${user.preferences.weightUnit.field})`, `Energy burned (${user.preferences.energyUnit.field})`],
+            initialValues: [set.reps, set.weight, set.energy],
+            extraConfigs: [{ keyboardType: "numeric" }, { keyboardType: "numeric" }, { keyboardType: "numeric" }],
+            onSubmit: async (vals) => {
+                try {
+                    showSpinner();
+                    const [reps, weight, energy] = vals;
+
+                    if (!reps || !weight || !energy)
+                        return createToast({ message: "Both fields must be filled" });
+
+                    const payload = {
+                        exerciseId: exercise.id,
+                        sets: exercise.sets.map(s => s.id === set.id ? { ...s, reps: Number(reps), weight: Number(weight), energy: Number(energy) } : s)
+                    }
+
+                    const result = await APIService.training.updateSets(payload);
+
+                    if (result.success) {
+                        const exercise = result.data.exercise;
+
+                        setExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
+                        setDateExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
+                    }
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    hideSpinner();
+                }
+            }
+        });
     }
+
+    async function handleDeleteSet(exercise, set) {
+        createDialog({
+            title: "Drop Set",
+            confirmText: "Drop",
+            text: `Remove this set?`,
+            confirmButtonStyle: { backgroundColor: colors.negativeRed, borderColor: colors.negativeRed },
+            onConfirm: async () => {
+                try {
+                    showSpinner();
+
+                    const payload = {
+                        exerciseId: exercise.id,
+                        sets: exercise.sets.filter(s => s.id !== set.id)
+                    }
+
+                    const result = await APIService.training.updateSets(payload);
+                    if (result.success) {
+                        const exercise = result.data.exercise;
+
+                        setExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
+                        setDateExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
+                    }
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    hideSpinner();
+                }
+            }
+        });
+    }
+
+    const exerciseCount = dateExercises.length;
 
     return (
         <>
@@ -160,34 +324,52 @@ export default function TrainingHub() {
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25 }}>
                         <View style={{ alignItems: 'center', justifyContent: 'center', width: '45%' }}>
-                            <AppText style={{ color: nutritionColors.carbs1, fontWeight: 'bold', fontSize: scaleFont(20), textAlign: 'center' }}>{totalExercises}</AppText>
+                            <AppText style={{ color: nutritionColors.carbs1, fontWeight: 'bold', fontSize: scaleFont(20), textAlign: 'center' }}>{exerciseCount}</AppText>
                             <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(15), textAlign: 'center' }}>Exercises</AppText>
                         </View>
                         <View style={{ width: '10%', alignItems: 'center', justifyContent: 'center', height: 50 }}>
                             <Divider />
                         </View>
                         <View style={{ alignItems: 'center', justifyContent: 'center', width: '45%' }}>
-                            <AppText style={{ color: nutritionColors.energy1, fontWeight: 'bold', fontSize: scaleFont(20), textAlign: 'center' }}>{convertEnergy(totalEnergy, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}</AppText>
+                            <AppText style={{ color: nutritionColors.energy1, fontWeight: 'bold', fontSize: scaleFont(20), textAlign: 'center' }}>{convertEnergy(exerciseCount, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}</AppText>
                             <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(15), textAlign: 'center' }}>Energy Burned</AppText>
                         </View>
                     </View>
                 </View>
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <AppText style={{ fontSize: scaleFont(15), color: colors.white, fontWeight: 'bold', marginTop: 35, marginHorizontal: 25 }}>
-                        Training Summary
-                    </AppText>
-                </View>
+                {dateExercises.length > 0 ?
+                    (
+                        <>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <AppText style={{ fontSize: scaleFont(15), color: colors.white, fontWeight: 'bold', marginTop: 35, marginHorizontal: 25 }}>
+                                    Training Summary
+                                </AppText>
+                            </View>
 
-                {dateExercises.map((exercise, i) =>
-                    <Exercise
-                        key={i}
-                        user={user}
-                        exercise={exercise}
-                        onAddPress={()=> handleAddSet(exercise)}
-                        onSetPress={(set) => handleEditSet(set)}
-                    />
-                )}
+                            {dateExercises.map((exercise, i) =>
+                                <Exercise
+                                    key={i}
+                                    user={user}
+                                    exercise={exercise}
+                                    onEditPress={() => handleEditExercise(exercise)}
+                                    onDeletePress={() => handleDeleteExercise(exercise.id)}
+                                    onAddPress={() => handleAddSet(exercise)}
+                                    onSetEditPress={(set) => handleEditSet(exercise, set)}
+                                    onSetDeletePress={(set) => handleDeleteSet(exercise, set)}
+                                    onExpand={() => setExpandedExercises(prev => prev.includes(exercise.id) ? prev.filter(e => e !== exercise.id) : [...prev, exercise.id])}
+                                    expanded={expandedExercises.includes(exercise.id)}
+                                />
+                            )}
+                        </>
+                    ) :
+                    (
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                            <Image source={Images.icon6} style={{ width: 100, height: 100, alignSelf: 'center', marginTop: 50, tintColor: colors.mutedText }} />
+                            <AppText style={{ fontSize: scaleFont(16), color: colors.mutedText, fontWeight: 'bold', textAlign: 'center',marginTop: 15 }}>No Exercises</AppText>
+                            <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold', textAlign: 'center' }}>Tap the + button to add an exercise</AppText>
+                        </View>
+                    )
+                }
             </AppScroll>
         </>
     );

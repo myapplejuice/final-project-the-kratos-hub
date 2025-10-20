@@ -10,8 +10,7 @@ import Inverted from '../effects/invert';
 import { convertWeight } from '../../common/utils/unit-converter';
 import UserContext from '../../common/contexts/user-context';
 
-export default function Exercise({ user, exercise, onAddPress = () => { }, onSetPress = () => { } }) {
-    const [expanded, setExpanded] = useState(false);
+export default function Exercise({ user, exercise, onExpand = () => { }, expanded = false, onAddPress = () => { }, onEditPress = () => { }, onDeletePress = () => { }, onSetEditPress = () => { }, onSetDeletePress = () => { } }) {
 
     function formatVolume(num) {
         const convertedValue = convertWeight(num, 'kg', user.preferences.weightUnit.key || 'kg');
@@ -29,27 +28,29 @@ export default function Exercise({ user, exercise, onAddPress = () => { }, onSet
             {/* Title Container */}
             <TouchableOpacity
                 style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
-                onPress={() => setExpanded(prev => !prev)}
+                onPress={onExpand}
             >
                 <View style={{ flex: 1 }}>
-                    <AppText style={{ color: 'white', fontSize: scaleFont(16), fontWeight: 'bold', marginBottom: 4 }}>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(16), fontWeight: 'bold' }}>
                         {exercise.label}
                     </AppText>
-                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(13) }}>
-                        {exercise.description}
-                    </AppText>
+                    {(exercise.bodyPart || exercise.description) && (
+                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11) }}>
+                            {exercise.bodyPart ? `${exercise.bodyPart} - ` : ''}{exercise.description}
+                        </AppText>
+                    )}
                 </View>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 12 }}>
                     <TouchableOpacity
                         style={{ padding: 8, backgroundColor: 'rgba(255, 59, 48, 0.15)', borderRadius: 8, marginLeft: 8 }}
-                        onPress={() => onSetPress('delete')}
+                        onPress={onDeletePress}
                     >
                         <Image source={Images.trash} style={{ width: 18, height: 18, tintColor: colors.negativeRed }} />
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={{ padding: 8, backgroundColor: 'rgba(255, 255, 255, 0.1)', borderRadius: 8, marginLeft: 8 }}
-                        onPress={() => onSetPress('edit')}
+                        onPress={onEditPress}
                     >
                         <Image source={Images.edit} style={{ width: 16, height: 16, tintColor: 'white' }} />
                     </TouchableOpacity>
@@ -76,7 +77,8 @@ export default function Exercise({ user, exercise, onAddPress = () => { }, onSet
                     {exercise.sets.map((set, index) => (
                         <TouchableOpacity
                             key={index}
-                            onPress={() => onSetPress(set)}
+                            onLongPress={() => onSetDeletePress(set)}
+                            onPress={() => onSetEditPress(set)}
                             style={{
                                 flexDirection: 'row',
                                 justifyContent: 'space-between',
@@ -88,7 +90,7 @@ export default function Exercise({ user, exercise, onAddPress = () => { }, onSet
                                 marginBottom: 8,
                             }}
                         >
-                            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', width: '20%' }}>
                                 <View
                                     style={{
                                         width: 24,
@@ -104,15 +106,15 @@ export default function Exercise({ user, exercise, onAddPress = () => { }, onSet
                                 </View>
                             </View>
 
-                            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 5, justifyContent: 'space-around' }}>
-                                <View style={{ alignItems: 'center' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', width: '80%', justifyContent: 'space-around' }}>
+                                <View style={{ alignItems: 'center', width: '49.9%' }}>
                                     <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11), fontWeight: '500' }}>Reps</AppText>
                                     <AppText style={{ color: 'white', fontWeight: '700', fontSize: scaleFont(14) }}>{set.reps}</AppText>
                                 </View>
 
-                                <View style={{ width: 1, height: 20, backgroundColor: 'rgba(255,255,255,0.2)', marginHorizontal: 8 }} />
+                                <View style={{ width: '0.2%', height: 20, backgroundColor: 'rgba(255,255,255,0.2)', marginHorizontal: 8 }} />
 
-                                <View style={{ alignItems: 'center' }}>
+                                <View style={{ alignItems: 'center', width: '49.9%' }}>
                                     <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11), fontWeight: '500' }}>Weight</AppText>
                                     <AppText style={{ color: 'white', fontWeight: '700', fontSize: scaleFont(14) }}>{convertWeight(set.weight, 'kg', user.preferences.weightUnit.key)} {user.preferences.weightUnit.field}</AppText>
                                 </View>
