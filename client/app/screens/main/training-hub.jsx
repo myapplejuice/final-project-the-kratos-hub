@@ -25,7 +25,7 @@ import ExpandInOut from "../../components/effects/expand-in-out";
 import Exercise from "../../components/screen-comps/exercise";
 
 export default function TrainingHub() {
-    const { showSpinner, hideSpinner, createToast } = usePopups();
+    const { showSpinner, hideSpinner, createInput, createDialog, createAlert, createToast } = usePopups();
     const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
@@ -33,21 +33,78 @@ export default function TrainingHub() {
     const [totalEnergy, setTotalEnergy] = useState(0);
     const [totalExercises, setTotalExercises] = useState(0);
     const [date, setDate] = useState(new Date());
+    const [exercises, setExercises] = useState([]);
+    const [dateExercises, setDateExercises] = useState([]);
 
     useEffect(() => {
         async function fetchExercises() {
-            const res = await APIService.getExercises(date);
-            if (res.success) {
-                setTotalEnergy(res.totalEnergy);
-                setTotalExercises(res.totalExercises);
+            const result = await APIService.training.exercises();
+
+            if (result.success) {
+                const exercises = result.data.exercises;
+                setExercises(result.data.exercises);
+                setDateExercises(exercises.filter(exercise => formatDate(exercise.date, { format: 'YYYY-MM-DD' }) === formatDate(date, { format: 'YYYY-MM-DD' })));
             }
         }
 
         fetchExercises();
     }, []);
 
-    async function handleAddExercise() {
+    useEffect(() => {
+        setDateExercises(exercises.filter(exercise => formatDate(exercise.date, { format: 'YYYY-MM-DD' }) === formatDate(date, { format: 'YYYY-MM-DD' })));
+    }, [date]);
 
+    async function handleDate(val) {
+        if (val === -1) {
+            const newDate = new Date(date);
+            newDate.setDate(newDate.getDate() - 1);
+            setDate(newDate);
+        } else if (val === 1) {
+            const newDate = new Date(date);
+            newDate.setDate(newDate.getDate() + 1);
+            setDate(newDate);
+        }
+    }
+
+    async function handleAddExercise() {
+        createInput({
+            title: "Add Exercise",
+            confirmText: "Add",
+            text: `Enter label, description and body part of the exercise`,
+            placeholders: [`Label`, `Description`, `Body Part`],
+            initialValues: [``, ``, ``],
+            onSubmit: async (vals) => {
+                try {
+                    const [label, description, bodyPart] = vals;
+
+                    if (!label)
+                        return createToast({ message: "Label is required" });
+
+                    const payload = {
+                        userId: user.id,
+                        date: new Date(),
+                        label,
+                        description: description || "No description",
+                        bodyPart: bodyPart || "Unknown Body Part",
+                        image: "",
+                        sets: [],
+                    }
+
+                    const result = await APIService.training.create(payload);
+
+                    if (result.success) {
+                        const exercise = result.data.exercise;
+
+                        setExercises(prev => [...prev, exercise]);
+                        setDateExercises(prev => [...prev, exercise]);
+                    }
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    hideSpinner();
+                }
+            }
+        });
     }
 
     async function handleEditExercise() {
@@ -62,10 +119,14 @@ export default function TrainingHub() {
 
     }
 
+    async function handleEditSet(){
+        
+    }
+
     return (
         <>
             <FloatingActionButton
-                onPress={() => { }}
+                onPress={handleAddExercise}
                 visible={fabVisible}
                 position={{ bottom: insets.bottom + 80, right: 20 }}
                 icon={Images.plus}
@@ -77,20 +138,20 @@ export default function TrainingHub() {
             <AppScroll extraBottom={150} hideNavBarOnScroll={true} onScrollSetStates={setFabVisible} >
                 <View style={{ paddingBottom: 20, paddingHorizontal: 20, borderBottomEndRadius: 30, borderBottomStartRadius: 30, backgroundColor: colors.cardBackground }}>
                     <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', marginVertical: 10 }}>
-                        <TouchableOpacity style={{ justifyContent: 'center', width: '25%', alignItems: 'center' }}>
+                        <TouchableOpacity onPress={() => handleDate(-1)} style={{ justifyContent: 'center', width: '25%', alignItems: 'center' }}>
                             <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white', transform: [{ scaleX: -1 }] }} />
                         </TouchableOpacity>
                         <View style={{ justifyContent: 'center' }}>
                             <AppText style={{ fontSize: scaleFont(18), color: colors.white, fontWeight: 'bold', margin: 15 }}>
                                 {
-                                    getDayComparisons(new Date()).isToday ? 'Today' :
-                                        getDayComparisons(new Date()).isTomorrow ? 'Tomorrow' :
-                                            getDayComparisons(new Date()).isYesterday ? 'Yesterday' :
-                                                formatDate(new Date(), { format: 'MMM d' })
+                                    getDayComparisons(date).isToday ? 'Today' :
+                                        getDayComparisons(date).isTomorrow ? 'Tomorrow' :
+                                            getDayComparisons(date).isYesterday ? 'Yesterday' :
+                                                formatDate(date, { format: 'MMM d' })
                                 }
                             </AppText>
                         </View>
-                        <TouchableOpacity style={{ justifyContent: 'center', width: '25%', alignItems: 'center', transform: [{ rotate: '180deg' }] }}>
+                        <TouchableOpacity onPress={() => handleDate(+1)} style={{ justifyContent: 'center', width: '25%', alignItems: 'center', transform: [{ rotate: '180deg' }] }}>
                             <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white', transform: [{ scaleX: -1 }] }} />
                         </TouchableOpacity>
                     </View>
@@ -118,21 +179,15 @@ export default function TrainingHub() {
                     </AppText>
                 </View>
 
-                <Exercise
-                    user={user}
-                    exercise={{
-                        date: new Date(),
-                        label: "Bench Press",
-                        description: "Chest compound movement for upper body strength",
-                        bodyPart: "Chest",
-                        sets: [
-                            { reps: 12, weight: 50 },
-                            { reps: 10, weight: 55 },
-                            { reps: 8, weight: 60 },
-                            { reps: 6, weight: 65 },
-                        ],
-                    }}
-                />
+                {dateExercises.map((exercise, i) =>
+                    <Exercise
+                        key={i}
+                        user={user}
+                        exercise={exercise}
+                        onAddPress={()=> handleAddSet(exercise)}
+                        onSetPress={(set) => handleEditSet(set)}
+                    />
+                )}
             </AppScroll>
         </>
     );

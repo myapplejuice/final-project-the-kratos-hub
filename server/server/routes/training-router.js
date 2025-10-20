@@ -9,10 +9,10 @@ export default class TrainingRouter {
         this.trainingRouter = Router();
         const { asyncHandler, tokenAuthorization, userAuthorization } = MiddlewaresManager;
 
-        this.trainingRouter.get('/create-exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.getExercises));
-        this.trainingRouter.post('/create-exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.createExercise));
-        this.trainingRouter.update('/update-exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.updateExercise));
-        this.trainingRouter.delete('/delete-exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.deleteExercise));
+        this.trainingRouter.get('/exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.getExercises));
+        this.trainingRouter.post('/exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.createExercise));
+        this.trainingRouter.put('/exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.updateExercise));
+        this.trainingRouter.delete('/exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.deleteExercise));
 
         return this.trainingRouter;
     }
