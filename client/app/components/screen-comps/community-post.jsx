@@ -18,7 +18,7 @@ export default function CommunityPost({
     post, isLikedByUser = false, isSavedByUser = false, isUserPost = false,
     onDeletePress = () => { }, onEditPress = () => { }, onLikePress = () => { },
     onSharePress = () => { }, onImagePress = () => { }, onSavePress = () => { },
-    onViewLikersPress = () => { }
+    onViewLikersPress = () => { }, onImagesPress = () => { }
 }) {
     const { user } = useContext(UserContext);
     const router = useRouter();
@@ -60,7 +60,6 @@ export default function CommunityPost({
             shadowRadius: 8,
             elevation: 8,
         }}>
-            {/* HEADER */}
             <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
@@ -86,7 +85,7 @@ export default function CommunityPost({
                             />
                         </TouchableOpacity>
                         <View style={{ justifyContent: 'center', marginStart: 12, flex: 1 }}>
-                            {/* Name + Status */}
+                         
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <TouchableOpacity
                                     onPress={handleUserPress}>
@@ -204,9 +203,8 @@ export default function CommunityPost({
                 </View>
             )}
 
-            {/* IMAGE SECTION */}
             {imagesURLS && imagesURLS.length > 0 && (
-                <View style={{ position: 'relative' }}>
+                <TouchableOpacity onPress={onImagesPress} style={{ position: 'relative' }}>
                     <AppImageBackground
                         source={{ uri: imagesURLS[currentImage] }}
                         style={{
@@ -288,10 +286,9 @@ export default function CommunityPost({
                             />
                         </View>
                     )}
-                </View>
+                </TouchableOpacity>
             )}
 
-            {/* ACTION BAR */}
             <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',

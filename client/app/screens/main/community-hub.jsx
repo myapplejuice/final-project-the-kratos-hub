@@ -2,7 +2,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Animated, Easing, Keyboard, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Animated, Dimensions, Easing, Keyboard, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import BuildFooter from "../../components/layout-comps/build-footer";
 import AppText from "../../components/screen-comps/app-text";
 import { Images } from '../../common/settings/assets';
@@ -27,12 +27,18 @@ import AppTextInput from '../../components/screen-comps/app-text-input';
 import CommunityPost from '../../components/screen-comps/community-post';
 import FloatingActionMenu from '../../components/screen-comps/floating-action-menu';
 import LikersModal from '../../components/screen-comps/likers-modal';
+import FadeInOut from '../../components/effects/fade-in-out';
+import AppImageBackground from '../../components/screen-comps/app-image-background';
+import AppImage from '../../components/screen-comps/app-image';
 
 export default function Community() {
     const { user } = useContext(UserContext);
     const { createToast, showSpinner, hideSpinner } = usePopups();
     const insets = useSafeAreaInsets();
 
+    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+    const [imagePreviewImages, setImagePreviewImages] = useState([]);
+    const [imagePreviewVisible, setImagePreviewVisible] = useState(false);
     const [likers, setLikers] = useState([]);
     const [likersVisible, setLikersVisible] = useState(false);
     const [page, setPage] = useState(1);
@@ -191,11 +197,38 @@ export default function Community() {
         }
     }
 
-    async function handleSharePress(postId) {
+    async function handleSharePress(postId) { }
+
+    async function handleImagesPress(URLS) {
+        setSelectedImageIndex(0);
+        setImagePreviewImages(URLS);
+        setImagePreviewVisible(true);
     }
 
     return (
         <>
+            <FadeInOut visible={imagePreviewVisible} style={{ position: 'absolute', zIndex: 10000, top: 0, left: 0, bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.8)' }}>
+                <TouchableOpacity activeOpacity={1} onPress={() => { setImagePreviewVisible(false) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(30), marginBottom: 15 }}>Tap anywhere to dismiss</AppText>
+                    <AppImageBackground
+                        source={{ uri: imagePreviewImages[selectedImageIndex] }}
+                        style={{ width: '100%', height: Dimensions.get('screen').height * 0.7, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignSelf: 'center', tintColor: 'white' }}
+                        resizeMode='contain'
+                    >
+                        {imagePreviewImages.length > 1 &&
+                            <>
+                                <TouchableOpacity onPress={() => setSelectedImageIndex(prev => (prev - 1 < 0 ? imagePreviewImages.length - 1 : prev - 1))} style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', marginHorizontal: 5, transform: [{ rotate: '180deg' }] }}>
+                                    <AppImage source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} resizeMode='contain' />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => setSelectedImageIndex(prev => (prev + 1 > imagePreviewImages.length - 1 ? 0 : prev + 1))} style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', marginHorizontal: 5, }}>
+                                    <AppImage source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} resizeMode='contain' />
+                                </TouchableOpacity>
+                            </>
+                        }
+                    </AppImageBackground>
+                </TouchableOpacity>
+            </FadeInOut>
+
             <FloatingActionMenu
                 overlayColor="rgba(0, 0, 0, 0.8)"
                 actions={[
@@ -248,6 +281,7 @@ export default function Community() {
                                     onSharePress={() => handleSharePress(post.id)}
                                     onSavePress={() => handleSavePress(post.id)}
                                     onViewLikersPress={() => handlerViewLikersPress(post.id)}
+                                    onImagesPress={() => handleImagesPress(post.imagesURLS)}
                                 />
 
                                 {idx < visiblePosts.length - 1 && <Divider orientation='horizontal' style={{ marginBottom: 25, borderRadius: 0 }} thickness={10} color='black' />}

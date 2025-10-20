@@ -32,6 +32,8 @@ import { useBackHandlerContext } from '../../../common/contexts/back-handler-con
 import FadeInOut from '../../../components/effects/fade-in-out';
 import AppView from '../../../components/screen-comps/app-view';
 import LikersModal from '../../../components/screen-comps/likers-modal';
+import AppImageBackground from '../../../components/screen-comps/app-image-background';
+import AppImage from '../../../components/screen-comps/app-image';
 
 export default function Post() {
     const { setLibraryActive } = useContext(LibraryContext);
@@ -41,6 +43,10 @@ export default function Post() {
     const { showSpinner, hideSpinner, createToast, createDialog, createAlert, createSelector } = usePopups();
     const insets = useSafeAreaInsets();
     const params = useLocalSearchParams();
+
+    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+    const [imagePreviewImages, setImagesPreviewImages] = useState([]);
+    const [imagesPreviewVisible, setImagesPreviewVisible] = useState(false);
 
     const [post, setPost] = useState(JSON.parse(params.post));
     const [selectedImage, setSelectedImage] = useState('');
@@ -106,8 +112,37 @@ export default function Post() {
         }
     }
 
+    async function handleImagesPress(URLS) {
+        setSelectedImageIndex(0);
+        setImagesPreviewImages(URLS);
+        setImagesPreviewVisible(true);
+    }
+
+
     return (
         <>
+            <FadeInOut visible={imagesPreviewVisible} style={{ position: 'absolute', zIndex: 10000, top: 0, left: 0, bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.8)' }}>
+                <TouchableOpacity activeOpacity={1} onPress={() => { setImagesPreviewVisible(false) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(30), marginBottom: 15 }}>Tap anywhere to dismiss</AppText>
+                    <AppImageBackground
+                        source={{ uri: imagePreviewImages[selectedImageIndex] }}
+                        style={{ width: '100%', height: Dimensions.get('screen').height * 0.7, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignSelf: 'center', tintColor: 'white' }}
+                        resizeMode='contain'
+                    >
+                        {imagePreviewImages.length > 1 &&
+                            <>
+                                <TouchableOpacity onPress={() => setSelectedImageIndex(prev => (prev - 1 < 0 ? imagePreviewImages.length - 1 : prev - 1))} style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', marginHorizontal: 5, transform: [{ rotate: '180deg' }] }}>
+                                    <AppImage source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} resizeMode='contain' />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => setSelectedImageIndex(prev => (prev + 1 > imagePreviewImages.length - 1 ? 0 : prev + 1))} style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', marginHorizontal: 5, }}>
+                                    <AppImage source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} resizeMode='contain' />
+                                </TouchableOpacity>
+                            </>
+                        }
+                    </AppImageBackground>
+                </TouchableOpacity>
+            </FadeInOut>
+
             <LikersModal visible={likersVisible} likers={likers} onClose={() => setLikersVisible(false)} />
 
             <FadeInOut visible={imagePreviewVisible} style={{ position: 'absolute', zIndex: 9999, top: 0, left: 0, bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.8)' }}>
@@ -134,6 +169,7 @@ export default function Post() {
                     isSavedByUser={post.isSavedByUser}
                     onLikePress={() => handleLikePress(post.id, post.postUser.id, post.imagesURLS[0])}
                     onSavePress={() => handleSavePress(post.id)}
+                    onImagesPress={()=> handleImagesPress(post.imagesURLS)}
                 />
             </AppView>
         </>

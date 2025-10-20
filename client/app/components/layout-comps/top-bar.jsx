@@ -100,7 +100,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.SHIELD_APPLICATION_REVIEW]: "Shield Application Review",
         [routes.USER_TRAINER_PROFILE]: "Trainer",
         [routes.USER_FOODS]: "User Foods",
-        [routes.COMMUNITY]: "Community Hub",
+        [routes.COMMUNITY]: "Community",
         [routes.USER_POSTS]: "My Posts",
         [routes.USER_POST]: "My Posts",
         [routes.POST_CREATOR]: "Create Post",
