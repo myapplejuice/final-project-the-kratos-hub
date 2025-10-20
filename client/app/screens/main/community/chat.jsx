@@ -32,7 +32,7 @@ import AppImage from "../../../components/screen-comps/app-image";
 
 export default function Chat() {
     const { createOptions, createDialog, createToast, showSpinner, hideSpinner, createSelector } = usePopups();
-    const { user, setUser, additionalContexts } = useContext(UserContext);
+    const { user, setUser, additionalContexts, setAdditionalContexts } = useContext(UserContext);
     const { libraryActive, setLibraryActive } = useContext(LibraryContext);
     const { cameraActive, setCameraActive } = useContext(CameraContext);
     const insets = useSafeAreaInsets();
@@ -62,6 +62,8 @@ export default function Chat() {
     const [message, setMessage] = useState('');
     const [messageHeight, setMessageHeight] = useState(50);
     const messagesRef = useRef(messages);
+
+    const [postToShare, setPostToShare] = useState(null);
 
     useEffect(() => {
         const profile = additionalContexts.chattingFriendProfile;
@@ -151,6 +153,12 @@ export default function Chat() {
         );
 
         fetchMessages();
+
+            console.log("additionalContexts.post", additionalContexts.post);
+        if (additionalContexts.post && additionalContexts.friendStatus === 'active') {
+            console.log("additionalContexts.post", additionalContexts.post);
+            handleMessageSend({ context: 'post', post: additionalContexts.post });
+        }
         return () => {
             const messageIds = messagesRef.current.map(m => m.id);
             if (messageIds.length > 0) {
@@ -163,6 +171,7 @@ export default function Chat() {
             showListener.remove();
             hideListener.remove();
 
+            setAdditionalContexts({});
             const lastMessageDetails = messagesRef.current[messagesRef.current.length - 1];
             if (lastMessageDetails) {
                 const { id: lastMessageId, message: lastMessage, dateTimeSent: lastMessageTime, senderId: lastMessageSenderId, hidden: lastMessageHidden, discarded: lastMessageDiscarded } = lastMessageDetails;
@@ -779,7 +788,7 @@ export default function Chat() {
                                                 <Image source={Images.arrow} style={{ width: 18, height: 18, tintColor: 'white', transform: [{ rotate: '90deg' }], marginTop: 3 }} />
                                                 <AppText style={{ color: 'white', marginTop: 5 }}>Download</AppText>
                                             </TouchableOpacity>
-                                            
+
                                             <Divider orientation="vertical" color="white" />
 
                                             <TouchableOpacity onPress={() => shareFile(message.extraInformation.imageUrl)} style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>

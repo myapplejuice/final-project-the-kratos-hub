@@ -73,7 +73,7 @@ export default function Friends() {
         chattingFriendProfile.isTrainer = isTrainer;
         chattingFriendProfile.isVerified = isVerified;
 
-        setAdditionalContexts({ chattingFriendProfile, friendStatus: status });
+        setAdditionalContexts(prev => ({ ...prev, chattingFriendProfile, friendStatus: status }));
         router.push(routes.CHAT)
     }
 

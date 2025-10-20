@@ -32,7 +32,7 @@ import AppImageBackground from '../../components/screen-comps/app-image-backgrou
 import AppImage from '../../components/screen-comps/app-image';
 
 export default function Community() {
-    const { user } = useContext(UserContext);
+    const { user, setAdditionalContexts } = useContext(UserContext);
     const { createToast, showSpinner, hideSpinner } = usePopups();
     const insets = useSafeAreaInsets();
 
@@ -197,7 +197,11 @@ export default function Community() {
         }
     }
 
-    async function handleSharePress(postId) { }
+    async function handleSharePress(post) {
+        console.log(post)
+        setAdditionalContexts(prev => ({ ...prev, post }));
+        router.push(routes.FRIENDS);
+    }
 
     async function handleImagesPress(URLS) {
         setSelectedImageIndex(0);
@@ -278,7 +282,7 @@ export default function Community() {
                                     isSavedByUser={post.isSavedByUser}
                                     isUserPost={false}
                                     onLikePress={() => handleLikePress(post.id, post.postUser.id, post.imagesURLS[0])}
-                                    onSharePress={() => handleSharePress(post.id)}
+                                    onSharePress={() => handleSharePress(post)}
                                     onSavePress={() => handleSavePress(post.id)}
                                     onViewLikersPress={() => handlerViewLikersPress(post.id)}
                                     onImagesPress={() => handleImagesPress(post.imagesURLS)}
