@@ -75,6 +75,11 @@ export default function ExerciseCard({ exercise, onExpandPress = () => { }, onAd
                         </View>
                     </View>
 
+<AppText style={styles.sectionLabel}>INSTRUCTIONS</AppText>
+<View style={{ backgroundColor: colors.backgroundSecond, borderRadius: 10, marginBottom: 15}}> 
+                    <AppText style={{color: 'white', padding: 15}}>{exercise.instructions}</AppText>
+</View>
+
                     <View style={styles.detailsGrid}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                             <View style={styles.detailItem}>

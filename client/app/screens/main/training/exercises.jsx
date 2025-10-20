@@ -36,33 +36,35 @@ export default function Exercises() {
     const [expandedId, setExpandedId] = useState(null);
     const [page, setPage] = useState(1);
     const [pageSize] = useState(10);
+    const [filteredExercises, setFilteredExercises] = useState([]);
     const [visibleExercises, setVisibleExercises] = useState([]);
     const [filter, setFilter] = useState({ muscle: '', level: '', type: '' });
 
- useEffect(() => {
-    const level = filter.level.toLowerCase();
-    const type = filter.type.toLowerCase();
-    const query = searchQuery.toLowerCase();
+    useEffect(() => {
+        const level = filter.level.toLowerCase();
+        const type = filter.type.toLowerCase();
+        const query = searchQuery.toLowerCase();
 
-    const filtered = exercises.filter(ex => {
-        const mainMuscle = ex.muscleGroups[0];
+        const filtered = exercises.filter(ex => {
+            const mainMuscle = ex.muscleGroups[0];
 
-        const matchMuscle = filter.muscle ? mainMuscle.toLowerCase() === filter.muscle.toLowerCase() : true;
-        const matchLevel = filter.level ? ex.level.toLowerCase() === level : true;
-        const matchType = filter.type ? ex.type.toLowerCase() === type : true;
+            const matchMuscle = filter.muscle ? mainMuscle.toLowerCase() === filter.muscle.toLowerCase() : true;
+            const matchLevel = filter.level ? ex.level.toLowerCase() === level : true;
+            const matchType = filter.type ? ex.type.toLowerCase() === type : true;
 
-        const matchSearch = query
-            ? ex.label.toLowerCase().includes(query) ||
-              ex.muscleGroups.some(m => m.toLowerCase().includes(query))
-            : true;
+            const matchSearch = query
+                ? ex.label.toLowerCase().includes(query) ||
+                ex.muscleGroups.some(m => m.toLowerCase().includes(query))
+                : true;
 
-        return matchMuscle && matchLevel && matchType && matchSearch;
-    });
+            return matchMuscle && matchLevel && matchType && matchSearch;
+        });
 
-    const start = 0;
-    const end = page * pageSize;
-    setVisibleExercises(filtered.slice(start, end));
-}, [page, filter, searchQuery]);
+        const start = 0;
+        const end = page * pageSize;
+        setFilteredExercises(filtered);
+        setVisibleExercises(filtered.slice(start, end));
+    }, [page, filter, searchQuery]);
 
     async function handleFiltering(filterKey) {
         const options =
@@ -88,6 +90,39 @@ export default function Exercises() {
         });
     }
 
+    async function handleAddExercise(exercise) {
+        try {
+            showSpinner();
+            const [label, description, bodyPart] = vals;
+
+            if (!label)
+                return createToast({ message: "Label is required" });
+
+            const payload = {
+                userId: user.id,
+                date: new Date(),
+                label,
+                description: description || "",
+                bodyPart: bodyPart || "",
+                image: "",
+                sets: [],
+            }
+
+            const result = await APIService.training.create(payload);
+
+            if (result.success) {
+                const exercise = result.data.exercise;
+
+                setExercises(prev => [...prev, exercise]);
+                setDateExercises(prev => [...prev, exercise]);
+            }
+        } catch (e) {
+            console.log(e)
+        } finally {
+            hideSpinner();
+        }
+    }
+
     return (
         <>
             <FloatingActionButton
@@ -97,6 +132,17 @@ export default function Exercises() {
                 icon={Images.arrow}
                 iconStyle={{ transform: [{ rotate: '-90deg' }], marginBottom: 2 }}
                 iconSize={20}
+                size={40}
+            />
+
+            <FloatingActionButton
+                onPress={() => { setFilter({ muscle: '', level: '', type: '' }, setScrollToTop(true)) }}
+                visible={!fabVisible && JSON.stringify(filter) !== JSON.stringify({ muscle: '', level: '', type: '' })}
+                style={{ width: '100%', padding: 15 }}
+                position={{ bottom: insets.bottom + 40, right: 20 }}
+                icon={Images.reset}
+                iconSize={20}
+                label='Clear Filter'
                 size={40}
             />
 
@@ -114,9 +160,6 @@ export default function Exercises() {
                 </View>
 
                 <View>
-                    <TouchableOpacity onPress={() => setFilter({ muscle: '', level: '', type: '' })}>
-                        <AppText style={{ color: 'white', fontSize: scaleFont(14), marginBottom: 10 }}>Clear Filters</AppText>
-                    </TouchableOpacity>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
                         {['Muscle', 'Level', 'Type'].map((filterKey, idx) => {
                             return (
@@ -143,17 +186,19 @@ export default function Exercises() {
                 <AppScroll scrollToTop={scrollToTop} extraBottom={350} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} extraTop={0} topPadding={false}>
                     {visibleExercises.map((exercise, index) =>
                         <ExerciseCard
-                            key={index}
+                            key={exercise.id}
                             exercise={exercise}
                             expanded={expandedId === exercise.id}
                             onExpandPress={() => expandedId === exercise.id ? setExpandedId(null) : setExpandedId(exercise.id)}
-                            onAddPress={() => { }}
+                            onAddPress={() => handleAddExercise(exercise)}
                         />
                     )
                     }
-                    <TouchableOpacity onPress={() => setPage(page + 1)} style={{ alignItems: 'center', borderWidth: 1, borderColor: colors.mutedText, borderRadius: 15, width: 100, alignSelf: 'center', marginTop: 30 }}>
-                        <AppText style={{ textAlign: 'center', marginVertical: 15, color: colors.mutedText }}>Load More</AppText>
-                    </TouchableOpacity>
+                    {visibleExercises.length < filteredExercises.length && (
+                        <TouchableOpacity onPress={() => setPage(page + 1)} style={{ alignItems: 'center', borderWidth: 1, borderColor: colors.mutedText, borderRadius: 15, width: 100, alignSelf: 'center', marginTop: 30 }}>
+                            <AppText style={{ textAlign: 'center', marginVertical: 15, color: colors.mutedText }}>Load More</AppText>
+                        </TouchableOpacity>
+                    )}
                 </AppScroll>
 
             </AppView>
