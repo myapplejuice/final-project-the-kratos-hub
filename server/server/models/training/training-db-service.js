@@ -3,6 +3,43 @@ import Database from '../database/database';
 import ObjectMapper from '../../utils/object-mapper';
 
 export default class TrainingDBService {
+    static async fetchExercises(userId) {
+        if (!userId) return null;
+
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
+
+            const query = `
+                SELECT *
+                FROM dbo.Exercises
+                WHERE UserId = @UserId
+                ORDER BY Date DESC
+            `;
+
+            const result = await request.query(query);
+            if (!result.recordset || result.recordset.length === 0) return [];
+
+            // Map and parse Sets
+            const exercises = result.recordset.map((row) => {
+                const exercise = {};
+                for (const key in row) {
+                    if (key === 'Sets') {
+                        exercise[ObjectMapper.toCamelCase(key)] = JSON.parse(row[key]);
+                    } else {
+                        exercise[ObjectMapper.toCamelCase(key)] = row[key];
+                    }
+                }
+                return exercise;
+            });
+
+            return exercises;
+        } catch (err) {
+            console.error('fetchExercises error:', err);
+            return null;
+        }
+    }
+
     static async createExercise(details) {
         try {
             const request = Database.getRequest();
@@ -14,7 +51,7 @@ export default class TrainingDBService {
             Database.addInput(request, 'Sets', sql.NVarChar(sql.MAX), JSON.stringify(details.sets));
 
             const query = `
-                INSERT INTO dbo.VerificationApplications (UserId, Label, Description, BodyPart, Image, Sets)
+                INSERT INTO dbo.Exercises (UserId, Label, Description, BodyPart, Image, Sets)
                 OUTPUT INSERTED.*
                 VALUES (@UserId, @Label, @Description, @BodyPart, @Image, @Sets)
             `;
@@ -48,7 +85,7 @@ export default class TrainingDBService {
             Database.addInput(request, 'Sets', sql.NVarChar(sql.MAX), JSON.stringify(details.sets));
 
             const query = `
-                UPDATE dbo.VerificationApplications
+                UPDATE dbo.Exercises
                 SET Label = @Label,
                     Description = @Description,
                     BodyPart = @BodyPart,
@@ -84,7 +121,7 @@ export default class TrainingDBService {
             Database.addInput(request, 'Id', sql.Int, id);
 
             const query = `
-                DELETE FROM dbo.VerificationApplications
+                DELETE FROM dbo.Exercises
                 WHERE Id = @Id
             `;
 

@@ -1,8 +1,8 @@
 export function trainingQuery() {
     const exercisesQuery = `
-        IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='VerificationApplications' AND xtype='U')
+        IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Exercises' AND xtype='U')
         BEGIN
-            CREATE TABLE dbo.VerificationApplications (
+            CREATE TABLE dbo.Exercises (
                 Id INT IDENTITY(1,1) PRIMARY KEY,
                 UserId UNIQUEIDENTIFIER NOT NULL,
                 
@@ -14,7 +14,7 @@ export function trainingQuery() {
                 
                 Sets NVARCHAR(MAX) NULL DEFAULT '[]', --JSON containing [{reps: 10, weight: 10}, {reps: 10, weight: 10}]
 
-                CONSTRAINT FK_VerificationApplications_Users FOREIGN KEY (UserId)
+                CONSTRAINT FK_Exercises_Users FOREIGN KEY (UserId)
                     REFERENCES dbo.Users(Id)
                     ON DELETE CASCADE
             );

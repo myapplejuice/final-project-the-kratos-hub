@@ -1,6 +1,15 @@
 import TrainingDBService from './training-db-service.js';
 
 export default class TrainingController {
+    static async getExercises(req, res) {
+        const id = req.params.id;
+
+        const result = await TrainingDBService.fetchExercises(id);
+        if (result === null) return res.status(500).json({ success: false, error: "Failed to create exercise" });
+
+        return res.status(200).json({ success: true, exercises: result });
+    }
+
     static async createExercise(req, res) {
         const details = req.body;
 

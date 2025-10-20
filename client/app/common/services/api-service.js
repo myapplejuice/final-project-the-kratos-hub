@@ -232,6 +232,9 @@ export default class APIService {
     };
 
     static training = {
-        exercises: (payload) 
+        exercises: (payload) => APIService.request(`/training/exercises/${APIService.USER_ID}`, 'POST', payload),
+        create: (payload) => APIService.request(`/training/exercises/${APIService.USER_ID}`, 'POST', payload),
+        update: (payload) => APIService.request(`/training/exercises/${APIService.USER_ID}`, 'PUT', payload),
+        delete: (payload) => APIService.request(`/training/exercises/${APIService.USER_ID}`, 'DELETE', payload)
     };
 }
