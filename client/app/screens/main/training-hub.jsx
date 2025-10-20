@@ -181,22 +181,22 @@ export default function TrainingHub() {
         createInput({
             title: "New Set",
             confirmText: "Add",
-            text: `Enter repetitions, weight in ${user.preferences.weightUnit.label} and energy burned in ${user.preferences.energyUnit.label}`,
-            placeholders: [`Repetitions`, `Weight (${user.preferences.weightUnit.field})`, `Energy burned (${user.preferences.energyUnit.field})`],
-            initialValues: [``, ``, ``],
-            extraConfigs: [{ keyboardType: "numeric" }, { keyboardType: "numeric" }, { keyboardType: "numeric" }],
+            text: `Enter repetitions and weight in ${user.preferences.weightUnit.label}`,
+            placeholders: [`Repetitions`, `Weight (${user.preferences.weightUnit.field})`],
+            initialValues: [``, ``],
+            extraConfigs: [{ keyboardType: "numeric" }, { keyboardType: "numeric" }],
             onSubmit: async (vals) => {
                 try {
                     showSpinner();
-                    const [reps, weight, energy] = vals;
+                    const [reps, weight] = vals;
 
-                    if (!reps || !weight|| !energy)
+                    if (!reps || !weight)
                         return createToast({ message: "Both fields must be filled" });
 
                     const id = Math.floor(100000 + Math.random() * 900000);
                     const payload = {
                         exerciseId: exercise.id,
-                        sets: [...exercise.sets, { id, reps: Number(reps), weight: Number(weight), energy: Number(energy) }]
+                        sets: [...exercise.sets, { id, reps: Number(reps), weight: Number(weight) }]
                     }
 
                     const result = await APIService.training.updateSets(payload);
@@ -220,21 +220,21 @@ export default function TrainingHub() {
         createInput({
             title: "Edit Set",
             confirmText: "Confirm Edit",
-            text: `Enter new repetitions, weight in ${user.preferences.weightUnit.label} and energy burned in ${user.preferences.energyUnit.label}`,
-            placeholders: [`Repetitions`, `Weight (${user.preferences.weightUnit.field})`, `Energy burned (${user.preferences.energyUnit.field})`],
-            initialValues: [set.reps, set.weight, set.energy],
-            extraConfigs: [{ keyboardType: "numeric" }, { keyboardType: "numeric" }, { keyboardType: "numeric" }],
+            text: `Enter new repetitions and weight in ${user.preferences.weightUnit.label}`,
+            placeholders: [`Repetitions`, `Weight (${user.preferences.weightUnit.field})`],
+            initialValues: [set.reps, set.weight],
+            extraConfigs: [{ keyboardType: "numeric" }, { keyboardType: "numeric" }],
             onSubmit: async (vals) => {
                 try {
                     showSpinner();
-                    const [reps, weight, energy] = vals;
+                    const [reps, weight] = vals;
 
-                    if (!reps || !weight || !energy)
+                    if (!reps || !weight)
                         return createToast({ message: "Both fields must be filled" });
 
                     const payload = {
                         exerciseId: exercise.id,
-                        sets: exercise.sets.map(s => s.id === set.id ? { ...s, reps: Number(reps), weight: Number(weight), energy: Number(energy) } : s)
+                        sets: exercise.sets.map(s => s.id === set.id ? { ...s, reps: Number(reps), weight: Number(weight) } : s)
                     }
 
                     const result = await APIService.training.updateSets(payload);
@@ -285,7 +285,8 @@ export default function TrainingHub() {
         });
     }
 
-    const exerciseCount = dateExercises.length;
+    const exercisesTotal = dateExercises.length;
+    const energyTotal = 0
 
     return (
         <>
@@ -324,14 +325,14 @@ export default function TrainingHub() {
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25 }}>
                         <View style={{ alignItems: 'center', justifyContent: 'center', width: '45%' }}>
-                            <AppText style={{ color: nutritionColors.carbs1, fontWeight: 'bold', fontSize: scaleFont(20), textAlign: 'center' }}>{exerciseCount}</AppText>
+                            <AppText style={{ color: nutritionColors.carbs1, fontWeight: 'bold', fontSize: scaleFont(20), textAlign: 'center' }}>{exercisesTotal}</AppText>
                             <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(15), textAlign: 'center' }}>Exercises</AppText>
                         </View>
                         <View style={{ width: '10%', alignItems: 'center', justifyContent: 'center', height: 50 }}>
                             <Divider />
                         </View>
                         <View style={{ alignItems: 'center', justifyContent: 'center', width: '45%' }}>
-                            <AppText style={{ color: nutritionColors.energy1, fontWeight: 'bold', fontSize: scaleFont(20), textAlign: 'center' }}>{convertEnergy(exerciseCount, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}</AppText>
+                            <AppText style={{ color: nutritionColors.energy1, fontWeight: 'bold', fontSize: scaleFont(20), textAlign: 'center' }}>{convertEnergy(energyTotal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}</AppText>
                             <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(15), textAlign: 'center' }}>Energy Burned</AppText>
                         </View>
                     </View>
