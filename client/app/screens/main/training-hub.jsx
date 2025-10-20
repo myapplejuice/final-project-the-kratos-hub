@@ -70,45 +70,45 @@ export default function TrainingHub() {
     }
 
     async function handleAddExercise() {
-        createInput({
-            title: "Add Exercise",
-            confirmText: "Add",
-            text: `Enter label, description and body part of the exercise`,
-            placeholders: [`Label`, `Description`, `Body Part`],
-            initialValues: [``, ``, ``],
-            onSubmit: async (vals) => {
-                try {
-                    showSpinner();
-                    const [label, description, bodyPart] = vals;
-
-                    if (!label)
-                        return createToast({ message: "Label is required" });
-
-                    const payload = {
-                        userId: user.id,
-                        date: new Date(),
-                        label,
-                        description: description || "",
-                        bodyPart: bodyPart || "",
-                        image: "",
-                        sets: [],
-                    }
-
-                    const result = await APIService.training.create(payload);
-
-                    if (result.success) {
-                        const exercise = result.data.exercise;
-
-                        setExercises(prev => [...prev, exercise]);
-                        setDateExercises(prev => [...prev, exercise]);
-                    }
-                } catch (e) {
-                    console.log(e)
-                } finally {
-                    hideSpinner();
-                }
-            }
-        });
+        //createInput({
+        //    title: "Add Exercise",
+        //    confirmText: "Add",
+        //    text: `Enter label, description and body part of the exercise`,
+        //    placeholders: [`Label`, `Description`, `Body Part`],
+        //    initialValues: [``, ``, ``],
+        //    onSubmit: async (vals) => {
+        //        try {
+        //            showSpinner();
+        //            const [label, description, bodyPart] = vals;
+//
+        //            if (!label)
+        //                return createToast({ message: "Label is required" });
+//
+        //            const payload = {
+        //                userId: user.id,
+        //                date: new Date(),
+        //                label,
+        //                description: description || "",
+        //                bodyPart: bodyPart || "",
+        //                image: "",
+        //                sets: [],
+        //            }
+//
+        //            const result = await APIService.training.create(payload);
+//
+        //            if (result.success) {
+        //                const exercise = result.data.exercise;
+//
+        //                setExercises(prev => [...prev, exercise]);
+        //                setDateExercises(prev => [...prev, exercise]);
+        //            }
+        //        } catch (e) {
+        //            console.log(e)
+        //        } finally {
+        //            hideSpinner();
+        //        }
+        //    }
+        //});
         router.push({
             pathname: routes.EXERCISES,
             params: {

@@ -35,7 +35,7 @@ export default function ExerciseCard({ exercise, onExpandPress = () => { }, onAd
 
             <ExpandInOut visible={expanded}>
                 <View style={[styles.cardBody]}>
-                    <View style={[styles.muscleSection, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
+                    <View style={[styles.muscleSection, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }]}>
                         <View style={{ width: '80%' }}>
                             <AppText style={styles.sectionLabel}>Target Muscles</AppText>
                             <View style={styles.musclePills}>
@@ -65,20 +65,20 @@ export default function ExerciseCard({ exercise, onExpandPress = () => { }, onAd
                         <View style={{ width: '20%' }}>
                             <View style={styles.energyBadge}>
                                 <Image source={Images.kcalBurn} style={styles.energyBadgeIcon} />
-                                <AppText style={styles.energyBadgeText}>
-                                    {convertEnergy(exercise.kCalBurned, 'kcal', user.preferences.energyUnit.key)}
-                                </AppText>
                                 <AppText style={styles.energyUnitSmall}>
-                                    {user.preferences.energyUnit.field}
+                                    <AppText style={styles.energyBadgeText}>
+                                        {convertEnergy(exercise.kCalBurned, 'kcal', user.preferences.energyUnit.key)}
+                                    </AppText>
+                                    {' ' + user.preferences.energyUnit.field}
                                 </AppText>
                             </View>
                         </View>
                     </View>
 
-<AppText style={styles.sectionLabel}>INSTRUCTIONS</AppText>
-<View style={{ backgroundColor: colors.backgroundSecond, borderRadius: 10, marginBottom: 15}}> 
-                    <AppText style={{color: 'white', padding: 15}}>{exercise.instructions}</AppText>
-</View>
+                    <AppText style={styles.sectionLabel}>INSTRUCTIONS</AppText>
+                    <View style={{ backgroundColor: colors.backgroundSecond, borderRadius: 10, marginBottom: 15 }}>
+                        <AppText style={{ color: 'white', padding: 15 }}>{exercise.instructions}</AppText>
+                    </View>
 
                     <View style={styles.detailsGrid}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
@@ -143,16 +143,16 @@ const styles = StyleSheet.create({
     },
     energyBadge: {
         backgroundColor: colors.backgroundSecond,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
+        padding: 10,
+        borderRadius: 20,
         borderRadius: 12,
         alignItems: 'center',
         minWidth: 70,
     },
     energyBadgeIcon: {
-        width: 16,
-        height: 16,
-        marginBottom: 2,
+        width: 25,
+        height: 25,
+        marginBottom: 3,
     },
     energyBadgeText: {
         fontSize: scaleFont(14),
@@ -160,10 +160,9 @@ const styles = StyleSheet.create({
         color: nutritionColors.energy1,
     },
     energyUnitSmall: {
-        fontSize: scaleFont(8),
+        fontSize: scaleFont(12),
         color: colors.mutedText,
         fontWeight: '600',
-        marginTop: -1,
     },
     cardBody: {
         padding: 20,
@@ -197,7 +196,7 @@ const styles = StyleSheet.create({
     detailsGrid: {
         marginBottom: 16,
         padding: 15,
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        backgroundColor: colors.backgroundSecond,
         borderRadius: 12,
     },
     detailItem: {
