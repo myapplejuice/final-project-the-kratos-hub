@@ -9,13 +9,13 @@ export default class TrainingRouter {
         this.trainingRouter = Router();
         const { asyncHandler, tokenAuthorization, userAuthorization } = MiddlewaresManager;
 
-        this.trainingRouter.get('/master-exercises/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.getMasterExercises));
-        this.trainingRouter.get('/session/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.getSession));
-        this.trainingRouter.get('/sessions/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.getAllSessions));
+        this.trainingRouter.post('/create-exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.createExercise));
+        this.trainingRouter.update('/update-exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.updateExercise));
+        this.trainingRouter.delete('/delete-exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.deleteExercise));
 
-        this.trainingRouter.post('/start/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.startSession));
-        this.trainingRouter.post('/exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.addExercise));
-        this.trainingRouter.post('/set/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.addSet));
+        this.trainingRouter.post('/create-set/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.createSet));
+        this.trainingRouter.update('/update-set/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.updateSet));
+        this.trainingRouter.delete('/delete-set/:id', tokenAuthorization, userAuthorization, asyncHandler(TrainingController.deleteSet));
 
         return this.trainingRouter;
     }

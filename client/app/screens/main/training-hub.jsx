@@ -1,251 +1,221 @@
-import { useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StyleSheet, TouchableOpacity, View, } from "react-native";
+import { useEffect, useContext, useState } from "react";
+import { router } from "expo-router";
+import { routes, } from "../../common/settings/constants";
+import { colors, nutritionColors } from "../../common/settings/styling";
 import AppText from "../../components/screen-comps/app-text";
-import AppTextInput from "../../components/screen-comps/app-text-input";
+import { scaleFont } from "../../common/utils/scale-fonts";
+import { UserContext } from "../../common/contexts/user-context";
+import { Image } from "expo-image";
+import { Images } from "../../common/settings/assets";
+import { convertEnergy, convertFluid, convertWeight } from "../../common/utils/unit-converter";
+import { formatDate, getDayComparisons } from "../../common/utils/date-time";
 import usePopups from "../../common/hooks/use-popups";
-import AppScroll from "../../components/screen-comps/app-scroll";
+import { totalDayConsumption } from "../../common/utils/metrics-calculator";
 import APIService from "../../common/services/api-service";
+import FloatingActionMenu from "../../components/screen-comps/floating-action-menu";
+import ProgressBar from "../../components/screen-comps/progress-bar";
+import DateDisplay from "../../components/screen-comps/date-display";
+import AppScroll from "../../components/screen-comps/app-scroll";
+import Divider from "../../components/screen-comps/divider";
+import FloatingActionButton from "../../components/screen-comps/floating-action-button";
+import AnimatedButton from "../../components/screen-comps/animated-button";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import ExpandInOut from "../../components/effects/expand-in-out";
+import Exercise from "../../components/screen-comps/exercise";
 
 export default function TrainingHub() {
-    const { showSpinner, hideSpinner, createAlert, createToast,
-        createPicker, createInput, createOptions, createSelector,
-        hideInput, hideSelector, createDialog } = usePopups();
+    const { showSpinner, hideSpinner, createToast } = usePopups();
+    const { user, setUser } = useContext(UserContext);
+    const insets = useSafeAreaInsets();
 
-    const [sessionId, setSessionId] = useState(null);
-    const [masterExercises, setMasterExercises] = useState([]);
-    const [showExerciseList, setShowExerciseList] = useState(false);
-    const [exercises, setExercises] = useState([]);
-    const [selectedExercise, setSelectedExercise] = useState(null);
-
-    const [weight, setWeight] = useState("");
-    const [reps, setReps] = useState("");
-    const [note, setNote] = useState("");
+    const [fabVisible, setFabVisible] = useState(true);
+    const [totalEnergy, setTotalEnergy] = useState(0);
+    const [totalExercises, setTotalExercises] = useState(0);
+    const [date, setDate] = useState(new Date());
 
     useEffect(() => {
-        async function fetchMasterExercises() {
-            try {
-                showSpinner();
-                const result = await APIService.training.fetch.masterExercises();
-
-                if (result.success) {
-                    const exercises = result.data.exercises;
-                    setMasterExercises(exercises);
-                }
-                else {
-                    createAlert({ title: "Network Error", text: result.message });
-                }
-            } catch (err) {
-                console.error("Error fetching exercises:", err);
-            } finally {
-                hideSpinner();
+        async function fetchExercises() {
+            const res = await APIService.getExercises(date);
+            if (res.success) {
+                setTotalEnergy(res.totalEnergy);
+                setTotalExercises(res.totalExercises);
             }
-        };
+        }
 
-        fetchMasterExercises();
+        fetchExercises();
     }, []);
 
-    async function startTraining() {
-        try {
-            showSpinner();
-            const result = await APIService.training.post.startSession();
+    async function handleAddExercise() {
 
-            if (result.success) {
-                const sessionId = result.data.sessionId;
-                setSessionId(sessionId);
-            }
-            else {
-                createAlert({ title: "Network Error", text: result.message });
-            }
-        } catch (err) {
-            console.error("Error starting session:", err);
-            createAlert({ title: "Network Error", text: 'Could not start the training session. Please try again later' });
-        } finally {
-            hideSpinner();
-        }
     }
 
-    async function addExercise(exerciseObj) {
-        try {
-            const payload = { sessionId, exerciseName: exerciseObj.Name };
-            const result = await APIService.training.post.addExercise(payload);
+    async function handleEditExercise() {
 
-            if (result.success) {
-                const exerceiseId = result.data.exerciseId;
-
-                const newExercise = {
-                    id: exerceiseId,
-                    name: exerciseObj.Name,
-                    isTimerOnly: exerciseObj.IsTimerOnly,
-                    sets: [],
-                };
-
-                setExercises((prev) => [...prev, newExercise]);
-                setSelectedExercise(newExercise);
-                setShowExerciseList(false);
-            } else {
-                createAlert({ title: "Network Error", text: result.message });
-            }
-        } catch (err) {
-            console.error("Error adding exercise:", err.message);
-            createAlert({ title: "Network Error", text: err.message });
-        }
     }
 
-    async function addSet() {
-        if (!selectedExercise) return;
-        if (!weight && !selectedExercise.isTimerOnly) {
-            createToast({ message: "Please fill weight and reps" });
-            return;
-        }
+    async function handleDeleteExercise() {
 
-        try {
-            const payload = { exerciseId: selectedExercise.id, weight, reps, note };
-            const result = await APIService.training.post.addSet(payload);
+    }
 
-            if (result.success) {
-                setExercises((prev) =>
-                    prev.map((ex) =>
-                        ex.id === selectedExercise.id
-                            ? { ...ex, sets: [...ex.sets, { weight, reps, note }] }
-                            : ex
-                    )
-                );
+    async function handleAddSet() {
 
-                setWeight("");
-                setReps("");
-                setNote("");
-            } else {
-                createAlert({ title: "Network Error", text: result.message });
-
-            }
-        } catch (err) {
-            console.error("Error adding set:", err);
-        }
     }
 
     return (
-        <AppScroll extraBottom={150}>
-            <View style={{ margin: 15 }}>
-                {!sessionId ? (
-                    <TouchableOpacity style={styles.button} onPress={startTraining}>
-                        <AppText style={styles.buttonText}>Start Training</AppText>
-                    </TouchableOpacity>
-                ) : (
-                    <>
-                        <AppText style={styles.header}>Training Session</AppText>
+        <>
+            <FloatingActionButton
+                onPress={() => { }}
+                visible={fabVisible}
+                position={{ bottom: insets.bottom + 80, right: 20 }}
+                icon={Images.plus}
+                iconStyle={{ marginTop: 2 }}
+                iconSize={20}
+                size={60}
+            />
 
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => setShowExerciseList(true)}
-                        >
-                            <AppText style={styles.buttonText}>Add Exercise</AppText>
+            <AppScroll extraBottom={150} hideNavBarOnScroll={true} onScrollSetStates={setFabVisible} >
+                <View style={{ paddingBottom: 20, paddingHorizontal: 20, borderBottomEndRadius: 30, borderBottomStartRadius: 30, backgroundColor: colors.cardBackground }}>
+                    <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', marginVertical: 10 }}>
+                        <TouchableOpacity style={{ justifyContent: 'center', width: '25%', alignItems: 'center' }}>
+                            <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white', transform: [{ scaleX: -1 }] }} />
                         </TouchableOpacity>
+                        <View style={{ justifyContent: 'center' }}>
+                            <AppText style={{ fontSize: scaleFont(18), color: colors.white, fontWeight: 'bold', margin: 15 }}>
+                                {
+                                    getDayComparisons(new Date()).isToday ? 'Today' :
+                                        getDayComparisons(new Date()).isTomorrow ? 'Tomorrow' :
+                                            getDayComparisons(new Date()).isYesterday ? 'Yesterday' :
+                                                formatDate(new Date(), { format: 'MMM d' })
+                                }
+                            </AppText>
+                        </View>
+                        <TouchableOpacity style={{ justifyContent: 'center', width: '25%', alignItems: 'center', transform: [{ rotate: '180deg' }] }}>
+                            <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white', transform: [{ scaleX: -1 }] }} />
+                        </TouchableOpacity>
+                    </View>
 
-                        {showExerciseList && !selectedExercise && (
-                            <KeyboardAwareScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-                                {masterExercises.map((item) => (
-                                    <TouchableOpacity
-                                        key={item.Id}
-                                        style={styles.exerciseButton}
-                                        onPress={() => addExercise(item)}
-                                    >
-                                        <AppText style={styles.exerciseText}>{item.Name}</AppText>
-                                    </TouchableOpacity>
-                                ))}
-                            </KeyboardAwareScrollView>
-                        )}
+                    <Divider orientation="horizontal" />
 
-                        {selectedExercise && !selectedExercise.isTimerOnly && (
-                            <View style={styles.setBox}>
-                                <AppText style={styles.subtitle}>Add Set for {selectedExercise.name}</AppText>
-                                <AppTextInput
-                                    style={styles.input}
-                                    placeholder="Weight (kg)"
-                                    placeholderTextColor="#aaa"
-                                    value={weight}
-                                    onChangeText={setWeight}
-                                    keyboardType="numeric"
-                                />
-                                <AppTextInput
-                                    style={styles.input}
-                                    placeholder="Reps"
-                                    placeholderTextColor="#aaa"
-                                    value={reps}
-                                    onChangeText={setReps}
-                                    keyboardType="numeric"
-                                />
-                                <AppTextInput
-                                    style={styles.input}
-                                    placeholder="Note (optional)"
-                                    placeholderTextColor="#aaa"
-                                    value={note}
-                                    onChangeText={setNote}
-                                />
-                                <TouchableOpacity style={styles.buttonSmall} onPress={addSet}>
-                                    <AppText style={styles.buttonText}>Add Set</AppText>
-                                </TouchableOpacity>
-                            </View>
-                        )}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25 }}>
+                        <View style={{ alignItems: 'center', justifyContent: 'center', width: '45%' }}>
+                            <AppText style={{ color: nutritionColors.carbs1, fontWeight: 'bold', fontSize: scaleFont(20), textAlign: 'center' }}>{totalExercises}</AppText>
+                            <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(15), textAlign: 'center' }}>Exercises</AppText>
+                        </View>
+                        <View style={{ width: '10%', alignItems: 'center', justifyContent: 'center', height: 50 }}>
+                            <Divider />
+                        </View>
+                        <View style={{ alignItems: 'center', justifyContent: 'center', width: '45%' }}>
+                            <AppText style={{ color: nutritionColors.energy1, fontWeight: 'bold', fontSize: scaleFont(20), textAlign: 'center' }}>{convertEnergy(totalEnergy, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}</AppText>
+                            <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(15), textAlign: 'center' }}>Energy Burned</AppText>
+                        </View>
+                    </View>
+                </View>
 
-                        {exercises.map((ex) => (
-                            <View key={ex.id} style={styles.exerciseBlock}>
-                                <AppText style={styles.exerciseTitle}>{ex.name}</AppText>
-                                {ex.sets.map((s, idx) => (
-                                    <AppText key={idx} style={styles.setText}>
-                                        Set {idx + 1}: {s.weight}kg x {s.reps || ""} reps{" "}
-                                        {s.note ? `(${s.note})` : ""}
-                                    </AppText>
-                                ))}
-                            </View>
-                        ))}
-                    </>
-                )}
-            </View>
-        </AppScroll>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <AppText style={{ fontSize: scaleFont(15), color: colors.white, fontWeight: 'bold', marginTop: 35, marginHorizontal: 25 }}>
+                        Training Summary
+                    </AppText>
+                </View>
+
+                <Exercise
+                    user={user}
+                    exercise={{
+                        date: new Date(),
+                        label: "Bench Press",
+                        description: "Chest compound movement for upper body strength",
+                        bodyPart: "Chest",
+                        sets: [
+                            { reps: 12, weight: 50 },
+                            { reps: 10, weight: 55 },
+                            { reps: 8, weight: 60 },
+                            { reps: 6, weight: 65 },
+                        ],
+                    }}
+                />
+            </AppScroll>
+        </>
     );
 }
 
 const styles = StyleSheet.create({
-    button: {
-        backgroundColor: "#4ECDC4",
+    scrollContent: {
+        backgroundColor: colors.background,
+    },
+    card: {
+        backgroundColor: colors.cardBackground,
+        padding: 20,
+        borderRadius: 20,
+        marginTop: 15,
+        marginHorizontal: 15,
+    },
+    sectionTitle: {
+        fontSize: scaleFont(19),
+        fontWeight: '700',
+        color: 'white',
+        marginBottom: 12,
+    },
+    feedbackRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: 6,
+    },
+    feedbackBullet: {
+        color: 'white',
+        fontSize: scaleFont(14),
+        marginRight: 6,
+    },
+    feedbackText: {
+        color: 'white',
+        fontSize: scaleFont(12),
+        lineHeight: 20,
+        flex: 1,
+    },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 15,
+    },
+    iconWrapper: {
         padding: 12,
-        borderRadius: 8,
-        marginVertical: 10
+        borderRadius: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
-    buttonSmall: {
-        backgroundColor: "#FF6B6B",
-        padding: 10,
-        borderRadius: 8,
-        marginVertical: 5
+    icon: {
+        width: 40,
+        height: 40,
     },
-    buttonText: { color: "#fff", fontWeight: "700", textAlign: "center" },
-    header: { color: "white", fontSize: 24, fontWeight: "700", marginBottom: 15 },
-    exerciseButton: {
-        padding: 15,
-        backgroundColor: "#333",
-        marginVertical: 5,
-        borderRadius: 10
+    textWrapper: {
+        flex: 1,
+        marginLeft: 5,
     },
-    exerciseText: { color: "#fff", fontSize: 18 },
-    setBox: { marginTop: 15 },
-    input: {
-        borderWidth: 1,
-        borderColor: "#666",
-        backgroundColor: "#222",
-        color: "#fff",
-        padding: 8,
-        marginVertical: 5,
-        borderRadius: 8
+    label: {
+        fontWeight: '700',
+        fontSize: scaleFont(22),
     },
-    exerciseBlock: {
-        padding: 10,
-        backgroundColor: "#333",
-        marginVertical: 10,
-        borderRadius: 10
+    subText: {
+        fontSize: scaleFont(12),
+        color: colors.mutedText,
+        marginTop: 2,
     },
-    exerciseTitle: { color: "#4CAF50", fontSize: 20, fontWeight: "700" },
-    setText: { color: "#fff", marginLeft: 10, marginTop: 5 },
-    subtitle: { color: "#fff", fontSize: 16, marginBottom: 5 }
+    arrow: {
+        width: 20,
+        height: 20,
+        tintColor: 'white',
+    },
+    divider: { width: 1, backgroundColor: "rgba(102,102,102,0.2)", alignSelf: "center", height: "60%" },
+    button: {
+        marginTop: 18,
+        height: 50,
+        borderRadius: 20,
+        backgroundColor: 'linear-gradient(90deg, rgba(0,140,255,1) 0%, rgba(0,200,255,1) 100%)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: 'white',
+        fontWeight: '700',
+        fontSize: scaleFont(14),
+    }
 });

@@ -232,15 +232,6 @@ export default class APIService {
     };
 
     static training = {
-        fetch: {
-            masterExercises: () => APIService.request(`/training/master-exercises/${APIService.USER_ID}`, 'GET'),
-            session: (payload) => APIService.request(`/training/session/${APIService.USER_ID}`, 'GET', payload),
-            allSessions: () => APIService.request(`/training/sessions/${APIService.USER_ID}`, 'GET'),
-        },
-        post: {
-            startSession: () => APIService.request(`/training/start/${APIService.USER_ID}`, 'POST'),
-            addExercise: (payload) => APIService.request(`/training/exercise/${APIService.USER_ID}`, 'POST', payload),
-            addSet: (payload) => APIService.request(`/training/set/${APIService.USER_ID}`, 'POST', payload),
-        },
+        exercises: (payload) 
     };
 }

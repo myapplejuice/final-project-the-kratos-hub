@@ -1,6 +1,28 @@
 import { Images } from "../settings/assets";
 import { convertWeight } from "./unit-converter";
 
+export const bodyParts = [
+    { label: 'Traps', imageUrl: '' },
+    { label: 'Shoulders', imageUrl: '' },
+    { label: 'Chest', imageUrl: '' },
+    { label: 'Upper Back', imageUrl: '' },
+    { label: 'Lower Back', imageUrl: '' },
+    { label: 'Biceps', imageUrl: '' },
+    { label: 'Triceps', imageUrl: '' },
+    { label: 'Forearms', imageUrl: '' },
+    { label: 'Abs / Core', imageUrl: '' },
+    { label: 'Obliques', imageUrl: '' },
+    { label: 'Quads', imageUrl: '' },
+    { label: 'Hamstrings', imageUrl: '' },
+    { label: 'Glutes', imageUrl: '' },
+    { label: 'Calves', imageUrl: '' },
+    { label: 'Hip Flexors', imageUrl: '' },
+    { label: 'Adductors (Inner Thigh)', imageUrl: '' },
+    { label: 'Abductors (Outer Thigh)', imageUrl: '' },
+    { label: 'Neck', imageUrl: '' },
+    { label: 'Traps & Neck', imageUrl: '' },
+]
+
 export const countryCodes = [
     { name: "United States", code: "US", dial_code: "+1" },
     { name: "Canada", code: "CA", dial_code: "+1" },

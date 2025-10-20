@@ -171,4 +171,6 @@ export const Images_2 = {
     missingImage: require('../../../assets/images/missing-image.jpg'),
     missingImagePNG: require('../../../assets/images/missing-image.png'),
     msisingImageTwo: require('../../../assets/images/missing-image-2.png'),
+    exercises: require('../../../assets/images/exercises.png'),
+    exercisesTwo: require('../../../assets/images/exercises-2.png'),
 };
