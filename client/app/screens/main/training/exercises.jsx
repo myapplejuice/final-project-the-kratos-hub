@@ -17,12 +17,15 @@ import { colors, nutritionColors } from "../../../common/settings/styling";
 import FadeInOut from "../../../components/effects/fade-in-out";
 import { CameraContext } from '../../../common/contexts/camera-context';
 import BarcodeScanner from '../../../components/screen-comps/barcode-scanner';
-import { exercises } from '../../../common/utils/global-options';
+import { exercises, muscleGroups } from '../../../common/utils/global-options';
 import ExerciseCard from './exercise-card';
+import usePopups from '../../../common/hooks/use-popups';
+import { ScrollView } from 'react-native';
 
 export default function Exercises() {
     const params = useLocalSearchParams();
     const date = params.date;
+    const { createOptions } = usePopups();
     const { user } = useContext(UserContext);
     const { setCameraActive } = useContext(CameraContext);
     const insets = useSafeAreaInsets();
@@ -30,10 +33,60 @@ export default function Exercises() {
     const [scrollToTop, setScrollToTop] = useState(false);
 
     const [searchQuery, setSearchQuery] = useState('');
+    const [expandedId, setExpandedId] = useState(null);
+    const [page, setPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [visibleExercises, setVisibleExercises] = useState([]);
+    const [filter, setFilter] = useState({ muscle: '', level: '', type: '' });
 
-    useEffect(() => {
-        console.log(params)
-    }, []);
+ useEffect(() => {
+    const level = filter.level.toLowerCase();
+    const type = filter.type.toLowerCase();
+    const query = searchQuery.toLowerCase();
+
+    const filtered = exercises.filter(ex => {
+        const mainMuscle = ex.muscleGroups[0];
+
+        const matchMuscle = filter.muscle ? mainMuscle.toLowerCase() === filter.muscle.toLowerCase() : true;
+        const matchLevel = filter.level ? ex.level.toLowerCase() === level : true;
+        const matchType = filter.type ? ex.type.toLowerCase() === type : true;
+
+        const matchSearch = query
+            ? ex.label.toLowerCase().includes(query) ||
+              ex.muscleGroups.some(m => m.toLowerCase().includes(query))
+            : true;
+
+        return matchMuscle && matchLevel && matchType && matchSearch;
+    });
+
+    const start = 0;
+    const end = page * pageSize;
+    setVisibleExercises(filtered.slice(start, end));
+}, [page, filter, searchQuery]);
+
+    async function handleFiltering(filterKey) {
+        const options =
+            filterKey === 'Muscle' ? muscleGroups :
+                filterKey === 'Level' ? [
+                    "Beginner",
+                    "Intermediate",
+                    "Advanced"
+                ] :
+                    ["Compound", "Isolation"];
+
+        createOptions({
+            title: `${filterKey}`,
+            options,
+            current: filter[filterKey] ? filter[filterKey] : null,
+            onConfirm: (selected) => {
+                if (!selected) return;
+
+                setScrollToTop(true);
+                setPage(1);
+                setFilter({ ...filter, [filterKey.toLowerCase()]: selected });
+            },
+        });
+    }
 
     return (
         <>
@@ -60,11 +113,49 @@ export default function Exercises() {
                     </View>
                 </View>
 
+                <View>
+                    <TouchableOpacity onPress={() => setFilter({ muscle: '', level: '', type: '' })}>
+                        <AppText style={{ color: 'white', fontSize: scaleFont(14), marginBottom: 10 }}>Clear Filters</AppText>
+                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
+                        {['Muscle', 'Level', 'Type'].map((filterKey, idx) => {
+                            return (
+                                <TouchableOpacity
+                                    key={idx}
+                                    onPress={() => handleFiltering(filterKey)}
+                                    style={{
+                                        width: '30%',
+                                        alignItems: 'center',
+                                        paddingVertical: 8,
+                                        borderRadius: 20,
+                                        backgroundColor: filter[filterKey.toLowerCase()] ? colors.main : colors.cardBackground,
+                                    }}
+                                >
+                                    <AppText style={{ color: 'white', fontSize: 14 }}>{filter[filterKey.toLowerCase()] || filterKey}</AppText>
+                                </TouchableOpacity>
+                            )
+                        })}
+                    </View>
+                </View>
+
                 <Divider orientation="horizontal" thickness={2} color={colors.divider} style={{ borderRadius: 50, marginBottom: 15 }} />
 
-                <AppScroll scrollToTop={scrollToTop} extraBottom={200} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} extraTop={0} topPadding={false}>
-                        <ExerciseCard exercise={exercises[0]} />
+                <AppScroll scrollToTop={scrollToTop} extraBottom={350} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} extraTop={0} topPadding={false}>
+                    {visibleExercises.map((exercise, index) =>
+                        <ExerciseCard
+                            key={index}
+                            exercise={exercise}
+                            expanded={expandedId === exercise.id}
+                            onExpandPress={() => expandedId === exercise.id ? setExpandedId(null) : setExpandedId(exercise.id)}
+                            onAddPress={() => { }}
+                        />
+                    )
+                    }
+                    <TouchableOpacity onPress={() => setPage(page + 1)} style={{ alignItems: 'center', borderWidth: 1, borderColor: colors.mutedText, borderRadius: 15, width: 100, alignSelf: 'center', marginTop: 30 }}>
+                        <AppText style={{ textAlign: 'center', marginVertical: 15, color: colors.mutedText }}>Load More</AppText>
+                    </TouchableOpacity>
                 </AppScroll>
+
             </AppView>
         </>
     );

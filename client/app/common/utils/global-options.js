@@ -516,9 +516,6 @@ export const bodyFatRanges = [
 ];
 
 
-
-
-
 // type: "compound" | "isolation"
 // mechanic: "push" | "pull" | "static"
 // level: "beginner" | "intermediate" | "advanced"
@@ -730,3 +727,31 @@ export const exercises = [
 
 ];
 
+export const muscleGroups = [
+    "Chest",
+    "Triceps",
+    "Front Delts",
+    "Quads",
+    "Glutes",
+    "Hamstrings",
+    "Lower Back",
+    "Lats",
+    "Biceps",
+    "Traps",
+    "Shoulders",
+    "Back",
+    "Rear Delts",
+    "Forearms",
+    "Abs",
+    "Core",
+    "Obliques",
+    "Calves",
+    "Adductors",
+    "Hip Abductors",
+    "Hip Flexors",
+    "Arms",
+    "Full Body",
+    "Cardio",
+    "Brachialis",
+    "Upper Chest"
+]
