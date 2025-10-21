@@ -77,7 +77,6 @@ export default function TrainingHub() {
 
      return (
           <AppScroll extraBottom={150} extraTop={0} hideNavBarOnScroll={true}>
-               {/* Header Section */}
                <View style={styles.header}>
                     <View style={styles.headerTop}>
                          <AppText style={styles.headerTitle}>
@@ -92,7 +91,6 @@ export default function TrainingHub() {
                          </View>
                     </View>
 
-                    {/* Quick Stats */}
                     <View style={styles.statsGrid}>
                          <View style={styles.statItem}>
                               <AppText style={styles.statValue}>{totalExercises}</AppText>
@@ -113,7 +111,6 @@ export default function TrainingHub() {
                     </View>
                </View>
 
-               {/* MAIN FEATURE - Workouts Log Hero Card */}
                <View style={styles.mainSection}>
                     <TouchableOpacity
                          onPress={() => router.push(routes.WORKOUTS_LOG)}
@@ -155,12 +152,10 @@ export default function TrainingHub() {
                     </TouchableOpacity>
                </View>
 
-               {/* Training Tools Section */}
                <View style={styles.toolsSection}>
                     <AppText style={styles.sectionTitle}>Training Tools</AppText>
 
                     <View style={styles.toolsGrid}>
-                         {/* Workout Plans */}
                          <TouchableOpacity
                               onPress={handleWorkoutPlans}
                               style={styles.toolCard}
@@ -174,40 +169,6 @@ export default function TrainingHub() {
                               <AppText style={styles.toolTitle}>Workout Plans</AppText>
                               <AppText style={styles.toolDescription}>
                                    Create custom workout routines
-                              </AppText>
-                         </TouchableOpacity>
-
-                         {/* Progress Photos */}
-                         <TouchableOpacity
-                              onPress={() => { }}
-                              style={styles.toolCard}
-                         >
-                              <View style={[styles.toolIcon, styles.photosIcon]}>
-                                   <Image
-                                        source={Images.camera}
-                                        style={styles.toolIconImage}
-                                   />
-                              </View>
-                              <AppText style={styles.toolTitle}>Progress Photos</AppText>
-                              <AppText style={styles.toolDescription}>
-                                   Visual transformation tracking
-                              </AppText>
-                         </TouchableOpacity>
-
-                         {/* Body Metrics */}
-                         <TouchableOpacity
-                              onPress={() => { }}
-                              style={styles.toolCard}
-                         >
-                              <View style={[styles.toolIcon, styles.metricsIcon]}>
-                                   <Image
-                                        source={Images.measuringTape}
-                                        style={styles.toolIconImage}
-                                   />
-                              </View>
-                              <AppText style={styles.toolTitle}>Body Metrics</AppText>
-                              <AppText style={styles.toolDescription}>
-                                   Track measurements & weight
                               </AppText>
                          </TouchableOpacity>
 
@@ -226,10 +187,41 @@ export default function TrainingHub() {
                                    200+ exercises with guides
                               </AppText>
                          </TouchableOpacity>
+
+                         <TouchableOpacity
+                              onPress={() => { }}
+                              style={styles.toolCard}
+                         >
+                              <View style={[styles.toolIcon, styles.photosIcon]}>
+                                   <Image
+                                        source={Images.cameraOutline}
+                                        style={styles.toolIconImage}
+                                   />
+                              </View>
+                              <AppText style={styles.toolTitle}>Progress Photos</AppText>
+                              <AppText style={styles.toolDescription}>
+                                   Visual transformation tracking
+                              </AppText>
+                         </TouchableOpacity>
+
+                         <TouchableOpacity
+                              onPress={() => { }}
+                              style={styles.toolCard}
+                         >
+                              <View style={[styles.toolIcon, styles.metricsIcon]}>
+                                   <Image
+                                        source={Images.statistics2Outline}
+                                        style={styles.toolIconImage}
+                                   />
+                              </View>
+                              <AppText style={styles.toolTitle}>Progress</AppText>
+                              <AppText style={styles.toolDescription}>
+                                   Track your progress & strength
+                              </AppText>
+                         </TouchableOpacity>
                     </View>
                </View>
 
-               {/* Quick Actions */}
                <View style={styles.actionsSection}>
                     <AppText style={styles.sectionTitle}>Quick Actions</AppText>
 
@@ -244,15 +236,7 @@ export default function TrainingHub() {
 
                          <TouchableOpacity style={styles.actionButton}>
                               <Image
-                                   source={Images.checkMark}
-                                   style={styles.actionIcon}
-                              />
-                              <AppText style={styles.actionText}>Progress</AppText>
-                         </TouchableOpacity>
-
-                         <TouchableOpacity style={styles.actionButton}>
-                              <Image
-                                   source={Images.share}
+                                   source={Images.shareOutline}
                                    style={styles.actionIcon}
                               />
                               <AppText style={styles.actionText}>Share</AppText>
@@ -394,6 +378,7 @@ const styles = StyleSheet.create({
           fontWeight: 'bold',
           color: 'white',
           marginBottom: 15,
+          marginHorizontal:15
      },
      toolsGrid: {
           flexDirection: 'row',
@@ -402,11 +387,13 @@ const styles = StyleSheet.create({
      },
      toolCard: {
           width: '48%',
+          height: 140,
           backgroundColor: colors.cardBackground,
           borderRadius: 16,
           padding: 16,
           marginBottom: 12,
           alignItems: 'center',
+          justifyContent: 'center'
      },
      toolIcon: {
           width: 50,
