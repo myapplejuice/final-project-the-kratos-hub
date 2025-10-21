@@ -85,49 +85,7 @@ export default function TrainingHub() {
             }
         })
     }
-
-    async function handleEditExercise(exercise) {
-        createInput({
-            title: "Edit Exercise",
-            confirmText: "Confirm Edit",
-            text: `Enter the details you want to change`,
-            placeholders: [`Label`, `Description`, `Body Part`],
-            initialValues: [exercise.label || '', exercise.description || '', exercise.bodyPart || ''],
-            onSubmit: async (vals) => {
-                try {
-                    showSpinner();
-                    const [label, description, bodyPart] = vals;
-
-                    if (!label)
-                        return createToast({ message: "Label is required" });
-
-                    const payload = {
-                        id: exercise.id,
-                        userId: user.id,
-                        date: exercise.date,
-                        label,
-                        description: description || "",
-                        bodyPart: bodyPart || "",
-                        image: exercise.image,
-                    }
-
-                    const result = await APIService.training.update(payload);
-
-                    if (result.success) {
-                        const exercise = result.data.exercise;
-
-                        setExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
-                        setDateExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
-                    }
-                } catch (e) {
-                    console.log(e)
-                } finally {
-                    hideSpinner();
-                }
-            }
-        });
-    }
-
+    
     async function handleDeleteExercise(exerciseId) {
         createDialog({
             title: "Delete Exercise",
@@ -178,7 +136,7 @@ export default function TrainingHub() {
 
                     if (result.success) {
                         const exercise = result.data.exercise;
-console.log(exercise)
+
                         setExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
                         setDateExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
                     }
