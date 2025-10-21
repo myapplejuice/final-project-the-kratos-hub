@@ -61,10 +61,17 @@ export default function Exercises() {
             return matchMuscle && matchLevel && matchType && matchSearch;
         });
 
-        const start = 0;
-        const end = page * pageSize;
-        setFilteredExercises(filtered);
-        setVisibleExercises(filtered.slice(start, end));
+        const seenLabels = new Set();
+const uniqueFiltered = filtered.filter(ex => {
+    if (seenLabels.has(ex.label.toLowerCase())) return false;
+    seenLabels.add(ex.label.toLowerCase());
+    return true;
+});
+
+const start = 0;
+const end = page * pageSize;
+setFilteredExercises(uniqueFiltered);
+setVisibleExercises(uniqueFiltered.slice(start, end));
     }, [page, filter, searchQuery]);
 
     async function handleFiltering(filterKey) {

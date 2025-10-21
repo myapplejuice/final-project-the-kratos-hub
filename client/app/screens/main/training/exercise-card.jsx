@@ -36,7 +36,7 @@ export default function ExerciseCard({ exercise, onExpandPress = () => { }, onAd
             <ExpandInOut visible={expanded}>
                 <View style={[styles.cardBody]}>
                     <View style={[styles.muscleSection, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }]}>
-                        <View style={{ width: '80%' }}>
+                        <View style={{ width: '70%' }}>
                             <AppText style={styles.sectionLabel}>Target Muscles</AppText>
                             <View style={styles.musclePills}>
                                 {exercise.muscleGroups.map((muscle, index) => (
@@ -62,16 +62,14 @@ export default function ExerciseCard({ exercise, onExpandPress = () => { }, onAd
                                 ))}
                             </View>
                         </View>
-                        <View style={{ width: '20%' }}>
-                            <View style={styles.energyBadge}>
-                                <Image source={Images.kcalBurn} style={styles.energyBadgeIcon} />
-                                <AppText style={styles.energyUnitSmall}>
-                                    <AppText style={styles.energyBadgeText}>
-                                        {convertEnergy(exercise.kCalBurned, 'kcal', user.preferences.energyUnit.key)}
-                                    </AppText>
-                                    {' ' + user.preferences.energyUnit.field}
+                        <View style={styles.energyBadge}>
+                            <Image source={Images.kcalBurn} style={styles.energyBadgeIcon} />
+                            <AppText style={styles.energyUnitSmall}>
+                                <AppText style={styles.energyBadgeText}>
+                                    {convertEnergy(exercise.kCalBurned, 'kcal', user.preferences.energyUnit.key)}
                                 </AppText>
-                            </View>
+                                {' ' + user.preferences.energyUnit.field}
+                            </AppText>
                         </View>
                     </View>
 
