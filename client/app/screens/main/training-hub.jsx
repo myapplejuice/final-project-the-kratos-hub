@@ -29,7 +29,17 @@ export default function TrainingHub() {
                try {
                     const result = await APIService.training.exercises.exercisesByDate(new Date());
                     if (result.success) {
-                         console.log(result.data.exercises)
+                         const exercises = result.data.exercises;
+
+                         const exercisesTotal = exercises.length;
+                         const energyTotal = Math.round(exercises.reduce((total, ex) => {
+                              const totalReps = ex.sets.reduce((sum, set) => sum + set.reps, 0);
+                              const units = totalReps / 5;
+                              const exerciseKCal = (ex.exercise.kCalBurned || 0) * units;
+                              return total + exerciseKCal;
+                         }, 0));
+
+                         console.log(energyTotal, exercisesTotal);
                     }
                } catch (err) {
                     console.log(err);

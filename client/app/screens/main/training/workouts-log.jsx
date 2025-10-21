@@ -267,46 +267,59 @@ export default function WorkoutsLog() {
                 size={60}
             />
 
-            <AppScroll extraBottom={150} hideNavBarOnScroll={true} onScrollSetStates={setFabVisible} >
-                <View style={{ paddingBottom: 20, paddingHorizontal: 20, borderBottomEndRadius: 30, borderBottomStartRadius: 30, backgroundColor: colors.cardBackground }}>
-                    <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', marginVertical: 10 }}>
-                        <TouchableOpacity onPress={() => handleDate(-1)} style={{ justifyContent: 'center', width: '25%', alignItems: 'center' }}>
-                            <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white', transform: [{ scaleX: -1 }] }} />
-                        </TouchableOpacity>
-                        <View style={{ justifyContent: 'center' }}>
-                            <AppText style={{ fontSize: scaleFont(18), color: colors.white, fontWeight: 'bold', margin: 15 }}>
-                                {
-                                    getDayComparisons(date).isToday ? 'Today' :
-                                        getDayComparisons(date).isTomorrow ? 'Tomorrow' :
-                                            getDayComparisons(date).isYesterday ? 'Yesterday' :
-                                                formatDate(date, { format: 'MMM d' })
-                                }
-                            </AppText>
+            {loading ?
+                <View style={{ backgroundColor: colors.background, flex: 1, paddingTop: 75 }}>
+                    {[...Array(2)].map((_, idx) => (
+                        <View key={idx} style={{ margin: 15 }}>
+                            <View style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 15, borderRadius: 10 }} >
+                                <View style={{ justifyContent: 'flex-start', alignItems: 'flex-start', marginTop: 15 }}>
+                                    <View style={{ width: 90, height: 10, borderRadius: 20, backgroundColor: colors.backgroundSecond, marginStart: 15, marginVertical: 5 }} />
+                                    <View style={{ width: 60, height: 7, borderRadius: 20, backgroundColor: colors.backgroundSecond, marginStart: 15, marginVertical: 5 }} />
+                                </View>
+                            </View>
                         </View>
-                        <TouchableOpacity onPress={() => handleDate(+1)} style={{ justifyContent: 'center', width: '25%', alignItems: 'center', transform: [{ rotate: '180deg' }] }}>
-                            <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white', transform: [{ scaleX: -1 }] }} />
-                        </TouchableOpacity>
-                    </View>
-
-                    <Divider orientation="horizontal" />
-
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25 }}>
-                        <View style={{ alignItems: 'center', justifyContent: 'center', width: '45%' }}>
-                            <AppText style={{ color: nutritionColors.carbs1, fontWeight: 'bold', fontSize: scaleFont(20), textAlign: 'center' }}>{exercisesTotal}</AppText>
-                            <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(15), textAlign: 'center' }}>Exercises</AppText>
-                        </View>
-                        <View style={{ width: '10%', alignItems: 'center', justifyContent: 'center', height: 50 }}>
-                            <Divider />
-                        </View>
-                        <View style={{ alignItems: 'center', justifyContent: 'center', width: '45%' }}>
-                            <AppText style={{ color: nutritionColors.energy1, fontWeight: 'bold', fontSize: scaleFont(20), textAlign: 'center' }}>{convertEnergy(energyTotal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}</AppText>
-                            <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(15), textAlign: 'center' }}>Energy Burned</AppText>
-                        </View>
-                    </View>
+                    ))}
                 </View>
+                :
+                <AppScroll extraBottom={150} hideNavBarOnScroll={true} onScrollSetStates={setFabVisible} >
+                    <View style={{ paddingBottom: 20, paddingHorizontal: 20, borderBottomEndRadius: 30, borderBottomStartRadius: 30, backgroundColor: colors.cardBackground }}>
+                        <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', marginVertical: 10 }}>
+                            <TouchableOpacity onPress={() => handleDate(-1)} style={{ justifyContent: 'center', width: '25%', alignItems: 'center' }}>
+                                <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white', transform: [{ scaleX: -1 }] }} />
+                            </TouchableOpacity>
+                            <View style={{ justifyContent: 'center' }}>
+                                <AppText style={{ fontSize: scaleFont(18), color: colors.white, fontWeight: 'bold', margin: 15 }}>
+                                    {
+                                        getDayComparisons(date).isToday ? 'Today' :
+                                            getDayComparisons(date).isTomorrow ? 'Tomorrow' :
+                                                getDayComparisons(date).isYesterday ? 'Yesterday' :
+                                                    formatDate(date, { format: 'MMM d' })
+                                    }
+                                </AppText>
+                            </View>
+                            <TouchableOpacity onPress={() => handleDate(+1)} style={{ justifyContent: 'center', width: '25%', alignItems: 'center', transform: [{ rotate: '180deg' }] }}>
+                                <Image source={Images.arrow} style={{ width: 22, height: 22, tintColor: 'white', transform: [{ scaleX: -1 }] }} />
+                            </TouchableOpacity>
+                        </View>
 
-                {loading ? <></> :
-                    dateExercises.length > 0 ?
+                        <Divider orientation="horizontal" />
+
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 25 }}>
+                            <View style={{ alignItems: 'center', justifyContent: 'center', width: '45%' }}>
+                                <AppText style={{ color: nutritionColors.carbs1, fontWeight: 'bold', fontSize: scaleFont(20), textAlign: 'center' }}>{exercisesTotal}</AppText>
+                                <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(15), textAlign: 'center' }}>Exercises</AppText>
+                            </View>
+                            <View style={{ width: '10%', alignItems: 'center', justifyContent: 'center', height: 50 }}>
+                                <Divider />
+                            </View>
+                            <View style={{ alignItems: 'center', justifyContent: 'center', width: '45%' }}>
+                                <AppText style={{ color: nutritionColors.energy1, fontWeight: 'bold', fontSize: scaleFont(20), textAlign: 'center' }}>{convertEnergy(energyTotal, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}</AppText>
+                                <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(15), textAlign: 'center' }}>Energy Burned</AppText>
+                            </View>
+                        </View>
+                    </View>
+
+                    {dateExercises.length > 0 ?
                         (
                             <>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -338,8 +351,9 @@ export default function WorkoutsLog() {
                                 <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold', textAlign: 'center' }}>Tap the + button to add an exercise</AppText>
                             </View>
                         )
-                }
-            </AppScroll>
+                    }
+                </AppScroll>
+            }
         </>
     );
 }
