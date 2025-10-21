@@ -57,13 +57,13 @@ export default function TrainingHub() {
         setExpandedExercises([filtered[0]?.id || null]);
     }, [date]);
 
-    useEffect(()=>{
-const exercise = additionalContexts.newExercise;
-        if(exercise){
+    useEffect(() => {
+        const exercise = additionalContexts.newExercise;
+        if (exercise) {
             setExercises([...exercises, exercise]);
             setDateExercises([...dateExercises, exercise]);
         }
-    },[additionalContexts.newExercise]);
+    }, [additionalContexts.newExercise]);
 
     async function handleDate(val) {
         if (val === -1) {
@@ -78,11 +78,10 @@ const exercise = additionalContexts.newExercise;
     }
 
     async function handleAddExercise() {
-        
         router.push({
             pathname: routes.EXERCISES,
             params: {
-                date
+                date: encodeURIComponent(date)
             }
         })
     }
@@ -342,7 +341,7 @@ const exercise = additionalContexts.newExercise;
                     (
                         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                             <Image source={Images.icon6} style={{ width: 100, height: 100, alignSelf: 'center', marginTop: 50, tintColor: colors.mutedText }} />
-                            <AppText style={{ fontSize: scaleFont(16), color: colors.mutedText, fontWeight: 'bold', textAlign: 'center',marginTop: 15 }}>No Exercises</AppText>
+                            <AppText style={{ fontSize: scaleFont(16), color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginTop: 15 }}>No Exercises</AppText>
                             <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold', textAlign: 'center' }}>Tap the + button to add an exercise</AppText>
                         </View>
                     )

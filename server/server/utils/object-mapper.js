@@ -127,7 +127,8 @@ export default class ObjectMapper {
             Date: 'date',
             BodyPart: 'bodyPart',
             Image: 'image',
-            Sets: 'sets'
+            Sets: 'sets',
+            Exercise: 'exercise'
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -259,7 +260,8 @@ export default class ObjectMapper {
             date:   'Date',
             bodyPart: 'BodyPart',
             image: 'Image',
-            sets: 'Sets'
+            sets: 'Sets',
+            exercise: 'Exercise'
         };
         return map[key] || key;
     }

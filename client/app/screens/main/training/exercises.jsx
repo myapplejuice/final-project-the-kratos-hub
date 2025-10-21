@@ -21,12 +21,13 @@ import { exercises, muscleGroups } from '../../../common/utils/global-options';
 import ExerciseCard from './exercise-card';
 import usePopups from '../../../common/hooks/use-popups';
 import { ScrollView } from 'react-native';
+import APIService from '../../../common/services/api-service';
 
 export default function Exercises() {
     const params = useLocalSearchParams();
-    const date = params.date;
-    const { createOptions } = usePopups();
-    const { user } = useContext(UserContext);
+    const date = decodeURIComponent(params.date);
+    const { createOptions, showSpinner, hideSpinner, createToast } = usePopups();
+    const { user, setAdditionalContexts } = useContext(UserContext);
     const { setCameraActive } = useContext(CameraContext);
     const insets = useSafeAreaInsets();
     const [fabVisible, setFabVisible] = useState(true);
@@ -93,25 +94,22 @@ export default function Exercises() {
     async function handleAddExercise(exercise) {
         try {
             showSpinner();
-            const [label, description, bodyPart] = vals;
-
-            if (!label)
-                return createToast({ message: "Label is required" });
-
             const payload = {
                 userId: user.id,
-                date,
-                label,
-                description: description || "",
-                bodyPart: bodyPart || "",
-                image: "",
-                sets: [],
+                date: new Date(date),
+                exercise,
+                sets: []
             }
 
             const result = await APIService.training.create(payload);
 
             if (result.success) {
-                const exercise = result.data.exercise;
+                const newExercise = result.data.exercise;
+                setAdditionalContexts(prev => ({ ...prev, newExercise }));
+                createToast({ message: "Exercise added" });
+                router.back();
+            } else {
+                createToast({ message: result.message });
             }
         } catch (e) {
             console.log(e)

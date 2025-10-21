@@ -44,6 +44,7 @@ export default class TrainingDBService {
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, details.userId);
+            Database.addInput(request, 'Date', sql.DateTime2, details.date);
             Database.addInput(request, 'Exercise', sql.NVarChar(sql.MAX), JSON.stringify(details.exercise));
             Database.addInput(request, 'Sets', sql.NVarChar(sql.MAX), JSON.stringify(details.sets));
 
