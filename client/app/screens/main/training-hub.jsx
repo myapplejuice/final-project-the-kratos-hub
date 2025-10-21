@@ -132,7 +132,7 @@ export default function TrainingHub() {
         createDialog({
             title: "Delete Exercise",
             confirmText: "Delete",
-            text: `Are you sure you want to delete this exercise?\n\nThis action cannot be undone`,
+            text: `Are you sure you want to delete this exercise?`,
             confirmButtonStyle: { backgroundColor: colors.negativeRed, borderColor: colors.negativeRed },
             onConfirm: async () => {
                 try {
@@ -326,8 +326,8 @@ export default function TrainingHub() {
                                 <Exercise
                                     key={i}
                                     user={user}
-                                    exercise={exercise}
-                                    onEditPress={() => handleEditExercise(exercise)}
+                                    sets={exercise.sets}
+                                    exercise={exercise.exercise}
                                     onDeletePress={() => handleDeleteExercise(exercise.id)}
                                     onAddPress={() => handleAddSet(exercise)}
                                     onSetEditPress={(set) => handleEditSet(exercise, set)}

@@ -8,10 +8,8 @@ import { scaleFont } from '../../common/utils/scale-fonts';
 import { Images } from '../../common/settings/assets';
 import Inverted from '../effects/invert';
 import { convertWeight } from '../../common/utils/unit-converter';
-import UserContext from '../../common/contexts/user-context';
 
-export default function Exercise({ user, exercise, onExpand = () => { }, expanded = false, onAddPress = () => { }, onEditPress = () => { }, onDeletePress = () => { }, onSetEditPress = () => { }, onSetDeletePress = () => { } }) {
-
+export default function Exercise({ user, sets, exercise, onExpand = () => { }, expanded = false, onAddPress = () => { }, onDeletePress = () => { }, onSetEditPress = () => { }, onSetDeletePress = () => { } }) {
     function formatVolume(num) {
         const convertedValue = convertWeight(num, 'kg', user.preferences.weightUnit.key || 'kg');
         if (convertedValue >= 1_000_000) return (convertedValue / 1_000_000).toFixed(2) + "M";
@@ -19,9 +17,9 @@ export default function Exercise({ user, exercise, onExpand = () => { }, expande
         return convertedValue.toString();
     };
 
-    const totalSets = exercise.sets.length;
-    const totalReps = exercise.sets.reduce((sum, s) => sum + s.reps, 0);
-    const totalVolume = exercise.sets.reduce((sum, s) => sum + s.reps * s.weight, 0);
+    const totalSets = sets?.length || 0;
+    const totalReps = sets?.reduce((sum, s) => sum + s.reps, 0) || 0;
+    const totalVolume = sets?.reduce((sum, s) => sum + s.reps * s.weight, 0) || 0;
 
     return (
         <View style={[styles.card]}>
@@ -32,13 +30,11 @@ export default function Exercise({ user, exercise, onExpand = () => { }, expande
             >
                 <View style={{ flex: 1 }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(16), fontWeight: 'bold' }}>
-                        {exercise.label}
+                        {exercise?.label}
                     </AppText>
-                    {(exercise.bodyPart || exercise.description) && (
-                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11) }}>
-                            {exercise.bodyPart ? `${exercise.bodyPart} - ` : ''}{exercise.description}
-                        </AppText>
-                    )}
+                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11) }}>
+                        {exercise?.muscleGroups?.join(', ')}
+                    </AppText>
                 </View>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 12 }}>
@@ -47,12 +43,6 @@ export default function Exercise({ user, exercise, onExpand = () => { }, expande
                         onPress={onDeletePress}
                     >
                         <Image source={Images.trash} style={{ width: 18, height: 18, tintColor: colors.negativeRed }} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={{ padding: 8, backgroundColor: 'rgba(255, 255, 255, 0.1)', borderRadius: 8, marginLeft: 8 }}
-                        onPress={onEditPress}
-                    >
-                        <Image source={Images.edit} style={{ width: 16, height: 16, tintColor: 'white' }} />
                     </TouchableOpacity>
                     <Inverted inverted={expanded} axis='horizontal' >
                         <Image
@@ -74,7 +64,7 @@ export default function Exercise({ user, exercise, onExpand = () => { }, expande
                 <View style={{ marginTop: 25 }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(14), fontWeight: '700', marginBottom: 12 }}>Sets</AppText>
 
-                    {exercise.sets.map((set, index) => (
+                    {sets.map((set, index) => (
                         <TouchableOpacity
                             key={index}
                             onLongPress={() => onSetDeletePress(set)}
