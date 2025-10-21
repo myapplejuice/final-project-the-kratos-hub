@@ -85,7 +85,7 @@ export default function TrainingHub() {
             }
         })
     }
-    
+
     async function handleDeleteExercise(exerciseId) {
         createDialog({
             title: "Delete Exercise",
@@ -219,7 +219,12 @@ export default function TrainingHub() {
     }
 
     const exercisesTotal = dateExercises.length;
-    const energyTotal = 0
+    const energyTotal = Math.round(dateExercises.reduce((total, ex) => {
+        const totalReps = ex.sets.reduce((sum, set) => sum + set.reps, 0);
+        const units = totalReps / 5;
+        const exerciseKCal = (ex.exercise.kCalBurned || 0) * units;
+        return total + exerciseKCal;
+    }, 0));
 
     return (
         <>
