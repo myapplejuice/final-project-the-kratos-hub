@@ -1,20 +1,90 @@
-{
-    "date": "2025-10-21T14:27:31.168Z",
-    "description": "Mainly upper chest for strength",
-    "duration": "100",
-    "exercises": [
-        {
-            "exercise": [Object
+[
+    {
+        "exercise": {
+            "equipment": "Barbell",
+            "id": "ex_001",
+            "instructions": "Keep your feet flat, control the bar, and avoid bouncing off the chest.",
+            "isBodyweight": false,
+            "kCalBurned": 12,
+            "label": "Barbell Bench Press",
+            "level": "intermediate",
+            "mechanic": "push",
+            "muscleGroups": [Array
             ],
-            "id": 1,
-            "sets": [Array
+            "type": "compound"
+        },
+        "sets": [
+            [Object
             ],
-            "userId": "204EFF41-FF71-4636-9425-14DBB383E2BA",
-            "workoutId": 5
-        }
-    ],
-    "id": 5,
-    "intensity": "Moderate",
-    "label": "Upper Chest Strength",
-    "userId": "204EFF41-FF71-4636-9425-14DBB383E2BA"
-}
+            [Object
+            ],
+            [Object
+            ]
+        ]
+    },
+    {
+        "exercise": {
+            "equipment": "Dip Bar",
+            "id": "ex_010",
+            "instructions": "Lower your body until your arms are at a 90-degree angle, then push back up.",
+            "isBodyweight": true,
+            "kCalBurned": 10,
+            "label": "Tricep Dips",
+            "level": "intermediate",
+            "mechanic": "push",
+            "muscleGroups": [Array
+            ],
+            "type": "compound"
+        },
+        "sets": [
+            [Object
+            ],
+            [Object
+            ]
+        ]
+    },
+    {
+        "exercise": {
+            "equipment": "Bodyweight",
+            "id": "ex_003",
+            "instructions": "Keep your body straight and lower until your chest nearly touches the floor.",
+            "isBodyweight": true,
+            "kCalBurned": 8,
+            "label": "Push-Up",
+            "level": "beginner",
+            "mechanic": "push",
+            "muscleGroups": [Array
+            ],
+            "type": "compound"
+        },
+        "sets": [
+            [Object
+            ],
+            [Object
+            ]
+        ]
+    },
+    {
+        "exercise": {
+            "equipment": "Dumbbells",
+            "id": "ex_034",
+            "instructions": "Perform fly motion on an incline bench, squeeze chest at top.",
+            "isBodyweight": false,
+            "kCalBurned": 6,
+            "label": "Incline Dumbbell Fly",
+            "level": "beginner",
+            "mechanic": "static",
+            "muscleGroups": [Array
+            ],
+            "type": "isolation"
+        },
+        "sets": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ]
+    }
+]

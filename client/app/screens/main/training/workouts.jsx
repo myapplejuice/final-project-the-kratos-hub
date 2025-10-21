@@ -16,6 +16,7 @@ import { routes } from '../../../common/settings/constants';
 import Workout from "../../../components/screen-comps/workout";
 
 export default function Workouts() {
+    const date = decodeURIComponent(useLocalSearchParams().date);
     const insets = useSafeAreaInsets();
 
     const { createInput, showSpinner, hideSpinner, createToast, createDialog, createAlert, createOptions } = usePopups();
@@ -180,8 +181,30 @@ export default function Workouts() {
         })
     }
 
-    async function handleWorkoutImport(workout) { 
+    async function handleWorkoutImport(workout) {
+        const exercises = workout.exercises.map(exercise => ({ exercise: exercise.exercise, sets: exercise.sets }));
 
+        const payload = {
+            userId: user.id,
+            date: new Date(date),
+            exercises
+        }
+
+        try {
+            showSpinner();
+
+            const result = await APIService.training.exercises.createBulk(payload);
+            if (result.success) {
+
+                router.back();
+            } else {
+                createToast({ message: result.message });
+            }
+        } catch (e) {
+            createToast({ message: e.message });
+        } finally {
+            hideSpinner();
+        }
     }
 
     if (loading) {

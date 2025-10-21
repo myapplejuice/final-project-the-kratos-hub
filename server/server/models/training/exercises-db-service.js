@@ -153,4 +153,45 @@ export default class ExercisesDBService {
             return false;
         }
     }
+
+    static async createBulkExercises(details) {
+        const { userId, date, exercises } = details;
+
+        try {
+            const insertedExercises = await Promise.all(
+                exercises.map(async (exercise) => {
+                    const request = Database.getRequest();
+                    Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
+                    Database.addInput(request, 'Date', sql.DateTime2, date);
+                    Database.addInput(request, 'Exercise', sql.NVarChar(sql.MAX), JSON.stringify(exercise.exercise));
+                    Database.addInput(request, 'Sets', sql.NVarChar(sql.MAX), JSON.stringify(exercise.sets));
+
+                    const query = `
+                    INSERT INTO dbo.Exercises (UserId, Exercise, Sets)
+                    OUTPUT INSERTED.*
+                    VALUES (@UserId, @Exercise, @Sets)
+                `;
+
+                    const result = await request.query(query);
+                    if (!result.recordset[0]) return null;
+
+                    const inserted = {};
+                    for (const key in result.recordset[0]) {
+                        if (key === 'Sets' || key === 'Exercise') {
+                            inserted[ObjectMapper.toCamelCase(key)] = JSON.parse(result.recordset[0][key]);
+                        } else {
+                            inserted[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
+                        }
+                    }
+
+                    return inserted;
+                })
+            );
+
+            return insertedExercises;
+        } catch (err) {
+            console.error('createBulkExercises error:', err);
+            return null;
+        }
+    }
 }

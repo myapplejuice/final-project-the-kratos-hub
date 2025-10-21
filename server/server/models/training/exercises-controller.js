@@ -45,4 +45,13 @@ export default class ExercisesController {
 
         return res.status(200).json({ success: true });
     }
+
+    static async createBulkExercises(req, res) {
+        const details = req.body;
+
+        const result = await ExercisesDBService.createBulkExercises(details);
+        if (result === null) return res.status(500).json({ success: false, error: "Failed to create exercise" });
+
+        return res.status(200).json({ success: true, exercises: result });
+    }
 }
