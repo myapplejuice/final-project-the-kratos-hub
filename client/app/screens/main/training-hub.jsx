@@ -86,6 +86,10 @@ export default function TrainingHub() {
         })
     }
 
+    async function handleImportPlan(){
+        
+    }
+
     async function handleDeleteExercise(exerciseId) {
         createDialog({
             title: "Delete Exercise",
@@ -228,8 +232,12 @@ export default function TrainingHub() {
 
     return (
         <>
-            <FloatingActionButton
+            <FloatingActionMenu
                 onPress={handleAddExercise}
+                actions={[
+                    { icon: Images.icon6, title: "Import Plan", onPress: handleImportPlan, closeOnAction: true },
+                    { icon: Images.icon6, title: "Add Exercise", onPress: handleAddExercise, closeOnAction: true },
+                ]}
                 visible={fabVisible}
                 position={{ bottom: insets.bottom + 80, right: 20 }}
                 icon={Images.plus}

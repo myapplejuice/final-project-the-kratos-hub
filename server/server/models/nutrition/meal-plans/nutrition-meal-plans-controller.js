@@ -8,6 +8,7 @@ export default class NutritionMealPlansController {
         const plan = await NutritionMealPlansDBService.createPlan(userId, details);
         if (!plan) return res.status(500).json({ success: false, error: "Failed to create meal" });
 
+        console.log(plan)
         return res.status(200).json({ success: true, plan });
     }
 

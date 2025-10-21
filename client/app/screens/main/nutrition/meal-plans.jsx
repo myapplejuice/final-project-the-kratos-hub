@@ -10,7 +10,7 @@ import { UserContext } from '../../../common/contexts/user-context';
 import usePopups from "../../../common/hooks/use-popups";
 import { scaleFont } from "../../../common/utils/scale-fonts";
 import APIService from "../../../common/services/api-service";
-import { colors,} from "../../../common/settings/styling";
+import { colors, } from "../../../common/settings/styling";
 import { router, useLocalSearchParams } from 'expo-router';
 import { routes } from '../../../common/settings/constants';
 import MealPlan from '../../../components/screen-comps/meal-plan';
@@ -50,11 +50,13 @@ export default function MealsPlans() {
                     isCreatedByCoach: false,
                     coachId: null,
                 }
+
                 try {
                     const result = await APIService.nutrition.mealPlans.create(payload);
                     const newPlan = result.data.plan;
 
                     if (result.success) {
+                        
                         setUser(prev => ({
                             ...prev,
                             plans: [...prev.plans, newPlan]
@@ -215,7 +217,10 @@ export default function MealsPlans() {
             <FloatingActionButton
                 onPress={handlePlanAddition}
                 visible={fabVisible}
-                position={{ bottom: insets.bottom + 50, right: 20 }}
+                position={{ bottom: insets.bottom + 50, right: 20, left: 20 }}
+                style={{ width: '100%', height: 50, backgroundColor: colors.accentGreen }}
+
+                label="Create New Plan"
                 icon={Images.plus}
                 iconStyle={{ transform: [{ rotate: '-90deg' }], marginBottom: 2 }}
             />
@@ -249,7 +254,7 @@ export default function MealsPlans() {
                             You have no meal plans
                         </AppText>
                         <AppText style={{ fontSize: scaleFont(14), color: 'white', textAlign: 'center', marginTop: 5 }}>
-                            Tap on plus the "+" to add new meal plan
+                            Tap below to start creating your own meal plans
                         </AppText>
                     </View>}
             </AppScroll >

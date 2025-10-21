@@ -34,6 +34,7 @@ export default class NutritionMealPlansDBService {
                 plan[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
             }
 
+            console.log(plan)
             return plan;
         } catch (err) {
             console.error('createPlan error:', err);

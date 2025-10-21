@@ -23,7 +23,6 @@ export default function Exercise({ user, sets, exercise, onExpand = () => { }, e
 
     return (
         <View style={[styles.card]}>
-            {/* Title Container */}
             <TouchableOpacity
                 style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
                 onPress={onExpand}
@@ -59,7 +58,6 @@ export default function Exercise({ user, sets, exercise, onExpand = () => { }, e
                 </View>
             </TouchableOpacity>
 
-            {/* Expandable Section */}
             <ExpandInOut visible={expanded}>
                 <View style={{ marginTop: 25 }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(14), fontWeight: '700', marginBottom: 12 }}>Sets</AppText>
@@ -113,7 +111,6 @@ export default function Exercise({ user, sets, exercise, onExpand = () => { }, e
                     ))}
                 </View>
 
-                {/* Totals Section */}
                 <View
                     style={{
                         flexDirection: 'row',
@@ -145,7 +142,6 @@ export default function Exercise({ user, sets, exercise, onExpand = () => { }, e
                     </View>
                 </View>
 
-                {/* Add Set Button */}
                 <AnimatedButton
                     title="Add Set"
                     onPress={onAddPress}
