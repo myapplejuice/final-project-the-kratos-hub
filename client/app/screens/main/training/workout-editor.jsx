@@ -29,16 +29,42 @@ export default function WorkoutEditor() {
     const [workout, setWorkout] = useState(JSON.parse(params.workout));
 
     useEffect(() => {
-        const newExercise = additionalContexts.newExercise;
+        const newExercise = additionalContexts.newWorkoutExercise;
 
         if (newExercise) {
+            setAdditionalContexts(prev => ({ ...prev, newWorkoutExerciseSecondLevel: newExercise }));
             setWorkout(prev => ({ ...prev, exercises: [...prev.exercises, newExercise] }));
+            setExpandedExercise(newExercise.id);
         }
-    }, [additionalContexts.newExercise])
+    }, [additionalContexts.newWorkoutExercise])
 
     function handleAddExercise() {
         setAdditionalContexts(prev => ({ ...prev, workout, context: 'add/workout' }));
         router.push(routes.EXERCISES)
+    }
+
+    async function handleDeleteExercise(exerciseId) {
+        createDialog({
+            title: "Drop Exercise",
+            confirmText: "Drop",
+            text: `Are you sure you want to remove this exercise?`,
+            confirmButtonStyle: { backgroundColor: colors.negativeRed, borderColor: colors.negativeRed },
+            onConfirm: async () => {
+                try {
+                    showSpinner();
+
+                    const result = await APIService.training.workouts.exercises.delete({ exerciseId });
+                    if (result.success) {
+                        setAdditionalContexts(prev => ({ ...prev, droppedExercise: workout.exercises.find(e => e.id === exerciseId) }));
+                        setWorkout(prev => ({ ...prev, exercises: prev.exercises.filter(e => e.id !== exerciseId) }));
+                    }
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    hideSpinner();
+                }
+            }
+        })
     }
 
     return (
@@ -73,7 +99,7 @@ export default function WorkoutEditor() {
                                 user={user}
                                 exercise={exercise.exercise}
                                 sets={exercise.sets}
-                                onDeletePress={() => { }}
+                                onDeletePress={() => handleDeleteExercise(exercise.id)}
                                 onAddPress={() => { }}
                                 onSetDeletePress={() => { }}
                                 onSetEditPress={() => { }}

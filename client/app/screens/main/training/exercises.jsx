@@ -138,10 +138,11 @@ export default function Exercises() {
 
                 const result = await APIService.training.workouts.exercises.add(payload);
                 if (result.success) {
-                    const newExercise = result.data.exercise;
+                    const newWorkoutExercise = result.data.exercise;
                     
-                    setAdditionalContexts({ ...additionalContexts, newExercise });
+                    setAdditionalContexts({ ...additionalContexts, newWorkoutExercise });
                     createToast({ message: "Exercise added" });
+                    router.back();
                 } else {
                     createToast({ message: result.message });
                 }

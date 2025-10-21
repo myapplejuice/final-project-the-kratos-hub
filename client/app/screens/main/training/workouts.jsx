@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppScroll from "../../../components/screen-comps/app-scroll";
@@ -11,7 +11,7 @@ import usePopups from "../../../common/hooks/use-popups";
 import { scaleFont } from "../../../common/utils/scale-fonts";
 import APIService from "../../../common/services/api-service";
 import { colors, } from "../../../common/settings/styling";
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { routes } from '../../../common/settings/constants';
 import Workout from "../../../components/screen-comps/workout";
 
@@ -19,32 +19,41 @@ export default function Workouts() {
     const insets = useSafeAreaInsets();
 
     const { createInput, showSpinner, hideSpinner, createToast, createDialog, createAlert, createOptions } = usePopups();
-    const { user, setUser } = useContext(UserContext);
+    const { user, setUser, additionalContexts, setAdditionalContexts } = useContext(UserContext);
     const [scrollToTop, setScrollToTop] = useState(false);
     const [fabVisible, setFabVisible] = useState(true);
 
+    const [loading, setLoading] = useState(true);
     const [expandedWorkout, setExpandedWorkout] = useState(null);
     const [workouts, setWorkouts] = useState([]);
 
-    useEffect(() => {
-        async function fetchWorkout() {
-            try {
-                showSpinner();
+    useFocusEffect(
+        useCallback(() => {
+            let isActive = true;
 
-                const result = await APIService.training.workouts.workouts();
-                if (result.success) {
-                    const workouts = result.data.workouts;
-                    setWorkouts(workouts);
+            async function fetchWorkout() {
+                try {
+                    setLoading(true);
+
+                    const result = await APIService.training.workouts.workouts();
+                    if (isActive && result.success) {
+                        const workouts = result.data.workouts;
+                        setWorkouts(workouts);
+                    }
+                } catch (e) {
+                    console.log(e);
+                } finally {
+                    setLoading(false);
                 }
-            } catch (e) {
-                console.log(e);
-            } finally {
-                hideSpinner();
             }
-        }
 
-        fetchWorkout();
-    }, [])
+            fetchWorkout();
+
+            return () => {
+                isActive = false; // cleanup to avoid setting state on unmounted screen
+            };
+        }, [])
+    );
 
     async function handleWorkoutAddition() {
         createInput({
@@ -80,7 +89,7 @@ export default function Workouts() {
                             if (result.success) {
                                 const workout = result.data.workout;
                                 setExpandedWorkout(workout.id);
-                                setWorkouts(prev => [...prev, workout]);
+                                setWorkouts(prev => [workout, ...prev]);
                             }
                         } catch (e) {
                             createToast({ message: e.message });
@@ -163,9 +172,9 @@ export default function Workouts() {
 
     async function handleWorkoutImport(workout) { }
 
-    async function handleWorkoutPress(workout) { 
+    async function handleWorkoutPress(workout) {
         router.push({
-        pathname: routes.WOUROUT_EDITOR,
+            pathname: routes.WOUROUT_EDITOR,
             params: {
                 workout: JSON.stringify(workout)
             }
@@ -195,32 +204,48 @@ export default function Workouts() {
                 iconStyle={{ transform: [{ rotate: '-90deg' }], marginBottom: 2 }}
             />
 
-            {workouts.length > 0 ?
-                (
-                    <AppScroll avoidKeyboard={false} extraBottom={250} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
-                        <View style={{ margin: 15 }}>
-                            {workouts.map((workout, index) => (
-                                <Workout
-                                    key={workout.id}
-                                    workout={workout}
-                                    expanded={expandedWorkout === workout.id}
-                                    onExpandPress={() => setExpandedWorkout(expandedWorkout === workout.id ? null : workout.id)}
-                                    onEditPress={() => handleWorkoutUpdate(workout)}
-                                    onDeletePress={() => handleWorkoutDeletion(workout.id)}
-                                    onWorkoutPress={() => handleWorkoutPress(workout)}
-                                    onAddPress={() => handleWorkoutAddition(workout)}
-                                />
-                            ))}
+            {loading ? (
+                workouts.length > 0 ?
+                    (
+                        <AppScroll avoidKeyboard={false} extraBottom={250} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
+                            <View style={{ margin: 15 }}>
+                                {workouts.map((workout, index) => (
+                                    <Workout
+                                        key={workout.id}
+                                        workout={workout}
+                                        expanded={expandedWorkout === workout.id}
+                                        onExpandPress={() => setExpandedWorkout(expandedWorkout === workout.id ? null : workout.id)}
+                                        onEditPress={() => handleWorkoutUpdate(workout)}
+                                        onDeletePress={() => handleWorkoutDeletion(workout.id)}
+                                        onWorkoutPress={() => handleWorkoutPress(workout)}
+                                        onAddPress={() => handleWorkoutAddition(workout)}
+                                    />
+                                ))}
+                            </View>
+                        </AppScroll >
+                    )
+                    : (
+                        <View style={{ backgroundColor: colors.background, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                            <Image source={Images.plan3} style={{ width: 100, height: 100, tintColor: colors.mutedText }} />
+                            <AppText style={{ fontSize: scaleFont(16), color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginTop: 15 }}>No Workouts</AppText>
+                            <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold', textAlign: 'center' }}>Tap below start adding workout plans</AppText>
                         </View>
-                    </AppScroll >
-                )
-                : (
-                    <View style={{ backgroundColor: colors.background, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <Image source={Images.plan3} style={{ width: 100, height: 100, tintColor: colors.mutedText }} />
-                        <AppText style={{ fontSize: scaleFont(16), color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginTop: 15 }}>No Workouts</AppText>
-                        <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold', textAlign: 'center' }}>Tap below start adding workout plans</AppText>
-                    </View>
-                )}
+                    )
+
+            ) : (
+                <View style={{ backgroundColor: colors.background, flex: 1, paddingTop: 75 }}>
+                    {[...Array(2)].map((_, idx) => (
+                        <View key={idx} style={{ marginTop: 15 }}>
+                            <View style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 15, borderRadius: 10 }} >
+                                <View style={{ justifyContent: 'flex-start', alignItems: 'flex-start' }}>
+                                    <View style={{ width: 90, height: 10, borderRadius: 20, backgroundColor: colors.backgroundSecond, marginStart: 15, marginVertical: 5 }} />
+                                    <View style={{ width: 60, height: 7, borderRadius: 20, backgroundColor: colors.backgroundSecond, marginStart: 15, marginVertical: 5 }} />
+                                </View>
+                            </View>
+                        </View>
+                    ))}
+                </View>
+            )}
         </>
     );
 }

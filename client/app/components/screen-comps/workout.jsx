@@ -58,7 +58,7 @@ export default function Workout({
 
                         <View style={styles.infoBox}>
                             <AppText style={styles.infoLabel}>Duration</AppText>
-                            <AppText style={styles.infoValue}>{workout.duration > 60 ? `${Math.floor(workout.duration / 60)}h ${workout.duration % 60}m` : `${workout.duration}m` || 'N/A'}</AppText>
+                            <AppText style={styles.infoValue}>{workout.duration !== 'N/A' && (workout.duration > 60 ? `${Math.floor(workout.duration / 60)}h ${workout.duration % 60}m` : `${workout.duration}m`) || workout.duration}</AppText>
                         </View>
                     </View>
 
