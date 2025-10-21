@@ -22,34 +22,48 @@ import Divider from "../../components/screen-comps/divider";
 export default function TrainingHub() {
      const { showSpinner, hideSpinner, createToast } = usePopups();
      const { user, setUser } = useContext(UserContext);
-     const [log, setLog] = useState({})
+
+     const [consumedEnergy, setConsumedEnergy] = useState(0);
+     const [exercises, setExercises] = useState([]);
+     const [totalEnergy, setTotalEnergy] = useState(0);
+     const [totalExercises, setTotalExercises] = useState(0);
 
      useEffect(() => {
-          async function prepareDayLog() {
+          async function prepareData() {
                try {
+                    showSpinner();
+
                     const result = await APIService.training.exercises.exercisesByDate(new Date());
+
                     if (result.success) {
                          const exercises = result.data.exercises;
-
                          const exercisesTotal = exercises.length;
-                         const energyTotal = Math.round(exercises.reduce((total, ex) => {
-                              const totalReps = ex.sets.reduce((sum, set) => sum + set.reps, 0);
-                              const units = totalReps / 5;
-                              const exerciseKCal = (ex.exercise.kCalBurned || 0) * units;
-                              return total + exerciseKCal;
-                         }, 0));
+                         const energyTotal = Math.round(
+                              exercises.reduce((total, ex) => {
+                                   const totalReps = ex.sets.reduce((sum, set) => sum + set.reps, 0);
+                                   const units = totalReps / 5;
+                                   const exerciseKCal = (ex.exercise.kCalBurned || 0) * units;
+                                   return total + exerciseKCal;
+                              }, 0)
+                         );
 
-                         console.log(energyTotal, exercisesTotal);
+                         setExercises(exercises);
+                         setTotalEnergy(energyTotal);
+                         setTotalExercises(exercisesTotal);
                     }
+
+                    const date = formatDate(new Date(), { format: "YYYY-MM-DD" });
+                    const nutritionLog = user.nutritionLogs[date];
+                    const { energyKcal } = totalDayConsumption(nutritionLog);
+                    setConsumedEnergy(energyKcal || 0);
                } catch (err) {
                     console.log(err);
                } finally {
                     hideSpinner();
                }
-
           }
 
-          prepareDayLog();
+          prepareData();
      }, []);
 
      function handleMealPlansPress() {
@@ -74,57 +88,22 @@ export default function TrainingHub() {
                               </View>
                          </View>
 
-                         <View style={{ marginBottom: 20 }}>
-                              <ProgressBar
-                                   title="Energy Burned"
-                                   current={convertEnergy(log?.consumedEnergyKcal || 0, 'kcal', user.preferences.energyUnit.key)}
-                                   max={convertEnergy(log?.targetEnergyKcal || user.nutrition.setEnergyKcal, 'kcal', user.preferences.energyUnit.key)}
-                                   unit={user.preferences.energyUnit.field}
-                                   color={log?.consumedEnergyKcal > log?.targetEnergyKcal ? 'red' : nutritionColors.energy1}
-                                   styleType="header"
-                                   height={10}
-                                   warningText="(Excess Energy Consumed)"
-                                   showWarningText={true}
-                                   borderRadius={5}
-                              />
-                         </View>
-                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                              {[
-                                   { label: 'Carbs', target: log?.targetCarbGrams || user.nutrition.carbGrams, consumed: log?.consumedCarbGrams || 0, color: nutritionColors.carbs1 },
-                                   { label: 'Protein', target: log?.targetProteinGrams || user.nutrition.proteinGrams, consumed: log?.consumedProteinGrams || 0, color: nutritionColors.protein1 },
-                                   { label: 'Fat', target: log?.targetFatGrams || user.nutrition.fatGrams, consumed: log?.consumedFatGrams || 0, color: nutritionColors.fat1 },
-                              ].map((macro, i) => {
-                                   return (
-                                        <ProgressBar
-                                             key={i}
-                                             title={macro.label}
-                                             current={macro.consumed}
-                                             max={macro.target}
-                                             unit={'g'}
-                                             color={macro.color}
-                                             styleType="inline"
-                                             height={10}
-                                             width={"30%"}
-                                             borderRadius={5}
-                                             valueStyle={{ fontSize: scaleFont(12) }}
-                                        />
-                                   );
-                              })}
-                         </View>
+                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, backgroundColor: colors.backgroundSecond }}>
+                              <View style={{ alignItems: 'center', flex: 1 }}>
+                                   <AppText style={{ fontSize: 14, color: colors.mutedText }}>Burned</AppText>
+                                   <AppText style={{ fontSize: 20, fontWeight: '700', color: nutritionColors.energy1 }}>
+                                        {convertEnergy(totalEnergy || 0, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
+                                   </AppText>
+                              </View>
 
-                         <Divider orientation="horizontal" style={{ marginVertical: 20 }} />
+                              <Divider style={{ width: 1, backgroundColor: '#dddddd88', marginHorizontal: 10, borderRadius: 20 }} />
 
-                         <View style={{ marginBottom: 20 }}>
-                              <ProgressBar
-                                   title="Water"
-                                   current={convertFluid(log?.consumedWaterMl || 0, 'ml', user.preferences.fluidUnit.key).toFixed(0)}
-                                   max={convertFluid(log?.targetWaterMl || user.nutrition.waterMl, 'ml', user.preferences.fluidUnit.key).toFixed(0)}
-                                   unit={user.preferences.fluidUnit.field}
-                                   color={nutritionColors.water1}
-                                   styleType="header"
-                                   height={10}
-                                   borderRadius={5}
-                              />
+                              <View style={{ alignItems: 'center', flex: 1 }}>
+                                   <AppText style={{ fontSize: 14, color: colors.mutedText }}>Consumed</AppText>
+                                   <AppText style={{ fontSize: 20, fontWeight: '700', color: '#ff4d4d'  }}>
+                                        {convertEnergy(consumedEnergy, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
+                                   </AppText>
+                              </View>
                          </View>
 
                          <AppText style={{ fontSize: scaleFont(11), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>
