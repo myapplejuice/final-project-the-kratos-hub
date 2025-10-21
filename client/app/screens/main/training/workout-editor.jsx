@@ -29,10 +29,9 @@ export default function WorkoutEditor() {
     const [workout, setWorkout] = useState(JSON.parse(params.workout));
 
     useEffect(() => {
-        const newExercise = additionalContexts.newWorkoutExercise;
-
-        if (newExercise) {
-            setAdditionalContexts(prev => ({ ...prev, newWorkoutExerciseSecondLevel: newExercise }));
+        if (additionalContexts.newWorkoutExercise) {
+            const newExercise = additionalContexts.newWorkoutExercise;
+            setAdditionalContexts(prev => ({ ...prev, newWorkoutExercise: null }));
             setWorkout(prev => ({ ...prev, exercises: [...prev.exercises, newExercise] }));
             setExpandedExercise(newExercise.id);
         }
@@ -55,7 +54,6 @@ export default function WorkoutEditor() {
 
                     const result = await APIService.training.workouts.exercises.delete({ exerciseId });
                     if (result.success) {
-                        setAdditionalContexts(prev => ({ ...prev, droppedExercise: workout.exercises.find(e => e.id === exerciseId) }));
                         setWorkout(prev => ({ ...prev, exercises: prev.exercises.filter(e => e.id !== exerciseId) }));
                     }
                 } catch (e) {
