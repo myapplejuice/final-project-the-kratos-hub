@@ -15,6 +15,7 @@ export default function Workout({
     onEditPress = () => { },
     onDeletePress = () => { },
     onWorkoutPress = () => { },
+    onAddPress = () => { },
 }) {
     return (
         <View style={styles.card}>
@@ -89,12 +90,20 @@ export default function Workout({
                         </View>
                     </View>
 
-                    <View style={styles.actions}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                         <AnimatedButton
+                            title="Add Workout"
+                            onPress={onAddPress}
+                            textStyle={{fontSize: scaleFont(14)}}
+                            style={[styles.actionButton, { backgroundColor: colors.accentGreen, width: '48%' }]}
+                            leftImage={Images.plus}
+                            leftImageStyle={{ tintColor: 'white', marginEnd: 5 }}
+                        />
+                           <AnimatedButton
                             title="View Full Workout"
                             onPress={onWorkoutPress}
                             textStyle={{fontSize: scaleFont(14)}}
-                            style={[styles.actionButton, { backgroundColor: colors.main }]}
+                            style={[styles.actionButton, { backgroundColor: colors.main, width: '48%' }]}
                             rightImage={Images.arrow}
                             rightImageStyle={{ tintColor: 'white', marginStart: 5 }}
                         />
@@ -210,9 +219,6 @@ const styles = StyleSheet.create({
         width: 1,
         height: 25,
         backgroundColor: 'rgba(255,255,255,0.2)',
-    },
-    actions: {
-        gap: 10,
     },
     actionButton: {
         paddingVertical: 14,

@@ -95,7 +95,49 @@ export default function Workouts() {
     }
 
     async function handleWorkoutUpdate(workout) {
+        createInput({
+            title: "New Workout",
+            confirmText: "Add",
+            text: "Enter new label, description, duration in minutes",
+            placeholders: ["Label", "Description", "Duration"],
+            initialValues: [workout.label, workout.description, workout.duration],
+            extraConfigs: [{ keyboardType: "default" }, { keyboardType: "default" }, { keyboardType: "numeric" }],
+            onSubmit: (vals) => {
+                const label = vals[0] ? vals[0] : workout.label;
+                const description = vals[1] ? vals[1] : workout.description;
+                const duration = vals[2] ? Number(vals[2]) :workout.duration;
 
+                createOptions({
+                    title: "Choose intensity",
+                    options: ["Low", "Moderate", "High", "Intense"],
+                    current: workout.intensity,
+                    onConfirm: async (selectedOption) => {
+                        try {
+                            showSpinner();
+                            const intensity = selectedOption ? selectedOption : "Not specified";
+
+                            const payload = {
+                                id: workout.id,
+                                label,
+                                description,
+                                duration,
+                                intensity
+                            }
+
+                            const result = await APIService.training.workouts.update(payload);
+                            if (result.success) {
+                                const workout = result.data.workout;
+                                setWorkouts(prev => prev.map(prevWorkout => prevWorkout.id === workout.id ? workout : prevWorkout));
+                            }
+                        } catch (e) {
+                            createToast({ message: e.message });
+                        } finally {
+                            hideSpinner();
+                        }
+                    }
+                });
+            }
+        });
     }
 
     async function handleWorkoutDeletion(workoutId) {
@@ -121,6 +163,7 @@ export default function Workouts() {
     }
 
     async function handleWorkoutImport(workout) {
+        
     }
 
     async function handleWorkoutPress(selectedWorkoutId) {
