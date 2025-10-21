@@ -37,7 +37,7 @@ export default function TrainingHub() {
 
     useEffect(() => {
         async function fetchExercises() {
-            const result = await APIService.training.exercises();
+            const result = await APIService.training.exercises.exercises();
 
             if (result.success) {
                 const exercises = result.data.exercises;
@@ -105,7 +105,7 @@ export default function TrainingHub() {
                 try {
                     showSpinner();
 
-                    const result = await APIService.training.delete({ exerciseId });
+                    const result = await APIService.training.exercises.delete({ exerciseId });
                     if (result.success) {
                         setExercises(prev => prev.filter(e => e.id !== exerciseId));
                         setDateExercises(prev => prev.filter(e => e.id !== exerciseId));
@@ -141,7 +141,7 @@ export default function TrainingHub() {
                         sets: [...exercise.sets, { id, reps: Number(reps), weight: Number(weight) }]
                     }
 
-                    const result = await APIService.training.updateSets(payload);
+                    const result = await APIService.training.exercises.updateSets(payload);
 
                     if (result.success) {
                         const exercise = result.data.exercise;
@@ -179,7 +179,7 @@ export default function TrainingHub() {
                         sets: exercise.sets.map(s => s.id === set.id ? { ...s, reps: Number(reps), weight: Number(weight) } : s)
                     }
 
-                    const result = await APIService.training.updateSets(payload);
+                    const result = await APIService.training.exercises.updateSets(payload);
 
                     if (result.success) {
                         const exercise = result.data.exercise;
@@ -211,7 +211,7 @@ export default function TrainingHub() {
                         sets: exercise.sets.filter(s => s.id !== set.id)
                     }
 
-                    const result = await APIService.training.updateSets(payload);
+                    const result = await APIService.training.exercises.updateSets(payload);
                     if (result.success) {
                         const exercise = result.data.exercise;
 

@@ -108,7 +108,7 @@ setVisibleExercises(uniqueFiltered.slice(start, end));
                 sets: []
             }
 
-            const result = await APIService.training.create(payload);
+            const result = await APIService.training.exercises.create(payload);
 
             if (result.success) {
                 const newExercise = result.data.exercise;

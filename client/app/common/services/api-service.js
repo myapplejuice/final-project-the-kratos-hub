@@ -232,10 +232,18 @@ export default class APIService {
     };
 
     static training = {
-        exercises: () => APIService.request(`/training/exercise/${APIService.USER_ID}`, 'GET'),
-        create: (payload) => APIService.request(`/training/exercise/${APIService.USER_ID}`, 'POST', payload),
-        update: (payload) => APIService.request(`/training/exercise/${APIService.USER_ID}`, 'PUT', payload),
-        updateSets: (payload) => APIService.request(`/training/exercise/sets/${APIService.USER_ID}`, 'PUT', payload),
-        delete: (payload) => APIService.request(`/training/exercise/${APIService.USER_ID}`, 'DELETE', payload)
+        exercises: {
+            exercises: () => APIService.request(`/training/exercise/${APIService.USER_ID}`, 'GET'),
+            create: (payload) => APIService.request(`/training/exercise/${APIService.USER_ID}`, 'POST', payload),
+            update: (payload) => APIService.request(`/training/exercise/${APIService.USER_ID}`, 'PUT', payload),
+            updateSets: (payload) => APIService.request(`/training/exercise/sets/${APIService.USER_ID}`, 'PUT', payload),
+            delete: (payload) => APIService.request(`/training/exercise/${APIService.USER_ID}`, 'DELETE', payload)
+        },
+        workouts:{
+            workouts: () => APIService.request(`/training/workout/${APIService.USER_ID}`, 'GET'),
+            create: (payload) => APIService.request(`/training/workout/${APIService.USER_ID}`, 'POST', payload),
+            update: (payload) => APIService.request(`/training/workout/${APIService.USER_ID}`, 'PUT', payload),
+            delete: (payload) => APIService.request(`/training/workout/${APIService.USER_ID}`, 'DELETE', payload)
+        }
     };
 }

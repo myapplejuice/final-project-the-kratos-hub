@@ -14,14 +14,13 @@ export default function Workout({
     onExpandPress = () => { },
     onEditPress = () => { },
     onDeletePress = () => { },
-    onViewDetails = () => { },
+    onWorkoutPress = () => { },
 }) {
     return (
         <View style={styles.card}>
-            {/* Header */}
             <TouchableOpacity
                 onPress={onExpandPress}
-                style={[styles.header, { backgroundColor: nutritionColors.energy1 }]}
+                style={[styles.header, { backgroundColor: colors.main }]}
             >
                 <View style={styles.headerContent}>
                     <View>
@@ -30,16 +29,23 @@ export default function Workout({
                             {new Date(workout.date).toLocaleDateString() || 'Unknown Date'}
                         </AppText>
                     </View>
-                    <Invert inverted={expanded} axis="horizontal">
-                        <Image
-                            source={Images.arrow}
-                            style={{ width: 20, height: 20, tintColor: 'white', transform: [{ rotate: '90deg' }] }}
-                        />
-                    </Invert>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{marginEnd: 10, backgroundColor: colors.backgroundSecond + '50', padding: 5, borderRadius: 5}}>
+                            <Image source={Images.edit} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                        </View>
+                        <View style={{marginEnd: 10, backgroundColor: colors.backgroundSecond + '50', padding: 5, borderRadius: 5}}>
+                            <Image source={Images.trash} style={{ width: 20, height: 20, tintColor: colors.negativeRed }} />
+                        </View>
+                        <Invert inverted={expanded} axis="horizontal">
+                            <Image
+                                source={Images.arrow}
+                                style={{ width: 20, height: 20, tintColor: 'white', transform: [{ rotate: '90deg' }] }}
+                            />
+                        </Invert>
+                    </View>
                 </View>
             </TouchableOpacity>
 
-            {/* Expandable Body */}
             <ExpandInOut visible={expanded}>
                 <View style={styles.body}>
                     {/* Info Section */}
@@ -55,7 +61,6 @@ export default function Workout({
                         </View>
                     </View>
 
-                    {/* Description */}
                     {workout.description ? (
                         <>
                             <AppText style={styles.sectionLabel}>DESCRIPTION</AppText>
@@ -67,7 +72,6 @@ export default function Workout({
                         </>
                     ) : null}
 
-                    {/* Stats */}
                     <View style={styles.statsRow}>
                         <View style={styles.stat}>
                             <AppText style={styles.statLabel}>Exercises</AppText>
@@ -85,25 +89,12 @@ export default function Workout({
                         </View>
                     </View>
 
-                    {/* Buttons */}
                     <View style={styles.actions}>
                         <AnimatedButton
                             title="View Details"
-                            onPress={onViewDetails}
+                            onPress={onWorkoutPress}
                             style={[styles.actionButton, { backgroundColor: colors.main }]}
                         />
-                        <View style={{ flexDirection: 'row', gap: 10 }}>
-                            <AnimatedButton
-                                title="Edit"
-                                onPress={onEditPress}
-                                style={[styles.actionButton, { backgroundColor: colors.accentGreen }]}
-                            />
-                            <AnimatedButton
-                                title="Delete"
-                                onPress={onDeletePress}
-                                style={[styles.actionButton, { backgroundColor: colors.negativeRed }]}
-                            />
-                        </View>
                     </View>
                 </View>
             </ExpandInOut>
@@ -222,6 +213,6 @@ const styles = StyleSheet.create({
     },
     actionButton: {
         paddingVertical: 14,
-        borderRadius: 14,
+        borderRadius: 20,
     },
 });
