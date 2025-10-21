@@ -91,6 +91,7 @@ export default function TrainingHub() {
                          </View>
                     </View>
 
+<View>
                     <View style={styles.statsGrid}>
                          <View style={styles.statItem}>
                               <AppText style={styles.statValue}>{totalExercises}</AppText>
@@ -108,6 +109,7 @@ export default function TrainingHub() {
                               </AppText>
                               <AppText style={styles.statLabel}>Consumed</AppText>
                          </View>
+                    </View>
                     </View>
                </View>
 
@@ -276,6 +278,9 @@ const styles = StyleSheet.create({
      statsGrid: {
           flexDirection: 'row',
           justifyContent: 'space-between',
+          backgroundColor: colors.backgroundTop,
+          padding: 15, 
+          borderRadius: 20
      },
      statItem: {
           alignItems: 'center',
