@@ -26,7 +26,7 @@ import Exercise from "../../components/screen-comps/exercise";
 
 export default function TrainingHub() {
     const { showSpinner, hideSpinner, createInput, createDialog, createAlert, createToast } = usePopups();
-    const { user, setUser, setAdditionalContexts,additionalContexts } = useContext(UserContext);
+    const { user, setUser, setAdditionalContexts, additionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
     const [expandedExercises, setExpandedExercises] = useState([]);
@@ -65,6 +65,14 @@ export default function TrainingHub() {
         }
     }, [additionalContexts.newExercise]);
 
+    useEffect(() => {
+        const newExercises = additionalContexts.newExercises;
+        if (newExercises) {
+            setExercises([...exercises, newExercises]);
+            setDateExercises([...dateExercises, newExercises]);
+        }
+    }, [additionalContexts.newExercises]);
+
     async function handleDate(val) {
         if (val === -1) {
             const newDate = new Date(date);
@@ -87,7 +95,7 @@ export default function TrainingHub() {
         })
     }
 
-    async function handleImportWorkout(){
+    async function handleImportWorkout() {
         router.push({
             pathname: routes.WORKOUTS,
             params: {

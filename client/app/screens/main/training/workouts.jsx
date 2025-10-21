@@ -195,7 +195,10 @@ export default function Workouts() {
 
             const result = await APIService.training.exercises.createBulk(payload);
             if (result.success) {
+                const newExercises = result.data.exercises;
 
+                setAdditionalContexts(prev => ({ ...prev, newExercises }));
+                createToast({ message: "Workout imported" });
                 router.back();
             } else {
                 createToast({ message: result.message });
