@@ -76,172 +76,393 @@ export default function TrainingHub() {
      }
 
      return (
-          <>
-               <AppScroll extraBottom={150} extraTop={0} hideNavBarOnScroll={true} >
-                    <View style={{ margin: 0, paddingHorizontal: 20, paddingTop: 60, paddingBottom: 20, borderBottomEndRadius: 30, borderBottomStartRadius: 30, backgroundColor: colors.cardBackground }}>
-                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 30 }}>
-                              <AppText style={{ fontSize: scaleFont(15), color: colors.white, fontWeight: 'bold' }}>
-                                   Today's Training Summary
-                              </AppText>
-                              <View style={{ justifyContent: 'center' }}>
-                                   <DateDisplay showDay={false} dateStyle={{ fontSize: scaleFont(14) }} uppercaseDate={false} />
-                              </View>
-                         </View>
-
-                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, backgroundColor: colors.backgroundTop, padding: 15, borderRadius: 20 }}>
-                              <View style={{ alignItems: 'center', width: '49.8%' }}>
-                                   <AppText style={{ fontSize: 14, color: colors.mutedText }}>Burned</AppText>
-                                   <AppText style={{ fontSize: 20, fontWeight: '700', color: nutritionColors.energy1 }}>
-                                        {convertEnergy(totalEnergy || 0, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
-                                   </AppText>
-                              </View>
-
-                              <Divider style={{ width: '0.4%', backgroundColor: colors.mutedText, borderRadius: 20 }} />
-
-                              <View style={{ alignItems: 'center', width: '49.8%' }}>
-                                   <AppText style={{ fontSize: 14, color: colors.mutedText }}>Consumed</AppText>
-                                   <AppText style={{ fontSize: 20, fontWeight: '700', color: '#ff4d4d' }}>
-                                        {convertEnergy(consumedEnergy, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
-                                   </AppText>
-                              </View>
-                         </View>
-
-                         <View style={{ flexDirection: 'row', justifyContent: 'center', backgroundColor: colors.backgroundTop, padding: 15, borderRadius: 20 }}>
-                              <View style={{ alignItems: 'center' }}>
-                                   <AppText style={{ fontSize: 14, color: colors.mutedText }}>Total Exercises</AppText>
-                                   <AppText style={{ fontSize: 20, fontWeight: '700', color: colors.main }}>
-                                        {totalExercises}
-                                   </AppText>
-                              </View>
+          <AppScroll extraBottom={150} extraTop={0} hideNavBarOnScroll={true}>
+               {/* Header Section */}
+               <View style={styles.header}>
+                    <View style={styles.headerTop}>
+                         <AppText style={styles.headerTitle}>
+                              Training Summary
+                         </AppText>
+                         <View style={styles.dateContainer}>
+                              <DateDisplay
+                                   showDay={false}
+                                   dateStyle={styles.dateText}
+                                   uppercaseDate={false}
+                              />
                          </View>
                     </View>
 
-                    <AppText style={[styles.sectionTitle, { marginHorizontal: 25, fontSize: scaleFont(20), fontWeight: 'bold', marginBottom: 0, marginTop: 25 }]}>Training Tabs</AppText>
-
-                    <TouchableOpacity onPress={() => router.push(routes.WORKOUTS_LOG)} style={[styles.card, { padding: 20 }]}>
-                         <View style={{ alignItems: 'center', borderRadius: 15, padding: 20 }}>
-                              <Image
-                                   source={Images.workoutLogOutline}
-                                   style={{ width: 60, height: 60, tintColor: 'white' }}
-                              />
+                    {/* Quick Stats */}
+                    <View style={styles.statsGrid}>
+                         <View style={styles.statItem}>
+                              <AppText style={styles.statValue}>{totalExercises}</AppText>
+                              <AppText style={styles.statLabel}>Exercises</AppText>
                          </View>
-                         <View style={{ justifyContent: 'flex-start', paddingBottom: 20 }}>
-                              <View style={{ alignItems: 'center' }}>
-                                   <AppText style={{ color: 'white', fontSize: scaleFont(20), fontWeight: 'bold' }}>
-                                        Workouts Log
-                                   </AppText>
-                                   <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
-                                        Always stay on track with your workouts and progress
-                                   </AppText>
-                              </View>
+                         <View style={styles.statItem}>
+                              <AppText style={styles.statValue}>
+                                   {convertEnergy(totalEnergy || 0, 'kcal', user.preferences.energyUnit.key)}
+                              </AppText>
+                              <AppText style={styles.statLabel}>Burned</AppText>
                          </View>
-                    </TouchableOpacity>
+                         <View style={styles.statItem}>
+                              <AppText style={styles.statValue}>
+                                   {convertEnergy(consumedEnergy, 'kcal', user.preferences.energyUnit.key)}
+                              </AppText>
+                              <AppText style={styles.statLabel}>Consumed</AppText>
+                         </View>
+                    </View>
+               </View>
 
-                    <TouchableOpacity onPress={handleWorkoutPlans} style={[styles.card, { padding: 15 }]}>
-                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 1 }}>
-                                   <View style={{ borderRadius: 15, padding: 12, backgroundColor: colors.lightMutedText, overflow: 'hidden' }}>
+               {/* MAIN FEATURE - Workouts Log Hero Card */}
+               <View style={styles.mainSection}>
+                    <TouchableOpacity
+                         onPress={() => router.push(routes.WORKOUTS_LOG)}
+                         style={styles.heroCard}
+                    >
+                         <View style={styles.heroBackground}>
+                              <View style={styles.heroContent}>
+                                   <View style={styles.heroIconContainer}>
                                         <Image
-                                             source={Images.workoutPlanOutline}
-                                             style={{ width: 35, height: 35, tintColor: 'white' }}
+                                             source={Images.workoutLogOutline}
+                                             style={styles.heroIcon}
                                         />
                                    </View>
-                                   <View style={{ justifyContent: 'flex-start', marginStart: 15, marginEnd: 70 }}>
-                                        <View>
-                                             <AppText style={{ color: 'white', fontSize: scaleFont(18), fontWeight: 'bold' }}>
-                                                  Workout Plans
-                                             </AppText>
-                                             <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
-                                                  Build your own daily workout plan to easily use in your logs
-                                             </AppText>
-                                        </View>
+                                   <View style={styles.heroText}>
+                                        <AppText style={styles.heroTitle}>Workouts Log</AppText>
+                                        <AppText style={styles.heroSubtitle}>
+                                             Track, analyze, and optimize your fitness journey
+                                        </AppText>
+                                   </View>
+                                   <View>
+                                        <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
+                                   </View>
+                              </View>
+                              <View style={styles.heroStats}>
+                                   <View style={styles.heroStat}>
+                                        <AppText style={styles.heroStatValue}>12</AppText>
+                                        <AppText style={styles.heroStatLabel}>This Week</AppText>
+                                   </View>
+                                   <View style={styles.heroStat}>
+                                        <AppText style={styles.heroStatValue}>47</AppText>
+                                        <AppText style={styles.heroStatLabel}>This Month</AppText>
+                                   </View>
+                                   <View style={styles.heroStat}>
+                                        <AppText style={styles.heroStatValue}>98%</AppText>
+                                        <AppText style={styles.heroStatLabel}>Consistency</AppText>
                                    </View>
                               </View>
                          </View>
                     </TouchableOpacity>
-               </AppScroll >
-          </>
+               </View>
+
+               {/* Training Tools Section */}
+               <View style={styles.toolsSection}>
+                    <AppText style={styles.sectionTitle}>Training Tools</AppText>
+
+                    <View style={styles.toolsGrid}>
+                         {/* Workout Plans */}
+                         <TouchableOpacity
+                              onPress={handleWorkoutPlans}
+                              style={styles.toolCard}
+                         >
+                              <View style={[styles.toolIcon, styles.plansIcon]}>
+                                   <Image
+                                        source={Images.workoutPlanOutline}
+                                        style={styles.toolIconImage}
+                                   />
+                              </View>
+                              <AppText style={styles.toolTitle}>Workout Plans</AppText>
+                              <AppText style={styles.toolDescription}>
+                                   Create custom workout routines
+                              </AppText>
+                         </TouchableOpacity>
+
+                         {/* Progress Photos */}
+                         <TouchableOpacity
+                              onPress={() => { }}
+                              style={styles.toolCard}
+                         >
+                              <View style={[styles.toolIcon, styles.photosIcon]}>
+                                   <Image
+                                        source={Images.camera}
+                                        style={styles.toolIconImage}
+                                   />
+                              </View>
+                              <AppText style={styles.toolTitle}>Progress Photos</AppText>
+                              <AppText style={styles.toolDescription}>
+                                   Visual transformation tracking
+                              </AppText>
+                         </TouchableOpacity>
+
+                         {/* Body Metrics */}
+                         <TouchableOpacity
+                              onPress={() => { }}
+                              style={styles.toolCard}
+                         >
+                              <View style={[styles.toolIcon, styles.metricsIcon]}>
+                                   <Image
+                                        source={Images.measuringTape}
+                                        style={styles.toolIconImage}
+                                   />
+                              </View>
+                              <AppText style={styles.toolTitle}>Body Metrics</AppText>
+                              <AppText style={styles.toolDescription}>
+                                   Track measurements & weight
+                              </AppText>
+                         </TouchableOpacity>
+
+                         <TouchableOpacity
+                              onPress={() => router.push(routes.EXERCISES_LIST)}
+                              style={styles.toolCard}
+                         >
+                              <View style={[styles.toolIcon, styles.libraryIcon]}>
+                                   <Image
+                                        source={Images.icon6}
+                                        style={styles.toolIconImage}
+                                   />
+                              </View>
+                              <AppText style={styles.toolTitle}>Exercise Library</AppText>
+                              <AppText style={styles.toolDescription}>
+                                   200+ exercises with guides
+                              </AppText>
+                         </TouchableOpacity>
+                    </View>
+               </View>
+
+               {/* Quick Actions */}
+               <View style={styles.actionsSection}>
+                    <AppText style={styles.sectionTitle}>Quick Actions</AppText>
+
+                    <View style={styles.actionsRow}>
+                         <TouchableOpacity style={styles.actionButton}>
+                              <Image
+                                   source={Images.plus}
+                                   style={styles.actionIcon}
+                              />
+                              <AppText style={styles.actionText}>New Workout</AppText>
+                         </TouchableOpacity>
+
+                         <TouchableOpacity style={styles.actionButton}>
+                              <Image
+                                   source={Images.checkMark}
+                                   style={styles.actionIcon}
+                              />
+                              <AppText style={styles.actionText}>Progress</AppText>
+                         </TouchableOpacity>
+
+                         <TouchableOpacity style={styles.actionButton}>
+                              <Image
+                                   source={Images.share}
+                                   style={styles.actionIcon}
+                              />
+                              <AppText style={styles.actionText}>Share</AppText>
+                         </TouchableOpacity>
+                    </View>
+               </View>
+          </AppScroll>
      );
 }
-
 const styles = StyleSheet.create({
-     scrollContent: {
-          backgroundColor: colors.background,
-     },
-     card: {
+     // Header Styles
+     header: {
+          paddingHorizontal: 20,
+          paddingTop: 60,
+          paddingBottom: 20,
+          borderBottomEndRadius: 30,
+          borderBottomStartRadius: 30,
           backgroundColor: colors.cardBackground,
-          padding: 20,
-          borderRadius: 20,
-          marginTop: 15,
-          marginHorizontal: 15,
      },
-     sectionTitle: {
-          fontSize: scaleFont(19),
-          fontWeight: '700',
-          color: 'white',
-          marginBottom: 12,
-     },
-     feedbackRow: {
+     headerTop: {
           flexDirection: 'row',
-          alignItems: 'flex-start',
-          marginBottom: 6,
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 25,
      },
-     feedbackBullet: {
-          color: 'white',
+     headerTitle: {
+          fontSize: scaleFont(18),
+          color: colors.white,
+          fontWeight: 'bold',
+     },
+     dateText: {
           fontSize: scaleFont(14),
-          marginRight: 6,
+          color: colors.mutedText,
      },
-     feedbackText: {
-          color: 'white',
-          fontSize: scaleFont(12),
-          lineHeight: 20,
+
+     // Stats Grid
+     statsGrid: {
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+     },
+     statItem: {
+          alignItems: 'center',
           flex: 1,
      },
-     row: {
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginTop: 15,
+     statValue: {
+          fontSize: scaleFont(20),
+          fontWeight: '800',
+          color: colors.white,
+          marginBottom: 4,
      },
-     iconWrapper: {
-          padding: 12,
-          borderRadius: 12,
-          flexDirection: 'row',
-          alignItems: 'center',
-     },
-     icon: {
-          width: 40,
-          height: 40,
-     },
-     textWrapper: {
-          flex: 1,
-          marginLeft: 5,
-     },
-     label: {
-          fontWeight: '700',
-          fontSize: scaleFont(22),
-     },
-     subText: {
+     statLabel: {
           fontSize: scaleFont(12),
           color: colors.mutedText,
-          marginTop: 2,
      },
-     arrow: {
+
+     // Main Hero Section
+     mainSection: {
+          paddingHorizontal: 20,
+          paddingTop: 25,
+     },
+     heroCard: {
+          backgroundColor: 'linear-gradient(135deg, rgba(74, 144, 226, 0.3) 0%, rgba(101, 83, 240, 0.3) 100%)',
+          borderRadius: 25,
+          overflow: 'hidden',
+          borderWidth: 1,
+          borderColor: 'rgba(255,255,255,0.1)',
+     },
+     heroBackground: {
+          padding: 25,
+     },
+     heroContent: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: 20,
+     },
+     heroIconContainer: {
+          backgroundColor: 'rgba(255,255,255,0.2)',
+          borderRadius: 16,
+          padding: 16,
+          marginRight: 15,
+     },
+     heroIcon: {
+          width: 32,
+          height: 32,
+          tintColor: 'white',
+     },
+     heroText: {
+          flex: 1,
+     },
+     heroTitle: {
+          fontSize: scaleFont(24),
+          fontWeight: 'bold',
+          color: 'white',
+          marginBottom: 4,
+     },
+     heroSubtitle: {
+          fontSize: scaleFont(13),
+          color: 'rgba(255,255,255,0.8)',
+     },
+     heroBadge: {
+          backgroundColor: '#FF6B6B',
+          paddingHorizontal: 8,
+          paddingVertical: 4,
+          borderRadius: 12,
+     },
+     heroBadgeText: {
+          fontSize: scaleFont(10),
+          color: 'white',
+          fontWeight: 'bold',
+     },
+     heroStats: {
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          borderTopWidth: 1,
+          borderTopColor: 'rgba(255,255,255,0.1)',
+          paddingTop: 20,
+     },
+     heroStat: {
+          alignItems: 'center',
+     },
+     heroStatValue: {
+          fontSize: scaleFont(18),
+          fontWeight: 'bold',
+          color: 'white',
+          marginBottom: 2,
+     },
+     heroStatLabel: {
+          fontSize: scaleFont(11),
+          color: 'rgba(255,255,255,0.7)',
+     },
+
+     // Training Tools Section
+     toolsSection: {
+          paddingHorizontal: 20,
+          paddingTop: 30,
+     },
+     sectionTitle: {
+          fontSize: scaleFont(18),
+          fontWeight: 'bold',
+          color: 'white',
+          marginBottom: 15,
+     },
+     toolsGrid: {
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+     },
+     toolCard: {
+          width: '48%',
+          backgroundColor: colors.cardBackground,
+          borderRadius: 16,
+          padding: 16,
+          marginBottom: 12,
+          alignItems: 'center',
+     },
+     toolIcon: {
+          width: 50,
+          height: 50,
+          borderRadius: 12,
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginBottom: 8,
+          backgroundColor: colors.backgroundTop,
+          borderRadius: 10
+     },
+     toolIconImage: {
+          width: 24,
+          height: 24,
+          tintColor: 'white',
+     },
+     toolTitle: {
+          fontSize: scaleFont(14),
+          fontWeight: '600',
+          color: 'white',
+          textAlign: 'center',
+          marginBottom: 4,
+     },
+     toolDescription: {
+          fontSize: scaleFont(10),
+          color: colors.mutedText,
+          textAlign: 'center',
+     },
+
+     // Quick Actions
+     actionsSection: {
+          paddingHorizontal: 20,
+          paddingTop: 20,
+          paddingBottom: 30,
+     },
+     actionsRow: {
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+     },
+     actionButton: {
+          flex: 1,
+          backgroundColor: colors.cardBackground,
+          borderRadius: 12,
+          padding: 12,
+          alignItems: 'center',
+          marginHorizontal: 4,
+     },
+     actionIcon: {
           width: 20,
           height: 20,
           tintColor: 'white',
+          marginBottom: 6,
      },
-     divider: { width: 1, backgroundColor: "rgba(102,102,102,0.2)", alignSelf: "center", height: "60%" },
-     button: {
-          marginTop: 18,
-          height: 50,
-          borderRadius: 20,
-          backgroundColor: 'linear-gradient(90deg, rgba(0,140,255,1) 0%, rgba(0,200,255,1) 100%)',
-          justifyContent: 'center',
-          alignItems: 'center',
-     },
-     buttonText: {
+     actionText: {
+          fontSize: scaleFont(11),
           color: 'white',
-          fontWeight: '700',
-          fontSize: scaleFont(14),
-     }
+          fontWeight: '500',
+     },
 });

@@ -68,6 +68,7 @@ export const routes = {
 
     /* TRAINING CHILDREN */
     EXERCISES: '/screens/main/training/exercises',
+    EXERCISES_LIST: '/screens/main/training/exercises-list',
     WORKOUTS_LOG: '/screens/main/training/workouts-log',
     WORKOUTS: '/screens/main/training/workouts',
     WORKOUT_EDITOR: '/screens/main/training/workout-editor',

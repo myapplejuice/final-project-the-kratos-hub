@@ -110,6 +110,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.WORKOUTS]: "Workouts",
         [routes.WORKOUT_EDITOR]: "Edit Workout",
         [routes.WORKOUTS_LOG]: "Workouts Diary",
+        [routes.EXERCISES_LIST]: "Exercises",
     };
 
     function handleUserProfilePress() {

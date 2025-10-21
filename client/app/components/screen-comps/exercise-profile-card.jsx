@@ -10,7 +10,7 @@ import AnimatedButton from './animated-button';
 import ExpandInOut from '../effects/expand-in-out';
 import Invert from '../effects/invert';
 
-export default function ExerciseProfileCard({ exercise, onExpandPress = () => { }, onAddPress = () => { }, expanded = false }) {
+export default function ExerciseProfileCard({ exercise, onExpandPress = () => { }, onAddPress = () => { }, expanded = false, addButtonVisible = true }) {
     const { user } = useContext(UserContext);
 
     function capitalizeFirstLetter(string) {
@@ -101,13 +101,15 @@ export default function ExerciseProfileCard({ exercise, onExpandPress = () => { 
                         </View>
                     </View>
 
-                    <AnimatedButton
-                     title={"Add Exercise"} 
-                    onPress={onAddPress} 
-                    textStyle={{ fontSize: scaleFont(14), fontWeight: 'bold' }}
-                    leftImage={Images.plus}
-                    leftImageStyle={{ tintColor: 'white', marginEnd: 5}}
-                    style={{ backgroundColor: colors.accentGreen, padding: 13, borderRadius: 15 }} />
+                    {addButtonVisible &&
+                        <AnimatedButton
+                            title={"Add Exercise"}
+                            onPress={onAddPress}
+                            textStyle={{ fontSize: scaleFont(14), fontWeight: 'bold' }}
+                            leftImage={Images.plus}
+                            leftImageStyle={{ tintColor: 'white', marginEnd: 5 }}
+                            style={{ backgroundColor: colors.accentGreen, padding: 13, borderRadius: 15, marginTop: 15 }} />
+                    }
                 </View>
             </ExpandInOut>
         </View>
@@ -198,7 +200,6 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     detailsGrid: {
-        marginBottom: 16,
         padding: 15,
         backgroundColor: colors.backgroundSecond,
         borderRadius: 12,
