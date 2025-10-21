@@ -67,16 +67,11 @@ export default function TrainingHub() {
 
     useEffect(() => {
         const newExercises = additionalContexts.newExercises;
-        console.log('here', exercises)
         if (newExercises && newExercises.length > 0) {
             setExercises([...exercises, ...newExercises]);
             setDateExercises([...dateExercises, ...newExercises]);
         }
     }, [additionalContexts.newExercises]);
-
-    useEffect(() => {
-        console.log(exercises)
-    },[exercises])
 
     async function handleDate(val) {
         if (val === -1) {
