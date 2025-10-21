@@ -106,9 +106,14 @@ export default function TrainingHub() {
                               </View>
                          </View>
 
-                         <AppText style={{ fontSize: scaleFont(11), color: colors.mutedText, textAlign: 'center', marginTop: 5 }}>
-                              Macro Ratios by Total Daily Energy
-                         </AppText>
+                         <View style={{ flexDirection: 'row', justifyContent: 'center', backgroundColor: colors.backgroundTop, padding: 15, borderRadius: 20 }}>
+                              <View style={{ alignItems: 'center' }}>
+                                   <AppText style={{ fontSize: 14, color: colors.mutedText }}>Total Exercises</AppText>
+                                   <AppText style={{ fontSize: 20, fontWeight: '700', color: nutritionColors.energy1 }}>
+                                        {totalExercises}
+                                   </AppText>
+                              </View>
+                         </View>
                     </View>
 
                     <AppText style={[styles.sectionTitle, { marginHorizontal: 25, fontSize: scaleFont(20), fontWeight: 'bold', marginBottom: 0, marginTop: 25 }]}>Nutrition Tabs</AppText>
