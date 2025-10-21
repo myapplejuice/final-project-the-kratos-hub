@@ -116,22 +116,22 @@ export default function TrainingHub() {
                          </View>
                     </View>
 
-                    <AppText style={[styles.sectionTitle, { marginHorizontal: 25, fontSize: scaleFont(20), fontWeight: 'bold', marginBottom: 0, marginTop: 25 }]}>Nutrition Tabs</AppText>
+                    <AppText style={[styles.sectionTitle, { marginHorizontal: 25, fontSize: scaleFont(20), fontWeight: 'bold', marginBottom: 0, marginTop: 25 }]}>Training Tabs</AppText>
 
                     <TouchableOpacity onPress={() => router.push(routes.WORKOUTS_LOG)} style={[styles.card, { padding: 20 }]}>
                          <View style={{ alignItems: 'center', borderRadius: 15, padding: 20 }}>
                               <Image
-                                   source={Images.book5}
+                                   source={Images.workoutLogOutline}
                                    style={{ width: 60, height: 60, tintColor: 'white' }}
                               />
                          </View>
                          <View style={{ justifyContent: 'flex-start', paddingBottom: 20 }}>
                               <View style={{ alignItems: 'center' }}>
                                    <AppText style={{ color: 'white', fontSize: scaleFont(20), fontWeight: 'bold' }}>
-                                        Meals Diary
+                                        Workouts Log
                                    </AppText>
                                    <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
-                                        Track and log all your meals in one place
+                                        Always stay on track with your workouts and progress
                                    </AppText>
                               </View>
                          </View>
@@ -142,64 +142,17 @@ export default function TrainingHub() {
                               <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 1 }}>
                                    <View style={{ borderRadius: 15, padding: 12, backgroundColor: colors.lightMutedText, overflow: 'hidden' }}>
                                         <Image
-                                             source={Images.plan2}
+                                             source={Images.workoutPlanOutline}
                                              style={{ width: 35, height: 35, tintColor: 'white' }}
                                         />
                                    </View>
                                    <View style={{ justifyContent: 'flex-start', marginStart: 15, marginEnd: 70 }}>
                                         <View>
                                              <AppText style={{ color: 'white', fontSize: scaleFont(18), fontWeight: 'bold' }}>
-                                                  Nutrition Plans
+                                                  Workout Plans
                                              </AppText>
                                              <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
-                                                  Build and prepare your own meals ready for import to your diary
-                                             </AppText>
-                                        </View>
-                                   </View>
-                              </View>
-                         </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => router.push(routes.FOODS)} style={[styles.card, { padding: 15 }]}>
-                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 1 }}>
-                                   <View style={{ borderRadius: 15, padding: 12, backgroundColor: colors.lightMutedText, overflow: 'hidden' }}>
-                                        <Image
-                                             source={Images.foodsOne}
-                                             style={{ width: 35, height: 35, tintColor: 'white' }}
-                                        />
-                                   </View>
-                                   <View style={{ justifyContent: 'flex-start', marginStart: 15, marginEnd: 70 }}>
-                                        <View>
-                                             <AppText style={{ color: 'white', fontSize: scaleFont(18), fontWeight: 'bold' }}>
-                                                  Personal Foods
-                                             </AppText>
-                                             <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
-                                                  Create your own foods and share them with others
-                                             </AppText>
-                                        </View>
-                                   </View>
-                              </View>
-                         </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => router.push(routes.USDA_PROFILE)} style={[styles.card, { padding: 15 }]}>
-                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 1 }}>
-                                   <View style={{ borderRadius: 15, padding: 12, backgroundColor: colors.lightMutedText, overflow: 'hidden' }}>
-                                        <Image
-                                             source={Images.usdaLogo}
-                                             style={{ width: 35, height: 35, tintColor: 'white' }}
-                                             contentFit="contain"
-                                        />
-                                   </View>
-                                   <View style={{ justifyContent: 'flex-start', marginStart: 15, marginEnd: 70 }}>
-                                        <View>
-                                             <AppText style={{ color: 'white', fontSize: scaleFont(18), fontWeight: 'bold' }}>
-                                                  Food Source
-                                             </AppText>
-                                             <AppText style={{ color: colors.mutedText, fontSize: scaleFont(10) }}>
-                                                  Tap for more information about the United States Department of Agriculture, our foods provider
+                                                  Build your own daily workout plan to easily use in your logs
                                              </AppText>
                                         </View>
                                    </View>

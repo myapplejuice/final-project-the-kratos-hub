@@ -173,4 +173,10 @@ export const Images_2 = {
     msisingImageTwo: require('../../../assets/images/missing-image-2.png'),
     exercises: require('../../../assets/images/exercises.png'),
     exercisesTwo: require('../../../assets/images/exercises-2.png'),
+    workoutLog: require('../../../assets/images/workout-log.png'),
+    workoutLogOutline: require('../../../assets/images/workout-log-outline.png'),
+    workoutPlan: require('../../../assets/images/workout-plan.png'),
+    workoutPlanOutline: require('../../../assets/images/workout-plan-outline.png'),
+    wokroutPlanTwo: require('../../../assets/images/workout-plan-2.png'),
+    workoutPlanTwoOutline: require('../../../assets/images/workout-plan-2-outline.png'),
 };
