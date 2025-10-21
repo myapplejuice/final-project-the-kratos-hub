@@ -30,7 +30,7 @@ export default function Exercise({ user, sets, exercise, onExpand = () => { }, e
             >
                 <View style={{ flex: 1 }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(16), fontWeight: 'bold' }}>
-                       {exercise?.muscleGroups?.join(', ') ?? ''}
+                       {exercise?.label ?? ''}
                     </AppText>
                     <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11) }}>
                         {exercise?.muscleGroups?.join(', ') ?? ''}
