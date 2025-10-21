@@ -88,19 +88,19 @@ export default function TrainingHub() {
                               </View>
                          </View>
 
-                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, backgroundColor: colors.backgroundSecond }}>
-                              <View style={{ alignItems: 'center', flex: 1 }}>
+                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, backgroundColor: colors.backgroundTop, padding: 15, borderRadius: 20 }}>
+                              <View style={{ alignItems: 'center', width: '49.8%' }}>
                                    <AppText style={{ fontSize: 14, color: colors.mutedText }}>Burned</AppText>
                                    <AppText style={{ fontSize: 20, fontWeight: '700', color: nutritionColors.energy1 }}>
                                         {convertEnergy(totalEnergy || 0, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
                                    </AppText>
                               </View>
 
-                              <Divider style={{ width: 1, backgroundColor: '#dddddd88', marginHorizontal: 10, borderRadius: 20 }} />
+                              <Divider style={{ width: '0.4%', backgroundColor: colors.mutedText, borderRadius: 20 }} />
 
-                              <View style={{ alignItems: 'center', flex: 1 }}>
+                              <View style={{ alignItems: 'center', width: '49.8%' }}>
                                    <AppText style={{ fontSize: 14, color: colors.mutedText }}>Consumed</AppText>
-                                   <AppText style={{ fontSize: 20, fontWeight: '700', color: '#ff4d4d'  }}>
+                                   <AppText style={{ fontSize: 20, fontWeight: '700', color: '#ff4d4d' }}>
                                         {convertEnergy(consumedEnergy, 'kcal', user.preferences.energyUnit.key)} {user.preferences.energyUnit.field}
                                    </AppText>
                               </View>
