@@ -169,7 +169,7 @@ export default function MealPlan({ label, date, description, meals = [], onDelet
                             />
                         }
                         <AnimatedButton
-                            title="View Full Plan"
+                            title="Full Plan"
                             style={{
                                 padding: 15,
                                 backgroundColor: colors.accentGreen,

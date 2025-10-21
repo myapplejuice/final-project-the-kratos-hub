@@ -16,7 +16,6 @@ import { routes } from '../../../common/settings/constants';
 import Workout from "../../../components/screen-comps/workout";
 
 export default function Workouts() {
-    const context = useLocalSearchParams();
     const insets = useSafeAreaInsets();
 
     const { createInput, showSpinner, hideSpinner, createToast, createDialog, createAlert, createOptions } = usePopups();
@@ -105,7 +104,7 @@ export default function Workouts() {
             onSubmit: (vals) => {
                 const label = vals[0] ? vals[0] : workout.label;
                 const description = vals[1] ? vals[1] : workout.description;
-                const duration = vals[2] ? Number(vals[2]) :workout.duration;
+                const duration = vals[2] ? Number(vals[2]) : workout.duration;
 
                 createOptions({
                     title: "Choose intensity",
@@ -162,12 +161,15 @@ export default function Workouts() {
         })
     }
 
-    async function handleWorkoutImport(workout) {
-        
-    }
+    async function handleWorkoutImport(workout) { }
 
-    async function handleWorkoutPress(selectedWorkoutId) {
-
+    async function handleWorkoutPress(workout) { 
+        router.push({
+        pathname: routes.WOUROUT_EDITOR,
+            params: {
+                workout: JSON.stringify(workout)
+            }
+        })
     }
 
     return (
@@ -204,7 +206,8 @@ export default function Workouts() {
                                     onExpandPress={() => setExpandedWorkout(expandedWorkout === workout.id ? null : workout.id)}
                                     onEditPress={() => handleWorkoutUpdate(workout)}
                                     onDeletePress={() => handleWorkoutDeletion(workout.id)}
-                                    onWorkoutPress={handleWorkoutPress}
+                                    onWorkoutPress={() => handleWorkoutPress(workout)}
+                                    onAddPress={() => handleWorkoutAddition(workout)}
                                 />
                             ))}
                         </View>

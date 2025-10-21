@@ -100,7 +100,7 @@ export default function Workout({
                             leftImageStyle={{ tintColor: 'white', marginEnd: 5 }}
                         />
                            <AnimatedButton
-                            title="View Full Workout"
+                            title="Full Workout"
                             onPress={onWorkoutPress}
                             textStyle={{fontSize: scaleFont(14)}}
                             style={[styles.actionButton, { backgroundColor: colors.main, width: '48%' }]}

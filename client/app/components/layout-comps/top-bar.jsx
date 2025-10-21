@@ -108,7 +108,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.POST]: "Saved Posts",
         [routes.EXERCISES]: "Exercises",
         [routes.WORKOUTS]: "Workouts",
-
+        [routes.WOUROUT_EDITOR]: "Edit Workout",
     };
 
     function handleUserProfilePress() {
