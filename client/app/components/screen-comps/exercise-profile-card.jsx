@@ -101,7 +101,13 @@ export default function ExerciseProfileCard({ exercise, onExpandPress = () => { 
                         </View>
                     </View>
 
-                    <AnimatedButton title={"Add Exercise"} onPress={onAddPress} style={{ backgroundColor: colors.accentGreen, padding: 13, borderRadius: 15 }} />
+                    <AnimatedButton
+                     title={"Add Exercise"} 
+                    onPress={onAddPress} 
+                    textStyle={{ fontSize: scaleFont(14), fontWeight: 'bold' }}
+                    leftImage={Images.plus}
+                    leftImageStyle={{ tintColor: 'white', marginEnd: 5}}
+                    style={{ backgroundColor: colors.accentGreen, padding: 13, borderRadius: 15 }} />
                 </View>
             </ExpandInOut>
         </View>

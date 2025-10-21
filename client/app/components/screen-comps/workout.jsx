@@ -30,12 +30,12 @@ export default function Workout({
                         </AppText>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={{marginEnd: 10, backgroundColor: colors.backgroundSecond + '50', padding: 5, borderRadius: 5}}>
+                        <TouchableOpacity onPress={onEditPress} style={{marginEnd: 10, backgroundColor: colors.backgroundSecond + '50', padding: 5, borderRadius: 5}}>
                             <Image source={Images.edit} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                        </View>
-                        <View style={{marginEnd: 10, backgroundColor: colors.backgroundSecond + '50', padding: 5, borderRadius: 5}}>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={onDeletePress} style={{marginEnd: 10, backgroundColor: colors.backgroundSecond + '50', padding: 5, borderRadius: 5}}>
                             <Image source={Images.trash} style={{ width: 20, height: 20, tintColor: colors.negativeRed }} />
-                        </View>
+                        </TouchableOpacity>
                         <Invert inverted={expanded} axis="horizontal">
                             <Image
                                 source={Images.arrow}
@@ -57,7 +57,7 @@ export default function Workout({
 
                         <View style={styles.infoBox}>
                             <AppText style={styles.infoLabel}>Duration</AppText>
-                            <AppText style={styles.infoValue}>{workout.duration || 'N/A'}</AppText>
+                            <AppText style={styles.infoValue}>{workout.duration > 60 ? `${Math.floor(workout.duration / 60)}h ${workout.duration % 60}m` : `${workout.duration}m` || 'N/A'}</AppText>
                         </View>
                     </View>
 
@@ -91,9 +91,12 @@ export default function Workout({
 
                     <View style={styles.actions}>
                         <AnimatedButton
-                            title="View Details"
+                            title="View Full Workout"
                             onPress={onWorkoutPress}
+                            textStyle={{fontSize: scaleFont(14)}}
                             style={[styles.actionButton, { backgroundColor: colors.main }]}
+                            rightImage={Images.arrow}
+                            rightImageStyle={{ tintColor: 'white', marginStart: 5 }}
                         />
                     </View>
                 </View>

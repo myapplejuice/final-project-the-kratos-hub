@@ -29,7 +29,7 @@ export default function Exercise({ user, sets, exercise, onExpand = () => { }, e
             >
                 <View style={{ flex: 1 }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(16), fontWeight: 'bold' }}>
-                       {exercise?.label ?? ''}
+                        {exercise?.label ?? ''}
                     </AppText>
                     <AppText style={{ color: colors.mutedText, fontSize: scaleFont(11) }}>
                         {exercise?.muscleGroups?.join(', ') ?? ''}
@@ -145,7 +145,10 @@ export default function Exercise({ user, sets, exercise, onExpand = () => { }, e
                 <AnimatedButton
                     title="Add Set"
                     onPress={onAddPress}
-                    style={{ marginTop: 15, backgroundColor: colors.main, paddingVertical: 15, borderRadius: 20 }}
+                    textStyle={{ fontSize: scaleFont(14), fontWeight: 'bold' }}
+                    leftImage={Images.plus}
+                    leftImageStyle={{ tintColor: 'white', marginEnd: 5}}
+                    style={{ marginTop: 15, backgroundColor: colors.main, paddingVertical: 15, borderRadius: 15 }}
                 />
             </ExpandInOut>
         </View>
