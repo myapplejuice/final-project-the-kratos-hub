@@ -9,7 +9,7 @@ import { Images } from '../../common/settings/assets';
 import Inverted from '../effects/invert';
 import { convertWeight } from '../../common/utils/unit-converter';
 
-export default function Exercise({ user, sets, exercise, onExpand = () => { }, expanded = false, onAddPress = () => { }, onDeletePress = () => { }, onSetEditPress = () => { }, onSetDeletePress = () => { } }) {
+export default function Exercise({ user, sets, exercise, onExpandPress = () => { }, expanded = false, onAddPress = () => { }, onDeletePress = () => { }, onSetEditPress = () => { }, onSetDeletePress = () => { } }) {
     function formatVolume(num) {
         const convertedValue = convertWeight(num, 'kg', user.preferences.weightUnit.key || 'kg');
         if (convertedValue >= 1_000_000) return (convertedValue / 1_000_000).toFixed(2) + "M";
@@ -25,7 +25,7 @@ export default function Exercise({ user, sets, exercise, onExpand = () => { }, e
         <View style={[styles.card]}>
             <TouchableOpacity
                 style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
-                onPress={onExpand}
+                onPress={onExpandPress}
             >
                 <View style={{ flex: 1 }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(16), fontWeight: 'bold' }}>

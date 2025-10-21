@@ -2,6 +2,7 @@ import { Router } from 'express';
 import ExercisesController from '../models/training/exercises-controller.js';
 import MiddlewaresManager from '../utils/middlewares-manager.js';
 import WorkoutsController from '../models/training/workouts/workouts-controller.js';
+import WorkoutsExercisesController from '../models/training/workouts/workouts-exercises/workouts-exercises-controller.js';
 
 export default class TrainingRouter {
     static trainingRouter;
@@ -20,6 +21,11 @@ export default class TrainingRouter {
         this.trainingRouter.post('/workout/:id', tokenAuthorization, userAuthorization, asyncHandler(WorkoutsController.createWorkout));
         this.trainingRouter.put('/workout/:id', tokenAuthorization, userAuthorization, asyncHandler(WorkoutsController.updateWorkout));
         this.trainingRouter.delete('/workout/:id', tokenAuthorization, userAuthorization, asyncHandler(WorkoutsController.deleteWorkout));
+
+        
+        this.trainingRouter.post('/workout/exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(WorkoutsExercisesController.createExercise));
+        this.trainingRouter.put('/workout/exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(WorkoutsExercisesController.updateExercise));
+        this.trainingRouter.delete('/workout/exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(WorkoutsExercisesController.deleteExercise));
 
         return this.trainingRouter;
     }

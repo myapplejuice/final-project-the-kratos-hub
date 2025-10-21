@@ -128,7 +128,10 @@ export default class ObjectMapper {
             BodyPart: 'bodyPart',
             Image: 'image',
             Sets: 'sets',
-            Exercise: 'exercise'
+            Exercise: 'exercise',
+            Intensity: 'intensity',
+            Duration: 'duration',
+            WorkoutId: 'workoutId'
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -261,7 +264,10 @@ export default class ObjectMapper {
             bodyPart: 'BodyPart',
             image: 'Image',
             sets: 'Sets',
-            exercise: 'Exercise'
+            exercise: 'Exercise',
+            exerciseId: 'ExerciseId',
+            intensity: 'Intensity',
+            duration: 'Duration',
         };
         return map[key] || key;
     }

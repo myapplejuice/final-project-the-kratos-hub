@@ -243,7 +243,12 @@ export default class APIService {
             workouts: () => APIService.request(`/training/workout/${APIService.USER_ID}`, 'GET'),
             create: (payload) => APIService.request(`/training/workout/${APIService.USER_ID}`, 'POST', payload),
             update: (payload) => APIService.request(`/training/workout/${APIService.USER_ID}`, 'PUT', payload),
-            delete: (payload) => APIService.request(`/training/workout/${APIService.USER_ID}`, 'DELETE', payload)
+            delete: (payload) => APIService.request(`/training/workout/${APIService.USER_ID}`, 'DELETE', payload),
+            exercises: {
+                add: (payload) => APIService.request(`/training/workout/exercise/${APIService.USER_ID}`, 'POST', payload),
+                update: (payload) => APIService.request(`/training/workout/exercise/${APIService.USER_ID}`, 'PUT', payload),
+                delete: (payload) => APIService.request(`/training/workout/exercise/${APIService.USER_ID}`, 'DELETE', payload)
+            }
         }
     };
 }

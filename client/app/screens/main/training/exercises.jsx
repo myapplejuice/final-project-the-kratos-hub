@@ -25,9 +25,9 @@ import APIService from '../../../common/services/api-service';
 
 export default function Exercises() {
     const params = useLocalSearchParams();
-    const date = decodeURIComponent(params.date);
+    const date = decodeURIComponent(params.date || '');
     const { createOptions, showSpinner, hideSpinner, createToast } = usePopups();
-    const { user, setAdditionalContexts } = useContext(UserContext);
+    const { user, additionalContexts, setAdditionalContexts } = useContext(UserContext);
     const { setCameraActive } = useContext(CameraContext);
     const insets = useSafeAreaInsets();
     const [fabVisible, setFabVisible] = useState(true);
@@ -62,16 +62,16 @@ export default function Exercises() {
         });
 
         const seenLabels = new Set();
-const uniqueFiltered = filtered.filter(ex => {
-    if (seenLabels.has(ex.label.toLowerCase())) return false;
-    seenLabels.add(ex.label.toLowerCase());
-    return true;
-});
+        const uniqueFiltered = filtered.filter(ex => {
+            if (seenLabels.has(ex.label.toLowerCase())) return false;
+            seenLabels.add(ex.label.toLowerCase());
+            return true;
+        });
 
-const start = 0;
-const end = page * pageSize;
-setFilteredExercises(uniqueFiltered);
-setVisibleExercises(uniqueFiltered.slice(start, end));
+        const start = 0;
+        const end = page * pageSize;
+        setFilteredExercises(uniqueFiltered);
+        setVisibleExercises(uniqueFiltered.slice(start, end));
     }, [page, filter, searchQuery]);
 
     async function handleFiltering(filterKey) {
@@ -99,29 +99,57 @@ setVisibleExercises(uniqueFiltered.slice(start, end));
     }
 
     async function handleAddExercise(exercise) {
-        try {
-            showSpinner();
-            const payload = {
-                userId: user.id,
-                date: new Date(date),
-                exercise,
-                sets: []
-            }
+        if (additionalContexts.context === 'add/date') {
+            try {
+                showSpinner();
+                const payload = {
+                    userId: user.id,
+                    date: new Date(date),
+                    exercise,
+                    sets: []
+                }
 
-            const result = await APIService.training.exercises.create(payload);
+                const result = await APIService.training.exercises.create(payload);
 
-            if (result.success) {
-                const newExercise = result.data.exercise;
-                setAdditionalContexts(prev => ({ ...prev, newExercise }));
-                createToast({ message: "Exercise added" });
-                router.back();
-            } else {
-                createToast({ message: result.message });
+                if (result.success) {
+                    const newExercise = result.data.exercise;
+                    setAdditionalContexts(prev => ({ ...prev, newExercise }));
+                    createToast({ message: "Exercise added" });
+                    router.back();
+                } else {
+                    createToast({ message: result.message });
+                }
+            } catch (e) {
+                console.log(e)
+            } finally {
+                hideSpinner();
             }
-        } catch (e) {
-            console.log(e)
-        } finally {
-            hideSpinner();
+        }
+        else {
+            try {
+                showSpinner();
+
+                const payload = {
+                    userId: user.id,
+                    workoutId: additionalContexts.workout.id,
+                    exercise,
+                    sets: []
+                }
+
+                const result = await APIService.training.workouts.exercises.add(payload);
+                if (result.success) {
+                    const newExercise = result.data.exercise;
+                    
+                    setAdditionalContexts({ ...additionalContexts, newExercise });
+                    createToast({ message: "Exercise added" });
+                } else {
+                    createToast({ message: result.message });
+                }
+            } catch (e) {
+                createToast({ message: e.message });
+            } finally {
+                hideSpinner();
+            }
         }
     }
 

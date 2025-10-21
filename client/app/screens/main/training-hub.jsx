@@ -26,7 +26,7 @@ import Exercise from "../../components/screen-comps/exercise";
 
 export default function TrainingHub() {
     const { showSpinner, hideSpinner, createInput, createDialog, createAlert, createToast } = usePopups();
-    const { user, setUser, additionalContexts } = useContext(UserContext);
+    const { user, setUser, setAdditionalContexts,additionalContexts } = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
     const [expandedExercises, setExpandedExercises] = useState([]);
@@ -78,6 +78,7 @@ export default function TrainingHub() {
     }
 
     async function handleAddExercise() {
+        setAdditionalContexts(prev => ({ ...prev, context: 'add/date' }));
         router.push({
             pathname: routes.EXERCISES,
             params: {
@@ -309,7 +310,7 @@ export default function TrainingHub() {
                                     onAddPress={() => handleAddSet(exercise)}
                                     onSetEditPress={(set) => handleEditSet(exercise, set)}
                                     onSetDeletePress={(set) => handleDeleteSet(exercise, set)}
-                                    onExpand={() => setExpandedExercises(prev => prev.includes(exercise.id) ? prev.filter(e => e !== exercise.id) : [...prev, exercise.id])}
+                                    onExpandPress={() => setExpandedExercises(prev => prev.includes(exercise.id) ? prev.filter(e => e !== exercise.id) : [...prev, exercise.id])}
                                     expanded={expandedExercises.includes(exercise.id)}
                                 />
                             )}

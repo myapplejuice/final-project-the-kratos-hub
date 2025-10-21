@@ -14,14 +14,14 @@ import { colors, } from "../../../common/settings/styling";
 import { router, useLocalSearchParams } from 'expo-router';
 import { routes } from '../../../common/settings/constants';
 import Workout from "../../../components/screen-comps/workout";
-import ExerciseProfileCard from "../../../components/screen-comps/exercise-profile-card";
+import Exercise from "../../../components/screen-comps/exercise";
 
 export default function WorkoutEditor() {
     const params = useLocalSearchParams();
     const insets = useSafeAreaInsets();
 
     const { createInput, showSpinner, hideSpinner, createToast, createDialog, createAlert, createOptions } = usePopups();
-    const { user, setUser } = useContext(UserContext);
+    const { user, setUser, additionalContexts, setAdditionalContexts } = useContext(UserContext);
     const [scrollToTop, setScrollToTop] = useState(false);
     const [fabVisible, setFabVisible] = useState(true);
 
@@ -29,12 +29,17 @@ export default function WorkoutEditor() {
     const [workout, setWorkout] = useState(JSON.parse(params.workout));
 
     useEffect(() => {
-        async function fetchExercises() {
-
+        const newExercise = additionalContexts.newExercise;
+        
+        if(newExercise) {
+            setWorkout(prev => ({ ...prev, exercises: [...prev.exercises, newExercise] }));
         }
+    }, [additionalContexts.newExercise])
 
-        fetchExercises();
-    }, [])
+    function handleAddExercise() {
+        setAdditionalContexts(prev => ({ ...prev, workout, context: 'add/workout' }));
+        router.push(routes.EXERCISES)
+    }
 
     return (
         <>
@@ -49,7 +54,7 @@ export default function WorkoutEditor() {
             />
 
             <FloatingActionButton
-                onPress={() => { }}
+                onPress={() => handleAddExercise()}
                 visible={fabVisible}
                 position={{ bottom: insets.bottom + 50, right: 20, left: 20 }}
                 style={{ width: '100%', height: 50, backgroundColor: colors.accentGreen }}
@@ -64,9 +69,11 @@ export default function WorkoutEditor() {
                     <AppScroll avoidKeyboard={false} extraBottom={250} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
                         <View style={{ margin: 15 }}>
                             {workout.exercises.map((exercise, index) => (
-                                <ExerciseProfileCard
+                                <Exercise
                                     key={index}
+                                    user={user}
                                     exercise={exercise}
+                                    sets={exercise.sets}
                                     onAddPress={() => { }}
                                     onExpandPress={() => setExpandedExercise(expandedExercise === exercise.id ? null : exercise.id)}
                                     expanded={expandedExercise === exercise.id}
@@ -75,7 +82,8 @@ export default function WorkoutEditor() {
                         </View>
                     </AppScroll >
                 )
-                : (
+                :
+                (
                     <View style={{ backgroundColor: colors.background, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                         <Image source={Images.icon6} style={{ width: 100, height: 100, tintColor: colors.mutedText }} />
                         <AppText style={{ fontSize: scaleFont(16), color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginTop: 15 }}>No Exercises</AppText>

@@ -1,6 +1,6 @@
 import sql from 'mssql/msnodesqlv8.js';
-import Database from '../../database/database.js';
-import ObjectMapper from '../../../utils/object-mapper.js';
+import Database from '../../../database/database.js';
+import ObjectMapper from '../../../../utils/object-mapper.js';
 
 export default class WorkoutsExercisesDBService {
     static async fetchWorkoutExercises(workoutId, userId) {
@@ -47,10 +47,10 @@ export default class WorkoutsExercisesDBService {
             Database.addInput(request, 'Sets', sql.NVarChar(sql.MAX), JSON.stringify(details.sets || []));
 
             const query = `
-        INSERT INTO dbo.WorkoutsExercises (UserId, WorkoutId, Exercise, Sets)
-        OUTPUT INSERTED.*
-        VALUES (@UserId, @WorkoutId, @Exercise, @Sets)
-      `;
+            INSERT INTO dbo.WorkoutsExercises (UserId, WorkoutId, Exercise, Sets)
+            OUTPUT INSERTED.*
+            VALUES (@UserId, @WorkoutId, @Exercise, @Sets)
+          `;
 
             const result = await request.query(query);
             if (!result.recordset[0]) return null;
@@ -74,16 +74,14 @@ export default class WorkoutsExercisesDBService {
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, details.id);
-            Database.addInput(request, 'Exercise', sql.NVarChar(sql.MAX), JSON.stringify(details.exercise || []));
             Database.addInput(request, 'Sets', sql.NVarChar(sql.MAX), JSON.stringify(details.sets || []));
 
             const query = `
-        UPDATE dbo.WorkoutsExercises
-        SET Exercise = @Exercise,
-            Sets = @Sets
-        OUTPUT INSERTED.*
-        WHERE Id = @Id
-      `;
+               UPDATE dbo.WorkoutsExercises
+               SET Sets = @Sets
+               OUTPUT INSERTED.*
+               WHERE Id = @Id
+             `;
 
             const result = await request.query(query);
             if (!result.recordset[0]) return null;

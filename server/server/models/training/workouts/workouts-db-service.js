@@ -1,7 +1,7 @@
 import sql from 'mssql/msnodesqlv8.js';
 import Database from '../../database/database.js';
 import ObjectMapper from '../../../utils/object-mapper.js';
-import WorkoutsExercisesDBService from './workouts-exercises-db-service.js';
+import WorkoutsExercisesDBService from './workouts-exercises/workouts-exercises-db-service.js';
 
 export default class WorkoutsDBService {
     static async fetchWorkouts(userId) {
