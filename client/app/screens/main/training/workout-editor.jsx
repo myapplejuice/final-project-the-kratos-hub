@@ -65,6 +65,113 @@ export default function WorkoutEditor() {
         })
     }
 
+    async function handleAddSet(exercise) {
+        createInput({
+            title: "New Set",
+            confirmText: "Add",
+            text: `Enter repetitions and weight in ${user.preferences.weightUnit.label}`,
+            placeholders: [`Repetitions`, `Weight (${user.preferences.weightUnit.field})`],
+            initialValues: [``, ``],
+            extraConfigs: [{ keyboardType: "numeric" }, { keyboardType: "numeric" }],
+            onSubmit: async (vals) => {
+                try {
+                    showSpinner();
+                    const [reps, weight] = vals;
+
+                    if (!reps || !weight)
+                        return createToast({ message: "Both fields must be filled" });
+
+                    const id = Math.floor(100000 + Math.random() * 900000);
+                    const payload = {
+                        exerciseId: exercise.id,
+                        sets: [...exercise.sets, { id, reps: Number(reps), weight: Number(weight) }]
+                    }
+
+                    const result = await APIService.training.workouts.exercises.update(payload);
+
+                    if (result.success) {
+                        const exercise = result.data.exercise;
+
+                        setWorkout(prev => ({ ...prev, exercises: prev.exercises.map(e => e.id === exercise.id ? exercise : e) }));
+                    }
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    hideSpinner();
+                }
+            }
+        });
+    }
+
+    async function handleEditSet(exercise, set) {
+        createInput({
+            title: "Edit Set",
+            confirmText: "Confirm Edit",
+            text: `Enter new repetitions and weight in ${user.preferences.weightUnit.label}`,
+            placeholders: [`Repetitions`, `Weight (${user.preferences.weightUnit.field})`],
+            initialValues: [set.reps, set.weight],
+            extraConfigs: [{ keyboardType: "numeric" }, { keyboardType: "numeric" }],
+            onSubmit: async (vals) => {
+                try {
+                    showSpinner();
+                    const [reps, weight] = vals;
+
+                    if (!reps || !weight)
+                        return createToast({ message: "Both fields must be filled" });
+
+                    const payload = {
+                        exerciseId: exercise.id,
+                        sets: exercise.sets.map(s => s.id === set.id ? { ...s, reps: Number(reps), weight: Number(weight) } : s)
+                    }
+
+                    const result = await APIService.training.exercises.updateSets(payload);
+
+                    if (result.success) {
+                        const exercise = result.data.exercise;
+
+                        setExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
+                        setDateExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
+                    }
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    hideSpinner();
+                }
+            }
+        });
+    }
+
+    async function handleDeleteSet(exercise, set) {
+        createDialog({
+            title: "Drop Set",
+            confirmText: "Drop",
+            text: `Remove this set?`,
+            confirmButtonStyle: { backgroundColor: colors.negativeRed, borderColor: colors.negativeRed },
+            onConfirm: async () => {
+                try {
+                    showSpinner();
+
+                    const payload = {
+                        exerciseId: exercise.id,
+                        sets: exercise.sets.filter(s => s.id !== set.id)
+                    }
+
+                    const result = await APIService.training.exercises.updateSets(payload);
+                    if (result.success) {
+                        const exercise = result.data.exercise;
+
+                        setExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
+                        setDateExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
+                    }
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    hideSpinner();
+                }
+            }
+        });
+    }
+
     return (
         <>
             <FloatingActionButton
@@ -98,9 +205,9 @@ export default function WorkoutEditor() {
                                 exercise={exercise.exercise}
                                 sets={exercise.sets}
                                 onDeletePress={() => handleDeleteExercise(exercise.id)}
-                                onAddPress={() => { }}
-                                onSetDeletePress={() => { }}
-                                onSetEditPress={() => { }}
+                                onAddPress={() => handleAddSet(exercise)}
+                                onSetDeletePress={(set) => handleDeleteSet(exercise, set)}
+                                onSetEditPress={(set) => handleEditSet(exercise, set)}
                                 onExpandPress={() => setExpandedExercise(expandedExercise === exercise.id ? null : exercise.id)}
                                 expanded={expandedExercise === exercise.id}
                             />

@@ -73,7 +73,7 @@ export default class WorkoutsExercisesDBService {
     static async updateWorkoutExercise(details) {
         try {
             const request = Database.getRequest();
-            Database.addInput(request, 'Id', sql.Int, details.id);
+            Database.addInput(request, 'Id', sql.Int, details.exerciseId);
             Database.addInput(request, 'Sets', sql.NVarChar(sql.MAX), JSON.stringify(details.sets || []));
 
             const query = `

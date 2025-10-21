@@ -12,6 +12,7 @@ export default class WorkoutsExercisesController {
 
   static async updateExercise(req, res) {
     const details = req.body;
+    console.log(details)
 
     const result = await WorkoutsExercisesDBService.updateWorkoutExercise(details);
     if (result === null) return res.status(500).json({ success: false, error: "Failed to update exercise" });

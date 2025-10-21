@@ -182,6 +182,21 @@ export default function Workouts() {
         })
     }
 
+    if (loading) {
+        return <View style={{ backgroundColor: colors.background, flex: 1, paddingTop: 75 }}>
+            {[...Array(2)].map((_, idx) => (
+                <View key={idx} style={{ margin: 15 }}>
+                    <View style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 15, borderRadius: 10 }} >
+                        <View style={{ justifyContent: 'flex-start', alignItems: 'flex-start', marginTop: 15 }}>
+                            <View style={{ width: 90, height: 10, borderRadius: 20, backgroundColor: colors.backgroundSecond, marginStart: 15, marginVertical: 5 }} />
+                            <View style={{ width: 60, height: 7, borderRadius: 20, backgroundColor: colors.backgroundSecond, marginStart: 15, marginVertical: 5 }} />
+                        </View>
+                    </View>
+                </View>
+            ))}
+        </View>;
+    }
+
     return (
         <>
             <FloatingActionButton
@@ -205,48 +220,33 @@ export default function Workouts() {
                 iconStyle={{ transform: [{ rotate: '-90deg' }], marginBottom: 2 }}
             />
 
-            {!loading ? (
-                workouts.length > 0 ?
-                    (
-                        <AppScroll avoidKeyboard={false} extraBottom={250} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
-                            <View style={{ margin: 15 }}>
-                                {workouts.map((workout, index) => (
-                                    <Workout
-                                        key={workout.id}
-                                        workout={workout}
-                                        expanded={expandedWorkout === workout.id}
-                                        onExpandPress={() => setExpandedWorkout(expandedWorkout === workout.id ? null : workout.id)}
-                                        onEditPress={() => handleWorkoutUpdate(workout)}
-                                        onDeletePress={() => handleWorkoutDeletion(workout.id)}
-                                        onWorkoutPress={() => handleWorkoutPress(workout)}
-                                        onAddPress={() => handleWorkoutAddition(workout)}
-                                    />
-                                ))}
-                            </View>
-                        </AppScroll >
-                    )
-                    : (
-                        <View style={{ backgroundColor: colors.background, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Image source={Images.plan3} style={{ width: 100, height: 100, tintColor: colors.mutedText }} />
-                            <AppText style={{ fontSize: scaleFont(16), color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginTop: 15 }}>No Workouts</AppText>
-                            <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold', textAlign: 'center' }}>Tap below start adding workout plans</AppText>
+            {workouts.length > 0 ?
+                (
+                    <AppScroll avoidKeyboard={false} extraBottom={250} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
+                        <View style={{ margin: 15 }}>
+                            {workouts.map((workout, index) => (
+                                <Workout
+                                    key={workout.id}
+                                    workout={workout}
+                                    expanded={expandedWorkout === workout.id}
+                                    onExpandPress={() => setExpandedWorkout(expandedWorkout === workout.id ? null : workout.id)}
+                                    onEditPress={() => handleWorkoutUpdate(workout)}
+                                    onDeletePress={() => handleWorkoutDeletion(workout.id)}
+                                    onWorkoutPress={() => handleWorkoutPress(workout)}
+                                    onAddPress={() => handleWorkoutAddition(workout)}
+                                />
+                            ))}
                         </View>
-                    )
-
-            ) : (
-                <View style={{ backgroundColor: colors.background, flex: 1, paddingTop: 75 }}>
-                    {[...Array(2)].map((_, idx) => (
-                        <View key={idx} style={{ margin: 15 }}>
-                            <View style={{ backgroundColor: colors.cardBackground, height: 300, width: '100%', marginTop: 15, borderRadius: 10 }} >
-                                <View style={{ justifyContent: 'flex-start', alignItems: 'flex-start', marginTop: 15 }}>
-                                    <View style={{ width: 90, height: 10, borderRadius: 20, backgroundColor: colors.backgroundSecond, marginStart: 15, marginVertical: 5 }} />
-                                    <View style={{ width: 60, height: 7, borderRadius: 20, backgroundColor: colors.backgroundSecond, marginStart: 15, marginVertical: 5 }} />
-                                </View>
-                            </View>
-                        </View>
-                    ))}
-                </View>
-            )}
+                    </AppScroll >
+                )
+                : (
+                    <View style={{ backgroundColor: colors.background, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <Image source={Images.plan3} style={{ width: 100, height: 100, tintColor: colors.mutedText }} />
+                        <AppText style={{ fontSize: scaleFont(16), color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginTop: 15 }}>No Workouts</AppText>
+                        <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold', textAlign: 'center' }}>Tap below start adding workout plans</AppText>
+                    </View>
+                )
+            }
         </>
     );
 }
