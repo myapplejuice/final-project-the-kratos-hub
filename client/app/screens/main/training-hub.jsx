@@ -178,7 +178,7 @@ export default function TrainingHub() {
 
                     if (result.success) {
                         const exercise = result.data.exercise;
-
+console.log(exercise)
                         setExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
                         setDateExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
                     }
