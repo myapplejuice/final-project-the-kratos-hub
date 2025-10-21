@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import AppText from '../../components/screen-comps/app-text';
 import ExpandInOut from '../../components/effects/expand-in-out';
@@ -7,6 +7,8 @@ import { colors, nutritionColors } from '../../common/settings/styling';
 import { Images } from '../../common/settings/assets';
 import { scaleFont } from '../../common/utils/scale-fonts';
 import Invert from '../../components/effects/invert';
+import { convertWeight } from '../../common/utils/unit-converter';
+import { UserContext } from '../../common/contexts/user-context';
 
 export default function Workout({
     workout,
@@ -17,6 +19,17 @@ export default function Workout({
     onWorkoutPress = () => { },
     onAddPress = () => { },
 }) {
+    const { user } = useContext(UserContext);
+    const exerciseCount = workout.exercises.length
+    const setsCount = workout.exercises.reduce((total, exercise) => total + exercise.sets.length, 0);
+    const totalVolume = formatVolume(workout.exercises.reduce((total, exercise) => total + exercise.sets.reduce((total, set) => total + (set.weight * set.reps), 0), 0));
+    function formatVolume(num) {
+        const convertedValue = convertWeight(num, 'kg', user.preferences.weightUnit.key || 'kg');
+        if (convertedValue >= 1_000_000) return (convertedValue / 1_000_000).toFixed(2) + "M";
+        if (convertedValue >= 1_000) return (convertedValue / 1_000).toFixed(2) + "k";
+        return convertedValue.toString();
+    };
+
     return (
         <View style={styles.card}>
             <TouchableOpacity
@@ -31,10 +44,10 @@ export default function Workout({
                         </AppText>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <TouchableOpacity onPress={onEditPress} style={{marginEnd: 10, backgroundColor: colors.backgroundSecond + '50', padding: 5, borderRadius: 5}}>
+                        <TouchableOpacity onPress={onEditPress} style={{ marginEnd: 10, backgroundColor: colors.backgroundSecond + '50', padding: 5, borderRadius: 5 }}>
                             <Image source={Images.edit} style={{ width: 20, height: 20, tintColor: 'white' }} />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={onDeletePress} style={{marginEnd: 10, backgroundColor: colors.backgroundSecond + '50', padding: 5, borderRadius: 5}}>
+                        <TouchableOpacity onPress={onDeletePress} style={{ marginEnd: 10, backgroundColor: colors.backgroundSecond + '50', padding: 5, borderRadius: 5 }}>
                             <Image source={Images.trash} style={{ width: 20, height: 20, tintColor: colors.negativeRed }} />
                         </TouchableOpacity>
                         <Invert inverted={expanded} axis="horizontal">
@@ -76,33 +89,33 @@ export default function Workout({
                     <View style={styles.statsRow}>
                         <View style={styles.stat}>
                             <AppText style={styles.statLabel}>Exercises</AppText>
-                            <AppText style={styles.statValue}>0</AppText>
+                            <AppText style={styles.statValue}>{exerciseCount}</AppText>
                         </View>
                         <View style={styles.divider} />
                         <View style={styles.stat}>
                             <AppText style={styles.statLabel}>Sets</AppText>
-                            <AppText style={styles.statValue}>0</AppText>
+                            <AppText style={styles.statValue}>{setsCount}</AppText>
                         </View>
                         <View style={styles.divider} />
                         <View style={styles.stat}>
                             <AppText style={styles.statLabel}>Volume</AppText>
-                            <AppText style={styles.statValue}>0</AppText>
+                            <AppText style={styles.statValue}>{totalVolume}</AppText>
                         </View>
                     </View>
 
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <AnimatedButton
                             title="Add Workout"
                             onPress={onAddPress}
-                            textStyle={{fontSize: scaleFont(14)}}
+                            textStyle={{ fontSize: scaleFont(14) }}
                             style={[styles.actionButton, { backgroundColor: colors.accentGreen, width: '48%' }]}
                             leftImage={Images.plus}
                             leftImageStyle={{ tintColor: 'white', marginEnd: 5 }}
                         />
-                           <AnimatedButton
+                        <AnimatedButton
                             title="Full Workout"
                             onPress={onWorkoutPress}
-                            textStyle={{fontSize: scaleFont(14)}}
+                            textStyle={{ fontSize: scaleFont(14) }}
                             style={[styles.actionButton, { backgroundColor: colors.main, width: '48%' }]}
                             rightImage={Images.arrow}
                             rightImageStyle={{ tintColor: 'white', marginStart: 5 }}

@@ -91,7 +91,6 @@ export default function WorkoutEditor() {
 
                     if (result.success) {
                         const exercise = result.data.exercise;
-
                         setWorkout(prev => ({ ...prev, exercises: prev.exercises.map(e => e.id === exercise.id ? exercise : e) }));
                     }
                 } catch (e) {
@@ -124,13 +123,11 @@ export default function WorkoutEditor() {
                         sets: exercise.sets.map(s => s.id === set.id ? { ...s, reps: Number(reps), weight: Number(weight) } : s)
                     }
 
-                    const result = await APIService.training.exercises.updateSets(payload);
+                    const result = await APIService.training.workouts.exercises.update(payload);
 
                     if (result.success) {
                         const exercise = result.data.exercise;
-
-                        setExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
-                        setDateExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
+                        setWorkout(prev => ({ ...prev, exercises: prev.exercises.map(e => e.id === exercise.id ? exercise : e) }));
                     }
                 } catch (e) {
                     console.log(e)
@@ -156,12 +153,10 @@ export default function WorkoutEditor() {
                         sets: exercise.sets.filter(s => s.id !== set.id)
                     }
 
-                    const result = await APIService.training.exercises.updateSets(payload);
+                    const result = await APIService.training.workouts.exercises.update(payload);
                     if (result.success) {
                         const exercise = result.data.exercise;
-
-                        setExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
-                        setDateExercises(prev => prev.map(e => e.id === exercise.id ? exercise : e));
+                        setWorkout(prev => ({ ...prev, exercises: prev.exercises.map(e => e.id === exercise.id ? exercise : e) }));
                     }
                 } catch (e) {
                     console.log(e)
