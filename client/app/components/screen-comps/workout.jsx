@@ -19,11 +19,12 @@ export default function Workout({
     onWorkoutPress = () => { },
     onAddPress = () => { },
 }) {
-    const { user } = useContext(UserContext);
 
+    const { user } = useContext(UserContext);
     const exerciseCount = workout.exercises.length
     const setsCount = workout.exercises.reduce((total, exercise) => total + exercise.sets.length, 0);
     const totalVolume = formatVolume(workout.exercises.reduce((total, exercise) => total + exercise.sets.reduce((total, set) => total + (set.weight * set.reps), 0), 0));
+
     function formatVolume(num) {
         const convertedValue = convertWeight(num, 'kg', user.preferences.weightUnit.key || 'kg');
         if (convertedValue >= 1_000_000) return (convertedValue / 1_000_000).toFixed(2) + "M";

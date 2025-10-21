@@ -171,8 +171,6 @@ export default function Workouts() {
         })
     }
 
-    async function handleWorkoutImport(workout) { }
-
     async function handleWorkoutPress(workout) {
         router.push({
             pathname: routes.WOUROUT_EDITOR,
@@ -180,6 +178,10 @@ export default function Workouts() {
                 workout: JSON.stringify(workout)
             }
         })
+    }
+
+    async function handleWorkoutImport(workout) { 
+
     }
 
     if (loading) {
@@ -233,7 +235,7 @@ export default function Workouts() {
                                     onEditPress={() => handleWorkoutUpdate(workout)}
                                     onDeletePress={() => handleWorkoutDeletion(workout.id)}
                                     onWorkoutPress={() => handleWorkoutPress(workout)}
-                                    onAddPress={() => handleWorkoutAddition(workout)}
+                                    onAddPress={() => handleWorkoutImport(workout)}
                                 />
                             ))}
                         </View>
