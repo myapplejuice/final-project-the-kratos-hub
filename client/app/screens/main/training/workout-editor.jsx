@@ -28,7 +28,14 @@ export default function WorkoutEditor() {
     const [expandedExercise, setExpandedExercise] = useState(null);
     const [workout, setWorkout] = useState(JSON.parse(params.workout));
 
-    console.log(workout);
+    useEffect(() => {
+        async function fetchExercises() {
+
+        }
+
+        fetchExercises();
+    }, [])
+
     return (
         <>
             <FloatingActionButton
@@ -42,12 +49,13 @@ export default function WorkoutEditor() {
             />
 
             <FloatingActionButton
-                onPress={() => {}}
+                onPress={() => { }}
                 visible={fabVisible}
                 position={{ bottom: insets.bottom + 50, right: 20, left: 20 }}
                 style={{ width: '100%', height: 50, backgroundColor: colors.accentGreen }}
-                label="Create New Workout"
+                label="Add Exercise"
                 icon={Images.plus}
+                iconSize={20}
                 iconStyle={{ transform: [{ rotate: '-90deg' }], marginBottom: 2 }}
             />
 
@@ -69,9 +77,9 @@ export default function WorkoutEditor() {
                 )
                 : (
                     <View style={{ backgroundColor: colors.background, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <Image source={Images.plan3} style={{ width: 100, height: 100, tintColor: colors.mutedText }} />
-                        <AppText style={{ fontSize: scaleFont(16), color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginTop: 15 }}>No Workouts</AppText>
-                        <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold', textAlign: 'center' }}>Tap below start adding workout plans</AppText>
+                        <Image source={Images.icon6} style={{ width: 100, height: 100, tintColor: colors.mutedText }} />
+                        <AppText style={{ fontSize: scaleFont(16), color: colors.mutedText, fontWeight: 'bold', textAlign: 'center', marginTop: 15 }}>No Exercises</AppText>
+                        <AppText style={{ fontSize: scaleFont(14), color: 'white', fontWeight: 'bold', textAlign: 'center' }}>Tap below start adding exercises to the workout</AppText>
                     </View>
                 )}
         </>

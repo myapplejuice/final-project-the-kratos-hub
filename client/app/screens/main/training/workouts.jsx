@@ -191,6 +191,7 @@ export default function Workouts() {
                 style={{ width: '100%', height: 50, backgroundColor: colors.accentGreen }}
                 label="Create New Workout"
                 icon={Images.plus}
+                iconSize={20}
                 iconStyle={{ transform: [{ rotate: '-90deg' }], marginBottom: 2 }}
             />
 

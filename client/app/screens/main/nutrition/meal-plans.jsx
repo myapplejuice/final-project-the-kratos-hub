@@ -220,6 +220,7 @@ export default function MealsPlans() {
                 position={{ bottom: insets.bottom + 50, right: 20, left: 20 }}
                 style={{ width: '100%', height: 50, backgroundColor: colors.accentGreen }}
 
+                iconSize={20}
                 label="Create New Plan"
                 icon={Images.plus}
                 iconStyle={{ transform: [{ rotate: '-90deg' }], marginBottom: 2 }}
