@@ -3,6 +3,43 @@ import Database from '../database/database.js';
 import ObjectMapper from '../../utils/object-mapper.js';
 
 export default class ExercisesDBService {
+    static async fetchExercisesByDate(userId, date) {
+        if (!userId || !date) return null;
+
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
+            Database.addInput(request, 'Date', sql.DateTime2, date);
+
+            const query = `
+                SELECT *
+                FROM dbo.Exercises
+                WHERE UserId = @UserId AND CAST(Date AS DATE) = CAST(@Date AS DATE)
+                ORDER BY Date DESC
+            `;
+
+            const result = await request.query(query);
+            if (!result.recordset || result.recordset.length === 0) return null;
+
+            const exercises = result.recordset.map((row) => {
+                const exercise = {};
+                for (const key in row) {
+                    if (key === 'Sets' || key === 'Exercise') {
+                        exercise[ObjectMapper.toCamelCase(key)] = JSON.parse(row[key]);
+                    } else {
+                        exercise[ObjectMapper.toCamelCase(key)] = row[key];
+                    }
+                }
+                return exercise;
+            });
+
+            return exercises;
+        } catch (err) {
+            console.error('fetchExercisesByDate error:', err);
+            return null;
+        }
+    }
+
     static async fetchExercises(userId) {
         if (!userId) return null;
 

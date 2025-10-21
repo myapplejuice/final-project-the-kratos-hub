@@ -26,43 +26,21 @@ export default function TrainingHub() {
 
      useEffect(() => {
           async function prepareDayLog() {
-               showSpinner();
-               const todayKey = formatDate(new Date(), { format: 'YYYY-MM-DD' });
-
                try {
-                    let todayObject = user.nutritionLogs?.[todayKey];
-
-                    if (!todayObject) {
-                         const result = await APIService.nutrition.days.futureDays(todayKey);
-
-                         if (result.success) {
-                              todayObject = result.data.newDays[todayKey];
-                              setUser(prev => ({
-                                   ...prev,
-                                   nutritionLogs: { ...(prev.nutritionLogs || {}), ...result.data.newDays }
-                              }));
-                         } else {
-                              console.log(result.message);
-                              createToast({ message: `Server error, ${result.message}` });
-                         }
+                    const result = await APIService.training.exercises.exercisesByDate(new Date());
+                    if (result.success) {
+                         console.log(result.data.exercises)
                     }
-
-                    const { energyKcal, carbs, protein, fat } = totalDayConsumption(todayObject);
-                    todayObject.consumedEnergyKcal = energyKcal;
-                    todayObject.consumedCarbGrams = carbs;
-                    todayObject.consumedProteinGrams = protein;
-                    todayObject.consumedFatGrams = fat;
-
-                    setLog(todayObject);
                } catch (err) {
-                    console.log("Failed to create today's nutrition day:", err.message);
+                    console.log(err);
                } finally {
                     hideSpinner();
                }
+
           }
 
           prepareDayLog();
-     }, [user.nutritionLogs]);
+     }, []);
 
      function handleMealPlansPress() {
           router.push({
@@ -79,7 +57,7 @@ export default function TrainingHub() {
                     <View style={{ margin: 0, paddingHorizontal: 20, paddingTop: 60, paddingBottom: 20, borderBottomEndRadius: 30, borderBottomStartRadius: 30, backgroundColor: colors.cardBackground }}>
                          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 30 }}>
                               <AppText style={{ fontSize: scaleFont(15), color: colors.white, fontWeight: 'bold' }}>
-                                   Daily Nutrition Targets
+                                   Today's Training Summary
                               </AppText>
                               <View style={{ justifyContent: 'center' }}>
                                    <DateDisplay showDay={false} dateStyle={{ fontSize: scaleFont(14) }} uppercaseDate={false} />
@@ -88,7 +66,7 @@ export default function TrainingHub() {
 
                          <View style={{ marginBottom: 20 }}>
                               <ProgressBar
-                                   title="Energy"
+                                   title="Energy Burned"
                                    current={convertEnergy(log?.consumedEnergyKcal || 0, 'kcal', user.preferences.energyUnit.key)}
                                    max={convertEnergy(log?.targetEnergyKcal || user.nutrition.setEnergyKcal, 'kcal', user.preferences.energyUnit.key)}
                                    unit={user.preferences.energyUnit.field}

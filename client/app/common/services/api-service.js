@@ -234,6 +234,7 @@ export default class APIService {
     static training = {
         exercises: {
             exercises: () => APIService.request(`/training/exercise/${APIService.USER_ID}`, 'GET'),
+            exercisesByDate: (date) => APIService.request(`/training/exercise/${APIService.USER_ID}?date=${date}`, 'GET'),
             create: (payload) => APIService.request(`/training/exercise/${APIService.USER_ID}`, 'POST', payload),
             createBulk: (payload) => APIService.request(`/training/exercise/bulk/${APIService.USER_ID}`, 'POST', payload),
             update: (payload) => APIService.request(`/training/exercise/${APIService.USER_ID}`, 'PUT', payload),

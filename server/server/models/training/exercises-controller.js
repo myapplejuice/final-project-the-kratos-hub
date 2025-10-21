@@ -1,6 +1,17 @@
 import ExercisesDBService from './exercises-db-service.js';
 
 export default class ExercisesController {
+    static async getExercisesByDate(req, res) {
+        const { userId } = req.params.id;
+        const {date} = req.query.date;
+
+        console.log(userId, date)
+
+        const result = await ExercisesDBService.fetchExercisesByDate(userId, date);
+        if (result === null) return res.status(500).json({ success: false, error: "Failed to create exercise" });
+
+        return res.status(200).json({ success: true, exercises: result });
+    }
     static async getExercises(req, res) {
         const id = req.params.id;
 

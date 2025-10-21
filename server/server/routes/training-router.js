@@ -11,6 +11,7 @@ export default class TrainingRouter {
         this.trainingRouter = Router();
         const { asyncHandler, tokenAuthorization, userAuthorization } = MiddlewaresManager;
 
+        this.trainingRouter.get('/exercises/:id?', tokenAuthorization, userAuthorization, asyncHandler(ExercisesController.getExercisesByDate));
         this.trainingRouter.get('/exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(ExercisesController.getExercises));
         this.trainingRouter.post('/exercise/:id', tokenAuthorization, userAuthorization, asyncHandler(ExercisesController.createExercise));
         this.trainingRouter.post('/exercise/bulk/:id', tokenAuthorization, userAuthorization, asyncHandler(ExercisesController.createBulkExercises));
