@@ -18,7 +18,7 @@ import FadeInOut from "../../../components/effects/fade-in-out";
 import { CameraContext } from '../../../common/contexts/camera-context';
 import BarcodeScanner from '../../../components/screen-comps/barcode-scanner';
 import { exercises, muscleGroups } from '../../../common/utils/global-options';
-import ExerciseCard from './exercise-card';
+import ExerciseProfileCard from '../../../components/screen-comps/exercise-profile-card';
 import usePopups from '../../../common/hooks/use-popups';
 import { ScrollView } from 'react-native';
 import APIService from '../../../common/services/api-service';
@@ -187,7 +187,7 @@ setVisibleExercises(uniqueFiltered.slice(start, end));
 
                 <AppScroll scrollToTop={scrollToTop} extraBottom={350} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} extraTop={0} topPadding={false}>
                     {visibleExercises.map((exercise, index) =>
-                        <ExerciseCard
+                        <ExerciseProfileCard
                             key={exercise.id}
                             exercise={exercise}
                             expanded={expandedId === exercise.id}

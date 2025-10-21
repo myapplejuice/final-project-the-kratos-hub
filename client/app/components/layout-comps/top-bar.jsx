@@ -107,6 +107,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.USER_SAVED_POSTS]: "Saved Posts",
         [routes.POST]: "Saved Posts",
         [routes.EXERCISES]: "Exercises",
+        [routes.WORKOUTS]: "Workouts",
 
     };
 

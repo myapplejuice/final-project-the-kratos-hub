@@ -86,8 +86,13 @@ export default function TrainingHub() {
         })
     }
 
-    async function handleImportPlan(){
-        
+    async function handleImportWorkout(){
+        router.push({
+            pathname: routes.WORKOUTS,
+            params: {
+                date: encodeURIComponent(date)
+            }
+        })
     }
 
     async function handleDeleteExercise(exerciseId) {
@@ -235,7 +240,8 @@ export default function TrainingHub() {
             <FloatingActionMenu
                 onPress={handleAddExercise}
                 actions={[
-                    { icon: Images.icon6, title: "Import Plan", onPress: handleImportPlan, closeOnAction: true },
+                    { icon: Images.plan3, title: "Training Programs", onPress: handleImportWorkout, closeOnAction: true },
+                    { icon: Images.plan3, title: "Import Workout", onPress: handleImportWorkout, closeOnAction: true },
                     { icon: Images.icon6, title: "Add Exercise", onPress: handleAddExercise, closeOnAction: true },
                 ]}
                 visible={fabVisible}

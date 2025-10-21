@@ -1,16 +1,16 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { colors, muscleGroupColors, nutritionColors } from '../../../common/settings/styling';
-import { Images } from '../../../common/settings/assets';
-import { scaleFont } from '../../../common/utils/scale-fonts';
-import { UserContext } from '../../../common/contexts/user-context';
-import { convertEnergy } from '../../../common/utils/unit-converter';
-import AppText from '../../../components/screen-comps/app-text';
-import AnimatedButton from '../../../components/screen-comps/animated-button';
-import ExpandInOut from '../../../components/effects/expand-in-out';
-import Invert from '../../../components/effects/invert';
+import { colors, muscleGroupColors, nutritionColors } from '../../common/settings/styling';
+import { Images } from '../../common/settings/assets';
+import { scaleFont } from '../../common/utils/scale-fonts';
+import { UserContext } from '../../common/contexts/user-context';
+import { convertEnergy } from '../../common/utils/unit-converter';
+import AppText from './app-text';
+import AnimatedButton from './animated-button';
+import ExpandInOut from '../effects/expand-in-out';
+import Invert from '../effects/invert';
 
-export default function ExerciseCard({ exercise, onExpandPress = () => { }, onAddPress = () => { }, expanded = false }) {
+export default function ExerciseProfileCard({ exercise, onExpandPress = () => { }, onAddPress = () => { }, expanded = false }) {
     const { user } = useContext(UserContext);
 
     function capitalizeFirstLetter(string) {
