@@ -12,6 +12,7 @@ import { UserContext } from '../../common/contexts/user-context';
 
 export default function Workout({
     workout,
+    addButtonVisible = true,
     expanded = false,
     onExpandPress = () => { },
     onEditPress = () => { },
@@ -106,19 +107,21 @@ export default function Workout({
                     </View>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <AnimatedButton
-                            title="Add Workout"
-                            onPress={onAddPress}
-                            textStyle={{ fontSize: scaleFont(14) }}
-                            style={[styles.actionButton, { backgroundColor: colors.accentGreen, width: '48%' }]}
-                            leftImage={Images.plus}
-                            leftImageStyle={{ tintColor: 'white', marginEnd: 5 }}
-                        />
+                        {addButtonVisible &&
+                            <AnimatedButton
+                                title="Add Workout"
+                                onPress={onAddPress}
+                                textStyle={{ fontSize: scaleFont(14) }}
+                                style={[styles.actionButton, { backgroundColor: colors.accentGreen, width: '48%' }]}
+                                leftImage={Images.plus}
+                                leftImageStyle={{ tintColor: 'white', marginEnd: 5 }}
+                            />
+                        }
                         <AnimatedButton
                             title="Full Workout"
                             onPress={onWorkoutPress}
                             textStyle={{ fontSize: scaleFont(14) }}
-                            style={[styles.actionButton, { backgroundColor: colors.main, width: '48%' }]}
+                            style={[styles.actionButton, { backgroundColor: colors.main, width: addButtonVisible ? '48%' : '100%' }]}
                             rightImage={Images.arrow}
                             rightImageStyle={{ tintColor: 'white', marginStart: 5 }}
                         />

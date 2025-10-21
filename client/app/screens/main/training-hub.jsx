@@ -66,11 +66,11 @@ export default function TrainingHub() {
           prepareData();
      }, []);
 
-     function handleMealPlansPress() {
+     function handleWorkoutPlans() {
           router.push({
-               pathname: routes.MEAL_PLANS,
+               pathname: routes.WORKOUTS,
                params: {
-                    mealPlansIntent: 'normal'
+                    workoutsContext: 'normal'
                }
           });
      }
@@ -109,7 +109,7 @@ export default function TrainingHub() {
                          <View style={{ flexDirection: 'row', justifyContent: 'center', backgroundColor: colors.backgroundTop, padding: 15, borderRadius: 20 }}>
                               <View style={{ alignItems: 'center' }}>
                                    <AppText style={{ fontSize: 14, color: colors.mutedText }}>Total Exercises</AppText>
-                                   <AppText style={{ fontSize: 20, fontWeight: '700', color: nutritionColors.energy1 }}>
+                                   <AppText style={{ fontSize: 20, fontWeight: '700', color: colors.main }}>
                                         {totalExercises}
                                    </AppText>
                               </View>
@@ -137,7 +137,7 @@ export default function TrainingHub() {
                          </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={handleMealPlansPress} style={[styles.card, { padding: 15 }]}>
+                    <TouchableOpacity onPress={handleWorkoutPlans} style={[styles.card, { padding: 15 }]}>
                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                               <View style={{ flexDirection: 'row', alignItems: 'center', flexShrink: 1 }}>
                                    <View style={{ borderRadius: 15, padding: 12, backgroundColor: colors.lightMutedText, overflow: 'hidden' }}>

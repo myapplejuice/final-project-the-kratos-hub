@@ -17,6 +17,7 @@ import Workout from "../../../components/screen-comps/workout";
 
 export default function Workouts() {
     const date = decodeURIComponent(useLocalSearchParams().date);
+    const context = useLocalSearchParams().workoutsContext;
     const insets = useSafeAreaInsets();
 
     const { createInput, showSpinner, hideSpinner, createToast, createDialog, createAlert, createOptions } = usePopups();
@@ -255,6 +256,7 @@ export default function Workouts() {
                             {workouts.map((workout, index) => (
                                 <Workout
                                     key={workout.id}
+                                    addButtonVisible={context === 'add'}
                                     workout={workout}
                                     expanded={expandedWorkout === workout.id}
                                     onExpandPress={() => setExpandedWorkout(expandedWorkout === workout.id ? null : workout.id)}

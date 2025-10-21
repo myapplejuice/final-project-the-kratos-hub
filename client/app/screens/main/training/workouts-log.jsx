@@ -106,7 +106,8 @@ export default function WorkoutsLog() {
         router.push({
             pathname: routes.WORKOUTS,
             params: {
-                date: encodeURIComponent(date)
+                date: encodeURIComponent(date),
+                workoutsContext: 'add'
             }
         })
     }
