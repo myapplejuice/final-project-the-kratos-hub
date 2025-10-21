@@ -34,7 +34,6 @@ export default class NutritionMealPlansDBService {
                 plan[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
             }
 
-            console.log(plan)
             return plan;
         } catch (err) {
             console.error('createPlan error:', err);
@@ -133,8 +132,7 @@ export default class NutritionMealPlansDBService {
                 coachId: sourcePlan.coachId || null,
                 label: `${sourcePlan.label}`,
                 description: sourcePlan.description !== 'No description provided' ? 
-                sourcePlan.description + "\n\nImported by " + sourcePlanUsername :
-                    "Cloned plan - Imported by " + sourcePlanUsername,
+                sourcePlan.description : `Copied from ${sourcePlanUsername}'s plan`
             });
 
             if (!newPlan || !newPlan.id) throw new Error("Failed to create new plan");
