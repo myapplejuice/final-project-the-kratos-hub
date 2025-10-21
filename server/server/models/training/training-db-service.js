@@ -24,7 +24,7 @@ export default class TrainingDBService {
             const exercises = result.recordset.map((row) => {
                 const exercise = {};
                 for (const key in row) {
-                    if (key === 'Sets') {
+                    if (key === 'Sets' || key === 'Exercise') {
                         exercise[ObjectMapper.toCamelCase(key)] = JSON.parse(row[key]);
                     } else {
                         exercise[ObjectMapper.toCamelCase(key)] = row[key];
@@ -44,16 +44,13 @@ export default class TrainingDBService {
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, details.userId);
-            Database.addInput(request, 'Label', sql.VarChar(100), details.label);
-            Database.addInput(request, 'Description', sql.VarChar(1000), details.description);
-            Database.addInput(request, 'BodyPart', sql.VarChar(100), details.bodyPart);
-            Database.addInput(request, 'Image', sql.NVarChar(sql.MAX), details.image);
+            Database.addInput(request, 'Exercise', sql.NVarChar(sql.MAX), JSON.stringify(details.exercise));
             Database.addInput(request, 'Sets', sql.NVarChar(sql.MAX), JSON.stringify(details.sets));
 
             const query = `
-                INSERT INTO dbo.Exercises (UserId, Label, Description, BodyPart, Image, Sets)
+                INSERT INTO dbo.Exercises (UserId, Exercise, Sets)
                 OUTPUT INSERTED.*
-                VALUES (@UserId, @Label, @Description, @BodyPart, @Image, @Sets)
+                VALUES (@UserId, @Exercise, @Sets)
             `;
 
             const result = await request.query(query);
@@ -61,7 +58,7 @@ export default class TrainingDBService {
 
             const exercise = {};
             for (const key in result.recordset[0]) {
-                if (key === 'Sets')
+                if (key === 'Sets' || key === 'Exercise')
                     exercise[ObjectMapper.toCamelCase(key)] = JSON.parse(result.recordset[0][key]);
                 else
                     exercise[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
@@ -78,17 +75,11 @@ export default class TrainingDBService {
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, details.id);
-            Database.addInput(request, 'Label', sql.VarChar(100), details.label);
-            Database.addInput(request, 'Description', sql.VarChar(1000), details.description);
-            Database.addInput(request, 'BodyPart', sql.VarChar(100), details.bodyPart);
-            Database.addInput(request, 'Image', sql.NVarChar(sql.MAX), details.image);
+            Database.addInput(request, 'Exercise', sql.NVarChar(sql.MAX), JSON.stringify(details.exercise));
 
             const query = `
                 UPDATE dbo.Exercises
-                SET Label = @Label,
-                    Description = @Description,
-                    BodyPart = @BodyPart,
-                    Image = @Image
+                SET Exercise = @Exercise
                 OUTPUT INSERTED.*
                 WHERE Id = @Id
             `;
@@ -98,7 +89,7 @@ export default class TrainingDBService {
 
             const exercise = {};
             for (const key in result.recordset[0]) {
-                if (key === 'Sets')
+                if (key === 'Sets' || key === 'Exercise')
                     exercise[ObjectMapper.toCamelCase(key)] = JSON.parse(result.recordset[0][key]);
                 else
                     exercise[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];

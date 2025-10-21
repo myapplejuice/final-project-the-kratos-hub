@@ -7,12 +7,8 @@ export function trainingQuery() {
                 UserId UNIQUEIDENTIFIER NOT NULL,
                 
                 Date DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
-                Label VARCHAR(100) NOT NULL DEFAULT '',
-                Description VARCHAR(1000) NOT NULL DEFAULT '',
-                BodyPart VARCHAR(100) NOT NULL DEFAULT '',
-                Image NVARCHAR(MAX) NULL DEFAULT '',
-                
-                Sets NVARCHAR(MAX) NULL DEFAULT '[]', --JSON containing [{reps: 10, weight: 10}, {reps: 10, weight: 10}]
+                Exercise NVARCHAR(MAX) NULL DEFAULT '[]',
+                Sets NVARCHAR(MAX) NULL DEFAULT '[]', 
 
                 CONSTRAINT FK_Exercises_Users FOREIGN KEY (UserId)
                     REFERENCES dbo.Users(Id)

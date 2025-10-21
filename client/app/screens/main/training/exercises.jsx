@@ -100,7 +100,7 @@ export default function Exercises() {
 
             const payload = {
                 userId: user.id,
-                date: new Date(),
+                date,
                 label,
                 description: description || "",
                 bodyPart: bodyPart || "",
@@ -112,9 +112,6 @@ export default function Exercises() {
 
             if (result.success) {
                 const exercise = result.data.exercise;
-
-                setExercises(prev => [...prev, exercise]);
-                setDateExercises(prev => [...prev, exercise]);
             }
         } catch (e) {
             console.log(e)
