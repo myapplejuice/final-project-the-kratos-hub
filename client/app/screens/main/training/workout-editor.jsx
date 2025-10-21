@@ -30,8 +30,8 @@ export default function WorkoutEditor() {
 
     useEffect(() => {
         const newExercise = additionalContexts.newExercise;
-        
-        if(newExercise) {
+
+        if (newExercise) {
             setWorkout(prev => ({ ...prev, exercises: [...prev.exercises, newExercise] }));
         }
     }, [additionalContexts.newExercise])
@@ -67,19 +67,20 @@ export default function WorkoutEditor() {
             {workout.exercises.length > 0 ?
                 (
                     <AppScroll avoidKeyboard={false} extraBottom={250} onScrollSetStates={[setFabVisible, () => setScrollToTop(false)]} scrollToTop={scrollToTop}>
-                        <View style={{ margin: 15 }}>
-                            {workout.exercises.map((exercise, index) => (
-                                <Exercise
-                                    key={index}
-                                    user={user}
-                                    exercise={exercise}
-                                    sets={exercise.sets}
-                                    onAddPress={() => { }}
-                                    onExpandPress={() => setExpandedExercise(expandedExercise === exercise.id ? null : exercise.id)}
-                                    expanded={expandedExercise === exercise.id}
-                                />
-                            ))}
-                        </View>
+                        {workout.exercises.map((exercise, index) => (
+                            <Exercise
+                                key={index}
+                                user={user}
+                                exercise={exercise.exercise}
+                                sets={exercise.sets}
+                                onDeletePress={() => { }}
+                                onAddPress={() => { }}
+                                onSetDeletePress={() => { }}
+                                onSetEditPress={() => { }}
+                                onExpandPress={() => setExpandedExercise(expandedExercise === exercise.id ? null : exercise.id)}
+                                expanded={expandedExercise === exercise.id}
+                            />
+                        ))}
                     </AppScroll >
                 )
                 :

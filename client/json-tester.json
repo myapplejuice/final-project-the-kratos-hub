@@ -1,0 +1,20 @@
+{
+    "date": "2025-10-21T14:27:31.168Z",
+    "description": "Mainly upper chest for strength",
+    "duration": "100",
+    "exercises": [
+        {
+            "exercise": [Object
+            ],
+            "id": 1,
+            "sets": [Array
+            ],
+            "userId": "204EFF41-FF71-4636-9425-14DBB383E2BA",
+            "workoutId": 5
+        }
+    ],
+    "id": 5,
+    "intensity": "Moderate",
+    "label": "Upper Chest Strength",
+    "userId": "204EFF41-FF71-4636-9425-14DBB383E2BA"
+}

@@ -62,7 +62,7 @@ export default function Exercise({ user, sets, exercise, onExpandPress = () => {
                 <View style={{ marginTop: 25 }}>
                     <AppText style={{ color: 'white', fontSize: scaleFont(14), fontWeight: '700', marginBottom: 12 }}>Sets</AppText>
 
-                    {sets.map((set, index) => (
+                    {sets.length > 0 && sets.map((set, index) => (
                         <TouchableOpacity
                             key={index}
                             onLongPress={() => onSetDeletePress(set)}
@@ -109,6 +109,9 @@ export default function Exercise({ user, sets, exercise, onExpandPress = () => {
                             </View>
                         </TouchableOpacity>
                     ))}
+                    {sets.length === 0 &&
+                        <AppText style={{ color: colors.mutedText, fontSize: scaleFont(14), fontWeight: '500', marginBottom: 12, textAlign: 'center' }}>No sets</AppText>
+                    }
                 </View>
 
                 <View
@@ -147,7 +150,7 @@ export default function Exercise({ user, sets, exercise, onExpandPress = () => {
                     onPress={onAddPress}
                     textStyle={{ fontSize: scaleFont(14), fontWeight: 'bold' }}
                     leftImage={Images.plus}
-                    leftImageStyle={{ tintColor: 'white', marginEnd: 5}}
+                    leftImageStyle={{ tintColor: 'white', marginEnd: 5 }}
                     style={{ marginTop: 15, backgroundColor: colors.main, paddingVertical: 15, borderRadius: 15 }}
                 />
             </ExpandInOut>
