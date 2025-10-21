@@ -174,6 +174,7 @@ function Layout() {
 
                                             {/* TRAINING CIHLDREN */}
                                             <Stack.Screen name="screens/main/training/exercises" />
+                                            <Stack.Screen name="screens/main/training/workouts-log" />
                                             <Stack.Screen name="screens/main/training/workouts" />
                                             <Stack.Screen name="screens/main/training/workout-editor" />
                                             

@@ -66,12 +66,11 @@ export const routes = {
     FOOD_PROFILE: '/screens/main/nutrition/food-profile',
     FOODS: '/screens/main/nutrition/foods',
 
-
     /* TRAINING CHILDREN */
     EXERCISES: '/screens/main/training/exercises',
+    WORKOUTS_LOG: '/screens/main/training/workouts-log',
     WORKOUTS: '/screens/main/training/workouts',
-    WOUROUT_EDITOR: '/screens/main/training/workout-editor',
-
+    WORKOUT_EDITOR: '/screens/main/training/workout-editor',
 }
 
 export const mainScreens = [

@@ -174,7 +174,7 @@ export default function Workouts() {
 
     async function handleWorkoutPress(workout) {
         router.push({
-            pathname: routes.WOUROUT_EDITOR,
+            pathname: routes.WORKOUT_EDITOR,
             params: {
                 workout: JSON.stringify(workout)
             }
