@@ -20,6 +20,7 @@ export default function Workout({
     onAddPress = () => { },
 }) {
     const { user } = useContext(UserContext);
+
     const exerciseCount = workout.exercises.length
     const setsCount = workout.exercises.reduce((total, exercise) => total + exercise.sets.length, 0);
     const totalVolume = formatVolume(workout.exercises.reduce((total, exercise) => total + exercise.sets.reduce((total, set) => total + (set.weight * set.reps), 0), 0));
