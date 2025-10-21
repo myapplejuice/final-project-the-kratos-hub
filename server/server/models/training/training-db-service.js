@@ -121,7 +121,7 @@ export default class TrainingDBService {
 
             const exercise = {};
             for (const key in result.recordset[0]) {
-                if (key === 'Sets')
+                if (key === 'Sets' || key === 'Exercise')
                     exercise[ObjectMapper.toCamelCase(key)] = JSON.parse(result.recordset[0][key]);
                 else
                     exercise[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
