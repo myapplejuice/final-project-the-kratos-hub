@@ -197,6 +197,7 @@ export default function Workouts() {
             if (result.success) {
                 const newExercises = result.data.exercises;
 
+                console.log(newExercises)
                 setAdditionalContexts(prev => ({ ...prev, newExercises }));
                 createToast({ message: "Workout imported" });
                 router.back();

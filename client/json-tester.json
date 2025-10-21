@@ -1,5 +1,6 @@
 [
     {
+        "date": "2025-10-21T17:08:12.643Z",
         "exercise": {
             "equipment": "Barbell",
             "id": "ex_001",
@@ -13,6 +14,7 @@
             ],
             "type": "compound"
         },
+        "id": 15,
         "sets": [
             [Object
             ],
@@ -20,9 +22,11 @@
             ],
             [Object
             ]
-        ]
+        ],
+        "userId": "204EFF41-FF71-4636-9425-14DBB383E2BA"
     },
     {
+        "date": "2025-10-21T17:08:12.643Z",
         "exercise": {
             "equipment": "Dip Bar",
             "id": "ex_010",
@@ -36,14 +40,17 @@
             ],
             "type": "compound"
         },
+        "id": 18,
         "sets": [
             [Object
             ],
             [Object
             ]
-        ]
+        ],
+        "userId": "204EFF41-FF71-4636-9425-14DBB383E2BA"
     },
     {
+        "date": "2025-10-21T17:08:12.643Z",
         "exercise": {
             "equipment": "Bodyweight",
             "id": "ex_003",
@@ -57,14 +64,17 @@
             ],
             "type": "compound"
         },
+        "id": 17,
         "sets": [
             [Object
             ],
             [Object
             ]
-        ]
+        ],
+        "userId": "204EFF41-FF71-4636-9425-14DBB383E2BA"
     },
     {
+        "date": "2025-10-21T17:08:12.643Z",
         "exercise": {
             "equipment": "Dumbbells",
             "id": "ex_034",
@@ -78,6 +88,7 @@
             ],
             "type": "isolation"
         },
+        "id": 16,
         "sets": [
             [Object
             ],
@@ -85,6 +96,7 @@
             ],
             [Object
             ]
-        ]
+        ],
+        "userId": "204EFF41-FF71-4636-9425-14DBB383E2BA"
     }
 ]
