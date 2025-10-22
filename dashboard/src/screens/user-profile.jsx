@@ -7,7 +7,7 @@ import { formatDate } from "../utils/date-time";
 import APIService from "../utils/api-service";
 
 export default function UserProfile() {
-    const { showDialog, showMessager } = usePopups();
+    const { showDialog, showMessager, showOptions } = usePopups();
     const nav = useNavigate();
     const location = useLocation();
     const [user, setUser] = useState(location.state?.user);
@@ -27,7 +27,7 @@ export default function UserProfile() {
                 {
                     label: "Yes", color: "#cc2e2eff", onClick: async () => {
                         const result = await APIService.routes.terminateUser({ id: user.id, isTerminated: !user.isTerminated });
-                        console.log(result)
+
                         if (result.success) {
                             setUser({ ...user, isTerminated: !user.isTerminated });
                         }
@@ -43,15 +43,36 @@ export default function UserProfile() {
             title: "Send a Message",
             sendLabel: "Send Now",
             onSend: async (message) => {
-                const result = await APIService.routes.notifyUser({ id: user.id, message, imagesURLS: [] });
-                
-                if (result.success){
-                    showMessager({
-                        title: "Message Sent",
-                        content: <p>Message sent and user will be notified</p>,
-                        actions: [{ label: "Ok", color: colors.primary, onClick: null }],
-                    });
-                }
+                if (!message) return;
+
+                showOptions({
+                    title: "Notification Sentiment",
+                    current: "",
+                    options: [
+                        { label: "Negative", color: "#cc2e2e", value: "negative" },
+                        { label: "Positive", color: "#40cc2e", value: "positive" },
+                        { label: "Neutral", color: "#6b6b6b", value: "normal" },
+                    ],
+                    onConfirm: async (chosen) => {
+                        if (!chosen) return;
+
+                        const result = await APIService.routes.notifyUser({
+                            id: user.id,
+                            message,
+                            imagesURLS: [],
+                            sentiment: chosen.value,
+                        });
+
+                        if (result.success) {
+                            showDialog({
+                                title: "Notification Sent",
+                                content: <p>Message sent and user will be notified</p>,
+                                actions: [{ label: "Ok", color: colors.primary, onClick: null }],
+                            });
+                        }
+                    },
+                });
+
             },
         })
     }
@@ -127,9 +148,6 @@ export default function UserProfile() {
                             }}>
                                 {user.firstname + " " + user.lastname}
                             </p>
-                            <div style={{ display: 'flex', alignItems: 'center', background: user.isTerminated ? '#ff0000ff' : '#00c510ff', width: 'fit-content', height: 'fit-content', margin: 0, padding: 0, lineHeight: 1, paddingInline: 15, borderRadius: 15, height: '30px' }}>
-                                <p style={{ color: 'white', fontWeight: 'bolder', }}>{user.isTerminated ? "Terminated Account" : "Active"}</p>
-                            </div>
                         </div>
                         <p style={{
                             color: "#64748b",
@@ -224,15 +242,25 @@ export default function UserProfile() {
                     border: '1px solid rgba(255,255,255,0.1)',
                     backdropFilter: 'blur(10px)'
                 }}>
-                    <p style={{
-                        fontWeight: '700',
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
                         marginBottom: '20px',
-                        marginTop: 0,
-                        fontSize: '22px',
-                        color: '#60a5fa',
                         borderBottom: '2px solid rgba(96,165,250,0.3)',
                         paddingBottom: '8px'
-                    }}>Basic Information</p>
+                    }}>
+                        <p style={{
+                            fontWeight: '700',
+                            margin: 0,
+                            fontSize: '22px',
+                            color: '#60a5fa',
+                        }}>Personal Profile</p>
+
+                        <div style={{ display: 'flex', alignItems: 'center', background: user.isTerminated ? '#ff0000ff' : '#00c510ff', width: 'fit-content', height: 'fit-content', marginBottom: 5, padding: 0, lineHeight: 1, paddingInline: 15, borderRadius: 15, height: '30px' }}>
+                            <p style={{ color: 'white', fontWeight: 'bolder', }}>{user.isTerminated ? "Terminated Account" : "Active"}</p>
+                        </div>
+                    </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Age:</strong> {user.age}</p>
                         <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Gender:</strong> {user.gender}</p>

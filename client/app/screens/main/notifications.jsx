@@ -386,7 +386,7 @@ export default function Notifications() {
                                                 <TouchableOpacity style={{ marginBottom: 25, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} onPress={() => notification.clickable && handleNotificationPress(notification)}>
                                                     <View style={{
                                                         borderStartColor: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white',
-                                                        borderStartWidth: 2, paddingStart: 15, width: notification.clickableDestination === 'user-post' ? '80%' : '100%'
+                                                        borderStartWidth: 2, paddingStart: 15, width: (notification.clickableDestination === 'user-post' || notification.clickableDestination === 'admin') ? '80%' : '100%'
                                                     }}>
                                                         <AppText style={{ fontSize: scaleFont(13), fontWeight: '600', color: notification.seen ? colors.mutedText : 'white' }}>
                                                             {notification.notification}
@@ -398,6 +398,11 @@ export default function Notifications() {
                                                     {notification.clickableDestination === 'user-post' && notification.clickableInfo.postImageURL &&
                                                         <View style={{ width: '20%', justifyContent: 'center', alignItems: 'center' }}>
                                                             <AppImage source={{ uri: notification.clickableInfo.postImageURL }} style={{ width: 60, height: 60, borderRadius: 10 }} resizeMode='contain' />
+                                                        </View>
+                                                    }
+                                                    {notification.clickableDestination === 'admin' &&
+                                                        <View style={{ width: '20%', justifyContent: 'center', alignItems: 'center' }}>
+                                                            <AppImage source={Images.logo} style={{ width: 60, height: 60, borderRadius: 10 }} resizeMode='contain' />
                                                         </View>
                                                     }
                                                 </TouchableOpacity>

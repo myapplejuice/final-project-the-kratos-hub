@@ -38,16 +38,16 @@ export default class AdminController {
     }
 
     static async notifyUser(req, res) {
-        const { id, message, imagesURLS } = req.body;
+        const { id, message, imagesURLS, sentiment } = req.body;
 
         const payload = {
             userId: id,
-            notification: `ADMINISTRATION: ${message}`,
+            notification: `Administration sent you a message:\n\n${message}`,
             seen: false,
             clickable: true,
             clickableInfo: JSON.stringify({ imagesURLS }),
             clickableDestination: 'admin',
-            sentiment: "normal",
+            sentiment,
             dateOfCreation: new Date()
         }
 
@@ -56,6 +56,6 @@ export default class AdminController {
         payload.clickableInfo = JSON.parse(payload.clickableInfo);
         SocketController.emitNotification(id, payload);
 
-        return res.status(200).json({ success: true, message: response.message });
+        return res.status(200).json({ success: true });
     }
 }
