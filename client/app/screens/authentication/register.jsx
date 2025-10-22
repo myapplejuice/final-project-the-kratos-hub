@@ -376,8 +376,8 @@ export default function Register() {
             if (result.success) {
                 const token = result.data.token;
                 await DeviceStorageService.setUserPreferences(pref);
-                const userProfile = await DeviceStorageService.initUserSession(token);
-                setUser(userProfile);
+                const profileResult = await DeviceStorageService.initUserSession(token);
+                setUser(profileResult.profile);
 
                 createAlert({
                     title: "Registration",
@@ -388,7 +388,7 @@ export default function Register() {
                 createAlert({ title: "Registration Failed", text: result.message })
             }
         } catch (e) {
-            createAlert({ title: "Registration", text: `Internal server error!${e.message ? `\n${e.message}` : ''}` })
+            createAlert({ title: "Registration", text: `${e.message ? `\n${e.message}` : ''}` })
         } finally {
             hideSpinner();
         }

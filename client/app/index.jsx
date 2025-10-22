@@ -1,5 +1,6 @@
 import { useEffect, useContext, useState } from 'react';
 import { View, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 import { Asset } from 'expo-asset';
 import { router } from 'expo-router';
 import { UserContext } from './common/contexts/user-context';
@@ -74,17 +75,28 @@ export default function Index() {
                     throw new Error('Servers unavailable!\nPlease try again later');
                 }
 
-                // User
-                const profile = await DeviceStorageService.initUserSession();
-                setUser(profile);
-
                 // Assets
                 await Asset.loadAsync(ImageAssets);
 
-                //Rerouting
-                if (profile !== false && typeof profile === 'object') {
-                    router.replace(routes.HOMEPAGE);
+                // User
+                const result = await DeviceStorageService.initUserSession();
+                if (result.success) {
+                    setUser(result.profile);
+
+                    if (!result.success && typeof result.profile !== 'object') {
+                        router.replace(routes.HOMEPAGE);
+                    } else {
+                        router.replace(routes.INTRODUCTION);
+                    }
                 } else {
+                    if (result.message?.includes('terminated')) {
+                        createAlert({
+                            title: 'Account Terminated',
+                            text: result.message,
+                            buttonText: 'Ok',
+                            onPress: async () => await SecureStore.deleteItemAsync("token")
+                        });
+                    }
                     router.replace(routes.INTRODUCTION);
                 }
             } catch (e) {
@@ -122,8 +134,8 @@ export default function Index() {
     }, []);
 
     const numSlots = 3;
-    const slotWidth = 50; 
-    const gap = 70;       
+    const slotWidth = 50;
+    const gap = 70;
 
     const slotPositions = Array.from({ length: numSlots }, (_, i) => {
         const totalWidth = numSlots * slotWidth + (numSlots - 1) * gap;

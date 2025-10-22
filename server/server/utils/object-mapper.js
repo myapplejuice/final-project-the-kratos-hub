@@ -135,7 +135,8 @@ export default class ObjectMapper {
             AccessId: 'accessId',
             AccessPassword: 'accessPassword',
             Permissions: 'permissions',
-            IsActive: 'isActive'
+            IsActive: 'isActive',
+            IsTerminated: 'isTerminated'
             
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
@@ -276,7 +277,8 @@ export default class ObjectMapper {
             accessId: 'AccessId',
             accessPassword: 'AccessPassword',
             permissions: 'Permissions',
-            isActive: 'IsActive'
+            isActive: 'IsActive',
+            isTerminated: 'IsTerminated',
         };
         return map[key] || key;
     }
@@ -412,6 +414,7 @@ export default class ObjectMapper {
             email: record.Email,
             phone: record.Phone,
             imageURL: record.ImageURL,
+            isTerminated: record.IsTerminated
         };
     }
 

@@ -245,19 +245,16 @@ body {
     color: #94a3b8;
 }
 
-.admin-table tr:hover {
-    background: rgba(59, 130, 246, 0.1);
+.admin-table tr td{
+      transition: transform 0.3s ease; 
+      cursor: pointer;
+}
+
+.admin-table tr:hover td {
+    transform: translateX(10px);
 }
 .admin-table tr:last-child td {
     border-bottom: none;
-}
-
-.admin-table a img {
-      transition: transform 0.3s ease; 
-}
-
-.admin-table a:hover img {
-    transform: translateX(10px);
 }
 
 .admin-btn {

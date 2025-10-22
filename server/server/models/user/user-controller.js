@@ -47,6 +47,11 @@ export default class UserController {
         }
 
         const profile = await UserDBService.fetchUserProfile(id);
+
+        if (profile.isTerminated){
+            return res.status(403).json({ message: `#${profile.id}\n\nName: ${profile.firstname + " " + profile.lastname}\n\nYour account has been terminated, contact support for further information!` });
+        }
+
         if (!profile) {
             return res.status(404).json({ message: "User not found." });
         }

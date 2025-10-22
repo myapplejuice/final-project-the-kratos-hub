@@ -13,6 +13,7 @@ import AppTextInput from "../../components/screen-comps/app-text-input";
 import DeviceStorageService from "../../common/services/device-storage-service";
 import APIService from "../../common/services/api-service";
 import AppScroll from '../../components/screen-comps/app-scroll';
+import * as SecureStore from 'expo-secure-store';
 
 export default function Login() {
     const { createAlert, showSpinner, hideSpinner } = usePopups();
@@ -30,14 +31,15 @@ export default function Login() {
             const payload = { email, password };
             const result = await APIService.user.login(payload);
 
+            console.log(result)
             if (result.success) {
                 const token = result.data.token;
-                const userProfile = await DeviceStorageService.initUserSession(token);
-                if (!userProfile) {
-                    createAlert({ title: "Login Failed", text: 'Internal Server Error, please try again later!' });
-                } else {
-                    setUser(userProfile);
+                const profileResult = await DeviceStorageService.initUserSession(token);
+                if (profileResult.success) {
+                    setUser(profileResult.profile);
                     router.replace(routes.HOMEPAGE);
+                } else {
+                    createAlert({ title: "Login Failed", text: profileResult.message, onPress: async () => await SecureStore.deleteItemAsync("token") });
                 }
             } else {
                 createAlert({ title: "Login Failed", text: "One or both credentials are wrong!" });

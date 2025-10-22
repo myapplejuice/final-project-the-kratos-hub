@@ -113,7 +113,6 @@ console.log('clicked')
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Actions</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -125,17 +124,6 @@ console.log('clicked')
                                         <td>
                                             <button className="admin-terminate-btn" onClick={handleTermination}>Terminate</button>
                                             <button className="admin-notify-btn" onClick={handleNotification} >Notify</button>
-                                        </td>
-                                        <td>
-                                            <a onClick={handleUserPress} style={{cursor: 'pointer'}}>
-                                                <img
-                                                    src={images.arrow}
-                                                    style={{
-                                                        filter: 'brightness(0) invert(1)',
-                                                        width: '25px', height: '25px'
-                                                    }}
-                                                />
-                                            </a>
                                         </td>
                                     </tr>
                                 ))}

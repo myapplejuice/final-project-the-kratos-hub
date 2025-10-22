@@ -21,12 +21,12 @@ export default class DeviceStorageService {
 
             const storedToken = await SecureStore.getItemAsync("token");
             if (!storedToken) {
-                return false;
+                return { success: false };
             }
 
             const profileResponse = await APIService.user.profile();
             if (!profileResponse.success) {
-                return false;
+                return { success: false, message: profileResponse.message, };
             }
 
             const profile = profileResponse.data.profile;
@@ -36,10 +36,10 @@ export default class DeviceStorageService {
 
             await SocketService.connect();
 
-            return profile;
+            return { success: true, profile };
         } catch (error) {
             console.error("Error initializing user session:", error);
-            return false;
+            return { success: false, message: error.message };
         }
     }
 
