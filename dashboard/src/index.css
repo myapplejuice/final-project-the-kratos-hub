@@ -1,6 +1,12 @@
-@import "/src/utils/stylings.css";
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
+:root {
+    --color-background: #0f0f0f;
+    --color-primary: #008cff;
+    --color-secondary: #385dc2;
+    --color-text: #9ca3af;
+    --color-subtext: #9ca3af; 
+}
 
 * {
     box-sizing: border-box;
@@ -35,7 +41,6 @@ body {
     border-radius: 20px;
     text-align: center;
     padding: 40px;
-    width: 350px;
 }
 
 .gate-title {

@@ -28,7 +28,8 @@ export default class AdminDBService {
 
             const admin = {}
             for (const key in row) {
-                admin[ObjectMapper.toCamelCase(key)] = row[key];
+                if (key !== 'AccessPassword')
+                    admin[ObjectMapper.toCamelCase(key)] = row[key];
             }
 
             return { success: true, message: 'Access granted!', admin };

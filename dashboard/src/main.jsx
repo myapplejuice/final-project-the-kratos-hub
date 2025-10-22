@@ -5,18 +5,18 @@ import App from './App';
 import Gate from './screens/gate';
 import Dashboard from './screens/dashboard';
 import { routes } from './utils/constants';
-import { AppProvider } from './utils/app-context';
+import { PopupsProvider } from './utils/popups.provider';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AppProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path={routes.main} element={<App />} />
-          <Route path={routes.gate} element={<Gate />} />
-          <Route path={routes.dashboard} element={<Dashboard />} />
-        </Routes>
-      </BrowserRouter>
-    </AppProvider>
+    <PopupsProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path={routes.main} element={<App />} />
+            <Route path={routes.gate} element={<Gate />} />
+            <Route path={routes.dashboard} element={<Dashboard />} />
+          </Routes>
+        </BrowserRouter>
+    </PopupsProvider>
   </StrictMode>
 );

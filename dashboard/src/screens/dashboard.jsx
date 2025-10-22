@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import * as styles from "../index.css";
 
 export default function Dashboard() {
     const [activeSection, setActiveSection] = useState("Users");
+
+    useEffect(()=>{
+        
+    },[])
 
     const users = [
         { id: 1, name: "John Doe", email: "john@example.com" },
