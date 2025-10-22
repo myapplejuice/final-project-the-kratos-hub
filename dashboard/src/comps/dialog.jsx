@@ -47,10 +47,10 @@ export default function Dialog({ visible = false, title, children, onClose, acti
     cursor: "pointer",
   };
 
-  // handle any click inside dialog to close
-  const handleClick = () => {
-    if (onClose) onClose(); // optional callback
-  };
+  function handleClick(func) {
+    if (func) func();
+    if (onClose) onClose();
+  }
 
   return (
     <div style={overlayStyle}>
@@ -63,7 +63,7 @@ export default function Dialog({ visible = false, title, children, onClose, acti
               <button
                 key={idx}
                 style={{ ...buttonStyle, backgroundColor: action.color || "#3498db", color: "#fff" }}
-                onClick={handleClick} // click button also closes dialog
+                onClick={() => handleClick(action.onClick)} // click button also closes dialog
               >
                 {action.label}
               </button>

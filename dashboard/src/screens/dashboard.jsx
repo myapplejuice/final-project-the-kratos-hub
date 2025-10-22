@@ -26,12 +26,16 @@ export default function Dashboard() {
         })
     }
 
-    function terminateUser() {
+    function handleTermination() {
         showDialog({
-            title: "Failure",
-            content: <p>Invalid credentials!</p>,
+            title: 'User Termination',
+            content: <p>Are you sure you want terminate this user?</p>,
             actions: [
-                { label: "Ok", onClick: () => { }, color: "#cc2e2eff" },
+                {
+                    label: "Ok", color: "#cc2e2eff", onClick: async () => {
+                        console.log('termination')
+                    }
+                },
             ],
         });
     }
@@ -86,8 +90,8 @@ export default function Dashboard() {
                                         <td>{u.name}</td>
                                         <td>{u.email}</td>
                                         <td>
-                                            <button className="admin-terminate-btn">Terminate</button>
-                                            <button onClick={handleNotification} className="admin-notify-btn">Notify</button>
+                                            <button className="admin-terminate-btn" onClick={handleTermination}>Terminate</button>
+                                            <button className="admin-notify-btn" onClick={handleNotification} >Notify</button>
                                         </td>
                                     </tr>
                                 ))}
