@@ -40,6 +40,7 @@ export default function Workouts() {
                     const result = await APIService.training.workouts.workouts();
                     if (isActive && result.success) {
                         const workouts = result.data.workouts;
+                        
                         setWorkouts(workouts);
                         setExpandedWorkout(workouts.length > 0 ? workouts[0].id : null);
                     }
@@ -91,6 +92,7 @@ export default function Workouts() {
                             const result = await APIService.training.workouts.create(payload);
                             if (result.success) {
                                 const workout = result.data.workout;
+                                console.log(workout)
                                 setExpandedWorkout(workout.id);
                                 setWorkouts(prev => [workout, ...prev]);
                             }
@@ -116,7 +118,7 @@ export default function Workouts() {
             onSubmit: (vals) => {
                 const label = vals[0] ? vals[0] : workout.label;
                 const description = vals[1] ? vals[1] : workout.description;
-                const duration = vals[2] ? Number(vals[2]) : workout.duration;
+                const duration = vals[2] ? Number(vals[2]) : null;
 
                 createOptions({
                     title: "Choose intensity",

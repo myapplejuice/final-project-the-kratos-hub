@@ -63,6 +63,9 @@ export default class WorkoutsDBService {
             for (const key in result.recordset[0]) {
                 workout[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
             }
+            
+            workout.exercises = await WorkoutsExercisesDBService.fetchWorkoutExercises(workout.id, details.userId) || [];
+
             return workout;
         } catch (err) {
             console.error('createWorkout error:', err);
@@ -72,6 +75,7 @@ export default class WorkoutsDBService {
 
     static async updateWorkout(details) {
         try {
+            console.log(details)
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, details.id);
             Database.addInput(request, 'Label', sql.NVarChar(sql.MAX), details.label || null);
@@ -96,6 +100,9 @@ export default class WorkoutsDBService {
             for (const key in result.recordset[0]) {
                 workout[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
             }
+
+            workout.exercises = await WorkoutsExercisesDBService.fetchWorkoutExercises(workout.id, details.userId) || [];
+            
             return workout;
         } catch (err) {
             console.error('updateWorkout error:', err);

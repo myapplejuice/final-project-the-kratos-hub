@@ -121,6 +121,7 @@ export function nutritionTablesQuery() {
 
                 Label VARCHAR(50) NOT NULL,
                 Description VARCHAR(400) NOT NULL DEFAULT 'No description provided',
+                SourcePlanId INT NULL,
 
                 CONSTRAINT FK_MealPlans_UserId FOREIGN KEY (UserId)
                     REFERENCES dbo.Users(Id)
