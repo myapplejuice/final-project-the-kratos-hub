@@ -4,11 +4,14 @@ import APIService from "../utils/api-service";
 import { useNavigate } from "react-router-dom";
 import SessionStorageService from "../utils/session-storage-service";
 import { usePopups } from "../utils/popups.provider";
+import { images } from "../utils/assets";
 
 export default function Dashboard() {
     const { showMessager, hideMessager, showDialog, showSpinner, hideSpinner } = usePopups();
-    const [activeSection, setActiveSection] = useState("Users");
     const nav = useNavigate();
+
+    const [activeSection, setActiveSection] = useState("Users");
+    const [users, setUsers] = useState([]);
 
     useEffect(() => {
         async function fetchUserList() {
@@ -17,7 +20,9 @@ export default function Dashboard() {
 
                 const result = await APIService.routes.users();
                 if (result.success) {
-                    console.log(result)
+                    const users = result.data.users;
+                    console.log(users)
+                    setUsers(users);
                 }
             }
             catch (err) {
@@ -63,6 +68,10 @@ export default function Dashboard() {
         });
     }
 
+    function handleUserPress() {
+console.log('clicked')
+    }
+
     return (
         <div className="admin-page">
             {/* Sidebar */}
@@ -104,17 +113,29 @@ export default function Dashboard() {
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Actions</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.map((u) => (
+                                {users.map((u, i) => (
                                     <tr key={u.id}>
                                         <td>{u.id}</td>
-                                        <td>{u.name}</td>
+                                        <td>{u.firstname} {u.lastname}</td>
                                         <td>{u.email}</td>
                                         <td>
                                             <button className="admin-terminate-btn" onClick={handleTermination}>Terminate</button>
                                             <button className="admin-notify-btn" onClick={handleNotification} >Notify</button>
+                                        </td>
+                                        <td>
+                                            <a onClick={handleUserPress} style={{cursor: 'pointer'}}>
+                                                <img
+                                                    src={images.arrow}
+                                                    style={{
+                                                        filter: 'brightness(0) invert(1)',
+                                                        width: '25px', height: '25px'
+                                                    }}
+                                                />
+                                            </a>
                                         </td>
                                     </tr>
                                 ))}
@@ -225,12 +246,6 @@ export default function Dashboard() {
         </div>
     );
 }
-
-const users = [
-    { id: 1, name: "John Doe", email: "john@example.com" },
-    { id: 2, name: "Jane Smith", email: "jane@example.com" },
-    { id: 3, name: "Ali Hassan", email: "ali@kratohub.com" },
-];
 
 const reports = [
     {

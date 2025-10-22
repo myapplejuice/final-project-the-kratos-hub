@@ -2,13 +2,13 @@
 
 :root {
     --color-background: #0f0f0f;
-    --color-primary: #008cff;
-    --color-primary-hover: #00447c;
+    --color-primary: #00447c;
+    --color-primary-hover: #008cff;
     --color-secondary: #3e7eb3;
     --color-text: #9ca3af;
     --color-subtext: #9ca3af;
-    --color-negative-red: #ff0000;
-    --color-negative-red-hover: #660000;
+    --color-negative-red: #962e2e;
+    --color-negative-red-hover: #ff0000;
 }
 
 * {
@@ -248,6 +248,17 @@ body {
 .admin-table tr:hover {
     background: rgba(59, 130, 246, 0.1);
 }
+.admin-table tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-table a img {
+      transition: transform 0.3s ease; 
+}
+
+.admin-table a:hover img {
+    transform: translateX(10px);
+}
 
 .admin-btn {
     border: none;
@@ -265,7 +276,7 @@ body {
 
 .admin-terminate-btn {
     width: 100px;
-    background: #dc2626;
+    background: var(--color-negative-red);
     border: none;
     color: white;
     padding: 12px;
@@ -307,7 +318,7 @@ body {
 }
 
 .admin-reject-btn {
-    background: #ef4444;
+    background: var(--color-negative-red-hover);
 }
 
 .admin-btn:hover {
@@ -324,11 +335,11 @@ body {
     color: #fff;
     margin-left: 5px;
     transition: 0.2s;
-    background: #962e2e;
+    background: var(--color-negative-red);
     font-size: 18px;
     transition: 0.5s;
 }
 
 .admin-logout-btn:hover {
-    background: #ff0000;
+    background: var(--color-negative-red-hover);
 }
