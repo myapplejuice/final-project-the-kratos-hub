@@ -7,6 +7,7 @@ import NutritionFoodsDBService from "../nutrition/foods/nutrition-foods-db-servi
 import NutritionMealPlansDBService from "../nutrition/meal-plans/nutrition-meal-plans-db-service.js";
 import UserToUserDBService from "./user-to-user-db-service.js";
 import SocketController from "../socket/socket-controller.js";
+import UserTrainerProfileDBService from "../user/user-trainer-profile/user-trainer-profile-db-service.js";
 
 export default class UserToUserController {
     static async getAnotherUserProfile(req, res) {
@@ -42,6 +43,7 @@ export default class UserToUserController {
     static async replyToFriendRequest(req, res) {
         const details = req.body;
 
+        console.log(details)
         const response = await UserToUserDBService.replyToFriendRequest(details);
         if (!response.success) return res.status(400).json({ message: response.message });
 
@@ -64,7 +66,9 @@ export default class UserToUserController {
         SocketController.emitNotification(details.adderId, adderPayload);
         await SocketController.emitFriendRequestResponse(details.reply, details.adderId, details.receiverId);
 
-        return res.status(200).json({ success: true, message: response.message, id: response.id, chatRoomId: response.newChatId });
+        const trainerProfile = await UserTrainerProfileDBService.fetchTrainerProfile(details.receiverId);
+
+        return res.status(200).json({ success: true, message: response.message, id: response.id, chatRoomId: response.newChatId, trainerProfile });
     }
 
     static async disableFriendship(req, res) {

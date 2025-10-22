@@ -256,11 +256,9 @@ export default class UserToUserDBService {
                 let userOne = details.adderId;
                 let userTwo = details.receiverId;
 
-                // Swap so UserOne < UserTwo
-                if (userOne > userTwo) {
-                    [userOne, userTwo] = [userTwo, userOne];
-                }
+                [userOne, userTwo] = [userOne, userTwo].sort((a, b) => a.localeCompare(b));
 
+                console.log(userOne, userTwo)
                 Database.addInput(request, 'UserOne', sql.UniqueIdentifier, userOne);
                 Database.addInput(request, 'UserTwo', sql.UniqueIdentifier, userTwo);
 

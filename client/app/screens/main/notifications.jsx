@@ -114,7 +114,9 @@ export default function Notifications() {
                     if (result.success) {
                         const newFriendshipId = result.data.id;
                         const chatRoomId = result.data.chatRoomId;
+                        const trainerProfile = request.profile.trainerProfile;
 
+                        console.log(trainerProfile)
                         setUser(prev => ({
                             ...prev,
                             pendingFriends: prev.pendingFriends.map(f =>
@@ -122,11 +124,18 @@ export default function Notifications() {
                             ),
                             friends: reply === 'accepted'
                                 ? [...prev.friends, {
-                                    id: newFriendshipId, friendId: request.adderId,
-                                    status: 'active', lastMessage: null, lastMessageTime: null,
-                                    lastMessageSenderId: null, lastMessageId: null,
-                                    lastMessageHidden: false, lastMessageDiscarded: false,
-                                    unreadCount: 0, chatRoomId
+                                    id: newFriendshipId,
+                                    friendId: request.adderId,
+                                    status: 'active',
+                                    trainerProfile,
+                                    lastMessage: null,
+                                    lastMessageTime: null,
+                                    lastMessageSenderId: null,
+                                    lastMessageId: null,
+                                    lastMessageHidden: false,
+                                    lastMessageDiscarded: false,
+                                    unreadCount: 0,
+                                    chatRoomId
                                 }]
                                 : prev.friends
                         }));

@@ -92,8 +92,6 @@ export function userTablesQuery() {
                     UserTwo UNIQUEIDENTIFIER NOT NULL,
                     Status VARCHAR(20) NOT NULL,
                     TerminatedBy UNIQUEIDENTIFIER NULL,
-                    -- enforce consistent order to prevent symmetric duplicates
-                    CONSTRAINT CK_UserFriendList_Order CHECK (UserOne < UserTwo),
                     CONSTRAINT UQ_UserFriendList UNIQUE (UserOne, UserTwo),
                     CONSTRAINT FK_UserFriendList_UserOne FOREIGN KEY (UserOne)
                         REFERENCES dbo.Users(Id)

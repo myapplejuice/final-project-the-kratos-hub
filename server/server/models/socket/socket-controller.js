@@ -1,5 +1,6 @@
 import Server from "../../server.js";
 import UserToUserDBService from "../user-to-user/user-to-user-db-service.js";
+import UserTrainerProfileDBService from "../user/user-trainer-profile/user-trainer-profile-db-service.js";
 import ChatDBService from "./chat-db-service.js";
 
 export default class SocketController {
@@ -53,9 +54,11 @@ export default class SocketController {
         if (reply === 'accepted') {
             const userFriend = await UserToUserDBService.fetchUserFriend(userId, friendId);
             const newFriendSummary = await ChatDBService.fetchSingleFriendMessageSummary(userId, friendId);
-            console.log(newFriendSummary)
+            const trainerProfile = await UserTrainerProfileDBService.fetchTrainerProfile(friendId);
+
             const friendSummary = {
                 ...userFriend,
+                trainerProfile,
                 lastMessageSenderId: newFriendSummary?.lastMessageSenderId || null,
                 lastMessage: newFriendSummary?.lastMessage || null,
                 lastMessageTime: newFriendSummary?.lastMessageTime || null,
