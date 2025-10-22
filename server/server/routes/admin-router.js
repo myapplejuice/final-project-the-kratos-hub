@@ -14,6 +14,8 @@ export default class AdminRouter {
         this.adminRouter.post('/access', asyncHandler(AdminController.access));
 
         this.adminRouter.get('/users/:id', adminAuthorization, asyncHandler(AdminController.getUsers));
+        this.adminRouter.delete('/users/terminate/:id', adminAuthorization, asyncHandler(AdminController.terminateUser));
+        this.adminRouter.post('/users/notify/:id', adminAuthorization, asyncHandler(AdminController.notifyUser));
 
         return this.adminRouter;
     }

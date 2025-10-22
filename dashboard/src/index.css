@@ -49,7 +49,7 @@ body {
 .gate-title {
     font-size: 26px;
     font-weight: 600;
-    color: var(--color-primary);
+    color: var(--color-primary-hover);
     letter-spacing: 1px;
     margin-bottom: 10px;
 }
@@ -102,7 +102,7 @@ body {
     font-size: 16px;
     font-weight: 600;
     color: #fff;
-    background: var(--color-primary);
+    background: var(--color-primary-hover);
     cursor: pointer;
     transition: all 0.3s ease;
 }

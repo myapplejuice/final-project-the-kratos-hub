@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import SessionStorageService from "../utils/session-storage-service";
 import { usePopups } from "../utils/popups.provider";
 import { images } from "../utils/assets";
+import { routes } from "../utils/constants";
 
 export default function Dashboard() {
     const { showMessager, hideMessager, showDialog, showSpinner, hideSpinner } = usePopups();
@@ -52,37 +53,8 @@ export default function Dashboard() {
         nav("/");
     }
 
-    function handleNotification() {
-        showMessager({
-            title: "Send a Message",
-            sendLabel: "Send Now",
-            onSend: async () => {
-                console.log('sending')
-            },
-        })
-    }
-
-    function handleTermination() {
-        showDialog({
-            title: 'User Termination',
-            content: <p>Are you sure you want terminate this user?</p>,
-            actions: [
-                {
-                    label: "Ok", color: "#cc2e2eff", onClick: async () => {
-
-                    }
-                },
-            ],
-        });
-    }
-
-    function handleUserPress() {
-        console.log('clicked')
-    }
-
     return (
         <div className="admin-page">
-            {/* Sidebar */}
             <aside className="admin-sidebar">
                 <div>
                     <h2>Kratos Hub Administration</h2>
@@ -105,7 +77,6 @@ export default function Dashboard() {
                 </div>
             </aside>
 
-            {/* Main content */}
             <main className="admin-main">
                 {activeSection === "Users" && (
                     <div className="admin-section">
@@ -121,13 +92,13 @@ export default function Dashboard() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.map((u, i) => (
-                                    <tr key={u.id}>
-                                        <td>{u.id}</td>
-                                        <td>{u.firstname} {u.lastname}</td>
-                                        <td>{u.email}</td>
-                                        <td>{u.isTerminated ? 'Terminated' : 'Active'}</td>
-                                        <td><img src={images.arrow} onClick={handleUserPress} style={{ width: '20px', height: '20px', filter: 'brightness(0) invert(1)' }} /> </td>
+                                {users.map((user, i) => (
+                                    <tr key={user.id} onClick={() => nav(routes.user_profile, { state: { user } })}>
+                                        <td>{user.id}</td>
+                                        <td>{user.firstname} {user.lastname}</td>
+                                        <td>{user.email}</td>
+                                        <td>{user.isTerminated ? 'Terminated' : 'Active'}</td>
+                                        <td><img src={images.arrow} style={{ width: '20px', height: '20px', filter: 'brightness(0) invert(1)' }} /> </td>
                                     </tr>
                                 ))}
                             </tbody>

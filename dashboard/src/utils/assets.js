@@ -92,6 +92,8 @@ import noBug from '../assets/no-bug.png';
 import noTheme from '../assets/no-theme.png';
 import communication from '../assets/communication.png';
 import question from '../assets/question.png';
+import shield from '../assets/shield.png';
+import personalTrainer from '../assets/personal-trainer.png';
 
 export const images = {
   logo,
@@ -187,5 +189,7 @@ export const images = {
   noBug,
   noTheme,
   communication,
-  question
+  question,
+  shield,
+  personalTrainer
 };

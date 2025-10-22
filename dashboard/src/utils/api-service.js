@@ -108,5 +108,7 @@ export default class APIService {
     static routes = {       
          access: (payload) => APIService.request(`/admin/access`, 'POST', payload),
          users: () => APIService.request(`/admin/users/${SessionStorageService.getItem("admin")?.admin?.id}`, 'GET'),
+         terminateUser: (payload) => APIService.request(`/admin/users/terminate/${SessionStorageService.getItem("admin")?.admin?.id}`, 'DELETE', payload),
+         notifyUser: (payload) => APIService.request(`/admin/users/notify/${SessionStorageService.getItem("admin")?.admin?.id}`, 'POST', payload),
     }
 }

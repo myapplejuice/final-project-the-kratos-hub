@@ -2,6 +2,7 @@ import sql from 'mssql/msnodesqlv8.js';
 import PasswordHasher from '../../utils/password-hasher.js';
 import Database from '../database/database.js';
 import ObjectMapper from '../../utils/object-mapper.js';
+import UserTrainerProfileDBService from '../user/user-trainer-profile/user-trainer-profile-db-service.js';
 
 export default class AdminDBService {
     static async access(id, pass) {
@@ -42,13 +43,36 @@ export default class AdminDBService {
     static async fetchUsers() {
         try {
             const request = Database.getRequest();
-
             const query = `SELECT * FROM Users`;
-
             const result = await request.query(query);
+
             if (!result.recordset.length) return [];
 
-            return result.recordset.map(row => ObjectMapper.mapUser(row));
+            const users = await Promise.all(
+                result.recordset.map(async row => {
+                    const profile = ObjectMapper.mapUser(row);
+                    profile.trainerProfile = await UserTrainerProfileDBService.fetchTrainerProfile(profile.id);
+                    return profile;
+                })
+            );
+
+            return users;
+        } catch (err) {
+            console.error('fetchUserProfile error:', err);
+            return null;
+        }
+    }
+
+    static async setTerminated(id, IsTerminated) {
+        try {
+            const request = Database.getRequest();
+            const query = `UPDATE Users SET IsTerminated = ${IsTerminated ? 1 : 0} WHERE Id = @Id`;
+            Database.addInput(request, 'Id', sql.UniqueIdentifier, id);
+
+            const result = await request.query(query);
+            console.log(result)
+
+            return { success: result.rowsAffected[0] > 0 };
         } catch (err) {
             console.error('fetchUserProfile error:', err);
             return null;
