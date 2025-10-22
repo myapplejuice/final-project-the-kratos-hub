@@ -78,26 +78,25 @@ export default function Index() {
                 // Assets
                 await Asset.loadAsync(ImageAssets);
 
-                // User
+                // User & Routing
                 const result = await DeviceStorageService.initUserSession();
-                if (result.success) {
-                    setUser(result.profile);
 
-                    if (!result.success && typeof result.profile !== 'object') {
-                        router.replace(routes.HOMEPAGE);
-                    } else {
-                        router.replace(routes.INTRODUCTION);
-                    }
+                if (result.success) {
+                    const profile = result.profile;
+                    setUser(profile);
+                    router.replace(routes.HOMEPAGE);
                 } else {
                     if (result.message?.includes('terminated')) {
                         createAlert({
                             title: 'Account Terminated',
                             text: result.message,
                             buttonText: 'Ok',
-                            onPress: async () => await SecureStore.deleteItemAsync("token")
+                            onPress: async () => {
+                                await SecureStore.deleteItemAsync("token");
+                                router.replace(routes.INTRODUCTION);
+                            }
                         });
-                    }
-                    router.replace(routes.INTRODUCTION);
+                    } else { router.replace(routes.INTRODUCTION); }
                 }
             } catch (e) {
                 createAlert({

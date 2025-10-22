@@ -1,31 +1,80 @@
-[
-    {
-        "date": "2025-10-22T18:11:46.841Z",
-        "description": "No description provided",
-        "duration": "N/A",
-        "exercises": [],
-        "id": 11,
-        "intensity": "Intense",
-        "label": "Workout 2",
-        "userId": "723FBAFD-4253-4E50-B1CC-FB3EA8E085A1"
+{
+    "profile": {
+        "age": 33,
+        "dateOfCreation": "2025-10-22T19:50:22.478Z",
+        "email": "Abed@gmail.com",
+        "firstname": "Jsbsv",
+        "foods": [],
+        "friends": [],
+        "gender": "male",
+        "id": "FAFA8319-AD5D-4A2F-8883-6FD39D7C3419",
+        "imageURL": "https://res.cloudinary.com/dkujdjk2d/image/upload/v1760445047/profile-pic_xhxuvd.jpg",
+        "isTerminated": false,
+        "lastname": "Hbb",
+        "metrics": {
+            "activityLevel": "sedentary",
+            "bmi": 151.5,
+            "bmr": 913,
+            "bodyFat": 175.4,
+            "heightCm": 66,
+            "leanBodyMass": -49.8,
+            "tdee": 1096,
+            "weightKg": 66
+        },
+        "notifications": [],
+        "nutrition": {
+            "carbGrams": 50,
+            "carbRate": 25,
+            "diet": "highProtein",
+            "fatGrams": 31,
+            "fatRate": 35,
+            "goal": "weightLoss",
+            "proteinGrams": 80,
+            "proteinRate": 40,
+            "proteinRequirement": -60,
+            "recommendedEnergyKcal": 877,
+            "setEnergyKcal": 800,
+            "waterMl": 2400
+        },
+        "nutritionLogs": {
+            "2025-10-22": [Object
+            ],
+            "2025-10-23": [Object
+            ],
+            "2025-10-24": [Object
+            ],
+            "2025-10-25": [Object
+            ]
+        },
+        "pendingFriends": [],
+        "phone": "+1946465959",
+        "plans": [],
+        "preferences": {
+            "dateFormat": [Object
+            ],
+            "energyUnit": [Object
+            ],
+            "fluidUnit": [Object
+            ],
+            "heightUnit": [Object
+            ],
+            "language": [Object
+            ],
+            "theme": "dark",
+            "timeFormat": [Object
+            ],
+            "weightUnit": [Object
+            ]
+        },
+        "trainerProfile": {
+            "biography": null,
+            "images": [Array
+            ],
+            "isVerified": false,
+            "trainerStatus": "inactive",
+            "userId": "FAFA8319-AD5D-4A2F-8883-6FD39D7C3419",
+            "yearsOfExperience": "New Trainer"
+        }
     },
-    {
-        "date": "2025-10-22T18:07:29.112Z",
-        "description": "No description provided",
-        "duration": "N/A",
-        "exercises": [],
-        "id": 10,
-        "intensity": "High",
-        "label": "Workout 1",
-        "userId": "723FBAFD-4253-4E50-B1CC-FB3EA8E085A1"
-    },
-    {
-        "date": "2025-10-22T18:11:46.841Z",
-        "description": "No description provided",
-        "duration": "N/A",
-        "id": 11,
-        "intensity": "Intense",
-        "label": "Workout 2",
-        "userId": "723FBAFD-4253-4E50-B1CC-FB3EA8E085A1"
-    }
-]
+    "success": true
+}
