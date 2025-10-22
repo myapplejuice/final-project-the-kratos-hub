@@ -54,6 +54,26 @@ export default class MiddlewaresManager {
     }
 
     static adminAuthorization(req, res, next) {
-        //DO ADMIN
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ message: 'Unauthorized! No token provided.' });
+        }
+
+        const token = authHeader.split(' ')[1];
+
+        try {
+            const decoded = jwt.verify(token, MiddlewaresManager.SECRET_KEY);
+
+            if (decoded.isActive === false) {
+                return res.status(403).json({ message: 'Admin account deactivated!' });
+            }
+
+            req.permissions = decoded.permissions;
+            req.id = decoded.id;
+            next();
+        } catch (err) {
+            return res.status(401).json({ message: 'Invalid or expired token.' });
+        }
     }
 }

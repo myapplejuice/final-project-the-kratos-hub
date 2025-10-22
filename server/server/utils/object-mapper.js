@@ -131,7 +131,12 @@ export default class ObjectMapper {
             Exercise: 'exercise',
             Intensity: 'intensity',
             Duration: 'duration',
-            WorkoutId: 'workoutId'
+            WorkoutId: 'workoutId',
+            AccessId: 'accessId',
+            AccessPassword: 'accessPassword',
+            Permissions: 'permissions',
+            IsActive: 'isActive'
+            
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -268,6 +273,10 @@ export default class ObjectMapper {
             exerciseId: 'ExerciseId',
             intensity: 'Intensity',
             duration: 'Duration',
+            accessId: 'AccessId',
+            accessPassword: 'AccessPassword',
+            permissions: 'Permissions',
+            isActive: 'IsActive'
         };
         return map[key] || key;
     }
