@@ -13,6 +13,8 @@ export default class AdminRouter {
         this.adminRouter.get('/test-token/:id', adminAuthorization, asyncHandler(AdminController.testAdminToken));
         this.adminRouter.post('/access', asyncHandler(AdminController.access));
 
+        this.adminRouter.get('/users/:id', adminAuthorization, asyncHandler(AdminController.getUsers));
+
         return this.adminRouter;
     }
 }

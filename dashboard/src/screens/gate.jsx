@@ -23,9 +23,7 @@ export default function Gate() {
                 const admin = result.data.admin;
                 const token = result.data.token;
 
-                SessionStorageSerivce.setItem('admin', admin)
-                APIService.setAdmin(token, admin.accessId);
-                await APIService.routes.testToken();
+                SessionStorageSerivce.setItem('admin', { admin, token });
                 nav(routes.dashboard);
             } else {
                 showDialog({

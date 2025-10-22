@@ -38,4 +38,20 @@ export default class AdminDBService {
             return { success: false, message: 'Database error during login' };
         }
     }
+
+    static async fetchUsers() {
+        try {
+            const request = Database.getRequest();
+
+            const query = `SELECT * FROM Users`;
+
+            const result = await request.query(query);
+            if (!result.recordset.length) return [];
+
+            return result.recordset.map(row => ObjectMapper.mapUser(row));
+        } catch (err) {
+            console.error('fetchUserProfile error:', err);
+            return null;
+        }
+    }
 }

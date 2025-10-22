@@ -6,13 +6,36 @@ import SessionStorageService from "../utils/session-storage-service";
 import { usePopups } from "../utils/popups.provider";
 
 export default function Dashboard() {
-    const { showMessager, hideMessager, showDialog } = usePopups();
+    const { showMessager, hideMessager, showDialog, showSpinner, hideSpinner } = usePopups();
     const [activeSection, setActiveSection] = useState("Users");
     const nav = useNavigate();
 
+    useEffect(() => {
+        async function fetchUserList() {
+            try {
+                showSpinner();
+
+                const result = await APIService.routes.users();
+                if (result.success) {
+                    console.log(result)
+                }
+            }
+            catch (err) {
+                showDialog({
+                    title: 'Failure',
+                    content: <p>Failed to fetch user list</p>,
+                    actions: [{ label: "Ok", color: "#cc2e2eff", onClick: null }],
+                });
+            } finally {
+                hideSpinner();
+            }
+        }
+
+        fetchUserList();
+    }, []);
+
     function handleSignOut() {
         SessionStorageService.removeItem("admin");
-        APIService.clearAdmin();
         nav("/");
     }
 
@@ -33,7 +56,7 @@ export default function Dashboard() {
             actions: [
                 {
                     label: "Ok", color: "#cc2e2eff", onClick: async () => {
-                        console.log('termination')
+
                     }
                 },
             ],

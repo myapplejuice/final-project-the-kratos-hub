@@ -68,6 +68,7 @@ export default class MiddlewaresManager {
         try {
             const decoded = jwt.verify(token, MiddlewaresManager.SECRET_KEY);
 
+            console.log(decoded)
             if (decoded.id !== req.params.id) {
                 return res.status(403).json({ message: 'Forbidden! Invalid admin ID.' });
             }

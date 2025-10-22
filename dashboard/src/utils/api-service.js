@@ -1,18 +1,8 @@
+import SessionStorageService from "./session-storage-service";
+
 export default class APIService {
     static BASE_URL = "http://192.168.33.16:8080/api";
     static CLOUDINARY_CLOUD_NAME = "dkujdjk2d";
-    static TOKEN = null;
-    static ADMIN_ID = null;
-
-    static async setAdmin(token, id) {
-        this.TOKEN = token;
-        this.ADMIN_ID = id;
-    }
-
-    static async clearAdmin() {
-        this.TOKEN = null;
-        this.ADMIN_ID = null;
-    }
 
     static async ping() {
         const res = await this.request('/ping', 'GET', null, false);
@@ -28,7 +18,7 @@ export default class APIService {
         try {
             const headers = { "Content-Type": "application/json" };
             if (useToken) {
-                const token = tokenOverride ?? this.TOKEN;
+                const token = tokenOverride ?? SessionStorageService.getItem("admin")?.token;
                 if (token) headers.Authorization = `Bearer ${token}`;
             }
 
@@ -116,7 +106,7 @@ export default class APIService {
 
 
     static routes = {       
-         access: (payload) => APIService.request(`/admin/access`, 'POST', payload,false),
-         testToken: () => APIService.request(`/admin/test-token/${APIService.ADMIN_ID}`, 'GET'),
+         access: (payload) => APIService.request(`/admin/access`, 'POST', payload),
+         users: () => APIService.request(`/admin/users/${SessionStorageService.getItem("admin")?.admin?.id}`, 'GET'),
     }
 }
