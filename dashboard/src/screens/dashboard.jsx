@@ -11,7 +11,9 @@ export default function Dashboard() {
     const nav = useNavigate();
 
     const [activeSection, setActiveSection] = useState("Users");
+    const [searchQuery, setSearchQuery] = useState("");
     const [users, setUsers] = useState([]);
+    const [visibleUsers, setVisibleUsers] = useState([]);
 
     useEffect(() => {
         async function fetchUserList() {
@@ -38,6 +40,12 @@ export default function Dashboard() {
 
         fetchUserList();
     }, []);
+
+    useEffect(() => {
+        if(activeSection === "Users") {
+            setVisibleUsers(users);
+        }
+    }, [activeSection, searchQuery]);
 
     function handleSignOut() {
         SessionStorageService.removeItem("admin");
@@ -69,7 +77,7 @@ export default function Dashboard() {
     }
 
     function handleUserPress() {
-console.log('clicked')
+        console.log('clicked')
     }
 
     return (
@@ -86,7 +94,7 @@ console.log('clicked')
                             "Community Posts",
                             "Trainer Applications",
                         ].map((section) => (
-                            <li key={section} className={activeSection === section ? "active" : ""} onClick={() => setActiveSection(section)}>
+                            <li key={section} className={activeSection === section ? "active" : ""} onClick={() => {setSearchQuery(''), setActiveSection(section)}}>
                                 {section}{" "}{section === "Reports" ? "(3)" : section === "Users" ? "(3)" : section === "Food List" ? "(2)" : section === "Community Posts" ? "(2)" : "(2)"}
                             </li>
                         ))}
@@ -99,10 +107,6 @@ console.log('clicked')
 
             {/* Main content */}
             <main className="admin-main">
-                <div className="admin-header">
-                    <h1>Welcome, Admin</h1>
-                </div>
-
                 {activeSection === "Users" && (
                     <div className="admin-section">
                         <h2>User Management</h2>
@@ -112,7 +116,8 @@ console.log('clicked')
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Actions</th>
+                                    <th>Account Status</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -121,10 +126,8 @@ console.log('clicked')
                                         <td>{u.id}</td>
                                         <td>{u.firstname} {u.lastname}</td>
                                         <td>{u.email}</td>
-                                        <td>
-                                            <button className="admin-terminate-btn" onClick={handleTermination}>Terminate</button>
-                                            <button className="admin-notify-btn" onClick={handleNotification} >Notify</button>
-                                        </td>
+                                        <td>{u.isTerminated ? 'Terminated' : 'Active'}</td>
+                                        <td><img src={images.arrow} onClick={handleUserPress} style={{ width: '20px', height: '20px', filter: 'brightness(0) invert(1)' }} /> </td>
                                     </tr>
                                 ))}
                             </tbody>

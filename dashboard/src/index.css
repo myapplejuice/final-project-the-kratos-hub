@@ -192,7 +192,7 @@ body {
 
 .admin-main {
     flex: 1;
-    padding: 40px;
+    padding-inline: 25px;
     background: radial-gradient(circle at top right, #1e293b 0%, #0f172a 80%);
     overflow-y: auto;
     position: relative;
@@ -206,25 +206,20 @@ body {
     margin-bottom: 30px;
 }
 
-.admin-header h1 {
-    font-size: 24px;
-    color: #fff;
-    font-weight: 600;
-    text-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
-}
-
 .admin-section {
     background: rgba(255, 255, 255, 0.05);
     padding: 25px;
-    border-radius: 15px;
-    margin-bottom: 30px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
     backdrop-filter: blur(15px);
 }
 
 .admin-section h2 {
     color: #60a5fa;
+    margin-top: 0;
     margin-bottom: 15px;
     font-weight: 600;
+    font-size: 25px;
 }
 
 .admin-table {
@@ -251,7 +246,7 @@ body {
 }
 
 .admin-table tr:hover td {
-    transform: translateX(10px);
+    transform: translateX(15px);
 }
 .admin-table tr:last-child td {
     border-bottom: none;
