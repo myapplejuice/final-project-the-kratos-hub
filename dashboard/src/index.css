@@ -3,9 +3,12 @@
 :root {
     --color-background: #0f0f0f;
     --color-primary: #008cff;
-    --color-secondary: #385dc2;
+    --color-primary-hover: #00447c;
+    --color-secondary: #3e7eb3;
     --color-text: #9ca3af;
-    --color-subtext: #9ca3af; 
+    --color-subtext: #9ca3af;
+    --color-negative-red: #ff0000;
+    --color-negative-red-hover: #660000;
 }
 
 * {
@@ -106,7 +109,7 @@ body {
 
 .gate-btn:hover {
     opacity: 0.5;
-    background: var(--color-second);
+    background: var(--color-secondary);
 }
 
 .gate-footer {
@@ -137,51 +140,14 @@ body {
     position: relative;
 }
 
-.admin-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.3;
-    animation: admin-float 10s ease-in-out infinite;
-    z-index: 0;
-}
-
-.admin-orb:nth-child(1) {
-    width: 300px;
-    height: 300px;
-    background: #3b82f6;
-    top: -80px;
-    left: -80px;
-}
-
-.admin-orb:nth-child(2) {
-    width: 250px;
-    height: 250px;
-    background: #10b981;
-    bottom: 50px;
-    right: 100px;
-    animation-delay: 2s;
-}
-
-@keyframes admin-float {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-25px);
-    }
-}
-
 .admin-sidebar {
-    width: 250px;
+    width: 300px;
     background: rgba(17, 24, 39, 0.7);
     backdrop-filter: blur(20px);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     padding: 30px 20px;
     z-index: 2;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.4);
@@ -211,6 +177,13 @@ body {
 }
 
 .admin-sidebar li:hover {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.3), rgba(16, 185, 129, 0.3));
+    color: #fff;
+    transform: translateX(5px);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.admin-sidebar .active {
     background: linear-gradient(90deg, rgba(59, 130, 246, 0.3), rgba(16, 185, 129, 0.3));
     color: #fff;
     transform: translateX(5px);
@@ -291,12 +264,43 @@ body {
 }
 
 .admin-terminate-btn {
-    background: #ef4444;
+    width: 100px;
+    background: #dc2626;
+    border: none;
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: 0.5s;
 }
 
-.admin-msg-btn {
-    background: #3b82f6;
+.admin-terminate-btn:hover {
+    background: var(--color-negative-red-hover);
 }
+
+
+.admin-notify-btn {
+    width: 100px;
+    background: var(--color-primary);
+    border: none;
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: 0.5s;
+    margin-left: 15px;
+}
+
+.admin-notify-btn:hover {
+    background: var(--color-primary-hover);
+}
+
 
 .admin-approve-btn {
     background: #10b981;
@@ -309,4 +313,22 @@ body {
 .admin-btn:hover {
     transform: scale(1.05);
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.admin-logout-btn {
+    border: none;
+    width: 100%;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    color: #fff;
+    margin-left: 5px;
+    transition: 0.2s;
+    background: #962e2e;
+    font-size: 18px;
+    transition: 0.5s;
+}
+
+.admin-logout-btn:hover {
+    background: #ff0000;
 }

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 import LoadingSpinner from "../comps/loading-spinner";
 import Dialog from "../comps/Dialog";
+import Messager from "../comps/messager";
 
 const PopupsContext = createContext(null);
 
@@ -8,6 +9,7 @@ export function PopupsProvider({ children }) {
   const [spinnerVisible, setSpinnerVisible] = useState(false);
   const [dialogState, setDialogState] = useState({ visible: false, title: "", content: null, actions: [] });
   const [alertState, setAlertState] = useState({ visible: false, message: "", title: "" });
+  const [messagerState, setMessagerState] = useState({ visible: false, title: "", onClose: null, onSend: null, sendLabel: "Send" });
 
   // Dialog
   const showDialog = ({ title, content, actions }) => {
@@ -23,8 +25,12 @@ export function PopupsProvider({ children }) {
   const showSpinner = () => setSpinnerVisible(true);
   const hideSpinner = () => setSpinnerVisible(false);
 
+  // Messager
+  const showMessager = ({ title, onClose, onSend, sendLabel }) => setMessagerState({ visible: true, title, onClose, onSend, sendLabel });
+  const hideMessager = () => { messagerState.onClose?.(); setMessagerState({ visible: false, title: "", onClose: null, onSend: null, sendLabel: "Send" }); };
+
   return (
-    <PopupsContext.Provider value={{ showDialog, hideDialog, showAlert, hideAlert, showSpinner, hideSpinner }}>
+    <PopupsContext.Provider value={{ showDialog, hideDialog, showAlert, hideAlert, showSpinner, hideSpinner, showMessager, hideMessager }}>
       {children}
 
       <LoadingSpinner visible={spinnerVisible} />
@@ -46,6 +52,14 @@ export function PopupsProvider({ children }) {
       >
         {alertState.message}
       </Dialog>
+
+      <Messager
+        visible={messagerState.visible}
+        title={messagerState.title}
+        onClose={hideMessager}
+        onSend={messagerState.onSend}
+        sendLabel={messagerState.sendLabel}
+      />
     </PopupsContext.Provider>
   );
 }

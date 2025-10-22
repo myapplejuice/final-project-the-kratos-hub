@@ -9,6 +9,11 @@ export default class APIService {
         this.ADMIN_ID = id;
     }
 
+    static async clearAdmin() {
+        this.TOKEN = null;
+        this.ADMIN_ID = null;
+    }
+
     static async ping() {
         const res = await this.request('/ping', 'GET', null, false);
         return res.success;
