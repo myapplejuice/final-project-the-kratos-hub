@@ -9,7 +9,16 @@ export default class UserTrainerProfileDBService {
             Database.addInput(request, "UserId", sql.UniqueIdentifier, userId);
 
             const result = await request.query(`
-                SELECT * FROM UserTrainerProfile WHERE UserId = @UserId
+              IF NOT EXISTS (SELECT 1 FROM UserTrainerProfile WHERE UserId = @UserId)
+                BEGIN
+                    INSERT INTO UserTrainerProfile (UserId)
+                    OUTPUT inserted.*
+                    VALUES (@UserId)
+                END
+                ELSE
+                BEGIN
+                    SELECT * FROM UserTrainerProfile WHERE UserId = @UserId
+                END
             `);
 
             const profile = result.recordset.map(row => {

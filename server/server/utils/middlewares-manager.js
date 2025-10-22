@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import jwt from 'jsonwebtoken';
 
 export default class MiddlewaresManager {
@@ -9,18 +11,7 @@ export default class MiddlewaresManager {
         };
     }
 
-    static userAuthorization(req, res, next) {
-        const tokenId = req.id;
-        const callId = req.params.id;
-
-        if (!tokenId || tokenId !== callId) {
-            return res.status(403).json({ message: 'Forbidden! Invalid user ID.' });
-        }
-
-        next();
-    }
-
-    static tokenAuthorization(req, res, next) {
+        static tokenAuthorization(req, res, next) {
         const authHeader = req.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -31,11 +22,23 @@ export default class MiddlewaresManager {
 
         try {
             const decoded = jwt.verify(token, MiddlewaresManager.SECRET_KEY);
+            
             req.id = decoded.id;
             next();
         } catch (err) {
             return res.status(401).json({ message: 'Invalid or expired token.' });
         }
+    }
+
+    static userAuthorization(req, res, next) {
+        const tokenId = req.id;
+        const callId = req.params.id;
+
+        if (!tokenId || tokenId !== callId) {
+            return res.status(403).json({ message: 'Forbidden! Invalid user ID.' });
+        }
+
+        next();
     }
 
     static socketAuthorization(socket, next) {
@@ -64,6 +67,10 @@ export default class MiddlewaresManager {
 
         try {
             const decoded = jwt.verify(token, MiddlewaresManager.SECRET_KEY);
+
+            if (decoded.id !== req.params.id) {
+                return res.status(403).json({ message: 'Forbidden! Invalid admin ID.' });
+            }
 
             if (decoded.isActive === false) {
                 return res.status(403).json({ message: 'Admin account deactivated!' });

@@ -1,5 +1,5 @@
 import { Keyboard, StyleSheet, View, Dimensions, Image, TouchableOpacity } from "react-native";
-import { useState, useContext } from "react";
+import { useState, useContext, use } from "react";
 import { router } from "expo-router";
 import usePopups from "../../common/hooks/use-popups";
 import AnimatedButton from "../../components/screen-comps/animated-button";
@@ -33,8 +33,12 @@ export default function Login() {
             if (result.success) {
                 const token = result.data.token;
                 const userProfile = await DeviceStorageService.initUserSession(token);
-                setUser(userProfile);
-                router.replace(routes.HOMEPAGE);
+                if (!userProfile) {
+                    createAlert({ title: "Login Failed", text: 'Internal Server Error, please try again later!' });
+                } else {
+                    setUser(userProfile);
+                    router.replace(routes.HOMEPAGE);
+                }
             } else {
                 createAlert({ title: "Login Failed", text: "One or both credentials are wrong!" });
             }

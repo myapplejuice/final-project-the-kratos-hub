@@ -10,7 +10,8 @@ export default class AdminRouter {
         const asyncHandler = MiddlewaresManager.asyncHandler;
         const adminAuthorization = MiddlewaresManager.adminAuthorization;
 
-        this.adminRouter.post('/access/:id', asyncHandler(AdminController.Access));
+        this.adminRouter.get('/test-token/:id', adminAuthorization, asyncHandler(AdminController.testAdminToken));
+        this.adminRouter.post('/access', asyncHandler(AdminController.access));
 
         return this.adminRouter;
     }

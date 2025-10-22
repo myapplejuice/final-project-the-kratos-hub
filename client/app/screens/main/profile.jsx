@@ -120,9 +120,9 @@ export default function Profile() {
             <ImageCapture onConfirm={async (image) => setNewImage(image)} />
             <AppScroll extraBottom={20}>
                 <View style={[styles.card, { alignItems: 'center' }]}>
-                    {user.trainerProfile.trainerStatus === 'active' &&
+                    {user.trainerProfile?.trainerStatus === 'active' &&
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginBottom: 20 }}>
-                            {user.trainerProfile.isVerified &&
+                            {user.trainerProfile?.isVerified &&
                                 <TouchableOpacity onPress={() => router.push(routes.SHIELD_OF_TRUST)} style={{ padding: 10, backgroundColor: colors.main, borderRadius: 15, flexDirection: 'row', alignItems: 'center' }}>
                                     <Image source={Images.shield} style={{ width: 20, height: 20, tintColor: 'white' }} />
                                     <AppText style={{ color: 'white', marginStart: 5, fontSize: scaleFont(12), fontWeight: 'bold' }}>Trusted Trainer</AppText>
