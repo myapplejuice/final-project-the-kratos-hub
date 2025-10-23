@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 import * as styles from "../index.css";
 import APIService from "../utils/api-service";
 import { useNavigate } from "react-router-dom";
@@ -421,8 +421,8 @@ export default function Dashboard() {
                                 </thead>
                                 <tbody>
                                     {admins.map((admin) => (
-                                        <>
-                                            <tr key={admin.id} style={{ background: expandedAdmin === admin.id ? 'rgba(59, 130, 246, 0.1)' : 'none' }} onClick={() => expandedAdmin === admin.id ? setExpandedAdmin(null) : setExpandedAdmin(admin.id)}>
+                                        <Fragment key={admin.id}>
+                                            <tr style={{ background: expandedAdmin === admin.id ? 'rgba(59, 130, 246, 0.1)' : 'none' }} onClick={() => expandedAdmin === admin.id ? setExpandedAdmin(null) : setExpandedAdmin(admin.id)}>
                                                 <td>{admin.id}</td>
                                                 <td style={{ color: admin.isActive ? "#00ff00" : "#ff0000" }}>{admin.isActive ? "Active" : "Inactive"}</td>
                                                 <td>
@@ -501,7 +501,7 @@ export default function Dashboard() {
                                                     </td>
                                                 </tr>
                                             )}
-                                        </>
+                                        </Fragment>
                                     ))}
                                 </tbody>
                             </table>
