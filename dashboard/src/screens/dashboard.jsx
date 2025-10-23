@@ -10,7 +10,7 @@ import colors from "../utils/stylings";
 
 export default function Dashboard() {
     const admin = SessionStorageService.getItem("admin").admin;
-    const { showMessager, hideMessager, showDialog, showSpinner, hideSpinner, showInput } = usePopups();
+    const { showMessager, hideMessager, showDialog, showSpinner, hideSpinner, showInput, hideInput, showAlert } = usePopups();
     const nav = useNavigate();
 
     const [expandedAdmin, setExpandedAdmin] = useState(null);
@@ -85,7 +85,7 @@ export default function Dashboard() {
                     required: true
                 },
                 {
-                    name: "password",
+                    name: "accessPassword",
                     label: "Password",
                     type: "password",
                     placeholder: "Enter password",
@@ -98,14 +98,38 @@ export default function Dashboard() {
                     options: [
                         { value: "all", label: "All Permissions" },
                         { value: "read", label: "Read Only" },
-                        { value: "write", label: "Read & Write" }
+                        { value: "verifications", label: "Resolving Verifications" },
+                        { value: "termination", label: "Terminating Users" },
                     ],
                     required: true
                 }
             ],
-            onConfirm: (values) => {
-                console.log("Admin data:", values);
+            onConfirm: async (values) => {
+                hideInput();
+                const { accessId, accessPassword, permissions } = values;
+                if (!accessId || !accessPassword || !permissions) return showAlert({ title: "Failure", message: "All fields are required to create an admin account" });
 
+                const payload = {
+                    accessId,
+                    accessPassword,
+                    permissions
+                }
+
+                try {
+                    showSpinner();
+
+                    const result = await APIService.routes.newAdmin(payload);
+
+                    if (result.success) {
+                        const admin = result.data.admin;
+                        console.log(admin)
+                        setAdmins([...admins, admin]);
+                    }
+                } catch (error) {
+                    console.error("Error fetching dashboard data:", error);
+                } finally {
+                    hideSpinner();
+                }
             },
             confirmText: "Create Admin"
         });
@@ -125,7 +149,7 @@ export default function Dashboard() {
                             //"Food List",
                         ].map((section) => (
                             <li key={section} className={activeSection === section ? "active" : ""} onClick={() => { setSearchQuery(''), setActiveSection(section) }}>
-                                {section}{" "}{section === "Reports" ? "(3)" : section === "Users" ? "(3)" : section === "Food List" ? "(2)" : section === "Community Posts" ? "(2)" : "(2)"}
+                                {section}{" "}{section === "Verification Applications" ? `${verificationApps.filter(app => app.status === "pending").length === 0 ? '' : `(${verificationApps.filter(app => app.status === "pending").length})`}` : ""}
                             </li>
                         ))}
                     </ul>
@@ -149,6 +173,9 @@ export default function Dashboard() {
                 {activeSection === "Users" && (
                     <div className="admin-section" style={{ marginBottom: 300 }}>
                         <h2>Users</h2>
+                        <p style={{ margin: '0 0 20px 0', color: '#6b7280' }}>
+                            Total: {users.length} / Filter: {visibleUsers.length}
+                        </p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: 25 }}>
                             <input
                                 type="text"
@@ -357,12 +384,7 @@ export default function Dashboard() {
                                                                     <strong>Created:</strong> {new Date(admin.dateOfCreation).toLocaleString("en-US")}
                                                                 </div>
                                                                 <div className="detail-item">
-                                                                    <strong>Permissions:</strong> {Array.isArray(admin.permissions)
-                                                                        ? admin.permissions.map(p =>
-                                                                            p && p.charAt(0).toUpperCase() + p.slice(1)
-                                                                        ).join(', ')
-                                                                        : 'No permissions'
-                                                                    }
+                                                                   <strong>Permissions:</strong> {admin.permissions ? admin.permissions.charAt(0).toUpperCase() + admin.permissions.slice(1) : 'No permissions'}
                                                                 </div>
                                                             </div>
                                                         </div>

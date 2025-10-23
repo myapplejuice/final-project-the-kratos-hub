@@ -120,4 +120,11 @@ export default class AdminController {
 
         return res.status(200).json({ success: true, message: response.message });
     }
+
+    static async createNewAdmin(req, res) {
+        const { accessId, accessPassword, permissions } = req.body;
+
+        const response = await AdminDBService.insertNewAdmin(accessId, accessPassword, permissions);
+        return res.status(200).json({ success: true, message: response.message, admin: response.admin });
+    }
 }

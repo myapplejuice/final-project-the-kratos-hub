@@ -9,7 +9,7 @@ export function adminQuery() {
                 AccessId NVARCHAR(20) NOT NULL UNIQUE,
                 AccessPassword NVARCHAR(512) NOT NULL,
                 DateOfCreation DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
-                Permissions NVARCHAR(MAX) NULL DEFAULT '[]',
+                Permissions NVARCHAR(MAX) NULL DEFAULT '',
                 IsActive BIT NOT NULL DEFAULT 0,
                 IsSeed BIT NOT NULL DEFAULT 0,
 
@@ -22,7 +22,7 @@ export function adminQuery() {
             DECLARE @AccessId NVARCHAR(20) = 'XXXXXX';
             DECLARE @AccessPassword NVARCHAR(512) = '${pass}';
             DECLARE @DateOfCreation DATETIME2 = SYSUTCDATETIME();
-            DECLARE @Permissions NVARCHAR(MAX) = '["all"]';
+            DECLARE @Permissions NVARCHAR(MAX) = 'all';
             DECLARE @IsActive BIT = 1;
             DECLARE @IsSeed BIT = 1;
 

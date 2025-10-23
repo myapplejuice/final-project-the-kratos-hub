@@ -41,7 +41,7 @@ export default class APIService {
             }
 
             return { success: false, message: `Server error: ${e.message}` };
-        } 
+        }
     }
 
     static async uploadImageToCloudinary({ uri, folder, fileName, uploadPreset = "The_Kratos_Hub" }) {
@@ -105,15 +105,16 @@ export default class APIService {
     }
 
 
-    static routes = {       
-         access: (payload) => APIService.request(`/admin/access`, 'POST', payload),
-         dashboardData: (payload) => APIService.request(`/admin/dashboard-data/${SessionStorageService.getItem("admin")?.admin?.id}`, 'POST', payload),
-         /////
-         terminateUser: (payload) => APIService.request(`/admin/users/terminate/${SessionStorageService.getItem("admin")?.admin?.id}`, 'DELETE', payload),
-         notifyUser: (payload) => APIService.request(`/admin/users/notify/${SessionStorageService.getItem("admin")?.admin?.id}`, 'POST', payload),
-         reputationProfile: (payload) => APIService.request(`/admin/user/reputation-profile/${SessionStorageService.getItem("admin")?.admin?.id}`, 'POST', payload),
-         warnUser: (payload) => APIService.request(`/admin/user/warn/${SessionStorageService.getItem("admin")?.admin?.id}`, 'POST', payload),
-         warningsHistory: (payload) => APIService.request(`/admin/user/warnings-history/${SessionStorageService.getItem("admin")?.admin?.id}`, 'GET', payload),
-         updateApplication: (payload) => APIService.request(`/admin/applications/${SessionStorageService.getItem("admin")?.admin?.id}`, 'PUT', payload),
+    static routes = {
+        newAdmin: (payload) => APIService.request(`/admin/new-admin/${SessionStorageService.getItem("admin")?.admin?.id}`, 'POST', payload),
+        access: (payload) => APIService.request(`/admin/access`, 'POST', payload),
+        dashboardData: (payload) => APIService.request(`/admin/dashboard-data/${SessionStorageService.getItem("admin")?.admin?.id}`, 'POST', payload),
+        /////
+        terminateUser: (payload) => APIService.request(`/admin/users/terminate/${SessionStorageService.getItem("admin")?.admin?.id}`, 'DELETE', payload),
+        notifyUser: (payload) => APIService.request(`/admin/users/notify/${SessionStorageService.getItem("admin")?.admin?.id}`, 'POST', payload),
+        reputationProfile: (payload) => APIService.request(`/admin/user/reputation-profile/${SessionStorageService.getItem("admin")?.admin?.id}`, 'POST', payload),
+        warnUser: (payload) => APIService.request(`/admin/user/warn/${SessionStorageService.getItem("admin")?.admin?.id}`, 'POST', payload),
+        warningsHistory: (payload) => APIService.request(`/admin/user/warnings-history/${SessionStorageService.getItem("admin")?.admin?.id}`, 'GET', payload),
+        updateApplication: (payload) => APIService.request(`/admin/applications/${SessionStorageService.getItem("admin")?.admin?.id}`, 'PUT', payload),
     }
 }

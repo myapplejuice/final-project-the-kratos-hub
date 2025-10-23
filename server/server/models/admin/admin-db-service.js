@@ -22,7 +22,7 @@ export default class AdminDBService {
             }
 
             const row = result.recordset[0];
-            const isMatch = await PasswordHasher.comparePassword(pass, row.AccessPassword) && id === row.AccessId;
+            const isMatch = await PasswordHasher.comparePassword(pass, row.AccessPassword);
             if (!isMatch) {
                 return { success: false, message: 'One or both credentials are incorrect!' }
             }
@@ -76,8 +76,6 @@ export default class AdminDBService {
                 for (const key in row) {
                     if (key !== 'AccessPassword')
                         admin[ObjectMapper.toCamelCase(key)] = row[key];
-                    if(key === 'Permissions')
-                        admin[ObjectMapper.toCamelCase(key)] = JSON.parse(row[key]);
                 }
                 return admin;
             });
@@ -279,6 +277,37 @@ export default class AdminDBService {
         } catch (err) {
             console.error('updateApplicationStatus error:', err);
             return { success: false, message: 'Failed to update status' };
+        }
+    }
+
+    static async insertNewAdmin(id, password, permissions) {
+        try {
+            const request = Database.getRequest();
+            const hash = await PasswordHasher.hashPassword(password);
+            Database.addInput(request, 'AccessId', sql.NVarChar(20), id);
+            Database.addInput(request, 'AccessPassword', sql.NVarChar(512), hash);
+            Database.addInput(request, 'Permissions', sql.NVarChar(sql.MAX), permissions);
+            Database.addInput(request, 'DateOfCreation', sql.DateTime2, new Date());
+            Database.addInput(request, 'IsActive', sql.Bit, true);
+            Database.addInput(request, 'IsSeed', sql.Bit, false);
+
+            const query = `
+                INSERT INTO Admins (AccessId, AccessPassword, Permissions, DateOfCreation, IsActive, IsSeed)
+                OUTPUT INSERTED.*
+                VALUES (@AccessId, @AccessPassword, @Permissions, @DateOfCreation, @IsActive, @IsSeed)
+            `;
+
+            const result = await request.query(query);
+            const admin = {}
+
+            for (const key in result.recordset[0]) {
+                admin[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
+            }
+            return { success: true, message: 'Admin created successfully', admin };
+
+        } catch (err) {
+            console.error('insertNewAdmin error:', err);
+            return { success: false, message: 'Failed to create admin' };
         }
     }
 }
