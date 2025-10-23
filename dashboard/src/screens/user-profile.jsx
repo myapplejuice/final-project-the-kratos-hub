@@ -108,11 +108,11 @@ export default function UserProfile() {
         })
     }
 
-    function handleWarningIssue(){
+    function handleWarningIssue() {
         showMessager({
             title: "Warning Issue",
             sendLabel: "Send",
-            placeholder: "Explain thouroughly about the reason of the warning...",    
+            placeholder: "Explain thouroughly about the reason of the warning...",
             onSend: async (summary) => {
                 if (!summary) return;
 
@@ -128,7 +128,11 @@ export default function UserProfile() {
                         actions: [{ label: "Ok", color: colors.primary, onClick: null }],
                     });
 
-                    setUser({ ...user, currentWarningCount: user.currentWarningCount + 1, offenseCount: user.offenseCount + 1 });
+                    setReputationProfile({
+                        ...reputationProfile,
+                        currentWarningCount: reputationProfile.currentWarningCount + 1,
+                        offenseCount: reputationProfile.offenseCount + 1
+                    });
                 }
             },
         })
@@ -257,7 +261,7 @@ export default function UserProfile() {
                         >
                             {user.isTerminated ? "Re-activate" : "Terminate"}
                         </button>
-                         <button
+                        <button
                             onClick={handleWarningIssue}
                             style={{
                                 padding: '12px 24px',
@@ -465,31 +469,31 @@ export default function UserProfile() {
                 marginTop: 30,
                 marginBottom: 300
             }}>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginBottom: '20px',
-                        borderBottom: '2px solid rgba(96,165,250,0.3)',
-                        paddingBottom: '8px'
-                    }}>
-                        <p style={{
-                            fontWeight: '700',
-                            margin: 0,
-                            fontSize: '22px',
-                            color: '#60a5fa',
-                        }}>Reputation</p>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '20px',
+                    borderBottom: '2px solid rgba(96,165,250,0.3)',
+                    paddingBottom: '8px'
+                }}>
+                    <p style={{
+                        fontWeight: '700',
+                        margin: 0,
+                        fontSize: '22px',
+                        color: '#60a5fa',
+                    }}>Reputation</p>
 
-                         <div style={{ display: 'flex', alignItems: 'center', background: reputationProfile.tier?.color, width: 'fit-content', height: 'fit-content', marginBottom: 5, padding: 0, lineHeight: 1, paddingInline: 15, borderRadius: 15, height: '30px' }}>
-                            <p style={{ color: 'white', fontWeight: 'bolder', }}>{ reputationProfile.tier?.label}</p>
-                        </div>
+                    <div style={{ display: 'flex', alignItems: 'center', background: reputationProfile.tier?.color, width: 'fit-content', height: 'fit-content', marginBottom: 5, padding: 0, lineHeight: 1, paddingInline: 15, borderRadius: 15, height: '30px' }}>
+                        <p style={{ color: 'white', fontWeight: 'bolder', }}>{reputationProfile.tier?.label}</p>
                     </div>
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Number of Reports:</strong> {reputationProfile.reportCount || 0}</p>
-                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Offenses Count:</strong> {user.offenseCount || 0}</p>
-                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Termination Count:</strong> {user.terminationCount || 0}</p>
-                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Reinstatement Count:</strong> {user.reinstatementCount || 0}</p>
-                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Current Warnings:</strong> {user.currentWarningCount || 0}</p>
+                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Number of Reports:</strong> {reputationProfile.reportCount}</p>
+                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Offenses Count:</strong> {reputationProfile.offenseCount}</p>
+                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Termination Count:</strong> {reputationProfile.terminationCount}</p>
+                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Reinstatement Count:</strong> {reputationProfile.reinstatementCount}</p>
+                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Current Warnings:</strong> {reputationProfile.currentWarningCount}</p>
                 </div>
             </div>
         </main>

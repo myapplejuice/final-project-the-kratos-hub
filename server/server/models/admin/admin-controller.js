@@ -30,6 +30,7 @@ export default class AdminController {
     static async getUserReputationProfile(req, res) {
         const { id } = req.body;
         const response = await AdminDBService.fetchUserReputationProfile(id);
+        console.log(response)
         return res.status(200).json({ success: true, reputationProfile: response });
     }
 
@@ -68,8 +69,6 @@ export default class AdminController {
     static async issueWarning(req, res) {
         const { id, summary } = req.body;
         const adminId = req.params.id;
-
-        console.log(adminId)
 
         const response = await AdminDBService.createUserWarning(id, adminId, summary);
         if (!response.success) return res.status(400).json({ success: false, message: response.message });

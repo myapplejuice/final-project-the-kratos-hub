@@ -63,36 +63,34 @@ export default class AdminDBService {
         }
     }
 
-    static async fetchUserReputationProfile(id) {
-        try {
-            const request = Database.getRequest();
-            Database.addInput(request, 'UserId', sql.UniqueIdentifier, id);
+ static async fetchUserReputationProfile(id) {
+    try {
+        const request = Database.getRequest();
+        Database.addInput(request, 'UserId', sql.UniqueIdentifier, id);
 
-            const query = `SELECT * FROM UserReputationProfile WHERE UserId = @UserId`;
-            let result = await request.query(query);
+        const query = `
+            IF NOT EXISTS (SELECT 1 FROM UserReputationProfile WHERE UserId = @UserId)
+            BEGIN
+                INSERT INTO UserReputationProfile (UserId) VALUES (@UserId)
+            END
 
-            if (!result.recordset.length) {
-                const insertQuery = `
-                INSERT INTO UserReputationProfile (UserId)
-                VALUES (@UserId);
-            `;
-                await request.query(insertQuery);
+            SELECT * FROM UserReputationProfile WHERE UserId = @UserId
+        `;
 
-                result = await request.query(query);
-            }
+        const result = await request.query(query);
+        const row = result.recordset[0];
 
-            const row = result.recordset[0];
-            const reputationProfile = {};
-            for (const key in row) {
-                reputationProfile[ObjectMapper.toCamelCase(key)] = row[key];
-            }
-
-            return reputationProfile;
-        } catch (err) {
-            console.error('fetchUserReputationProfile error:', err);
-            return null;
+        const reputationProfile = {};
+        for (const key in row) {
+            reputationProfile[ObjectMapper.toCamelCase(key)] = row[key];
         }
+
+        return reputationProfile;
+    } catch (err) {
+        console.error('fetchUserReputationProfile error:', err);
+        return null;
     }
+}
 
     static async setTerminated(id, IsTerminated) {
         try {
@@ -122,7 +120,7 @@ export default class AdminDBService {
         }
     }
 
-    static async createUserWarning(id,adminId, summary) {
+    static async createUserWarning(id, adminId, summary) {
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'UserId', sql.UniqueIdentifier, id);

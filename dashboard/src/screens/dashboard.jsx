@@ -25,7 +25,6 @@ export default function Dashboard() {
                 const result = await APIService.routes.users();
                 if (result.success) {
                     const users = result.data.users;
-                    console.log(users)
                     setUsers(users);
                 }
             }
