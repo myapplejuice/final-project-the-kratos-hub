@@ -76,6 +76,8 @@ export default class AdminDBService {
                 for (const key in row) {
                     if (key !== 'AccessPassword')
                         admin[ObjectMapper.toCamelCase(key)] = row[key];
+                    if(key === 'Permissions')
+                        admin[ObjectMapper.toCamelCase(key)] = JSON.parse(row[key]);
                 }
                 return admin;
             });

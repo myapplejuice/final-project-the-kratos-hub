@@ -10,9 +10,10 @@ import colors from "../utils/stylings";
 
 export default function Dashboard() {
     const admin = SessionStorageService.getItem("admin").admin;
-    const { showMessager, hideMessager, showDialog, showSpinner, hideSpinner } = usePopups();
+    const { showMessager, hideMessager, showDialog, showSpinner, hideSpinner, showInput } = usePopups();
     const nav = useNavigate();
 
+    const [expandedAdmin, setExpandedAdmin] = useState(null);
     const [activeSection, setActiveSection] = useState("Users");
     const [searchQuery, setSearchQuery] = useState("");
     const [admins, setAdmins] = useState([]);
@@ -70,6 +71,45 @@ export default function Dashboard() {
         SessionStorageService.removeItem("admin");
         nav("/");
     }
+
+    function handleAddAdmin() {
+        showInput({
+            title: "Add New Admin",
+            message: "Enter the admin details below:",
+            inputs: [
+                {
+                    name: "accessId",
+                    label: "Access ID",
+                    type: "text",
+                    placeholder: "Enter access ID",
+                    required: true
+                },
+                {
+                    name: "password",
+                    label: "Password",
+                    type: "password",
+                    placeholder: "Enter password",
+                    required: true
+                },
+                {
+                    name: "permissions",
+                    label: "Permissions",
+                    type: "select",
+                    options: [
+                        { value: "all", label: "All Permissions" },
+                        { value: "read", label: "Read Only" },
+                        { value: "write", label: "Read & Write" }
+                    ],
+                    required: true
+                }
+            ],
+            onConfirm: (values) => {
+                console.log("Admin data:", values);
+
+            },
+            confirmText: "Create Admin"
+        });
+    };
 
     return (
         <div className="admin-page">
@@ -177,7 +217,7 @@ export default function Dashboard() {
                             <tbody>
                                 {[...verificationApps].sort((a, b) => new Date(b.dateOfCreation) - new Date(a.dateOfCreation)).map((app, i) => (
                                     <tr key={app.id} onClick={() => nav(routes.verification_application, { state: { app, user: users.find(u => u.id === app.userId) } })}>
-                                        <td>{app.userId}</td>
+                                        <td>{app.id}</td>
                                         <td>{(users.find(u => u.id === app.userId)?.firstname + " " + users.find(u => u.id === app.userId)?.lastname) || "Unknown / User Discarded"}</td>
                                         <td style={{ color: app.status === "cancelled" ? '#6b7280' : app.status === "rejected" ? "#ff0000ff" : app.status === "approved" ? "#00ff00" : "#fffb00ff" }}>
                                             {app.status === "cancelled" ? "Cancelled" : app.status === "approved" ? "Approved" : app.status === "rejected" ? "Rejected" : "Pending"}
@@ -267,29 +307,74 @@ export default function Dashboard() {
                 )}
 
                 {activeSection === "Admins" && (
-                    <div className="admin-section">
-                        <h2>Admins</h2>
-                        <table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Date Created</th>
-                                    <th>Status</th>
-                                    <th>Permissions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {admins.map((admin) => (
-                                    <tr key={admin.id}>
-                                        <td>{admin.id}</td>
-                                        <td>{admin.isActive}</td>
-                                        <td>{admin.dateOfCreation}</td>
-                                        <td>{admin.permissions}</td>
+                    <>
+                        <div style={{ position: 'fixed', bottom: '25px', right: '25px', }}>
+                            <button className="add-admin-btn" onClick={handleAddAdmin}>
+                                New Admin Record
+                            </button>
+                        </div>
+                        <div className="admin-section">
+                            <h2>Admins</h2>
+                            <table className="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Status</th>
+                                        <th></th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    {admins.map((admin) => (
+                                        <>
+                                            <tr key={admin.id} style={{ background: expandedAdmin === admin.id ? 'rgba(59, 130, 246, 0.1)' : 'none' }} onClick={() => expandedAdmin === admin.id ? setExpandedAdmin(null) : setExpandedAdmin(admin.id)}>
+                                                <td>{admin.id}</td>
+                                                <td style={{ color: admin.isActive ? "#00ff00" : "#ff0000" }}>{admin.isActive ? "Active" : "Inactive"}</td>
+                                                <td>
+                                                    <img
+                                                        src={images.arrow}
+                                                        style={{
+                                                            width: 20,
+                                                            height: 20,
+                                                            filter: "brightness(0) invert(1)",
+                                                            transform: expandedAdmin === admin.id ? "rotate(90deg)" : "rotate(0deg)",
+                                                            transition: "transform 0.2s ease"
+                                                        }}
+                                                    />
+                                                </td>
+                                            </tr>
+                                            {expandedAdmin === admin.id && (
+                                                <tr key={`${admin.id}-expanded`} className="expanded-row">
+                                                    <td colSpan="5" style={{ backgroundColor: 'rgba(59, 130, 246, 0.05)', padding: '20px' }}>
+                                                        <div className="admin-details">
+                                                            <div className="details-grid">
+                                                                <div className="detail-item">
+                                                                    <strong>Access ID:</strong> {admin.accessId}
+                                                                </div>
+                                                                <div className="detail-item">
+                                                                    <strong>Seed Admin:</strong> {admin.isSeed ? "Yes" : "No"}
+                                                                </div>
+                                                                <div className="detail-item">
+                                                                    <strong>Created:</strong> {new Date(admin.dateOfCreation).toLocaleString("en-US")}
+                                                                </div>
+                                                                <div className="detail-item">
+                                                                    <strong>Permissions:</strong> {Array.isArray(admin.permissions)
+                                                                        ? admin.permissions.map(p =>
+                                                                            p && p.charAt(0).toUpperCase() + p.slice(1)
+                                                                        ).join(', ')
+                                                                        : 'No permissions'
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </>
                 )}
             </main>
         </div>
@@ -329,4 +414,4 @@ const communityPosts = [
         author: "user_12",
         content: "Looking for a workout partner in Tel Aviv",
     },
-];
+]

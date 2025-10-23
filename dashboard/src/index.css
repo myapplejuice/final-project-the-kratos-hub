@@ -469,3 +469,138 @@ body {
 .admin-logout-btn:hover {
     background: var(--color-negative-red-hover);
 }
+
+
+.clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.clickable-row:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+.expanded-row {
+    border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+    cursor: default;
+    pointer-events: none;
+}
+
+.expanded-row:hover {
+    background-color: transparent !important;
+}
+
+.admin-details h4 {
+    margin: 0 0 15px 0;
+    color: #3b82f6;
+    font-size: 16px;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.detail-item {
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    border-left: 3px solid #3b82f6;
+}
+
+.detail-item strong {
+    color: #3b82f6;
+    margin-right: 8px;
+}
+
+
+/* Header with sticky add button */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Add New Admin Button */
+.add-admin-btn {
+    background: linear-gradient(135deg, #10b981, #3b82f6);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.add-admin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+/* Action buttons container */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    pointer-events: auto;
+}
+
+/* Edit Button */
+.edit-btn {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.edit-btn:hover {
+    background: rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Terminate Button */
+.terminate-btn {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.terminate-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Prevent row click when clicking buttons */
+.action-buttons button {
+    pointer-events: auto;
+}
+
+/* Ensure the entire row is still clickable except for buttons */
+tr {
+    cursor: pointer;
+}
+
+tr .action-buttons {
+    cursor: default;
+}

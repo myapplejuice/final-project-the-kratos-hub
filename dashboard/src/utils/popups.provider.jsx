@@ -3,110 +3,158 @@ import LoadingSpinner from "../comps/loading-spinner";
 import Dialog from "../comps/Dialog";
 import Messager from "../comps/messager";
 import Options from "../comps/options";
+import Input from "../comps/input";
 
 const PopupsContext = createContext(null);
 
 export function PopupsProvider({ children }) {
-  const [spinnerVisible, setSpinnerVisible] = useState(false);
-  const [dialogState, setDialogState] = useState({ visible: false, title: "", content: null, actions: [] });
-  const [alertState, setAlertState] = useState({ visible: false, message: "", title: "" });
-  const [messagerState, setMessagerState] = useState({ visible: false, placeholder: "Type your message...", title: "", onClose: null, onSend: null, sendLabel: "Send" });
-  const [optionsState, setOptionsState] = useState({ visible: false, title: "", current: "", options: [], onClose: null, onConfirm: null, confirmText: "Select", cancelText: "Cancel" });
+    const [spinnerVisible, setSpinnerVisible] = useState(false);
+    const [dialogState, setDialogState] = useState({ visible: false, title: "", content: null, actions: [] });
+    const [alertState, setAlertState] = useState({ visible: false, message: "", title: "" });
+    const [messagerState, setMessagerState] = useState({ visible: false, placeholder: "Type your message...", title: "", onClose: null, onSend: null, sendLabel: "Send" });
+    const [optionsState, setOptionsState] = useState({ visible: false, title: "", current: "", options: [], onClose: null, onConfirm: null, confirmText: "Select", cancelText: "Cancel" });
+    const [inputState, setInputState] = useState({ visible: false, title: "", message: "", inputs: [], onClose: null, onConfirm: null, confirmText: "Confirm", cancelText: "Cancel" });
 
-  // Dialog
-  const showDialog = ({ title, content, actions }) => {
-    setDialogState({ visible: true, title, content, actions });
-  };
-  const hideDialog = () => setDialogState((prev) => ({ ...prev, visible: false }));
+    // Dialog
+    const showDialog = ({ title, content, actions }) => {
+        setDialogState({ visible: true, title, content, actions });
+    };
+    const hideDialog = () => setDialogState((prev) => ({ ...prev, visible: false }));
 
-  // Alert
-  const showAlert = ({ title, message}) => setAlertState({ visible: true, message, title });
-  const hideAlert = () => setAlertState({ visible: false, title: "", message: "" });
+    // Alert
+    const showAlert = ({ title, message }) => setAlertState({ visible: true, message, title });
+    const hideAlert = () => setAlertState({ visible: false, title: "", message: "" });
 
-  // Spinner
-  const showSpinner = () => setSpinnerVisible(true);
-  const hideSpinner = () => setSpinnerVisible(false);
+    // Spinner
+    const showSpinner = () => setSpinnerVisible(true);
+    const hideSpinner = () => setSpinnerVisible(false);
 
-  // Messager
-  const showMessager = ({ title, placeholder, onClose, onSend, sendLabel }) => setMessagerState({ visible: true, placeholder, title, onClose, onSend, sendLabel });
-  const hideMessager = () => { messagerState.onClose?.(); setMessagerState({ visible: false, placeholder: "Type your message...", title: "", onClose: null, onSend: null, sendLabel: "Send" }); };
+    // Messager
+    const showMessager = ({ title, placeholder, onClose, onSend, sendLabel }) => setMessagerState({ visible: true, placeholder, title, onClose, onSend, sendLabel });
+    const hideMessager = () => { messagerState.onClose?.(); setMessagerState({ visible: false, placeholder: "Type your message...", title: "", onClose: null, onSend: null, sendLabel: "Send" }); };
 
-  const showOptions = ({
-    title,
-    current,
-    options,
-    onClose,
-    onConfirm,
-    confirmText,
-    cancelText,
-  }) => {
-    setOptionsState({
-      visible: true,
-      title: title || "",
-      current: current || "",
-      options: options || [],
-      onClose: onClose || (() => {}),
-      onConfirm: onConfirm || (() => {}),
-      confirmText: confirmText || "Select",
-      cancelText: cancelText || "Cancel",
-    });
-  };
+    const showOptions = ({
+        title,
+        current,
+        options,
+        onClose,
+        onConfirm,
+        confirmText,
+        cancelText,
+    }) => {
+        setOptionsState({
+            visible: true,
+            title: title || "",
+            current: current || "",
+            options: options || [],
+            onClose: onClose || (() => { }),
+            onConfirm: onConfirm || (() => { }),
+            confirmText: confirmText || "Select",
+            cancelText: cancelText || "Cancel",
+        });
+    };
 
-  const hideOptions = () => {
-    optionsState.onClose?.();
-    setOptionsState((prev) => ({ visible: false, title: "", current: "", options: [], onClose: null, onConfirm: null, confirmText: "Select", cancelText: "Cancel" }));
-  };
+    const hideOptions = () => {
+        optionsState.onClose?.();
+        setOptionsState((prev) => ({ visible: false, title: "", current: "", options: [], onClose: null, onConfirm: null, confirmText: "Select", cancelText: "Cancel" }));
+    };
 
-  return (
-    <PopupsContext.Provider value={{ showDialog, hideDialog, showAlert, hideAlert, showSpinner, hideSpinner, showMessager, hideMessager , showOptions, hideOptions}}>
-      {children}
+    const showInput = ({
+        title = "",
+        message = "",
+        inputs = [],
+        onClose,
+        onConfirm,
+        confirmText = "Confirm",
+        cancelText = "Cancel"
+    }) => {
+        setInputState({
+            visible: true,
+            title,
+            message,
+            inputs,
+            onClose: onClose || (() => { }),
+            onConfirm: onConfirm || (() => { }),
+            confirmText,
+            cancelText
+        });
+    };
 
-      <LoadingSpinner visible={spinnerVisible} />
+    const hideInput = () => {
+        inputState.onClose?.();
+        setInputState({
+            visible: false,
+            title: "",
+            message: "",
+            inputs: [],
+            onClose: null,
+            onConfirm: null,
+            confirmText: "Confirm",
+            cancelText: "Cancel"
+        });
+    };
 
-      <Dialog
-        visible={dialogState.visible}
-        title={dialogState.title}
-        actions={dialogState.actions}
-        onClose={hideDialog}
-      >
-        {dialogState.content}
-      </Dialog>
+    return (
+        <PopupsContext.Provider value={{ showDialog, hideDialog, showAlert, hideAlert, showSpinner, hideSpinner, showMessager, hideMessager, showOptions, hideOptions, showInput, hideInput }}>
+            {children}
 
-      <Dialog
-        visible={alertState.visible}
-        title={alertState.title}
-        actions={[{ label: "OK", onClick: hideAlert, color: "#e74c3c" }]}
-        onClose={hideAlert}
-      >
-        {alertState.message}
-      </Dialog>
+            <LoadingSpinner visible={spinnerVisible} />
 
-      <Messager
-        visible={messagerState.visible}
-        title={messagerState.title}
-        placeholder={messagerState.placeholder}
-        onClose={hideMessager}
-        onSend={messagerState.onSend}
-        sendLabel={messagerState.sendLabel}
-      />
+            <Dialog
+                visible={dialogState.visible}
+                title={dialogState.title}
+                actions={dialogState.actions}
+                onClose={hideDialog}
+            >
+                {dialogState.content}
+            </Dialog>
 
-        <Options
-        visible={optionsState.visible}
-        title={optionsState.title}
-        current={optionsState.current}
-        options={optionsState.options}
-        onClose={hideOptions}
-        onConfirm={optionsState.onConfirm}
-        confirmText={optionsState.confirmText}
-        cancelText={optionsState.cancelText}
-      />
-    </PopupsContext.Provider>
-  );
+            <Dialog
+                visible={alertState.visible}
+                title={alertState.title}
+                actions={[{ label: "OK", onClick: hideAlert, color: "#e74c3c" }]}
+                onClose={hideAlert}
+            >
+                {alertState.message}
+            </Dialog>
+
+            <Messager
+                visible={messagerState.visible}
+                title={messagerState.title}
+                placeholder={messagerState.placeholder}
+                onClose={hideMessager}
+                onSend={messagerState.onSend}
+                sendLabel={messagerState.sendLabel}
+            />
+
+            <Options
+                visible={optionsState.visible}
+                title={optionsState.title}
+                current={optionsState.current}
+                options={optionsState.options}
+                onClose={hideOptions}
+                onConfirm={optionsState.onConfirm}
+                confirmText={optionsState.confirmText}
+                cancelText={optionsState.cancelText}
+            />
+
+            <Input
+                visible={inputState.visible}
+                title={inputState.title}
+                message={inputState.message}
+                inputs={inputState.inputs}
+                onClose={hideInput}
+                onConfirm={inputState.onConfirm}
+                confirmText={inputState.confirmText}
+                cancelText={inputState.cancelText}
+            />
+        </PopupsContext.Provider>
+    );
 }
 
 // Hook to use popups anywhere
 export function usePopups() {
-  const context = useContext(PopupsContext);
-  if (!context) throw new Error("usePopups must be used within a PopupsProvider");
-  return context;
+    const context = useContext(PopupsContext);
+    if (!context) throw new Error("usePopups must be used within a PopupsProvider");
+    return context;
 }
