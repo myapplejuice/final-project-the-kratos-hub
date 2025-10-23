@@ -18,7 +18,6 @@ export default function Gate() {
     async function handleAccessRequest() {
         try {
             showSpinner();
-            console.log(id)
             const result = await APIService.routes.access({ id, pass });
             if (result.success) {
                 const admin = result.data.admin;

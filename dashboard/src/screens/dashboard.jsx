@@ -122,7 +122,6 @@ export default function Dashboard() {
 
                     if (result.success) {
                         const admin = result.data.admin;
-                        console.log(admin)
                         setAdmins([...admins, admin]);
                     }
                 } catch (error) {
@@ -187,7 +186,6 @@ export default function Dashboard() {
                     const result = await APIService.routes.updateAdmin(payload);
 
                     if (result.success) {
-                        console.log(result)
                         const admin = result.data.admin;
                         setAdmins(prev => prev.map(prevAdmin => prevAdmin.id === admin.id ? admin : prevAdmin));
                     }
