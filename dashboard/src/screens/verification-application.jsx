@@ -4,144 +4,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { usePopups } from "../utils/popups.provider";
 import colors from "../utils/stylings";
 import APIService from "../utils/api-service";
+import { routes } from "../utils/constants";
 
 export default function VerificationApplication() {
     const { showDialog, showMessager, showOptions } = usePopups();
     const nav = useNavigate();
     const location = useLocation();
+    const user = location.state?.user;
     const [app, setApp] = useState(location.state?.app);
-    const [user, setUser] = useState(location.state?.user);
-    const [reputationProfile, setReputationProfile] = useState({});
-
-    useEffect(() => {
-        if (!app) return;
-
-        async function fetchUserReputation() {
-            const result = await APIService.routes.reputationProfile({ id: app.userId });
-
-            if (result.success) {
-                const reputationProfile = result.data.reputationProfile;
-                const score =
-                    reputationProfile.reportCount * 1 +
-                    reputationProfile.offenseCount * 2 +
-                    reputationProfile.terminationCount * 5 +
-                    reputationProfile.currentWarningCount * 1 -
-                    reputationProfile.reinstatementCount * 2;
-
-                let tier;
-                if (score <= 1) tier = { label: "Respectable", color: "#10b981" };
-                else if (score <= 3) tier = { label: "Good", color: "#3b82f6" };
-                else if (score <= 6) tier = { label: "Neutral", color: "#9ca3af" };
-                else if (score <= 10) tier = { label: "Concerning", color: "#f59e0b" };
-                else tier = { label: "High-Risk", color: "#ef4444" };
-
-                setReputationProfile({ ...reputationProfile, tier });
-            }
-        }
-
-        fetchUserReputation();
-    }, [app]);
-
-    function handleBack() {
-        nav(-1);
-    }
-
-    function handleViewUserProfile() {
-        nav(`/admin/user-profile`, { state: { user } });
-    }
-
-    function handleTerminate() {
-        showDialog({
-            title: 'User Termination',
-            content: <p>Are you sure you want terminate this user?</p>,
-            actions: [
-                {
-                    label: "Cancel", color: "#5a5a5aff", onClick: null
-                },
-                {
-                    label: "Yes", color: "#cc2e2eff", onClick: async () => {
-                        const result = await APIService.routes.terminateUser({ id: user.id, isTerminated: !user.isTerminated });
-
-                        if (result.success) {
-                            setUser({ ...user, isTerminated: !user.isTerminated });
-                        }
-                    }
-                }
-            ],
-        });
-    }
-
-    function handleNotify() {
-        showMessager({
-            title: "Notification",
-            sendLabel: "Send",
-            onSend: async (message) => {
-                if (!message) return;
-
-                showOptions({
-                    title: "Notification Sentiment",
-                    current: "",
-                    options: [
-                        { label: "Negative", color: "#cc2e2e", value: "negative" },
-                        { label: "Positive", color: "#40cc2e", value: "positive" },
-                        { label: "Neutral", color: "#6b6b6b", value: "normal" },
-                    ],
-                    onConfirm: async (chosen) => {
-                        if (!chosen) return;
-
-                        const result = await APIService.routes.notifyUser({
-                            id: user.id,
-                            message,
-                            imagesURLS: [],
-                            sentiment: chosen.value,
-                        });
-
-                        if (result.success) {
-                            showDialog({
-                                title: "Notification Sent",
-                                content: <p>Message sent and user will be notified</p>,
-                                actions: [{ label: "Ok", color: colors.primary, onClick: null }],
-                            });
-                        }
-                    },
-                });
-            },
-        })
-    }
-
-    function handleWarningIssue() {
-        showMessager({
-            title: "Warning Issue",
-            sendLabel: "Send",
-            placeholder: "Explain thouroughly about the reason of the warning...",
-            onSend: async (summary) => {
-                if (!summary) return;
-
-                const result = await APIService.routes.warnUser({
-                    id: user.id,
-                    summary,
-                });
-
-                if (result.success) {
-                    const warning = result.data.warning;
-
-                    showDialog({
-                        title: "Warning Issued",
-                        content: <p>Warning issued and user will be notified</p>,
-                        actions: [{ label: "Ok", color: colors.primary, onClick: null }],
-                    });
-
-                    setReputationProfile(prev => ({
-                        ...prev,
-                        warningsHistory: [warning, ...(prev.warningsHistory || []),],
-                        currentWarningCount: (prev.currentWarningCount || 0) + 1,
-                        offenseCount: (prev.offenseCount || 0) + 1
-                    }));
-                }
-            },
-        })
-    }
-
+  
     function handleApplicationAction(action) {
         showDialog({
             title: `Application ${action.charAt(0).toUpperCase() + action.slice(1)}`,
@@ -225,7 +96,7 @@ export default function VerificationApplication() {
 
             <div className="user-profile-header">
                 <div className="header-left">
-                    <div className="back-button" onClick={handleBack}>
+                    <div className="back-button" onClick={()=> nav(-1)}>
                         <img src={images.backArrow} className="back-arrow" />
                     </div>
                     <div className="user-info">
@@ -239,8 +110,9 @@ export default function VerificationApplication() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     <div className="action-buttons">
                         <button
-                            className="action-button profile"
-                            onClick={handleViewUserProfile}
+                            className="action-button profile-button"
+                            onClick={() => nav(routes.user_profile, { state: { user } })}
+
                         >
                             View User Profile
                         </button>
@@ -256,7 +128,7 @@ export default function VerificationApplication() {
                 </div>
             </div>
 
-            <div className="profile-card" style={{marginBottom: 300}}>
+            <div className="profile-card" style={{ marginBottom: 300 }}>
                 <div className="card-header">
                     <p className="card-title">Application Details</p>
                     <div
