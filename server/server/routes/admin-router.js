@@ -22,6 +22,7 @@ export default class AdminRouter {
         this.adminRouter.post('/user/warnings-history/:id', adminAuthorization, asyncHandler(AdminController.getUserWarningsHistory));
         
         this.adminRouter.get('/applications/:id', adminAuthorization, asyncHandler(AdminController.getApplications));
+        this.adminRouter.put('/applications/:id', adminAuthorization, asyncHandler(AdminController.updateApplicationStatus));
 
 
         return this.adminRouter;

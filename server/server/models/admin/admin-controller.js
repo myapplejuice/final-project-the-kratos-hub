@@ -87,9 +87,9 @@ export default class AdminController {
     }
 
     static async updateApplicationStatus(req, res) {
-        const { applicationId, newStatus } = req.body;
+        const { applicationId, status, adminReply } = req.body;
 
-        const response = await AdminDBService.updateApplicationStatus(applicationId, newStatus);
-        return res.status(200).json({ success: true, message: response.message, applicationId, newStatus });
+        const response = await AdminDBService.updateApplicationStatus(applicationId, status, adminReply);
+        return res.status(200).json({ success: true, message: response.message });
     }
 }

@@ -21,9 +21,7 @@ export default function VerificationApplication() {
             title: `Application ${action === 'approve' ? 'Approval' : 'Rejection'}`,
             content: <p>Are you sure you want to {action} this verification application?</p>,
             actions: [
-                {
-                    label: "Cancel", color: "#5a5a5aff", onClick: null
-                },
+                { label: "Cancel", color: "#5a5a5aff", onClick: null },
                 {
                     label: "Confirm", color: action === 'approve' ? "#10b981" : "#ef4444", onClick: async () => {
 
