@@ -20,8 +20,8 @@ export function PopupsProvider({ children }) {
   const hideDialog = () => setDialogState((prev) => ({ ...prev, visible: false }));
 
   // Alert
-  const showAlert = (message) => setAlertState({ visible: true, message, title: "Alert" });
-  const hideAlert = () => setAlertState({ visible: false, message: "" });
+  const showAlert = ({ title, message}) => setAlertState({ visible: true, message, title });
+  const hideAlert = () => setAlertState({ visible: false, title: "", message: "" });
 
   // Spinner
   const showSpinner = () => setSpinnerVisible(true);
@@ -74,7 +74,7 @@ export function PopupsProvider({ children }) {
 
       <Dialog
         visible={alertState.visible}
-        title="Alert"
+        title={alertState.title}
         actions={[{ label: "OK", onClick: hideAlert, color: "#e74c3c" }]}
         onClose={hideAlert}
       >

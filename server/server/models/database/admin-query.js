@@ -48,6 +48,7 @@ export function adminQuery() {
                 Education VARCHAR(1000) NOT NULL,
                 Images NVARCHAR(MAX) NULL DEFAULT '[]',
                 Links NVARCHAR(MAX) NULL DEFAULT '[]',
+                AdminReply NVARCHAR(500) NULL DEFAULT '',
 
                 CONSTRAINT FK_VerificationApplications_Users FOREIGN KEY (UserId)
                     REFERENCES dbo.Users(Id)

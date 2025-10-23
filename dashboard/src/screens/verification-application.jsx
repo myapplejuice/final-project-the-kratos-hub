@@ -7,15 +7,18 @@ import APIService from "../utils/api-service";
 import { routes } from "../utils/constants";
 
 export default function VerificationApplication() {
-    const { showDialog, showMessager, showOptions } = usePopups();
+    const { showDialog, showMessager, showOptions, showAlert } = usePopups();
     const nav = useNavigate();
     const location = useLocation();
     const user = location.state?.user;
     const [app, setApp] = useState(location.state?.app);
+    const [note, setNote] = useState('');
 
     function handleApplicationAction(action) {
+        if (!note) return showAlert({ title: "Note Required", message: "Please provide a note for them to know reasoning of your decision", });
+
         showDialog({
-            title: `Application ${action.charAt(0).toUpperCase() + action.slice(1)}`,
+            title: `Application ${action === 'approve' ? 'Approval' : 'Rejection'}`,
             content: <p>Are you sure you want to {action} this verification application?</p>,
             actions: [
                 {
@@ -23,9 +26,11 @@ export default function VerificationApplication() {
                 },
                 {
                     label: "Confirm", color: action === 'approve' ? "#10b981" : "#ef4444", onClick: async () => {
+
                         const result = await APIService.routes.updateApplicationStatus({
                             applicationId: app.id,
-                            status: action
+                            status: action,
+                            adminReply: note
                         });
 
                         if (result.success) {
@@ -42,7 +47,7 @@ export default function VerificationApplication() {
         });
     }
 
-    const getStatusColor = (status) => {
+    function getStatusColor(status) {
         switch (status) {
             case 'pending': return '#f59e0b';
             case 'approved': return '#10b981';
@@ -52,7 +57,7 @@ export default function VerificationApplication() {
         }
     };
 
-    const getStatusLabel = (status) => {
+    function getStatusLabel(status) {
         switch (status) {
             case 'pending': return 'Pending Review';
             case 'approved': return 'Approved';
@@ -64,69 +69,6 @@ export default function VerificationApplication() {
 
     return (
         <>
-            {app && app.status === 'pending' &&
-                <div style={{
-                    display: 'flex', gap: '15px', marginTop: '10px', width: '100%', position: 'fixed', bottom: 0, zIndex: 9999, padding: 35,
-                    background: 'rgba(255, 255, 255, 0)',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
-                    borderTop: '1px solid rgba(255, 255, 255, 0.3)',
-                }}>
-                    <button
-                        onClick={() => handleApplicationAction('approve')}
-                        style={{
-                            flex: 1,
-                            padding: '15px 20px',
-                            borderRadius: '12px',
-                            border: 'none',
-                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                            color: 'white',
-                            fontWeight: '600',
-                            fontSize: '14px',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s ease',
-                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
-                        }}
-                        onMouseOver={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 6px 15px rgba(16, 185, 129, 0.4)';
-                        }}
-                        onMouseOut={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
-                        }}
-                    >
-                        Approve Application
-                    </button>
-                    <button
-                        onClick={() => handleApplicationAction('reject')}
-                        style={{
-                            flex: 1,
-                            padding: '15px 20px',
-                            borderRadius: '12px',
-                            border: 'none',
-                            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                            color: 'white',
-                            fontWeight: '600',
-                            fontSize: '14px',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s ease',
-                            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
-                        }}
-                        onMouseOver={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 6px 15px rgba(239, 68, 68, 0.4)';
-                        }}
-                        onMouseOut={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
-                        }}
-                    >
-                        Reject Application
-                    </button>
-                </div>
-            }
-
             <main className="user-profile-main">
                 <div style={{
                     alignItems: 'center',
@@ -141,10 +83,8 @@ export default function VerificationApplication() {
                             fontSize: 40,
                             fontWeight: 'bold',
                             margin: 0,
-                            background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
                             backgroundClip: 'text',
                             WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent'
                         }}>
                             Verification Application
                         </p>
@@ -191,7 +131,7 @@ export default function VerificationApplication() {
                     </div>
                 </div>
 
-                <div className="profile-card" style={{ marginBottom: 300 }}>
+                <div className="profile-card" style={{ marginBottom: app.status === 'pending' ? 30 : 300 }}>
                     <div className="card-header">
                         <p className="card-title">Application Details</p>
                         <div
@@ -258,6 +198,128 @@ export default function VerificationApplication() {
                         )}
                     </div>
                 </div>
+
+                {app.status === 'pending' && (
+                    <div className="profile-card" style={{ marginBottom: 300 }}>
+                        <div className="card-header">
+                            <p className="card-title">Application Review</p>
+                            <div style={{
+                                background: '#f59e0b',
+                                padding: '6px 12px',
+                                borderRadius: '15px',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                color: 'white'
+                            }}>
+                                ACTION REQUIRED
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '10px 0' }}>
+                            <div>
+                                <label style={{
+                                    display: 'block',
+                                    color: '#93c5fd',
+                                    fontWeight: '600',
+                                    marginBottom: '10px',
+                                    fontSize: '14px'
+                                }}>
+                                    Review Notes & Message to User:
+                                </label>
+                                <textarea
+                                    placeholder="Enter your review notes, feedback, or message that will be sent to the user..."
+                                    style={{
+                                        width: '100%',
+                                        minHeight: '120px',
+                                        padding: '15px',
+                                        borderRadius: '12px',
+                                        border: '1px solid rgba(96, 165, 250, 0.3)',
+                                        background: 'rgba(255, 255, 255, 0.05)',
+                                        color: 'white',
+                                        fontSize: '14px',
+                                        resize: 'vertical',
+                                        fontFamily: 'inherit',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                    onFocus={(e) => {
+                                        e.target.style.background = 'rgba(255, 255, 255, 0.08)';
+                                        e.target.style.borderColor = 'rgba(96, 165, 250, 0.6)';
+                                    }}
+                                    onBlur={(e) => {
+                                        e.target.style.background = 'rgba(255, 255, 255, 0.05)';
+                                        e.target.style.borderColor = 'rgba(96, 165, 250, 0.3)';
+                                    }}
+                                    value={note}
+                                    onChange={(e) => setNote(e.target.value)}
+                                />
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
+                                <button
+                                    onClick={() => handleApplicationAction('approve')}
+                                    style={{
+                                        flex: 1,
+                                        padding: '15px 20px',
+                                        borderRadius: '12px',
+                                        border: 'none',
+                                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                                        color: 'white',
+                                        fontWeight: '600',
+                                        fontSize: '14px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease',
+                                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
+                                    }}
+                                    onMouseOver={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                        e.currentTarget.style.boxShadow = '0 6px 15px rgba(16, 185, 129, 0.4)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                                    }}
+                                >
+                                    Approve Application
+                                </button>
+                                <button
+                                    onClick={() => handleApplicationAction('reject')}
+                                    style={{
+                                        flex: 1,
+                                        padding: '15px 20px',
+                                        borderRadius: '12px',
+                                        border: 'none',
+                                        background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                                        color: 'white',
+                                        fontWeight: '600',
+                                        fontSize: '14px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease',
+                                        boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
+                                    }}
+                                    onMouseOver={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                        e.currentTarget.style.boxShadow = '0 6px 15px rgba(239, 68, 68, 0.4)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
+                                    }}
+                                >
+                                    Reject Application
+                                </button>
+                            </div>
+
+                            <p style={{
+                                color: '#64748b',
+                                margin: 0,
+                                fontSize: '12px',
+                                textAlign: 'center',
+                                fontStyle: 'italic'
+                            }}>
+                                Your review notes will be included in the notification sent to the user
+                            </p>
+                        </div>
+                    </div>
+                )}
             </main>
         </>
     );

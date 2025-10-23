@@ -85,4 +85,11 @@ export default class AdminController {
         const applications = await AdminDBService.fetchApplications();
         return res.status(200).json({ success: true, applications });
     }
+
+    static async updateApplicationStatus(req, res) {
+        const { applicationId, newStatus } = req.body;
+
+        const response = await AdminDBService.updateApplicationStatus(applicationId, newStatus);
+        return res.status(200).json({ success: true, message: response.message, applicationId, newStatus });
+    }
 }
