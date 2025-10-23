@@ -160,18 +160,11 @@ export default function UserProfile() {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                    {admin.permissions !== 'read' &&
+                    {!admin.permissions.includes('read') &&
                         <div className="action-buttons">
-                            <button className="action-button notify" onClick={handleNotify}>Notify User</button>
-                            {admin.permissions === "all" || admin.permissions === 'termination' &&
-                                <button
-                                    className={`action-button ${user.isTerminated ? 'reactivate' : 'terminate'}`}
-                                    onClick={handleTerminate}
-                                >
-                                    {user.isTerminated ? "Re-activate" : "Terminate"}
-                                </button>
-                            }
-                            <button className="action-button warning" onClick={handleWarningIssue}>Issue Warning</button>
+                            {(admin.permissions.includes('notify') || admin.permissions.includes('all')) && <button className="action-button notify" onClick={handleNotify}>Notify User</button>}
+                            {(admin.permissions.includes('termination') || admin.permissions.includes('all')) && <button className={`action-button ${user.isTerminated ? 'reactivate' : 'terminate'}`} onClick={handleTerminate}      >    {user.isTerminated ? "Re-activate" : "Terminate"} </button>}
+                            {(admin.permissions.includes('warn') || admin.permissions.includes('all')) && <button className="action-button warning" onClick={handleWarningIssue}>Issue Warning</button>}
                         </div>
                     }
 

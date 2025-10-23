@@ -231,7 +231,7 @@ export default function VerificationApplication() {
                                 Review Notes & Message to User:
                             </label>
 
-                            {(app.status === 'pending' && (admin.permissions === 'all' || admin.permissions === 'verifications')) ? (
+                            {(app.status === 'pending' && (admin.permissions.includes('all') || admin.permissions.includes('verifications'))) ? (
                                 <textarea
                                     placeholder="Enter your review notes, feedback, or message that will be sent to the user..."
                                     style={{
@@ -276,7 +276,7 @@ export default function VerificationApplication() {
                             )}
                         </div>
 
-                        {app.status === 'pending' && (admin.permissions === 'all' || admin.permissions === 'verifications') &&
+                        {app.status === 'pending' && (admin.permissions.includes('all') || admin.permissions.includes('verifications')) &&
                             <>
                                 <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
                                     <button
