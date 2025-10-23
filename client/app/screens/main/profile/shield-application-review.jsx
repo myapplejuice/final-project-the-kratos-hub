@@ -305,6 +305,22 @@ export default function ShieldApplicationReview() {
                 onPress={handleUpdate}
             />
 
+            <FloatingActionButton
+                icon={Images.email}
+                label={"Administration Note"}
+                iconSize={18}
+                labelStyle={{ fontSize: scaleFont(14) }}
+                style={{ width: '100%', height: 50, backgroundColor: colors.accentGreen }}
+                position={{ bottom: insets.bottom + 20, left: 20, right: 20 }}
+                visible={fabVisible && application.status !== 'pending' && application.status !== 'cancelled'}
+                onPress={() => {
+                    createAlert({
+                        title: 'Administration Note',
+                        text: application.adminReply
+                    })
+                }}
+            />
+
             <AppScroll extraBottom={200} onScrollSetStates={setFabVisible}>
                 <View style={{ alignItems: 'center' }}>
                     <Image source={Images.shield} style={{ width: 80, height: 80, tintColor: 'white', marginTop: 25 }} />

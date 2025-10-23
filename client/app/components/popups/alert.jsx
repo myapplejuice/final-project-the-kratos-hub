@@ -1,5 +1,5 @@
 import React from "react";
-import { Animated, StyleSheet, TouchableOpacity, Platform, View } from "react-native";
+import { Animated, StyleSheet, TouchableOpacity, Platform, View, Dimensions } from "react-native";
 import { scaleFont } from "../../common/utils/scale-fonts";
 import usePopupAnimation from "./popup-animation";
 import { colors } from "../../common/settings/styling";
@@ -8,7 +8,7 @@ import AppText from "../screen-comps/app-text";
 export default function Alert({
     title = "Alert",
     text = "Something happened.",
-    onPress = () => {},
+    onPress = () => { },
     buttonText = "Ok"
 }) {
     const { opacity, translateY } = usePopupAnimation();
@@ -22,7 +22,9 @@ export default function Alert({
                         <AppText style={styles.title}>{title}</AppText>
                         <View style={styles.titleLine} />
                     </View>
-                    <AppText style={styles.text}>{text}</AppText>
+                    <View style={{ maxHeight: Dimensions.get('window').height * 0.8 }}>
+                        <AppText style={styles.text}>{text}</AppText>
+                    </View>
                 </View>
 
                 {/* Single Action Button */}
@@ -68,7 +70,7 @@ const styles = StyleSheet.create({
         }),
     },
     header: {
-        padding:15,
+        padding: 15,
         backgroundColor: "rgba(255,255,255,0.03)",
         borderBottomWidth: 1,
         borderBottomColor: "rgba(255,255,255,0.1)",
@@ -95,7 +97,7 @@ const styles = StyleSheet.create({
     buttonRow: {
         flexDirection: "row",
         justifyContent: "flex-end",
-        padding:15,
+        padding: 15,
     },
     buttonContainer: {
         alignItems: "center",

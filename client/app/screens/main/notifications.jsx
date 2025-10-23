@@ -419,7 +419,7 @@ export default function Notifications() {
                                                     }
                                                     {notification.clickableDestination === 'verification-reply' &&
                                                         <View style={{ width: '20%', justifyContent: 'center', alignItems: 'center' }}>
-                                                            <AppImage source={Images.shield} style={{ width: 60, height: 60, borderRadius: 10, tintColor: 'white' }} resizeMode='contain' />
+                                                            <AppImage source={Images.shield} style={{ width: 30, height: 30, borderRadius: 10, tintColor: 'white' }} resizeMode='contain' />
                                                         </View>
                                                     }
                                                 </TouchableOpacity>
