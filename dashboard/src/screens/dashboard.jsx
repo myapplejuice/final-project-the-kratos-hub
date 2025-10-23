@@ -7,6 +7,7 @@ import { usePopups } from "../utils/popups.provider";
 import { images } from "../utils/assets";
 import { routes } from "../utils/constants";
 import colors from "../utils/stylings";
+import { formatPermissions } from "../utils/utilities";
 
 export default function Dashboard() {
     const admin = SessionStorageService.getItem("admin").admin;
@@ -135,69 +136,90 @@ export default function Dashboard() {
     };
 
     function handleEditAdmin(admin) {
-        showInput({
-            title: "Edit Admin",
-            message: "Enter new admin details below (skip fields to keep untouched):",
-            inputs: [
-                {
-                    name: "accessId",
-                    label: "Access ID",
-                    type: "text",
-                    placeholder: "Enter new access ID",
-                    required: false
+     showInput({
+    title: "Edit Admin",
+    message: "Enter new admin details below (skip fields to keep untouched):",
+    inputs: [
+        {
+            name: "accessId",
+            label: "Access ID",
+            type: "text",
+            placeholder: "Enter new access ID",
+            required: false
+        },
+        {
+            name: "accessPassword", 
+            label: "Password",
+            type: "password",
+            placeholder: "Enter new password",
+            required: false
+        },
+        {
+            name: "permissions",
+            label: "Permissions",
+            type: "checkbox-group",
+            options: [
+                { 
+                    value: "all", 
+                    label: "All Permissions",
+                    onClickRemoveOthers: true 
                 },
-                {
-                    name: "accessPassword",
-                    label: "Password",
-                    type: "password",
-                    placeholder: "Enter new password",
-                    required: false
+                { 
+                    value: "read", 
+                    label: "Read Only", 
+                    onClickRemoveOthers: true 
                 },
-                {
-                    name: "permissions",
-                    label: "Permissions",
-                    type: "select",
-                    options: [
-                        { value: "all", label: "All Permissions" },
-                        { value: "read", label: "Read Only" },
-                        { value: "verifications", label: "Resolving Verifications" },
-                        { value: "termination", label: "Terminating Users" },
-                    ],
-                    required: false
-                }
+                { 
+                    value: "verifications", 
+                    label: "Resolving Verifications" 
+                },
+                { 
+                    value: "termination", 
+                    label: "Terminating Users" 
+                },
+                  { 
+                    value: "notify", 
+                    label: "Notifying Users" 
+                },
+                { 
+                    value: "warn", 
+                    label: "Issueing Warnings" 
+                },
             ],
-            onConfirm: async (values) => {
-                hideInput();
-                let { accessId, accessPassword, permissions } = values;
+            required: false
+        }
+    ],
+    onConfirm: async (values) => {
+        hideInput();
+        let { accessId, accessPassword, permissions } = values;
+        console.log(values)
 
-                if (!accessId) accessId = admin.accessId;
-                if (!permissions) permissions = admin.permissions;
+        if (!accessId) accessId = admin.accessId;
+        if (!permissions) permissions = admin.permissions;
 
-                const payload = {
-                    id: admin.id,
-                    accessId,
-                    accessPassword: accessPassword ? accessPassword : null,
-                    permissions
-                }
+        const payload = {
+            id: admin.id,
+            accessId,
+            accessPassword: accessPassword ? accessPassword : null,
+            permissions
+        }
 
-                try {
-                    showSpinner();
-
-                    const result = await APIService.routes.updateAdmin(payload);
-
-                    if (result.success) {
-                        const admin = result.data.admin;
-                        setAdmins(prev => prev.map(prevAdmin => prevAdmin.id === admin.id ? admin : prevAdmin));
-                    }
-                } catch (error) {
-                    console.error("Error fetching dashboard data:", error);
-                } finally {
-                    hideSpinner();
-                }
-            },
-            confirmText: "Confirm"
-        });
-
+        try {
+            showSpinner();
+            const result = await APIService.routes.updateAdmin(payload);
+            
+            if (result.success) {
+                const admin = result.data.admin;
+                setAdmins(prev => prev.map(prevAdmin => prevAdmin.id === admin.id ? admin : prevAdmin));
+            }
+        } catch (error) {
+            console.error("Error updating admin:", error);
+        } finally {
+            hideSpinner();
+        }
+    },
+    confirmText: "Confirm"
+});
     }
 
     function handleTerminateAdmin(admin) {
@@ -472,7 +494,7 @@ export default function Dashboard() {
                                                                     <strong>Created:</strong> {new Date(admin.dateOfCreation).toLocaleString("en-US")}
                                                                 </div>
                                                                 <div className="detail-item">
-                                                                    <strong>Permissions:</strong> {admin.permissions ? admin.permissions.charAt(0).toUpperCase() + admin.permissions.slice(1) : 'No permissions'}
+                                                                    <strong>Permissions:</strong> {admin.permissions === 'read' ? "Read Only" : formatPermissions(admin.permissions)}
                                                                 </div>
                                                             </div>
 
