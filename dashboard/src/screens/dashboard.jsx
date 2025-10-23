@@ -476,7 +476,7 @@ export default function Dashboard() {
                                                                 </div>
                                                             </div>
 
-                                                            {/* Action Buttons */}
+                                                           {!admin.isSeed &&
                                                             <div className="expanded-actions" style={{
                                                                 display: 'flex',
                                                                 gap: '10px',
@@ -516,6 +516,7 @@ export default function Dashboard() {
                                                                     {admin.isActive ? "Terminate Admin" : "Restore Admin"}
                                                                 </button>
                                                             </div>
+                                                            }
                                                         </div>
                                                     </td>
                                                 </tr>

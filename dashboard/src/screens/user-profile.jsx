@@ -6,8 +6,10 @@ import colors from "../utils/stylings";
 import { formatDate } from "../utils/date-time";
 import APIService from "../utils/api-service";
 import * as styles from "../user-profile.css";
+import SessionStorageService from "../utils/session-storage-service";
 
 export default function UserProfile() {
+    const admin = SessionStorageService.getItem("admin").admin;
     const { showDialog, showMessager, showOptions } = usePopups();
     const nav = useNavigate();
     const location = useLocation();
@@ -158,16 +160,20 @@ export default function UserProfile() {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                    <div className="action-buttons">
-                        <button className="action-button notify" onClick={handleNotify}>Notify User</button>
-                        <button
-                            className={`action-button ${user.isTerminated ? 'reactivate' : 'terminate'}`}
-                            onClick={handleTerminate}
-                        >
-                            {user.isTerminated ? "Re-activate" : "Terminate"}
-                        </button>
-                        <button className="action-button warning" onClick={handleWarningIssue}>Issue Warning</button>
-                    </div>
+                    {admin.permissions !== 'read' &&
+                        <div className="action-buttons">
+                            <button className="action-button notify" onClick={handleNotify}>Notify User</button>
+                            {admin.permissions === "all" || admin.permissions === 'termination' &&
+                                <button
+                                    className={`action-button ${user.isTerminated ? 'reactivate' : 'terminate'}`}
+                                    onClick={handleTerminate}
+                                >
+                                    {user.isTerminated ? "Re-activate" : "Terminate"}
+                                </button>
+                            }
+                            <button className="action-button warning" onClick={handleWarningIssue}>Issue Warning</button>
+                        </div>
+                    }
 
                     <a href={user.imageURL || images.profilePic} target="_blank">
                         <div className="profile-image-wrapper">

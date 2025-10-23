@@ -5,8 +5,10 @@ import { usePopups } from "../utils/popups.provider";
 import colors from "../utils/stylings";
 import APIService from "../utils/api-service";
 import { routes } from "../utils/constants";
+import SessionStorageService from "../utils/session-storage-service";
 
 export default function VerificationApplication() {
+    const admin = SessionStorageService.getItem("admin").admin;
     const { showDialog, showMessager, showOptions, showAlert } = usePopups();
     const nav = useNavigate();
     const location = useLocation();
@@ -229,7 +231,7 @@ export default function VerificationApplication() {
                                 Review Notes & Message to User:
                             </label>
 
-                            {app.status === 'pending' ? (
+                            {(app.status === 'pending' && (admin.permissions === 'all' || admin.permissions === 'verifications')) ? (
                                 <textarea
                                     placeholder="Enter your review notes, feedback, or message that will be sent to the user..."
                                     style={{
@@ -274,7 +276,7 @@ export default function VerificationApplication() {
                             )}
                         </div>
 
-                        {app.status === 'pending' &&
+                        {app.status === 'pending' && (admin.permissions === 'all' || admin.permissions === 'verifications') &&
                             <>
                                 <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
                                     <button
