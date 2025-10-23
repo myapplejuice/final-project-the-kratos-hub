@@ -21,7 +21,9 @@ export default function Dashboard() {
     const [users, setUsers] = useState([]);
     const [verificationApps, setVerificationApps] = useState([]);
     const [visibleUsers, setVisibleUsers] = useState([]);
-    const [filterTerminated, setFilterTerminated] = useState(false);
+    const [visibleApps, setVisibleApps] = useState([]);
+    const [filterTerminated, setFilterTerminated] = useState('all');
+    const [filterAppStatus, setFilterAppStatus] = useState('all');
 
     useEffect(() => {
         if (!admin) return;
@@ -58,20 +60,46 @@ export default function Dashboard() {
                     user.lastname.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     user.id.toLowerCase().includes(searchQuery.toLowerCase());
 
-                const matchesStatus = user.isTerminated === filterTerminated;
+                let matchesStatus
+                if (filterTerminated === 'all') {
+                    matchesStatus = true
+                } else {
+                    matchesStatus = user.isTerminated && filterTerminated === 'terminated' || !user.isTerminated && filterTerminated === 'active'
+                }
 
                 return matchesSearch && matchesStatus;
             });
 
             setVisibleUsers(filtered);
+        } else if (activeSection === "Verification Applications") {
+            const filtered = verificationApps.filter(app => {
+                const user = users.find(user => user.id === app.userId);
+                const idString = String(app.id);
+                const matchesSearch =
+                    user.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    user.lastname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    idString.toLowerCase().includes(searchQuery.toLowerCase());
+
+                let matchesStatus = true;
+                if (filterAppStatus === "all") {
+                    matchesStatus = true;
+                } else if (filterAppStatus === "pending") {
+                    matchesStatus = app.status === "pending";
+                } else if (filterAppStatus === "approved") {
+                    matchesStatus = app.status === "approved";
+                } else if (filterAppStatus === "rejected") {
+                    matchesStatus = app.status === "rejected";
+                } else if (filterAppStatus === "cancelled") {
+                    matchesStatus = app.status === "cancelled";
+                }
+
+                return matchesSearch && matchesStatus;
+            });
+
+            setVisibleApps(filtered);
         }
-    }, [users, activeSection, searchQuery, filterTerminated]);
+    }, [users, filterAppStatus, verificationApps, activeSection, searchQuery, filterTerminated]);
 
-
-    function handleSignOut() {
-        SessionStorageService.removeItem("admin");
-        nav("/");
-    }
 
     function handleAddAdmin() {
         showInput({
@@ -136,90 +164,90 @@ export default function Dashboard() {
     };
 
     function handleEditAdmin(admin) {
-     showInput({
-    title: "Edit Admin",
-    message: "Enter new admin details below (skip fields to keep untouched):",
-    inputs: [
-        {
-            name: "accessId",
-            label: "Access ID",
-            type: "text",
-            placeholder: "Enter new access ID",
-            required: false
-        },
-        {
-            name: "accessPassword", 
-            label: "Password",
-            type: "password",
-            placeholder: "Enter new password",
-            required: false
-        },
-        {
-            name: "permissions",
-            label: "Permissions",
-            type: "checkbox-group",
-            options: [
-                { 
-                    value: "all", 
-                    label: "All Permissions",
-                    onClickRemoveOthers: true 
+        showInput({
+            title: "Edit Admin",
+            message: "Enter new admin details below (skip fields to keep untouched):",
+            inputs: [
+                {
+                    name: "accessId",
+                    label: "Access ID",
+                    type: "text",
+                    placeholder: "Enter new access ID",
+                    required: false
                 },
-                { 
-                    value: "read", 
-                    label: "Read Only", 
-                    onClickRemoveOthers: true 
+                {
+                    name: "accessPassword",
+                    label: "Password",
+                    type: "password",
+                    placeholder: "Enter new password",
+                    required: false
                 },
-                { 
-                    value: "verifications", 
-                    label: "Resolving Verifications" 
-                },
-                { 
-                    value: "termination", 
-                    label: "Terminating Users" 
-                },
-                  { 
-                    value: "notify", 
-                    label: "Notifying Users" 
-                },
-                { 
-                    value: "warn", 
-                    label: "Issueing Warnings" 
-                },
+                {
+                    name: "permissions",
+                    label: "Permissions",
+                    type: "checkbox-group",
+                    options: [
+                        {
+                            value: "all",
+                            label: "All Permissions",
+                            onClickRemoveOthers: true
+                        },
+                        {
+                            value: "read",
+                            label: "Read Only",
+                            onClickRemoveOthers: true
+                        },
+                        {
+                            value: "verifications",
+                            label: "Resolving Verifications"
+                        },
+                        {
+                            value: "termination",
+                            label: "Terminating Users"
+                        },
+                        {
+                            value: "notify",
+                            label: "Notifying Users"
+                        },
+                        {
+                            value: "warn",
+                            label: "Issueing Warnings"
+                        },
+                    ],
+                    required: false
+                }
             ],
-            required: false
-        }
-    ],
-    onConfirm: async (values) => {
-        hideInput();
-        let { accessId, accessPassword, permissions } = values;
-        console.log(values)
+            onConfirm: async (values) => {
+                hideInput();
+                let { accessId, accessPassword, permissions } = values;
+                console.log(values)
 
-        if (!accessId) accessId = admin.accessId;
-        if (!permissions) permissions = admin.permissions;
+                if (!accessId) accessId = admin.accessId;
+                if (!permissions) permissions = admin.permissions;
 
-        const payload = {
-            id: admin.id,
-            accessId,
-            accessPassword: accessPassword ? accessPassword : null,
-            permissions
-        }
+                const payload = {
+                    id: admin.id,
+                    accessId,
+                    accessPassword: accessPassword ? accessPassword : null,
+                    permissions
+                }
 
-        try {
-            showSpinner();
-            const result = await APIService.routes.updateAdmin(payload);
-            
-            if (result.success) {
-                const admin = result.data.admin;
-                setAdmins(prev => prev.map(prevAdmin => prevAdmin.id === admin.id ? admin : prevAdmin));
-            }
-        } catch (error) {
-            console.error("Error updating admin:", error);
-        } finally {
-            hideSpinner();
-        }
-    },
-    confirmText: "Confirm"
-});
+                try {
+                    showSpinner();
+                    const result = await APIService.routes.updateAdmin(payload);
+
+                    if (result.success) {
+                        const admin = result.data.admin;
+                        setAdmins(prev => prev.map(prevAdmin => prevAdmin.id === admin.id ? admin : prevAdmin));
+                    }
+                } catch (error) {
+                    console.error("Error updating admin:", error);
+                } finally {
+                    hideSpinner();
+                }
+            },
+            confirmText: "Confirm"
+        });
     }
 
     function handleTerminateAdmin(admin) {
@@ -232,7 +260,7 @@ export default function Dashboard() {
                 },
                 {
                     label: "Yes", color: !admin.isActive ? "#cc2e2eff" : "#187ad4ff", onClick: async () => {
-                        
+
                         const result = await APIService.routes.terminateAdmin({ id: admin.id, isActive: !admin.isActive });
 
                         console.log(result);
@@ -274,7 +302,10 @@ export default function Dashboard() {
                         </div>
                     }
                     <div>
-                        <button className="admin-logout-btn" onClick={handleSignOut}>Sign Out</button>
+                        <button className="admin-logout-btn" onClick={() => {
+                            SessionStorageService.removeItem("admin");
+                            nav("/");
+                        }}>Sign Out</button>
                     </div>
                 </div>
             </aside>
@@ -283,8 +314,11 @@ export default function Dashboard() {
                 {activeSection === "Users" && (
                     <div className="admin-section" style={{ marginBottom: 300 }}>
                         <h2>Users</h2>
-                        <p style={{ margin: '0 0 20px 0', color: '#6b7280' }}>
+                        <p style={{ margin: '0 0 0px 0', color: '#6b7280' }}>
                             Total: {users.length} / Filter: {visibleUsers.length}
+                        </p>
+                        <p style={{ margin: '0 0 20px 0', color: '#6b7280' }}>
+                            Active: {users.filter(user => !user.isTerminated).length} / Terminations: {users.filter(user => user.isTerminated).length}
                         </p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: 25 }}>
                             <input
@@ -297,17 +331,25 @@ export default function Dashboard() {
                             />
 
                             <button
-                                onClick={() => setFilterTerminated(false)}
+                                onClick={() => setFilterTerminated('all')}
                                 className="status-btn active-btn"
-                                style={{ background: !filterTerminated ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'rgba(233, 233, 233, 0.1)' }}
+                                style={{ background: filterTerminated === 'all' ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' : 'rgba(233, 233, 233, 0.1)' }}
+                            >
+                                All
+                            </button>
+
+                            <button
+                                onClick={() => setFilterTerminated('active')}
+                                className="status-btn active-btn"
+                                style={{ background: filterTerminated === 'active' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'rgba(233, 233, 233, 0.1)' }}
                             >
                                 Active
                             </button>
 
                             <button
-                                onClick={() => setFilterTerminated(true)}
+                                onClick={() => setFilterTerminated('terminated')}
                                 className="status-btn terminated-btn"
-                                style={{ background: filterTerminated ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'rgba(233, 233, 233, 0.1)' }}
+                                style={{ background: filterTerminated === 'terminated' ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'rgba(233, 233, 233, 0.1)' }}
                             >
                                 Terminated
                             </button>
@@ -340,7 +382,81 @@ export default function Dashboard() {
 
                 {activeSection === "Verification Applications" && (
                     <div className="admin-section">
-                        <h2>Trainer Applications</h2>
+                        <h2>{activeSection}</h2>
+                        <p style={{ margin: '0 0 20px 0', color: '#6b7280' }}>
+                            Total: {verificationApps.length} / Filter: {visibleApps.length}
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: 25 }}>
+                            <input
+                                type="text"
+                                placeholder="ID, User ID, Firstname, Lastname..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="search-input"
+                                style={{ flex: 1 }}
+                            />
+
+                            <button
+                                onClick={() => setFilterAppStatus('all')}
+                                className="status-btn active-btn"
+                                style={{
+                                    background: filterAppStatus === 'all' ?
+                                        'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' :
+                                        'rgba(233, 233, 233, 0.1)'
+                                }}
+                            >
+                                All
+                            </button>
+
+                            <button
+                                onClick={() => setFilterAppStatus("pending")}
+                                className="status-btn active-btn"
+                                style={{
+                                    background: filterAppStatus === "pending" ?
+                                        'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' :
+                                        'rgba(233, 233, 233, 0.1)'
+                                }}
+                            >
+                                Pending
+                            </button>
+
+                            <button
+                                onClick={() => setFilterAppStatus("approved")}
+                                className="status-btn active-btn"
+                                style={{
+                                    background: filterAppStatus === "approved" ?
+                                        'linear-gradient(135deg, #10b981 0%, #059669 100%)' :
+                                        'rgba(233, 233, 233, 0.1)'
+                                }}
+                            >
+                                Approved
+                            </button>
+
+                            <button
+                                onClick={() => setFilterAppStatus("rejected")}
+                                className="status-btn terminated-btn"
+                                style={{
+                                    background: filterAppStatus === "rejected" ?
+                                        'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' :
+                                        'rgba(233, 233, 233, 0.1)'
+                                }}
+                            >
+                                Rejected
+                            </button>
+
+                            <button
+                                onClick={() => setFilterAppStatus("cancelled")}
+                                className="status-btn terminated-btn"
+                                style={{
+                                    background: filterAppStatus === "cancelled" ?
+                                        'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)' :
+                                        'rgba(233, 233, 233, 0.1)'
+                                }}
+                            >
+                                Cancelled
+                            </button>
+                        </div>
+
                         <table className="admin-table">
                             <thead>
                                 <tr>
@@ -352,7 +468,7 @@ export default function Dashboard() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {[...verificationApps].sort((a, b) => new Date(b.dateOfCreation) - new Date(a.dateOfCreation)).map((app, i) => (
+                                {[...visibleApps].sort((a, b) => new Date(b.dateOfCreation) - new Date(a.dateOfCreation)).map((app, i) => (
                                     <tr key={app.id} onClick={() => nav(routes.verification_application, { state: { app, user: users.find(u => u.id === app.userId) } })}>
                                         <td>{app.id}</td>
                                         <td>{(users.find(u => u.id === app.userId)?.firstname + " " + users.find(u => u.id === app.userId)?.lastname) || "Unknown / User Discarded"}</td>
@@ -498,46 +614,46 @@ export default function Dashboard() {
                                                                 </div>
                                                             </div>
 
-                                                           {!admin.isSeed &&
-                                                            <div className="expanded-actions" style={{
-                                                                display: 'flex',
-                                                                gap: '10px',
-                                                                marginTop: '20px',
-                                                                justifyContent: 'flex-end'
-                                                            }}>
-                                                                <button
-                                                                    className="edit-admin-btn"
-                                                                    onClick={() => handleEditAdmin(admin)}
-                                                                    style={{
-                                                                        padding: '8px 16px',
-                                                                        background: 'rgba(59, 130, 246, 0.2)',
-                                                                        color: '#3b82f6',
-                                                                        border: '1px solid rgba(59, 130, 246, 0.4)',
-                                                                        borderRadius: '6px',
-                                                                        cursor: 'pointer',
-                                                                        fontSize: '14px',
-                                                                        fontWeight: '500'
-                                                                    }}
-                                                                >
-                                                                    Edit Admin
-                                                                </button>
-                                                                <button
-                                                                    className={admin.isActive ? "terminate-admin-btn" :  "restore-admin-btn"}
-                                                                    onClick={() => handleTerminateAdmin(admin)}
-                                                                    style={{
-                                                                        padding: '8px 16px',
-                                                                        background: admin.isActive ?  'rgba(239, 68, 68, 0.2)': 'rgba(143, 246, 255, 0.2)',
-                                                                        color: admin.isActive ? '#ef4444' : '#3bf6c7ff',
-                                                                        border: admin.isActive ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(143, 246, 255, 0.4)',
-                                                                        borderRadius: '6px',
-                                                                        cursor: 'pointer',
-                                                                        fontSize: '14px',
-                                                                        fontWeight: '500'
-                                                                    }}
-                                                                >
-                                                                    {admin.isActive ? "Terminate Admin" : "Restore Admin"}
-                                                                </button>
-                                                            </div>
+                                                            {!admin.isSeed &&
+                                                                <div className="expanded-actions" style={{
+                                                                    display: 'flex',
+                                                                    gap: '10px',
+                                                                    marginTop: '20px',
+                                                                    justifyContent: 'flex-end'
+                                                                }}>
+                                                                    <button
+                                                                        className="edit-admin-btn"
+                                                                        onClick={() => handleEditAdmin(admin)}
+                                                                        style={{
+                                                                            padding: '8px 16px',
+                                                                            background: 'rgba(59, 130, 246, 0.2)',
+                                                                            color: '#3b82f6',
+                                                                            border: '1px solid rgba(59, 130, 246, 0.4)',
+                                                                            borderRadius: '6px',
+                                                                            cursor: 'pointer',
+                                                                            fontSize: '14px',
+                                                                            fontWeight: '500'
+                                                                        }}
+                                                                    >
+                                                                        Edit Admin
+                                                                    </button>
+                                                                    <button
+                                                                        className={admin.isActive ? "terminate-admin-btn" : "restore-admin-btn"}
+                                                                        onClick={() => handleTerminateAdmin(admin)}
+                                                                        style={{
+                                                                            padding: '8px 16px',
+                                                                            background: admin.isActive ? 'rgba(239, 68, 68, 0.2)' : 'rgba(143, 246, 255, 0.2)',
+                                                                            color: admin.isActive ? '#ef4444' : '#3bf6c7ff',
+                                                                            border: admin.isActive ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(143, 246, 255, 0.4)',
+                                                                            borderRadius: '6px',
+                                                                            cursor: 'pointer',
+                                                                            fontSize: '14px',
+                                                                            fontWeight: '500'
+                                                                        }}
+                                                                    >
+                                                                        {admin.isActive ? "Terminate Admin" : "Restore Admin"}
+                                                                    </button>
+                                                                </div>
                                                             }
                                                         </div>
                                                     </td>
