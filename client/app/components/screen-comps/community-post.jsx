@@ -85,51 +85,74 @@ export default function CommunityPost({
                             />
                         </TouchableOpacity>
                         <View style={{ justifyContent: 'center', marginStart: 12, flex: 1 }}>
-                         
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <TouchableOpacity
-                                    onPress={handleUserPress}>
-                                    <AppText style={{
-                                        color: 'white',
-                                        fontWeight: '700',
-                                        fontSize: scaleFont(14),
-                                    }}>
-                                        {postUser.firstname} {postUser.lastname}
-                                    </AppText>
-                                </TouchableOpacity>
 
-                                {postUser.trainerProfile?.trainerStatus === 'active' && (
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                                     <TouchableOpacity
-                                        onPress={() => router.push(routes.PERSONAL_TRAINING_EXPLANATION)}
-                                        style={{
-                                            height: 14,
-                                            width: 14,
-                                            borderRadius: 10,
-                                            backgroundColor: colors.main,
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                            marginStart: 6,
+                                        onPress={handleUserPress}>
+                                        <AppText style={{
+                                            color: 'white',
+                                            fontWeight: '700',
+                                            fontSize: scaleFont(14),
                                         }}>
-                                        <Image
-                                            source={Images.personalTrainer}
-                                            style={{ width: 10, height: 10, tintColor: 'white' }}
-                                        />
+                                            {postUser.firstname} {postUser.lastname}
+                                        </AppText>
                                     </TouchableOpacity>
-                                )}
 
-                                {postUser.trainerProfile?.isVerified && (
-                                    <TouchableOpacity
-                                        onPress={() => router.push(routes.SHIELD_OF_TRUST)}
-                                        style={{ justifyContent: 'center', alignItems: 'center', marginStart: 6 }}>
-                                        <Image
-                                            source={Images.shieldFour}
+                                    {postUser.trainerProfile?.trainerStatus === 'active' && (
+                                        <TouchableOpacity
+                                            onPress={() => router.push(routes.PERSONAL_TRAINING_EXPLANATION)}
                                             style={{
-                                                width: 17,
-                                                height: 17,
-                                            }}
-                                        />
-                                    </TouchableOpacity>
-                                )}
+                                                height: 14,
+                                                width: 14,
+                                                borderRadius: 10,
+                                                backgroundColor: colors.main,
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                                marginStart: 6,
+                                            }}>
+                                            <Image
+                                                source={Images.personalTrainer}
+                                                style={{ width: 10, height: 10, tintColor: 'white' }}
+                                            />
+                                        </TouchableOpacity>
+                                    )}
+
+                                    {postUser.trainerProfile?.isVerified && (
+                                        <TouchableOpacity
+                                            onPress={() => router.push(routes.SHIELD_OF_TRUST)}
+                                            style={{ justifyContent: 'center', alignItems: 'center', marginStart: 6 }}>
+                                            <Image
+                                                source={Images.shieldFour}
+                                                style={{
+                                                    width: 17,
+                                                    height: 17,
+                                                }}
+                                            />
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
+
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        router.push({
+                                            pathname: routes.COMMUNITY_POST_REPORT_FORM,
+                                            params: {
+                                                reportedPostId: post.id,
+                                                reportedUserId: postUser.id
+                                            }
+                                        })
+                                    }}
+                                >
+                                    <Image
+                                        source={Images.warning}
+                                        style={{
+                                            width: 22,
+                                            height: 22,
+                                            tintColor: colors.mutedText
+                                        }}
+                                    />
+                                </TouchableOpacity>
                             </View>
 
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -368,23 +391,24 @@ export default function CommunityPost({
                 </View>
 
                 {!isUserPost && (
-                    <TouchableOpacity
-                        onPress={onSavePress}
-                        style={{
-                            padding: 8,
-                        }}
-                    >
-                        <Image
-                            source={isSavedByUser ? Images.bookmark : Images.bookmarkOutline}
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <TouchableOpacity
+                            onPress={onSavePress}
                             style={{
-                                width: 22,
-                                height: 22,
-                                tintColor: colors.mutedText
+                                padding: 5,
                             }}
-                        />
-                    </TouchableOpacity>
+                        >
+                            <Image
+                                source={isSavedByUser ? Images.bookmark : Images.bookmarkOutline}
+                                style={{
+                                    width: 22,
+                                    height: 22,
+                                    tintColor: colors.mutedText
+                                }}
+                            />
+                        </TouchableOpacity>
+                    </View>
                 )}
-
             </View>
         </View>
     );
