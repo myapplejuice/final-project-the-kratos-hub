@@ -83,4 +83,9 @@ export default class SocketController {
         const io = Server.getIoSocket();
         io.to(userId).emit('new-friend-status', { status, friendId });
     }
+
+    static emitGrantBadge(userId){
+        const io = Server.getIoSocket();
+        io.to(userId).emit('grant-badge');
+    }
 }

@@ -26,13 +26,14 @@ export default function VerificationApplication() {
                     label: "Confirm", color: action === 'approve' ? "#10b981" : "#ef4444", onClick: async () => {
 
                         const result = await APIService.routes.updateApplication({
+                            userId: user.id,
                             applicationId: app.id,
-                            status: action,
+                            status: action === 'reject' ? 'rejected' : 'approved',
                             adminReply: note
                         });
 
                         if (result.success) {
-                            setApp({ ...app, status: action, adminReply: note });
+                            setApp({ ...app, status: action === 'reject' ? 'rejected' : 'approved', adminReply: note });
                             showDialog({
                                 title: "Application Updated",
                                 content: <p>Application has been {action}d</p>,
@@ -136,7 +137,7 @@ export default function VerificationApplication() {
                             className="status-badge"
                             style={{ background: getStatusColor(app.status) }}
                         >
-                            {getStatusLabel(app.status)}
+                            {getStatusLabel(app.status === 'approved' ? 'Approved' : app.status === 'rejected' ? 'Rejected' : app.status === 'cancelled' ? 'Cancelled' : 'Pending Review')}
                         </div>
                     </div>
                     <div className="card-details">
@@ -267,7 +268,7 @@ export default function VerificationApplication() {
                                     margin: 0,
                                     whiteSpace: 'pre-wrap'
                                 }}>
-                                    {note || "No review notes provided."}
+                                    {app.adminReply || "No review notes provided."}
                                 </p>
                             )}
                         </div>

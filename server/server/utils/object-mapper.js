@@ -144,6 +144,7 @@ export default class ObjectMapper {
             CurrentWarningCount: 'currentWarningCount',
             Offense: 'offense',
             Summary: 'summary',
+            AdminReply: 'adminReply',
 
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
@@ -293,6 +294,7 @@ export default class ObjectMapper {
             currentWarningCount: 'CurrentWarningCount',
             offense: 'Offense',
             summary: 'Summary',
+            adminReply: 'AdminReply',
         };
         return map[key] || key;
     }

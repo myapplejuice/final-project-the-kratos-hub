@@ -87,9 +87,34 @@ export default class AdminController {
     }
 
     static async updateApplicationStatus(req, res) {
-        const { applicationId, status, adminReply } = req.body;
+        const { userId, applicationId, status, adminReply } = req.body;
 
-        const response = await AdminDBService.updateApplicationStatus(applicationId, status, adminReply);
+        const response = await AdminDBService.updateApplicationStatus(userId, applicationId, status, adminReply);
+
+        if (response.success) {
+            const payload = {
+                userId,
+                notification:
+                    status === 'approved' ?
+                        `Verification Application\n\nYour verification has been approved, and you are granted a shield of trust.` :
+                        `Verification Application\n\nYour verification has been rejected. Tab for more information.`,
+                seen: false,
+                clickable: true,
+                clickableInfo: JSON.stringify({ applicationId }),
+                clickableDestination: 'verification-reply',
+                sentiment: status === 'approved' ? "positive" : "negative",
+                dateOfCreation: new Date()
+            }
+
+            const notificationId = await NotificationsDBService.pushNotification(payload);
+            payload.id = notificationId;
+            payload.clickableInfo = JSON.parse(payload.clickableInfo);
+            SocketController.emitNotification(userId, payload);
+
+            if (status === 'approved')
+                SocketController.emitGrantBadge(userId);
+        }
+
         return res.status(200).json({ success: true, message: response.message });
     }
 }

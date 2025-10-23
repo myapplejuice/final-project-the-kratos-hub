@@ -221,4 +221,38 @@ export default class AdminDBService {
             return null;
         }
     }
+
+    static async updateApplicationStatus(userId, applicationId, status, adminReply) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'Id', sql.Int, applicationId);
+            Database.addInput(request, 'UserId', sql.Int, userId);
+            Database.addInput(request, 'Status', sql.VarChar(20), status);
+            Database.addInput(request, 'AdminReply', sql.NVarChar(500), adminReply);
+
+            const updateQuery = `
+                UPDATE VerificationApplications
+                SET Status = @Status, AdminReply = @AdminReply
+                WHERE Id = @Id AND UserId = @UserId
+            `;
+
+            const result = await request.query(updateQuery);
+
+            if (!result.rowsAffected[0]) {
+                return { success: false, message: 'Application not found or status not updated' };
+            }
+
+            if (status === 'approved'){
+                const request = Database.getRequest();
+                Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
+                const query = `UPDATE UserTrainerProfile SET IsVerified = 1 WHERE UserId = @UserId`;
+                await request.query(query);
+            }
+
+            return { success: true, message: `Status updated to "${status}"`, applicationId };
+        } catch (err) {
+            console.error('updateApplicationStatus error:', err);
+            return { success: false, message: 'Failed to update status' };
+        }
+    }
 }
