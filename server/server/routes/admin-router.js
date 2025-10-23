@@ -18,6 +18,7 @@ export default class AdminRouter {
         this.adminRouter.post('/users/notify/:id', adminAuthorization, asyncHandler(AdminController.notifyUser));
 
         this.adminRouter.post('/user/reputation-profile/:id', adminAuthorization, asyncHandler(AdminController.getUserReputationProfile));
+        this.adminRouter.post('/user/warn/:id', adminAuthorization, asyncHandler(AdminController.issueWarning));
 
         return this.adminRouter;
     }

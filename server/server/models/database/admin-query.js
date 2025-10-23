@@ -60,8 +60,9 @@ export function adminQuery() {
             CREATE TABLE dbo.AdminUserWarnings (
                 Id INT IDENTITY(1,1) PRIMARY KEY,
                 UserId UNIQUEIDENTIFIER NOT NULL,
-                DateOfCreation DATETIME2 NOT NULL,
+                AdminId UNIQUEIDENTIFIER NOT NULL,
 
+                DateOfCreation DATETIME2 NOT NULL,
                 Summary NVARCHAR(MAX) NOT NULL,
                 ImagesURLS NVARCHAR(MAX) NULL DEFAULT '[]',
             );

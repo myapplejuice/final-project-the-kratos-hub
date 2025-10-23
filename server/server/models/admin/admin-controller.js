@@ -64,4 +64,16 @@ export default class AdminController {
 
         return res.status(200).json({ success: true });
     }
+
+    static async issueWarning(req, res) {
+        const { id, summary } = req.body;
+        const adminId = req.params.id;
+
+        console.log(adminId)
+
+        const response = await AdminDBService.createUserWarning(id, adminId, summary);
+        if (!response.success) return res.status(400).json({ success: false, message: response.message });
+
+        return res.status(200).json({ success: true, message: response.message });
+    }
 }

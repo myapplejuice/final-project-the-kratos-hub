@@ -110,39 +110,26 @@ export default function UserProfile() {
 
     function handleWarningIssue(){
         showMessager({
-            title: "Send a Message",
-            sendLabel: "Send Now",
-            onSend: async (message) => {
-                if (!message) return;
+            title: "Warning Issue",
+            sendLabel: "Send",
+            placeholder: "Explain thouroughly about the reason of the warning...",    
+            onSend: async (summary) => {
+                if (!summary) return;
 
-                showOptions({
-                    title: "Notification Sentiment",
-                    current: "",
-                    options: [
-                        { label: "Negative", color: "#cc2e2e", value: "negative" },
-                        { label: "Positive", color: "#40cc2e", value: "positive" },
-                        { label: "Neutral", color: "#6b6b6b", value: "normal" },
-                    ],
-                    onConfirm: async (chosen) => {
-                        if (!chosen) return;
-
-                        const result = await APIService.routes.notifyUser({
-                            id: user.id,
-                            message,
-                            imagesURLS: [],
-                            sentiment: chosen.value,
-                        });
-
-                        if (result.success) {
-                            showDialog({
-                                title: "Notification Sent",
-                                content: <p>Message sent and user will be notified</p>,
-                                actions: [{ label: "Ok", color: colors.primary, onClick: null }],
-                            });
-                        }
-                    },
+                const result = await APIService.routes.warnUser({
+                    id: user.id,
+                    summary,
                 });
 
+                if (result.success) {
+                    showDialog({
+                        title: "Warning Issued",
+                        content: <p>Warning issued and user will be notified</p>,
+                        actions: [{ label: "Ok", color: colors.primary, onClick: null }],
+                    });
+
+                    setUser({ ...user, currentWarningCount: user.currentWarningCount + 1, offenseCount: user.offenseCount + 1 });
+                }
             },
         })
     }

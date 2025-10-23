@@ -10,7 +10,7 @@ export function PopupsProvider({ children }) {
   const [spinnerVisible, setSpinnerVisible] = useState(false);
   const [dialogState, setDialogState] = useState({ visible: false, title: "", content: null, actions: [] });
   const [alertState, setAlertState] = useState({ visible: false, message: "", title: "" });
-  const [messagerState, setMessagerState] = useState({ visible: false, title: "", onClose: null, onSend: null, sendLabel: "Send" });
+  const [messagerState, setMessagerState] = useState({ visible: false, placeholder: "Type your message...", title: "", onClose: null, onSend: null, sendLabel: "Send" });
   const [optionsState, setOptionsState] = useState({ visible: false, title: "", current: "", options: [], onClose: null, onConfirm: null, confirmText: "Select", cancelText: "Cancel" });
 
   // Dialog
@@ -28,8 +28,8 @@ export function PopupsProvider({ children }) {
   const hideSpinner = () => setSpinnerVisible(false);
 
   // Messager
-  const showMessager = ({ title, onClose, onSend, sendLabel }) => setMessagerState({ visible: true, title, onClose, onSend, sendLabel });
-  const hideMessager = () => { messagerState.onClose?.(); setMessagerState({ visible: false, title: "", onClose: null, onSend: null, sendLabel: "Send" }); };
+  const showMessager = ({ title, placeholder, onClose, onSend, sendLabel }) => setMessagerState({ visible: true, placeholder, title, onClose, onSend, sendLabel });
+  const hideMessager = () => { messagerState.onClose?.(); setMessagerState({ visible: false, placeholder: "Type your message...", title: "", onClose: null, onSend: null, sendLabel: "Send" }); };
 
   const showOptions = ({
     title,
@@ -84,6 +84,7 @@ export function PopupsProvider({ children }) {
       <Messager
         visible={messagerState.visible}
         title={messagerState.title}
+        placeholder={messagerState.placeholder}
         onClose={hideMessager}
         onSend={messagerState.onSend}
         sendLabel={messagerState.sendLabel}

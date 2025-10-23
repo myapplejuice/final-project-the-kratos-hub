@@ -100,14 +100,17 @@ export default class AdminDBService {
             Database.addInput(request, 'Id', sql.UniqueIdentifier, id);
 
             const query = `
+            -- Update Users table
             UPDATE Users
             SET IsTerminated = ${IsTerminated ? 1 : 0}
             WHERE Id = @Id;
 
+            -- Update UserReputationProfile
             UPDATE UserReputationProfile
             SET
                 TerminationCount = TerminationCount + CASE WHEN ${IsTerminated ? 1 : 0} = 1 THEN 1 ELSE 0 END,
-                ReinstatementCount = ReinstatementCount + CASE WHEN ${IsTerminated ? 1 : 0} = 0 THEN 1 ELSE 0 END
+                ReinstatementCount = ReinstatementCount + CASE WHEN ${IsTerminated ? 1 : 0} = 0 THEN 1 ELSE 0 END,
+                CurrentWarningCount = CASE WHEN ${IsTerminated ? 1 : 0} = 0 THEN 0 ELSE CurrentWarningCount END
             WHERE UserId = @Id;
         `;
 
@@ -118,4 +121,34 @@ export default class AdminDBService {
             return null;
         }
     }
+
+    static async createUserWarning(id,adminId, summary) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'UserId', sql.UniqueIdentifier, id);
+            Database.addInput(request, 'AdminId', sql.UniqueIdentifier, adminId);
+            Database.addInput(request, 'DateOfCreation', sql.DateTime2, new Date());
+            Database.addInput(request, 'Summary', sql.NVarChar(sql.MAX), summary);
+
+            const query = `
+            -- Insert the warning
+            INSERT INTO AdminUserWarnings (UserId, AdminId, DateOfCreation, Summary)
+            VALUES (@UserId, @AdminId, @DateOfCreation, @Summary);
+
+            -- Increment offense and current warning counts
+            UPDATE UserReputationProfile
+            SET 
+                OffenseCount = OffenseCount + 1,
+                CurrentWarningCount = CurrentWarningCount + 1
+            WHERE UserId = @UserId;
+        `;
+
+            const result = await request.query(query);
+            return { success: result.rowsAffected[0] > 0 };
+        } catch (err) {
+            console.error('createUserWarning error:', err);
+            return null;
+        }
+    }
+
 }

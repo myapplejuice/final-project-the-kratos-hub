@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import colors from "../utils/stylings";
 
-export default function Messager({ visible = false, title, onClose, onSend, sendLabel = "Send" }) {
+export default function Messager({ visible = false, placeholder = "Type your message...", title, onClose, onSend, sendLabel = "Send" }) {
     const [message, setMessage] = useState("");
 
     if (!visible) return null;
@@ -75,7 +75,7 @@ export default function Messager({ visible = false, title, onClose, onSend, send
                     style={inputStyle}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Type your message..."
+                    placeholder={placeholder}
                 />
                 <div style={actionsStyle}>
                     {onClose && (
