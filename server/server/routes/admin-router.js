@@ -12,8 +12,8 @@ export default class AdminRouter {
 
         this.adminRouter.get('/test-token/:id', adminAuthorization, asyncHandler(AdminController.testAdminToken));
         this.adminRouter.post('/access', asyncHandler(AdminController.access));
+        this.adminRouter.post('/dashboard-data/:id', adminAuthorization, asyncHandler(AdminController.getDashboardData));
 
-        this.adminRouter.get('/users/:id', adminAuthorization, asyncHandler(AdminController.getUsers));
         this.adminRouter.delete('/users/terminate/:id', adminAuthorization, asyncHandler(AdminController.terminateUser));
         this.adminRouter.post('/users/notify/:id', adminAuthorization, asyncHandler(AdminController.notifyUser));
 
@@ -21,7 +21,6 @@ export default class AdminRouter {
         this.adminRouter.post('/user/warn/:id', adminAuthorization, asyncHandler(AdminController.issueWarning));
         this.adminRouter.post('/user/warnings-history/:id', adminAuthorization, asyncHandler(AdminController.getUserWarningsHistory));
         
-        this.adminRouter.get('/applications/:id', adminAuthorization, asyncHandler(AdminController.getApplications));
         this.adminRouter.put('/applications/:id', adminAuthorization, asyncHandler(AdminController.updateApplicationStatus));
 
 

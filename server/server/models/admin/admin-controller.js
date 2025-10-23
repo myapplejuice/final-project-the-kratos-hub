@@ -22,9 +22,16 @@ export default class AdminController {
         return res.status(200).json({ success: true, message: response.message, admin: response.admin, token });
     }
 
-    static async getUsers(req, res) {
-        const users = await AdminDBService.fetchUsers();
-        return res.status(200).json({ success: true, users });
+    static async getDashboardData(req, res) {
+        const { isSeed } = req.body;
+
+        const [users, applications, admins] = await Promise.all([
+            AdminDBService.fetchUsers(),
+            AdminDBService.fetchApplications(),
+            isSeed ? AdminDBService.fetchAdmins() : []
+        ]);
+
+        return res.status(200).json({ success: true, users, applications, admins });
     }
 
     static async getUserReputationProfile(req, res) {
@@ -81,10 +88,6 @@ export default class AdminController {
         return res.status(200).json({ success: true, warningsHistory: response });
     }
 
-    static async getApplications(req, res) {
-        const applications = await AdminDBService.fetchApplications();
-        return res.status(200).json({ success: true, applications });
-    }
 
     static async updateApplicationStatus(req, res) {
         const { userId, applicationId, status, adminReply } = req.body;

@@ -63,6 +63,30 @@ export default class AdminDBService {
         }
     }
 
+    static async fetchAdmins() {
+        try {
+            const request = Database.getRequest();
+            const query = `SELECT * FROM Admins`;
+            const result = await request.query(query);
+
+            if (!result.recordset.length) return [];
+
+            const admins = result.recordset.map(row => {
+                const admin = {};
+                for (const key in row) {
+                    if (key !== 'AccessPassword')
+                        admin[ObjectMapper.toCamelCase(key)] = row[key];
+                }
+                return admin;
+            });
+
+            return admins;
+        } catch (err) {
+            console.error('fetchAdmins error:', err);
+            return null;
+        }
+    }
+
     static async fetchUserReputationProfile(id) {
         try {
             const request = Database.getRequest();
@@ -242,7 +266,7 @@ export default class AdminDBService {
                 return { success: false, message: 'Application not found or status not updated' };
             }
 
-            if (status === 'approved'){
+            if (status === 'approved') {
                 const request = Database.getRequest();
                 Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
                 const query = `UPDATE UserTrainerProfile SET IsVerified = 1, TrainerStatus = 'active' WHERE UserId = @UserId`;

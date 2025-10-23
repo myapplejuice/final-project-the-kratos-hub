@@ -14,57 +14,36 @@ export default function Dashboard() {
 
     const [activeSection, setActiveSection] = useState("Users");
     const [searchQuery, setSearchQuery] = useState("");
+    const [admins, setAdmins] = useState([]);
     const [users, setUsers] = useState([]);
     const [verificationApps, setVerificationApps] = useState([]);
     const [visibleUsers, setVisibleUsers] = useState([]);
     const [filterTerminated, setFilterTerminated] = useState(false);
 
+
     useEffect(() => {
-        async function fetchUserList() {
+        async function fetchDashboardData() {
             try {
                 showSpinner();
-
-                const result = await APIService.routes.users();
+                const result = await APIService.routes.dashboardData();
+                
                 if (result.success) {
                     const users = result.data.users;
-                    setUsers(users);
-                }
-            }
-            catch (err) {
-                showDialog({
-                    title: 'Failure',
-                    content: <p>Failed to users, contact head of operations</p>,
-                    actions: [{ label: "Ok", color: "#cc2e2eff", onClick: null }],
-                });
-            } finally {
-                hideSpinner();
-            }
-        }
-
-        async function fetchApplicationsList() {
-            try {
-                showSpinner();
-
-                const result = await APIService.routes.applications();
-                if (result.success) {
-                    console.log(result)
+                    const admins = result.data.admins;
                     const applications = result.data.applications;
+
+                    setUsers(users);
+                    setAdmins(admins);
                     setVerificationApps(applications);
                 }
-            }
-            catch (err) {
-                showDialog({
-                    title: 'Failure',
-                    content: <p>Failed to applications, contact head of operations</p>,
-                    actions: [{ label: "Ok", color: "#cc2e2eff", onClick: null }],
-                });
+            } catch (error) {
+                console.error("Error fetching dashboard data:", error);
             } finally {
                 hideSpinner();
             }
         }
 
-        fetchApplicationsList();
-        fetchUserList();
+        fetchDashboardData();
     }, []);
 
     useEffect(() => {
