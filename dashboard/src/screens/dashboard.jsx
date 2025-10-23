@@ -383,9 +383,14 @@ export default function Dashboard() {
                 {activeSection === "Verification Applications" && (
                     <div className="admin-section">
                         <h2>{activeSection}</h2>
-                        <p style={{ margin: '0 0 20px 0', color: '#6b7280' }}>
+                        <div>
+                        <p style={{ margin: '0 0 0px 0', color: '#6b7280' }}>
                             Total: {verificationApps.length} / Filter: {visibleApps.length}
                         </p>
+                            <p style={{ margin: '0 0 20px 0', color: '#6b7280' }}>
+                           Approved: {verificationApps.filter(app => app.status === 'approved').length} / Pending: {verificationApps.filter(app => app.status === 'pending').length} / Rejected: {verificationApps.filter(app => app.status === 'rejected').length} / Cancelled: {verificationApps.filter(app => app.status === 'cancelled').length}
+                        </p>
+                        </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: 25 }}>
                             <input
                                 type="text"
