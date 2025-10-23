@@ -29,7 +29,6 @@ import FadeInOut from '../../../components/effects/fade-in-out';
 export default function CommunityPostReportForm() {
     const reportedUserId = useLocalSearchParams().reportedUserId;
     const reportedPostId = useLocalSearchParams().reportedPostId;
-    console.log(reportedUserId, reportedPostId)
     const { setLibraryActive } = useContext(LibraryContext);
     const { setCameraActive } = useContext(CameraContext);
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert, createOptions } = usePopups();
@@ -37,60 +36,28 @@ export default function CommunityPostReportForm() {
     const insets = useSafeAreaInsets();
 
     const [fabVisible, setFabVisible] = useState(true);
-    const [selectedImage, setSelectedImage] = useState({});
-    const [imagePreviewVisible, setImagePreviewVisible] = useState(false);
-
     const [offense, setOffense] = useState('');
     const [summary, setSummary] = useState('');
-    const [images, setImages] = useState([]);
-
-    async function handleNewImage(asset) {
-        const payload = {
-            fileName: asset.fileName || asset.uri.split('/').pop(),
-            url: asset.uri,
-            type: asset.type || 'image/jpeg'
-        }
-        setImages(prev => [...prev, payload]);
-    }
 
     async function handleReport() {
+        Keyboard.dismiss();
+        if (!summary || !offense) {
+            return createToast({ message: 'You must provide a summary of your report and choose the offense committed' });
+        }
         try {
             showSpinner();
-
-            const uploadedImages = await Promise.all(
-                images.map(async (image) => {
-                    if (image.url?.includes("res.cloudinary.com")) {
-                        return image;
-                    }
-
-                    try {
-                        const url = await APIService.uploadImageToCloudinary({
-                            uri: image.url || image.uri,
-                            folder: "user_reports_images",
-                            fileName: `user${user.id}_${Date.now()}_${image.fileName}_report_on_${reportedUserId}.jpg`,
-                        });
-
-                        return { ...image, url };
-                    } catch (err) {
-                        console.error(`Failed to upload image ${image.fileName}:`, err);
-                        return image;
-                    }
-                })
-            );
-
-            setImages(uploadedImages);
 
             const payload = {
                 userId: user.id,
                 reportedUserId,
-                type: "user",
+                type: `post-${reportedPostId}`,
                 offense,
                 summary,
-                imagesURLS: uploadedImages.map(image => image.url)
+                imagesURLS: []
             }
 
             const result = await APIService.reports.create(payload);
-            if (result.success){
+            if (result.success) {
                 createAlert({ title: 'User Report', text: "Your report has been submitted, we will review it as soon as possible and take appropriate action! Thank you for your patience.", onPress: () => router.back() });
             } else {
                 createAlert({ title: 'Error', text: result.message });
@@ -104,22 +71,6 @@ export default function CommunityPostReportForm() {
 
     return (
         <>
-            <ImageCapture onConfirm={async (image) => handleNewImage(image)} />
-            <FadeInOut visible={imagePreviewVisible} style={{ position: 'absolute', zIndex: 9999, top: 0, left: 0, bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.8)' }}>
-                <TouchableOpacity onPress={() => { setImagePreviewVisible(false), setSelectedImage({}), setFabVisible(true) }} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <AppText style={{ color: 'white', fontSize: scaleFont(30), marginBottom: 15 }}>Tap anywhere to dismiss</AppText>
-                    <Image source={{ uri: selectedImage.url }} style={{ width: 500, height: 500, alignSelf: 'center' }} resizeMode='contain' />
-                    <AnimatedButton
-                        title={'Delete Photo'}
-                        onPress={() => { setImagePreviewVisible(false), setSelectedImage({}), setImages(images.filter(i => i.url !== selectedImage.url)), setFabVisible(true) }}
-                        style={{ backgroundColor: colors.negativeRed, padding: 15, borderRadius: 30, width: '90%', marginTop: 15 }}
-                        textStyle={{ fontSize: scaleFont(15) }}
-                        leftImage={Images.trash}
-                        leftImageStyle={{ width: 20, height: 20, marginEnd: 5 }}
-                    />
-                </TouchableOpacity>
-            </FadeInOut>
-
             <FloatingActionButton
                 icon={Images.email}
                 label={"Submit Report"}
@@ -133,9 +84,9 @@ export default function CommunityPostReportForm() {
 
             <AppScroll extraBottom={200} onScrollSetStates={setFabVisible} >
                 <View style={{ alignItems: 'center' }}>
-                    <AppText style={{ color: 'white', fontSize: scaleFont(22), fontWeight: 'bold', marginTop: 25, marginBottom: 15 }}>User Report Form</AppText>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(22), fontWeight: 'bold', marginTop: 25, marginBottom: 15 }}>Community Post Violation Report</AppText>
                     <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12), textAlign: 'center', lineHeight: 20, marginTop: 5, marginHorizontal: 15 }}>
-                        Fill out the form below - explain briefly about the user's offense. Do not include any personal information or personal exchanges between you and the user. Unserious or unproven allegations should not be included. If the report is deemed to be valid, the user will be penalized.
+                        Fill out the form below - explain thoroughly what you think is wrong with this post and we will take a look at it as soon as possible.
                     </AppText>
                 </View>
 
@@ -202,60 +153,6 @@ export default function CommunityPostReportForm() {
                         color='white'
                         fontWeight='normal'
                     />
-                </View>
-
-                <View style={[styles.sectionHeader, { marginHorizontal: 15 }]}>
-                    <AppText style={styles.sectionTitle}>Images</AppText>
-                    <AppText style={styles.inputHint}>
-                        Your work, certificates and achievements to support your application
-                    </AppText>
-                </View>
-
-                {images.length > 0 && (
-                    <>
-                        {images.map((image, index) => (
-                            <TouchableOpacity onPress={() => { setSelectedImage(image), setImagePreviewVisible(true) }} key={index}
-                                style={[{
-                                    flexDirection: 'row', justifyContent: 'space-between', padding: 20, backgroundColor: colors.cardBackground,
-                                    borderRadius: 20, marginBottom: 10, alignItems: 'center', marginHorizontal: 15
-                                }]}>
-                                <AppText numberOfLines={1} ellipsizeMode="tail" style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12), width: '91%' }}>{image.fileName}</AppText>
-                                <View style={{ width: '9%', alignItems: 'center', flexDirection: 'row', }}>
-                                    <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white', marginStart: 10 }} />
-                                </View>
-                            </TouchableOpacity>
-                        ))}
-                    </>
-                )}
-
-                <View style={{ marginHorizontal: 15 }}>
-                    <TouchableOpacity
-                        onPress={() => {
-                            Keyboard.dismiss();
-
-                            createSelector({
-                                title: "Profile Picture",
-                                text: "Do you want to take a photo using camera or upload an image?",
-                                optionAText: "Take a Photo",
-                                optionBText: "Upload Image",
-                                cancelText: "Cancel",
-                                onPressA: async () => setCameraActive(true),
-                                onPressB: async () => setLibraryActive(true)
-                            });
-                        }}
-                        style={styles.uploadButton}
-                    >
-                        <View style={styles.uploadContent}>
-                            <Image
-                                source={Images.arrow}
-                                style={[styles.uploadIcon, { transform: [{ rotate: '-90deg' }], width: 25, height: 25, marginBottom: 0, marginBottom: 10 }]}
-                            />
-                            <AppText style={styles.uploadText}>Upload Image</AppText>
-                            <AppText style={styles.uploadHint}>
-                                PNG, JPG, JPEG up to 10MB
-                            </AppText>
-                        </View>
-                    </TouchableOpacity>
                 </View>
             </AppScroll>
         </>

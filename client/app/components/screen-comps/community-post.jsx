@@ -133,26 +133,28 @@ export default function CommunityPost({
                                     )}
                                 </View>
 
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        router.push({
-                                            pathname: routes.COMMUNITY_POST_REPORT_FORM,
-                                            params: {
-                                                reportedPostId: post.id,
-                                                reportedUserId: postUser.id
-                                            }
-                                        })
-                                    }}
-                                >
-                                    <Image
-                                        source={Images.warning}
-                                        style={{
-                                            width: 22,
-                                            height: 22,
-                                            tintColor: colors.mutedText
+                                {user.id !== postUser.id && (
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            router.push({
+                                                pathname: routes.COMMUNITY_POST_REPORT_FORM,
+                                                params: {
+                                                    reportedPostId: post.id,
+                                                    reportedUserId: postUser.id
+                                                }
+                                            })
                                         }}
-                                    />
-                                </TouchableOpacity>
+                                    >
+                                        <Image
+                                            source={Images.warning}
+                                            style={{
+                                                width: 22,
+                                                height: 22,
+                                                tintColor: colors.mutedText
+                                            }}
+                                        />
+                                    </TouchableOpacity>
+                                )}
                             </View>
 
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>

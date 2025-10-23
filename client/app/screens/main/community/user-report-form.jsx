@@ -52,6 +52,12 @@ export default function UserReportForm() {
     }
 
     async function handleReport() {
+        Keyboard.dismiss();
+        if (!summary || !offense) {
+            createToast({ message: 'You must provide a summary of your report and choose the offense committed' });
+            return;
+        }
+
         try {
             showSpinner();
 
@@ -88,7 +94,7 @@ export default function UserReportForm() {
             }
 
             const result = await APIService.reports.create(payload);
-            if (result.success){
+            if (result.success) {
                 createAlert({ title: 'User Report', text: "Your report has been submitted, we will review it as soon as possible and take appropriate action! Thank you for your patience.", onPress: () => router.back() });
             } else {
                 createAlert({ title: 'Error', text: result.message });
