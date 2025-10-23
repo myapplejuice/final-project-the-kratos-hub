@@ -63,12 +63,12 @@ export default class AdminDBService {
         }
     }
 
- static async fetchUserReputationProfile(id) {
-    try {
-        const request = Database.getRequest();
-        Database.addInput(request, 'UserId', sql.UniqueIdentifier, id);
+    static async fetchUserReputationProfile(id) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'UserId', sql.UniqueIdentifier, id);
 
-        const query = `
+            const query = `
             IF NOT EXISTS (SELECT 1 FROM UserReputationProfile WHERE UserId = @UserId)
             BEGIN
                 INSERT INTO UserReputationProfile (UserId) VALUES (@UserId)
@@ -77,20 +77,21 @@ export default class AdminDBService {
             SELECT * FROM UserReputationProfile WHERE UserId = @UserId
         `;
 
-        const result = await request.query(query);
-        const row = result.recordset[0];
+            const result = await request.query(query);
+            const row = result.recordset[0];
 
-        const reputationProfile = {};
-        for (const key in row) {
-            reputationProfile[ObjectMapper.toCamelCase(key)] = row[key];
+            const reputationProfile = {};
+            for (const key in row) {
+                reputationProfile[ObjectMapper.toCamelCase(key)] = row[key];
+            }
+
+            reputationProfile.warningsHistory = await AdminDBService.fetchUserWarningsHistory(id);
+            return reputationProfile;
+        } catch (err) {
+            console.error('fetchUserReputationProfile error:', err);
+            return null;
         }
-
-        return reputationProfile;
-    } catch (err) {
-        console.error('fetchUserReputationProfile error:', err);
-        return null;
     }
-}
 
     static async setTerminated(id, IsTerminated) {
         try {
@@ -149,4 +150,33 @@ export default class AdminDBService {
         }
     }
 
+    static async fetchUserWarningsHistory(id) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'UserId', sql.UniqueIdentifier, id);
+
+            const query = `
+            SELECT * FROM AdminUserWarnings
+            WHERE UserId = @UserId
+            ORDER BY DateOfCreation DESC, Id DESC
+        `;
+
+
+            const result = await request.query(query);
+            if (!result.recordset.length) return [];
+
+            const warningsHistory = result.recordset.map(row => {
+                const mapped = {};
+                for (const key in row) {
+                    mapped[ObjectMapper.toCamelCase(key)] = row[key];
+                }
+                return mapped;
+            });
+
+            return warningsHistory;
+        } catch (err) {
+            console.error('fetchUserWarningsHistory error:', err);
+            return null;
+        }
+    }
 }

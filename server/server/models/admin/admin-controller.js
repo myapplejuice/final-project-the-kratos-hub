@@ -30,14 +30,12 @@ export default class AdminController {
     static async getUserReputationProfile(req, res) {
         const { id } = req.body;
         const response = await AdminDBService.fetchUserReputationProfile(id);
-        console.log(response)
         return res.status(200).json({ success: true, reputationProfile: response });
     }
 
     static async terminateUser(req, res) {
         const { id, isTerminated } = req.body;
 
-        console.log(id, isTerminated);
         const response = await AdminDBService.setTerminated(id, isTerminated);
         if (!response.success) res.status(400).json({ success: false, message: response.message });
 
@@ -74,5 +72,12 @@ export default class AdminController {
         if (!response.success) return res.status(400).json({ success: false, message: response.message });
 
         return res.status(200).json({ success: true, message: response.message });
+    }
+
+    static async getUserWarningsHistory(req, res) {
+        const { id } = req.body;
+
+        const response = await AdminDBService.fetchUserWarningsHistory(id);
+        return res.status(200).json({ success: true, warningsHistory: response });
     }
 }
