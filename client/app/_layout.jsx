@@ -131,6 +131,7 @@ function Layout() {
                                             <Stack.Screen name="screens/main/community/post-creator" />
                                             <Stack.Screen name="screens/main/community/user-saved-posts" />
                                             <Stack.Screen name="screens/main/community/post" />
+                                            <Stack.Screen name="screens/main/community/user-report-form" />
 
                                             {/* HOMEPAGE CHILDREN */}
                                             <Stack.Screen name="screens/main/homepage/lean-body-mass" />

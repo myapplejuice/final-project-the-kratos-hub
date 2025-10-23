@@ -53,9 +53,13 @@ export function userTablesQuery() {
                     UserId UNIQUEIDENTIFIER PRIMARY KEY,
                     ReportedUserId UNIQUEIDENTIFIER NOT NULL,
 
-                    Offense VARCHAR(50) NOT NULL DEFAULT 'Communal Misconduct',
+                    Type VARCHAR(20) NOT NULL,
+                    Offense VARCHAR(50) NOT NULL DEFAULT 'Unspecified',
                     Summary VARCHAR(500) NOT NULL DEFAULT 'No description provided',
                     ImagesURLS VARCHAR(MAX) NOT NULL DEFAULT '[]',
+                    
+                    Resolved BIT NOT NULL DEFAULT 0,
+                    AdminNote VARCHAR(MAX) NOT NULL DEFAULT '',
                 );
             END;`
 
@@ -65,6 +69,10 @@ export function userTablesQuery() {
                     UserId UNIQUEIDENTIFIER PRIMARY KEY,
                     Summary VARCHAR(500) NOT NULL DEFAULT 'No description provided',
                     ImagesURLS VARCHAR(MAX) NOT NULL DEFAULT '[]',
+
+                    BugThreatLevel VARCHAR(20) NOT NULL DEFAULT 'Minor',
+                    AdminNote VARCHAR(MAX) NOT NULL DEFAULT '',
+                    Resolved BIT NOT NULL DEFAULT 0
                 );
             END;`
 

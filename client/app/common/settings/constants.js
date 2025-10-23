@@ -26,6 +26,7 @@ export const routes = {
     POST_CREATOR: '/screens/main/community/post-creator',
     USER_SAVED_POSTS: '/screens/main/community/user-saved-posts',
     POST: '/screens/main/community/post',
+    USER_REPORT_FORM: '/screens/main/community/user-report-form',
 
     /* HOMEPAGE CHILDREN */
     LEAN_BODY_MASS: '/screens/main/homepage/lean-body-mass',

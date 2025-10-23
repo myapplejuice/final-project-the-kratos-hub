@@ -179,4 +179,6 @@ export const Images_2 = {
     workoutPlanOutline: require('../../../assets/images/workout-plan-outline.png'),
     wokroutPlanTwo: require('../../../assets/images/workout-plan-2.png'),
     workoutPlanTwoOutline: require('../../../assets/images/workout-plan-2-outline.png'),
+    cardsOne: require('../../../assets/images/cards-1.png'),
+    cardsTwo: require('../../../assets/images/cards-2.png'),
 };

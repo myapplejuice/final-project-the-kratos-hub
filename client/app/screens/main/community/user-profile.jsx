@@ -166,7 +166,12 @@ export default function UserProfile() {
     }
 
     async function handleUserReport() {
-        //TODO WHEN REPORTING AND ADMING PAGE READY
+        router.push({
+            pathname: routes.USER_REPORT_FORM,
+            params: {
+                userId: profile.id
+            }
+        })
     }
 
     function handleTrainerProfile(){
