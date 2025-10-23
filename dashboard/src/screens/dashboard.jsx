@@ -6,6 +6,7 @@ import SessionStorageService from "../utils/session-storage-service";
 import { usePopups } from "../utils/popups.provider";
 import { images } from "../utils/assets";
 import { routes } from "../utils/constants";
+import colors from "../utils/stylings";
 
 export default function Dashboard() {
     const { showMessager, hideMessager, showDialog, showSpinner, hideSpinner } = usePopups();
@@ -97,7 +98,7 @@ export default function Dashboard() {
                                         <td>{user.id}</td>
                                         <td>{user.firstname} {user.lastname}</td>
                                         <td>{user.email}</td>
-                                        <td>{user.isTerminated ? 'Terminated' : 'Active'}</td>
+                                        <td style={{ color: user.isTerminated ? '#ff0000ff' : "#00ff00" }}>{user.isTerminated ? 'Terminated' : 'Active'}</td>
                                         <td><img src={images.arrow} style={{ width: '20px', height: '20px', filter: 'brightness(0) invert(1)' }} /> </td>
                                     </tr>
                                 ))}

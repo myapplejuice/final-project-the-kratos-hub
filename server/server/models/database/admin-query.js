@@ -55,9 +55,22 @@ export function adminQuery() {
             );
         END;`;
 
+    const adminUserWarnings = `IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='AdminUserWarnings' AND xtype='U')
+        BEGIN
+            CREATE TABLE dbo.AdminUserWarnings (
+                Id INT IDENTITY(1,1) PRIMARY KEY,
+                UserId UNIQUEIDENTIFIER NOT NULL,
+                DateOfCreation DATETIME2 NOT NULL,
+
+                Summary NVARCHAR(MAX) NOT NULL,
+                ImagesURLS NVARCHAR(MAX) NULL DEFAULT '[]',
+            );
+        END;`;
+
     const query = [
+        admins,
         verificationApplications,
-        admins
+        adminUserWarnings
     ].map(q => q.trim()).join('\n\n');
 
     return query;

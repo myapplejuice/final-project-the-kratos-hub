@@ -16,7 +16,7 @@ export function userTablesQuery() {
                 );
             END;`
 
-    const userTrainerProfile = `IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='UserTrainerProfile' AND xtype='U')
+    const userTrainerProfileQuery = `IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='UserTrainerProfile' AND xtype='U')
             BEGIN
                 CREATE TABLE dbo.UserTrainerProfile (
                     UserId UNIQUEIDENTIFIER PRIMARY KEY,
@@ -28,6 +28,43 @@ export function userTablesQuery() {
                     CONSTRAINT FK_UserTrainerProfile_Users FOREIGN KEY (UserId)
                         REFERENCES dbo.Users(Id)
                         ON DELETE CASCADE
+                );
+            END;`
+
+    const userReputationProfileQuery = `IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='UserReputationProfile' AND xtype='U')
+            BEGIN
+                CREATE TABLE dbo.UserReputationProfile (
+                    UserId UNIQUEIDENTIFIER PRIMARY KEY,
+                    OffenseCount INT NOT NULL DEFAULT 0,
+                    ReportCount INT NOT NULL DEFAULT 0,
+                    TerminationCount INT NOT NULL DEFAULT 0,
+                    ReinstatementCount INT NOT NULL DEFAULT 0,
+                    CurrentWarningCount INT NOT NULL DEFAULT 0,
+                    
+                    CONSTRAINT FK_UserReputationProfile_Users FOREIGN KEY (UserId)
+                        REFERENCES dbo.Users(Id)
+                        ON DELETE CASCADE
+                );
+            END;`
+
+    const userReportsQuery = `IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='UserReports' AND xtype='U')
+            BEGIN
+                CREATE TABLE dbo.UserReports (
+                    UserId UNIQUEIDENTIFIER PRIMARY KEY,
+                    ReportedUserId UNIQUEIDENTIFIER NOT NULL,
+
+                    Offense VARCHAR(50) NOT NULL DEFAULT 'Communal Misconduct',
+                    Summary VARCHAR(500) NOT NULL DEFAULT 'No description provided',
+                    ImagesURLS VARCHAR(MAX) NOT NULL DEFAULT '[]',
+                );
+            END;`
+
+    const userBugReportsQuery = `IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='UserBugReports' AND xtype='U')
+            BEGIN
+                CREATE TABLE dbo.UserBugReports (
+                    UserId UNIQUEIDENTIFIER PRIMARY KEY,
+                    Summary VARCHAR(500) NOT NULL DEFAULT 'No description provided',
+                    ImagesURLS VARCHAR(MAX) NOT NULL DEFAULT '[]',
                 );
             END;`
 
@@ -226,7 +263,10 @@ export function userTablesQuery() {
 
     const query = [
         userQuery,
-        userTrainerProfile,
+        userTrainerProfileQuery,
+        userReputationProfileQuery,
+        userReportsQuery,
+        userBugReportsQuery,
         userNotificationsQuery,
         userFriendListQuery,
         metricsQuery,

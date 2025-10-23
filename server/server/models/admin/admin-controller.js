@@ -27,6 +27,12 @@ export default class AdminController {
         return res.status(200).json({ success: true, users });
     }
 
+    static async getUserReputationProfile(req, res) {
+        const { id } = req.body;
+        const response = await AdminDBService.fetchUserReputationProfile(id);
+        return res.status(200).json({ success: true, reputationProfile: response });
+    }
+
     static async terminateUser(req, res) {
         const { id, isTerminated } = req.body;
 

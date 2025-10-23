@@ -11,6 +11,37 @@ export default function UserProfile() {
     const nav = useNavigate();
     const location = useLocation();
     const [user, setUser] = useState(location.state?.user);
+    const [reputationProfile, setReputationProfile] = useState({});
+
+    useEffect(() => {
+        if (!user) return;
+
+        async function fetchUserReputation() {
+            const result = await APIService.routes.reputationProfile({ id: user.id });
+
+            if (result.success) {
+
+                const reputationProfile = result.data.reputationProfile;
+                const score =
+                    reputationProfile.reportCount * 1 +
+                    reputationProfile.offenseCount * 2 +
+                    reputationProfile.terminationCount * 5 +
+                    reputationProfile.currentWarningCount * 1 -
+                    reputationProfile.reinstatementCount * 2;
+
+                let tier;
+                if (score <= 1) tier = { label: "Respectable", color: "#10b981" };
+                else if (score <= 3) tier = { label: "Good", color: "#3b82f6" };
+                else if (score <= 6) tier = { label: "Neutral", color: "#9ca3af" };
+                else if (score <= 10) tier = { label: "Concerning", color: "#f59e0b" };
+                else tier = { label: "High-Risk", color: "#ef4444" };
+
+                setReputationProfile({ ...reputationProfile, tier });
+            }
+        }
+
+        fetchUserReputation();
+    }, [user]);
 
     function handleBack() {
         nav(-1);
@@ -39,6 +70,45 @@ export default function UserProfile() {
     }
 
     function handleNotify() {
+        showMessager({
+            title: "Notification",
+            sendLabel: "Send",
+            onSend: async (message) => {
+                if (!message) return;
+
+                showOptions({
+                    title: "Notification Sentiment",
+                    current: "",
+                    options: [
+                        { label: "Negative", color: "#cc2e2e", value: "negative" },
+                        { label: "Positive", color: "#40cc2e", value: "positive" },
+                        { label: "Neutral", color: "#6b6b6b", value: "normal" },
+                    ],
+                    onConfirm: async (chosen) => {
+                        if (!chosen) return;
+
+                        const result = await APIService.routes.notifyUser({
+                            id: user.id,
+                            message,
+                            imagesURLS: [],
+                            sentiment: chosen.value,
+                        });
+
+                        if (result.success) {
+                            showDialog({
+                                title: "Notification Sent",
+                                content: <p>Message sent and user will be notified</p>,
+                                actions: [{ label: "Ok", color: colors.primary, onClick: null }],
+                            });
+                        }
+                    },
+                });
+
+            },
+        })
+    }
+
+    function handleWarningIssue(){
         showMessager({
             title: "Send a Message",
             sendLabel: "Send Now",
@@ -200,6 +270,23 @@ export default function UserProfile() {
                         >
                             {user.isTerminated ? "Re-activate" : "Terminate"}
                         </button>
+                         <button
+                            onClick={handleWarningIssue}
+                            style={{
+                                padding: '12px 24px',
+                                borderRadius: '12px',
+                                border: 'none',
+                                background: '#ff9e30ff',
+                                color: 'white',
+                                fontWeight: '600',
+                                fontSize: '14px',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease',
+                                minWidth: '120px'
+                            }}
+                        >
+                            Issue Warning
+                        </button>
                     </div>
 
                     {/* Profile Picture */}
@@ -263,10 +350,10 @@ export default function UserProfile() {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Age:</strong> {user.age}</p>
-                        <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Gender:</strong> {user.gender}</p>
+                        <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Gender:</strong> {user.gender === 'male' ? 'Male' : 'Female'}</p>
                         <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Phone:</strong> {user.phone}</p>
                         <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Email:</strong> {user.email}</p>
-                        <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Created:</strong> {formatDate(user.dateOfCreation, { format: 'MMMM d' }) + ", " + new Date(user.dateOfCreation).getFullYear()}</p>
+                        <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Created At:</strong> {formatDate(user.dateOfCreation, { format: 'MMMM d' }) + ", " + new Date(user.dateOfCreation).getFullYear()}</p>
                     </div>
                 </div>
 
@@ -327,7 +414,7 @@ export default function UserProfile() {
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Status:</strong> {user.trainerProfile?.trainerStatus || "N/A"}</p>
+                        <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Status:</strong> {user.trainerProfile?.trainerStatus === 'active' ? "Active" : "Inactive" || "N/A"}</p>
                         <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Verified:</strong> {user.trainerProfile?.isVerified ? "Yes" : "No"}</p>
                         <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Experience:</strong> {user.trainerProfile?.yearsOfExperience || "N/A"}</p>
                         <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Biography:</strong> {user.trainerProfile?.biography || "No biography"}</p>
@@ -376,6 +463,46 @@ export default function UserProfile() {
                             </div>
                         )}
                     </div>
+                </div>
+
+
+            </div>
+
+            <div style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)',
+                padding: '25px',
+                borderRadius: '16px',
+                boxShadow: '0 8px 25px rgba(0,0,0,0.12)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(10px)',
+                marginTop: 30,
+                marginBottom: 300
+            }}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '20px',
+                        borderBottom: '2px solid rgba(96,165,250,0.3)',
+                        paddingBottom: '8px'
+                    }}>
+                        <p style={{
+                            fontWeight: '700',
+                            margin: 0,
+                            fontSize: '22px',
+                            color: '#60a5fa',
+                        }}>Reputation</p>
+
+                         <div style={{ display: 'flex', alignItems: 'center', background: reputationProfile.tier?.color, width: 'fit-content', height: 'fit-content', marginBottom: 5, padding: 0, lineHeight: 1, paddingInline: 15, borderRadius: 15, height: '30px' }}>
+                            <p style={{ color: 'white', fontWeight: 'bolder', }}>{ reputationProfile.tier?.label}</p>
+                        </div>
+                    </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Number of Reports:</strong> {reputationProfile.reportCount || 0}</p>
+                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Offenses Count:</strong> {user.offenseCount || 0}</p>
+                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Termination Count:</strong> {user.terminationCount || 0}</p>
+                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Reinstatement Count:</strong> {user.reinstatementCount || 0}</p>
+                    <p style={{ color: 'white', margin: 0 }}><strong style={{ color: '#93c5fd' }}>Current Warnings:</strong> {user.currentWarningCount || 0}</p>
                 </div>
             </div>
         </main>

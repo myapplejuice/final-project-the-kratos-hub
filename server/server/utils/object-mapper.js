@@ -137,8 +137,14 @@ export default class ObjectMapper {
             Permissions: 'permissions',
             IsActive: 'isActive',
             IsTerminated: 'isTerminated',
-            OffenseCount: 'offenseCount'
-            
+            OffenseCount: 'offenseCount',
+            ReportCount: 'reportCount',
+            TerminationCount: 'terminationCount',
+            ReinstatementCount: 'reinstatementCount',
+            CurrentWarningCount: 'currentWarningCount',
+            Offense: 'offense',
+            Summary: 'summary',
+
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
     }
@@ -267,7 +273,7 @@ export default class ObjectMapper {
             shareCount: 'ShareCount',
             postId: 'PostId',
             topic: 'Topic',
-            date:   'Date',
+            date: 'Date',
             bodyPart: 'BodyPart',
             image: 'Image',
             sets: 'Sets',
@@ -280,7 +286,13 @@ export default class ObjectMapper {
             permissions: 'Permissions',
             isActive: 'IsActive',
             isTerminated: 'IsTerminated',
-            offenseCount: 'OffenseCount'
+            offenseCount: 'OffenseCount',
+            reportCount: 'ReportCount',
+            terminationCount: 'TerminationCount',
+            reinstatementCount: 'ReinstatementCount',
+            currentWarningCount: 'CurrentWarningCount',
+            offense: 'Offense',
+            summary: 'Summary',
         };
         return map[key] || key;
     }

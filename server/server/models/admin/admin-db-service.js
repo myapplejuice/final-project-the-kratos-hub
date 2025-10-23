@@ -63,18 +63,58 @@ export default class AdminDBService {
         }
     }
 
+    static async fetchUserReputationProfile(id) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'UserId', sql.UniqueIdentifier, id);
+
+            const query = `SELECT * FROM UserReputationProfile WHERE UserId = @UserId`;
+            let result = await request.query(query);
+
+            if (!result.recordset.length) {
+                const insertQuery = `
+                INSERT INTO UserReputationProfile (UserId)
+                VALUES (@UserId);
+            `;
+                await request.query(insertQuery);
+
+                result = await request.query(query);
+            }
+
+            const row = result.recordset[0];
+            const reputationProfile = {};
+            for (const key in row) {
+                reputationProfile[ObjectMapper.toCamelCase(key)] = row[key];
+            }
+
+            return reputationProfile;
+        } catch (err) {
+            console.error('fetchUserReputationProfile error:', err);
+            return null;
+        }
+    }
+
     static async setTerminated(id, IsTerminated) {
         try {
             const request = Database.getRequest();
-            const query = `UPDATE Users SET IsTerminated = ${IsTerminated ? 1 : 0} WHERE Id = @Id`;
             Database.addInput(request, 'Id', sql.UniqueIdentifier, id);
 
-            const result = await request.query(query);
-            console.log(result)
+            const query = `
+            UPDATE Users
+            SET IsTerminated = ${IsTerminated ? 1 : 0}
+            WHERE Id = @Id;
 
+            UPDATE UserReputationProfile
+            SET
+                TerminationCount = TerminationCount + CASE WHEN ${IsTerminated ? 1 : 0} = 1 THEN 1 ELSE 0 END,
+                ReinstatementCount = ReinstatementCount + CASE WHEN ${IsTerminated ? 1 : 0} = 0 THEN 1 ELSE 0 END
+            WHERE UserId = @Id;
+        `;
+
+            const result = await request.query(query);
             return { success: result.rowsAffected[0] > 0 };
         } catch (err) {
-            console.error('fetchUserProfile error:', err);
+            console.error('setTerminated error:', err);
             return null;
         }
     }
