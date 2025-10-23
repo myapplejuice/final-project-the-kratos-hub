@@ -1,11 +1,9 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { images } from "../utils/assets";
 import { useLocation, useNavigate } from "react-router-dom";
 import { usePopups } from "../utils/popups.provider";
 import colors from "../utils/stylings";
-import { formatDate } from "../utils/date-time";
 import APIService from "../utils/api-service";
-import * as styles from "../user-profile.css";
 
 export default function VerificationApplication() {
     const { showDialog, showMessager, showOptions } = usePopups();
@@ -22,7 +20,6 @@ export default function VerificationApplication() {
             const result = await APIService.routes.reputationProfile({ id: app.userId });
 
             if (result.success) {
-
                 const reputationProfile = result.data.reputationProfile;
                 const score =
                     reputationProfile.reportCount * 1 +
@@ -49,6 +46,10 @@ export default function VerificationApplication() {
         nav(-1);
     }
 
+    function handleViewUserProfile() {
+        nav(`/admin/user-profile`, { state: { user } });
+    }
+
     function handleTerminate() {
         showDialog({
             title: 'User Termination',
@@ -66,7 +67,6 @@ export default function VerificationApplication() {
                         }
                     }
                 }
-
             ],
         });
     }
@@ -105,7 +105,6 @@ export default function VerificationApplication() {
                         }
                     },
                 });
-
             },
         })
     }
@@ -143,8 +142,87 @@ export default function VerificationApplication() {
         })
     }
 
+    function handleApplicationAction(action) {
+        showDialog({
+            title: `Application ${action.charAt(0).toUpperCase() + action.slice(1)}`,
+            content: <p>Are you sure you want to {action} this verification application?</p>,
+            actions: [
+                {
+                    label: "Cancel", color: "#5a5a5aff", onClick: null
+                },
+                {
+                    label: "Confirm", color: action === 'approve' ? "#10b981" : "#ef4444", onClick: async () => {
+                        // Call API to update application status
+                        const result = await APIService.routes.updateApplicationStatus({
+                            applicationId: app.id,
+                            status: action
+                        });
+
+                        if (result.success) {
+                            setApp({ ...app, status: action });
+                            showDialog({
+                                title: "Application Updated",
+                                content: <p>Application has been {action}d successfully</p>,
+                                actions: [{ label: "Ok", color: colors.primary, onClick: null }],
+                            });
+                        }
+                    }
+                }
+            ],
+        });
+    }
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'pending': return '#f59e0b';
+            case 'approved': return '#10b981';
+            case 'rejected': return '#ef4444';
+            case 'cancelled': return '#6b7280';
+            default: return '#6b7280';
+        }
+    };
+
+    const getStatusLabel = (status) => {
+        switch (status) {
+            case 'pending': return 'Pending Review';
+            case 'approved': return 'Approved';
+            case 'rejected': return 'Rejected';
+            case 'cancelled': return 'Cancelled';
+            default: return status;
+        }
+    };
+
     return (
         <main className="user-profile-main">
+            <div style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                marginBlock: 40
+            }}>
+                <div className="user-info-header">
+                    <p style={{
+                        color: 'white',
+                        fontSize: 40,
+                        fontWeight: 'bold',
+                        margin: 0,
+                        background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent'
+                    }}>
+                        Verification Application
+                    </p>
+                </div>
+                <img src={images.shield} style={{
+                    width: 100,
+                    height: 100,
+                    filter: "invert(1)",
+                    marginTop: 20
+                }} />
+            </div>
+
             <div className="user-profile-header">
                 <div className="header-left">
                     <div className="back-button" onClick={handleBack}>
@@ -160,14 +238,12 @@ export default function VerificationApplication() {
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     <div className="action-buttons">
-                        <button className="action-button notify" onClick={handleNotify}>Notify User</button>
                         <button
-                            className={`action-button ${user.isTerminated ? 'reactivate' : 'terminate'}`}
-                            onClick={handleTerminate}
+                            className="action-button profile"
+                            onClick={handleViewUserProfile}
                         >
-                            {user.isTerminated ? "Re-activate" : "Terminate"}
+                            View User Profile
                         </button>
-                        <button className="action-button warning" onClick={handleWarningIssue}>Issue Warning</button>
                     </div>
 
                     <a href={user.imageURL || images.profilePic} target="_blank">
@@ -180,136 +256,70 @@ export default function VerificationApplication() {
                 </div>
             </div>
 
-            <div className="profile-grid">
-                <div className="profile-card">
-                    <div className="card-header">
-                        <p className="card-title">Personal Profile</p>
-                        <div className={`status-badge ${user.isTerminated ? 'terminated-badge' : 'active-badge'}`}>
-                            {user.isTerminated ? "Terminated" : "Active"}
-                        </div>
-                    </div>
-                    <div className="card-details">
-                        <div className="card-detail-row"><span className="card-detail-label">Age:</span><span className="card-detail-value">{user.age}</span></div>
-                        <div className="card-detail-row"><span className="card-detail-label">Gender:</span><span className="card-detail-value">{user.gender === 'male' ? 'Male' : 'Female'}</span></div>
-                        <div className="card-detail-row"><span className="card-detail-label">Phone:</span><span className="card-detail-value">{user.phone}</span></div>
-                        <div className="card-detail-row"><span className="card-detail-label">Email:</span><span className="card-detail-value">{user.email}</span></div>
-                        <div className="card-detail-row"><span className="card-detail-label">Created:</span><span className="card-detail-value">{new Date(user.dateOfCreation).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span></div>
+            <div className="profile-card" style={{marginBottom: 300}}>
+                <div className="card-header">
+                    <p className="card-title">Application Details</p>
+                    <div
+                        className="status-badge"
+                        style={{ background: getStatusColor(app.status) }}
+                    >
+                        {getStatusLabel(app.status)}
                     </div>
                 </div>
-
-                <div className="profile-card">
-                    <div className="card-header">
-                        <p className="card-title">Trainer Profile</p>
-                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                            {user.trainerProfile?.trainerStatus === 'active' && <div className="trainer-badge active-trainer">ACTIVE</div>}
-                            {user.trainerProfile?.isVerified && <div className="trainer-badge verified-trainer">VERIFIED</div>}
-                        </div>
+                <div className="card-details">
+                    <div className="card-detail-row">
+                        <span className="card-detail-label">Application ID:</span>
+                        <span className="card-detail-value">{app.id}</span>
                     </div>
-                    <div className="card-details">
-                        <div className="card-detail-row">
-                            <span className="card-detail-label">Status:</span>
-                            <span className="card-detail-value" style={{ color: user.trainerProfile?.trainerStatus === 'active' ? '#10b981' : '#ef4444' }}>
-                                {user.trainerProfile?.trainerStatus === 'active' ? "Active" : "Inactive"}
-                            </span>
-                        </div>
-                        <div className="card-detail-row">
-                            <span className="card-detail-label">Verified:</span>
-                            <span className="card-detail-value" style={{ color: user.trainerProfile?.isVerified ? '#10b981' : '#ef4444' }}>
-                                {user.trainerProfile?.isVerified ? "Yes" : "No"}
-                            </span>
-                        </div>
-                        <div className="card-detail-row">
-                            <span className="card-detail-label">Experience:</span>
-                            <span className="card-detail-value">{user.trainerProfile?.yearsOfExperience || "N/A"}</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <span className="card-detail-label">Biography:</span>
-                            <p className="card-detail-value" style={{ opacity: user.trainerProfile?.biography ? 1 : 0.7 }}>{user.trainerProfile?.biography || "No biography provided"}</p>
-                        </div>
-                        {user.trainerProfile?.images?.length > 0 && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '15px' }}>
-                                <p className="card-detail-label">Certificates & Qualifications</p>
-                                <div className="certificates-list">
-                                    {user.trainerProfile.images.map((img, i) => (
-                                        <a key={i} href={img.url} target="_blank" rel="noopener noreferrer">{img.url.split('/').pop() || `Certificate ${i + 1}`}</a>
-                                    ))}
-                                </div>
+                    <div className="card-detail-row">
+                        <span className="card-detail-label">Submitted:</span>
+                        <span className="card-detail-value">
+                            {new Date(app.dateOfCreation).toLocaleDateString('en-US', {
+                                month: 'long',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}
+                        </span>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '15px' }}>
+                        <span className="card-detail-label">Summary:</span>
+                        <p className="card-detail-value" style={{ opacity: app.summary ? 1 : 0.7, lineHeight: '1.5' }}>
+                            {app.summary || "No summary provided"}
+                        </p>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '15px' }}>
+                        <span className="card-detail-label">Education:</span>
+                        <p className="card-detail-value" style={{ opacity: app.education ? 1 : 0.7, lineHeight: '1.5' }}>
+                            {app.education || "No education information provided"}
+                        </p>
+                    </div>
+
+                    {app.links && app.links.filter(link => link && link.trim() !== '').length > 0 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '15px' }}>
+                            <p className="card-detail-label">Social Links</p>
+                            <div className="certificates-list">
+                                {app.links.filter(link => link && link.trim() !== '').map((link, i) => (
+                                    <a key={i} href={link} target="_blank" rel="noopener noreferrer" className="social-link">
+                                        {link}
+                                    </a>
+                                ))}
                             </div>
-                        )}
-                    </div>
-                </div>
-            </div>
+                        </div>
+                    )}
 
-            <div className="profile-card" >
-                <div className="card-header">
-                    <p className="card-title">Reputation & Compliance</p>
-                    <div className="status-badge" style={{ background: reputationProfile.tier?.color || '#60a5fa' }}>
-                        {reputationProfile.tier?.label || 'Standard Tier'}
-                    </div>
-                </div>
-                <div className="reputation-grid">
-                    <div className="reputation-card"><div className="value reports">{reputationProfile.reportCount}</div><div className="label">Reports</div></div>
-                    <div className="reputation-card"><div className="value offenses">{reputationProfile.offenseCount}</div><div className="label">Offenses</div></div>
-                    <div className="reputation-card"><div className="value terminations">{reputationProfile.terminationCount}</div><div className="label">Terminations</div></div>
-                    <div className="reputation-card"><div className="value reinstatements">{reputationProfile.reinstatementCount}</div><div className="label">Reinstatements</div></div>
-                    <div className="reputation-card"><div className="value active-warnings">{reputationProfile.currentWarningCount}</div><div className="label">Active Warnings</div></div>
-                </div>
-            </div>
-
-            <div className="profile-card warnings-history-card" style={{ marginTop: 30, marginBottom: 330 }}>
-                <div className="card-header">
-                    <p className="card-title">Warnings History</p>
-                </div>
-
-                <div className="warnings-list">
-                    {reputationProfile.warningsHistory?.length > 0 ? (
-                        reputationProfile.warningsHistory.map((warning, index) => {
-                            const isCurrent =
-                                index < reputationProfile.currentWarningCount;
-
-                            return (
-                                <div
-                                    key={index}
-                                    className={`warning-item ${isCurrent ? "current-warning" : ""}`}
-                                >
-                                    <div className="warning-top">
-                                        <span className="warning-date">
-                                            {new Date(warning.dateOfCreation).toLocaleDateString('en-US', {
-                                                month: 'short',
-                                                day: 'numeric',
-                                                year: 'numeric'
-                                            })}{" "}
-                                            {new Date(warning.dateOfCreation).toLocaleTimeString('en-US', {
-                                                hour: 'numeric',
-                                                minute: 'numeric',
-                                                hour12: true
-                                            })}
-                                        </span>
-                                        <span className="warning-admin">Admin ID: {warning.adminId}</span>
-                                    </div>
-
-                                    <p className="warning-summary">{warning.summary}</p>
-
-                                    {warning.imagesURLS && warning.imagesURLS !== "[]" && (
-                                        <div className="warning-images">
-                                            {JSON.parse(warning.imagesURLS).map((imgUrl, i) => (
-                                                <a
-                                                    key={i}
-                                                    href={imgUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="warning-image-link"
-                                                >
-                                                    {imgUrl.split("/").pop()}
-                                                </a>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })
-                    ) : (
-                        <p className="no-warnings">No warnings found</p>
+                    {app.images?.length > 0 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '15px' }}>
+                            <p className="card-detail-label">Supporting Documents</p>
+                            <div className="certificates-list">
+                                {app.images.map((img, i) => (
+                                    <a key={i} href={img.url} target="_blank" rel="noopener noreferrer" className="certificate-link">
+                                        {img.url.split('/').pop() || `Document ${i + 1}`}
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
                     )}
                 </div>
             </div>
