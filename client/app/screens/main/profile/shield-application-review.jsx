@@ -309,9 +309,9 @@ export default function ShieldApplicationReview() {
                 <View style={{ alignItems: 'center' }}>
                     <Image source={Images.shield} style={{ width: 80, height: 80, tintColor: 'white', marginTop: 25 }} />
                     <AppText style={{ color: 'white', fontSize: scaleFont(22), fontWeight: 'bold', marginTop: 15 }}>Application for Shield of Trust</AppText>
-                    <AppText style={{ color: application.status === 'pending' ? colors.accentYellow : application.status === 'accepted' ? colors.accentGreen : colors.negativeRed, fontSize: scaleFont(12), textAlign: 'center', lineHeight: 20, marginTop: 5, marginHorizontal: 15 }}>
+                    <AppText style={{ color: application.status === 'pending' ? colors.accentYellow : application.status === 'approved' ? colors.accentGreen : colors.negativeRed, fontSize: scaleFont(12), textAlign: 'center', lineHeight: 20, marginTop: 5, marginHorizontal: 15 }}>
                         {application.status === 'pending' ? 'Application is currently under review.' :
-                            application.status === 'accepted' ? 'Application has been approved.' :
+                            application.status === 'approved' ? 'Application has been approved.' :
                                 application.status === 'cancelled' ? 'Application cancelled by the user.'
                                     : 'Application has been denied.'
                         }

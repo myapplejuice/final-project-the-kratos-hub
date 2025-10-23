@@ -226,7 +226,7 @@ export default class AdminDBService {
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, applicationId);
-            Database.addInput(request, 'UserId', sql.Int, userId);
+            Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
             Database.addInput(request, 'Status', sql.VarChar(20), status);
             Database.addInput(request, 'AdminReply', sql.NVarChar(500), adminReply);
 

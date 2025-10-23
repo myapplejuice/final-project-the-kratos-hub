@@ -149,20 +149,40 @@ export default class SocketService {
             }));
         }
 
+        function handleNewBadge(){
+            console.log('comes here ')
+            setUser(prev => ({
+                ...prev,
+                trainerProfile: {
+                    ...prev.trainerProfile,
+                    isVerified: true
+                },
+                friends: prev.friends.map(friend => ({
+                    ...friend,
+                    trainerProfile: {
+                        ...friend.trainerProfile,
+                        isVerified: true
+                    }
+                }))
+            }));
+        }
+
         SocketService.on("new-message-notification", handleMessage);
         SocketService.on("updated-message-visibility", handleMessageUpdate);
         SocketService.on("new-notification", handleNotification);
         SocketService.on("new-friend-request", handleNewFriendRequest);
         SocketService.on("new-friend-response", handleNewFriendResponse);
         SocketService.on("new-friend-status", handleNewFriendStatus);
+        SocketService.on("grant-badge", handleNewBadge);
 
         return () => {
-            SocketService.off("new-message-notification", handleMessage)
-            SocketService.off("updated-message-visibility", handleMessageUpdate)
-            SocketService.off("new-notification", handleNotification)
-            SocketService.off("new-friend-request", handleNewFriendRequest)
-            SocketService.off("new-friend-response", handleNewFriendResponse)
-            SocketService.off("new-friend-status", handleNewFriendStatus)
+            SocketService.off("new-message-notification", handleMessage);
+            SocketService.off("updated-message-visibility", handleMessageUpdate);
+            SocketService.off("new-notification", handleNotification);
+            SocketService.off("new-friend-request", handleNewFriendRequest);
+            SocketService.off("new-friend-response", handleNewFriendResponse);
+            SocketService.off("new-friend-status", handleNewFriendStatus);
+            SocketService.off("grant-badge", handleNewBadge);
         };
 
     }

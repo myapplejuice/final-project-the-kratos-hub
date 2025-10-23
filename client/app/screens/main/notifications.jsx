@@ -183,6 +183,14 @@ export default function Notifications() {
             } else {
                 createToast({ message: result.message });
             }
+        } else if (notification.clickableDestination === 'verification-reply') {
+            const result = await APIService.verification.fetchApplications();
+            const application = result.data.applications.find(a => a.id === notification.clickableInfo.applicationId);
+
+            router.push({
+                pathname: routes.SHIELD_APPLICATION_REVIEW,
+                params: { application: JSON.stringify(application) }
+            });
         }
     }
 
@@ -386,7 +394,11 @@ export default function Notifications() {
                                                 <TouchableOpacity style={{ marginBottom: 25, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} onPress={() => notification.clickable && handleNotificationPress(notification)}>
                                                     <View style={{
                                                         borderStartColor: notification.seen ? colors.mutedText : notification.sentiment === 'negative' ? colors.negativeRed : notification.sentiment === 'positive' ? colors.accentGreen : 'white',
-                                                        borderStartWidth: 2, paddingStart: 15, width: (notification.clickableDestination === 'user-post' || notification.clickableDestination === 'admin') ? '80%' : '100%'
+                                                        borderStartWidth: 2, paddingStart: 15,
+                                                        width: (
+                                                            notification.clickableDestination === 'user-post' ||
+                                                            notification.clickableDestination === 'admin' ||
+                                                            notification.clickableDestination === 'verification-reply') ? '80%' : '100%'
                                                     }}>
                                                         <AppText style={{ fontSize: scaleFont(13), fontWeight: '600', color: notification.seen ? colors.mutedText : 'white' }}>
                                                             {notification.notification}
@@ -403,6 +415,11 @@ export default function Notifications() {
                                                     {notification.clickableDestination === 'admin' &&
                                                         <View style={{ width: '20%', justifyContent: 'center', alignItems: 'center' }}>
                                                             <AppImage source={Images.logo} style={{ width: 60, height: 60, borderRadius: 10 }} resizeMode='contain' />
+                                                        </View>
+                                                    }
+                                                    {notification.clickableDestination === 'verification-reply' &&
+                                                        <View style={{ width: '20%', justifyContent: 'center', alignItems: 'center' }}>
+                                                            <AppImage source={Images.shield} style={{ width: 60, height: 60, borderRadius: 10, tintColor: 'white' }} resizeMode='contain' />
                                                         </View>
                                                     }
                                                 </TouchableOpacity>
