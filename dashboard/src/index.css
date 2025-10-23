@@ -614,6 +614,11 @@ tr .action-buttons {
     transform: translateY(-1px);
 }
 
+.restore-admin-btn:hover {
+    background:  rgba(16, 185, 129, 0.3) !important;
+    transform: translateY(-1px);
+}
+
 .expanded-actions button {
     transition: all 0.2s ease;
 }

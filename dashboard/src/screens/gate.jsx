@@ -9,7 +9,7 @@ import { usePopups } from '../utils/popups.provider';
 import SessionStorageSerivce from '../utils/session-storage-service';
 
 export default function Gate() {
-    const { showDialog, showSpinner, hideSpinner } = usePopups();
+    const { showAlert, showDialog, showSpinner, hideSpinner } = usePopups();
     const nav = useNavigate();
 
     const [id, setId] = useState('');
@@ -19,6 +19,7 @@ export default function Gate() {
         try {
             showSpinner();
             const result = await APIService.routes.access({ id, pass });
+
             if (result.success) {
                 const admin = result.data.admin;
                 const token = result.data.token;
@@ -28,7 +29,7 @@ export default function Gate() {
             } else {
                 showDialog({
                     title: "Failure",
-                    content: <p>Invalid credentials!</p>,
+                    content: <p>{result.message}</p>,
                     actions: [
                         { label: "Ok", onClick: () => { }, color: "#cc2e2eff" },
                     ],

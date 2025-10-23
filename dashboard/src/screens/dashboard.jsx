@@ -201,7 +201,26 @@ export default function Dashboard() {
     }
 
     function handleTerminateAdmin(admin) {
+        showDialog({
+            title: `Admin ${admin.isActive ? "Activation" : "Termination"}`,
+            content: <p>Are you sure you want to {admin.isActive ? "activate" : "terminate"} this admin?</p>,
+            actions: [
+                {
+                    label: "Cancel", color: "#5a5a5aff", onClick: null
+                },
+                {
+                    label: "Yes", color: !admin.isActive ? "#cc2e2eff" : "#187ad4ff", onClick: async () => {
+                        
+                        const result = await APIService.routes.terminateAdmin({ id: admin.id, isActive: !admin.isActive });
 
+                        console.log(result);
+                        if (result.success) {
+                            setAdmins(prev => prev.map(prevAdmin => prevAdmin.id === admin.id ? { ...prevAdmin, isActive: !prevAdmin.isActive } : prevAdmin));
+                        }
+                    }
+                }
+            ]
+        })
     }
 
     return (
@@ -481,20 +500,20 @@ export default function Dashboard() {
                                                                     Edit Admin
                                                                 </button>
                                                                 <button
-                                                                    className="terminate-admin-btn"
+                                                                    className={admin.isActive ? "terminate-admin-btn" :  "restore-admin-btn"}
                                                                     onClick={() => handleTerminateAdmin(admin)}
                                                                     style={{
                                                                         padding: '8px 16px',
-                                                                        background: 'rgba(239, 68, 68, 0.2)',
-                                                                        color: '#ef4444',
-                                                                        border: '1px solid rgba(239, 68, 68, 0.4)',
+                                                                        background: admin.isActive ?  'rgba(239, 68, 68, 0.2)': 'rgba(143, 246, 255, 0.2)',
+                                                                        color: admin.isActive ? '#ef4444' : '#3bf6c7ff',
+                                                                        border: admin.isActive ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(143, 246, 255, 0.4)',
                                                                         borderRadius: '6px',
                                                                         cursor: 'pointer',
                                                                         fontSize: '14px',
                                                                         fontWeight: '500'
                                                                     }}
                                                                 >
-                                                                    Terminate Admin
+                                                                    {admin.isActive ? "Terminate Admin" : "Restore Admin"}
                                                                 </button>
                                                             </div>
                                                         </div>

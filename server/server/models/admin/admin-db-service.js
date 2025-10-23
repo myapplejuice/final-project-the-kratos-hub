@@ -22,6 +22,10 @@ export default class AdminDBService {
             }
 
             const row = result.recordset[0];
+            if (!row.IsActive){
+                return { success: false, message: 'This admin access is terminated' };
+            }
+
             const isMatch = await PasswordHasher.comparePassword(pass, row.AccessPassword);
             if (!isMatch) {
                 return { success: false, message: 'One or both credentials are incorrect!' }
@@ -353,6 +357,20 @@ export default class AdminDBService {
         } catch (err) {
             console.error('updateAdmin error:', err);
             return { success: false, message: 'Failed to update admin' };
+        }
+    }
+
+    static async setAdminTerminated(id, isActive) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'Id', sql.UniqueIdentifier, id);
+            Database.addInput(request, 'IsActive', sql.Bit, isActive);
+            const query = `UPDATE Admins SET IsActive = @IsActive WHERE Id = @Id`;
+            const result = await request.query(query);
+            return { success: result.rowsAffected[0] > 0, message: isActive ? 'Admin terminated successfully' : 'Admin reinstated successfully' };
+        } catch (err) {
+            console.error('setAdminTerminated error:', err);
+            return { success: false, message: 'Failed to terminate admin' };
         }
     }
 }

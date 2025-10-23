@@ -134,4 +134,10 @@ export default class AdminController {
         const response = await AdminDBService.updateAdmin(id, accessId, accessPassword, permissions);
         return res.status(200).json({ success: true, message: response.message, admin: response.admin });
     }
+
+    static async terminateAdmin(req, res) {
+        const { id, isActive } = req.body;
+        const response = await AdminDBService.setAdminTerminated(id, isActive);
+        return res.status(200).json({ success: true, message: response.message });
+    }
 }
