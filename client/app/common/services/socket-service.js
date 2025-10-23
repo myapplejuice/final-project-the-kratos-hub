@@ -149,19 +149,20 @@ export default class SocketService {
             }));
         }
 
-        function handleNewBadge(){
-            console.log('comes here ')
+        function handleNewBadge() {
             setUser(prev => ({
                 ...prev,
                 trainerProfile: {
                     ...prev.trainerProfile,
-                    isVerified: true
+                    isVerified: true,
+                    trainerStatus: 'active'
                 },
                 friends: prev.friends.map(friend => ({
                     ...friend,
                     trainerProfile: {
                         ...friend.trainerProfile,
-                        isVerified: true
+                        isVerified: true,
+                        trainerStatus: 'active'
                     }
                 }))
             }));

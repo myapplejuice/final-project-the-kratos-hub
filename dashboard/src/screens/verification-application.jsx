@@ -10,7 +10,7 @@ export default function VerificationApplication() {
     const { showDialog, showMessager, showOptions, showAlert } = usePopups();
     const nav = useNavigate();
     const location = useLocation();
-    const user = location.state?.user;
+    const [user, setUser] = useState(location.state?.user);
     const [app, setApp] = useState(location.state?.app);
     const [note, setNote] = useState('');
 
@@ -28,12 +28,13 @@ export default function VerificationApplication() {
                         const result = await APIService.routes.updateApplication({
                             userId: user.id,
                             applicationId: app.id,
-                            status: action === 'reject' ? 'rejected' : 'approved',
+                            status: action,
                             adminReply: note
                         });
 
                         if (result.success) {
-                            setApp({ ...app, status: action === 'reject' ? 'rejected' : 'approved', adminReply: note });
+                            setUser({ ...user, trainerProfile: { ...user.trainerProfile, trainerStatus: user.trainerProfile.trainerStatus === 'inactive' ? (action === 'rejected' ? 'inactive' : 'active') : 'active', isVerified: action === 'rejected' ? false : true } });
+                            setApp({ ...app, status: action, adminReply: note });
                             showDialog({
                                 title: "Application Updated",
                                 content: <p>Application has been {action}d</p>,
@@ -277,7 +278,7 @@ export default function VerificationApplication() {
                             <>
                                 <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
                                     <button
-                                        onClick={() => handleApplicationAction('approve')}
+                                        onClick={() => handleApplicationAction('approved')}
                                         style={{
                                             flex: 1,
                                             padding: '15px 20px',
@@ -303,7 +304,7 @@ export default function VerificationApplication() {
                                         Approve Application
                                     </button>
                                     <button
-                                        onClick={() => handleApplicationAction('reject')}
+                                        onClick={() => handleApplicationAction('rejected')}
                                         style={{
                                             flex: 1,
                                             padding: '15px 20px',

@@ -245,7 +245,7 @@ export default class AdminDBService {
             if (status === 'approved'){
                 const request = Database.getRequest();
                 Database.addInput(request, 'UserId', sql.UniqueIdentifier, userId);
-                const query = `UPDATE UserTrainerProfile SET IsVerified = 1 WHERE UserId = @UserId`;
+                const query = `UPDATE UserTrainerProfile SET IsVerified = 1, TrainerStatus = 'active' WHERE UserId = @UserId`;
                 await request.query(query);
             }
 
