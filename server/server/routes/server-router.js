@@ -7,6 +7,7 @@ import NotificationsRouter from './notifications-router.js';
 import VerificationRouter from './verification-router.js';
 import CommunityRouter from './community-router.js';
 import AdminRouter from './admin-router.js';
+import ReportsRouter from './reports-router.js';
 
 export default class ServerRouter {
     static ping(req, res) {
@@ -22,6 +23,7 @@ export default class ServerRouter {
         const verificationRouter = VerificationRouter.init();
         const communityRouter = CommunityRouter.init();
         const adminRouter = AdminRouter.init();
+        const reportsRouter = ReportsRouter.init();
 
         const serverRouter = new Router();
         serverRouter.get('/ping', this.ping);
@@ -33,6 +35,7 @@ export default class ServerRouter {
         serverRouter.use('/verification', verificationRouter);
         serverRouter.use('/community', communityRouter);
         serverRouter.use('/admin', adminRouter);
+        serverRouter.use('/reports', reportsRouter);
 
         return serverRouter;
     }

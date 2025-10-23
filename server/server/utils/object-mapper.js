@@ -145,6 +145,9 @@ export default class ObjectMapper {
             Offense: 'offense',
             Summary: 'summary',
             AdminReply: 'adminReply',
+            BugThreatLevel: 'bugThreatLevel',
+            Resolved: 'resolved',
+            AdminNote: 'adminNote'
 
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));

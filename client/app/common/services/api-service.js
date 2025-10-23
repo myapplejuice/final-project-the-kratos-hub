@@ -135,6 +135,10 @@ export default class APIService {
         }
     }
 
+    static reports ={
+        create: (payload) => APIService.request(`/reports/create/${APIService.USER_ID}`, 'POST', payload),
+    }
+
     static community = {
         post: (payload) => APIService.request(`/community/post/${APIService.USER_ID}`, 'POST', payload),
         posts: (payload) => APIService.request(`/community/posts/${APIService.USER_ID}`, 'POST', payload),

@@ -50,12 +50,14 @@ export function userTablesQuery() {
     const userReportsQuery = `IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='UserReports' AND xtype='U')
             BEGIN
                 CREATE TABLE dbo.UserReports (
-                    UserId UNIQUEIDENTIFIER PRIMARY KEY,
+                    Id INT IDENTITY(1,1) PRIMARY KEY,
+                    UserId UNIQUEIDENTIFIER NOT NULL,
                     ReportedUserId UNIQUEIDENTIFIER NOT NULL,
+                    DateOfCreation DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
 
                     Type VARCHAR(20) NOT NULL,
                     Offense VARCHAR(50) NOT NULL DEFAULT 'Unspecified',
-                    Summary VARCHAR(500) NOT NULL DEFAULT 'No description provided',
+                    Summary VARCHAR(500) NOT NULL DEFAULT 'User did not provide any explanation for the report',
                     ImagesURLS VARCHAR(MAX) NOT NULL DEFAULT '[]',
                     
                     Resolved BIT NOT NULL DEFAULT 0,

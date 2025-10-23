@@ -38,14 +38,9 @@ export default function UserReportForm() {
     const [selectedImage, setSelectedImage] = useState({});
     const [imagePreviewVisible, setImagePreviewVisible] = useState(false);
 
+    const [offense, setOffense] = useState('');
     const [summary, setSummary] = useState('');
-    const [education, setEducation] = useState('');
     const [images, setImages] = useState([]);
-
-    const [instagramLink, setInstagramLink] = useState('');
-    const [facebookLink, setFacebookLink] = useState('');
-    const [tikTokLink, setTikTokLink] = useState('');
-    const [xLink, setXLink] = useState('');
 
     async function handleNewImage(asset) {
         const payload = {
@@ -56,166 +51,53 @@ export default function UserReportForm() {
         setImages(prev => [...prev, payload]);
     }
 
-    async function handleSocialMediaLink(platform) {
-        platform = platform.trim();
+    async function handleReport() {
+        try {
+            showSpinner();
 
-        const platformMap = {
-            Instagram: {
-                getUrl: handle => `https://www.instagram.com/${handle}`,
-                link: instagramLink,
-                setter: setInstagramLink,
-            },
-            Facebook: {
-                getUrl: handle => `https://www.facebook.com/${handle}`,
-                link: facebookLink,
-                setter: setFacebookLink,
-            },
-            TikTok: {
-                getUrl: handle => `https://www.tiktok.com/@${handle}`,
-                link: tikTokLink,
-                setter: setTikTokLink,
-            },
-            X: {
-                getUrl: handle => `https://x.com/${handle}`,
-                link: xLink,
-                setter: setXLink,
-            },
-        };
-
-        const link = platformMap[platform];
-        if (!link) return;
-
-        const cleanHandle = handle =>
-            handle.replace(/^https?:\/\/(www\.)?(instagram\.com|facebook\.com|tiktok\.com|x\.com|twitter\.com)\/@?/, '');
-
-        if (!link.link) {
-            createInput({
-                title: 'Social Media Link',
-                confirmText: 'Ok',
-                text: `Enter your ${platform} handle (e.g. ${user.firstname}.${user.lastname})`,
-                placeholders: [platform],
-                onSubmit: async ([handle]) => {
-                    if (!handle) return;
-                    link.setter(link.getUrl(cleanHandle(handle.trim())));
-                },
-            });
-            return;
-        }
-
-        createDialog({
-            title: 'Social Media Link',
-            text: `Do you wish to change your ${platform} link or test it?`,
-            confirmText: 'Change Link',
-            abortText: 'Go To Link',
-            onConfirm: () => {
-                createInput({
-                    title: 'Social Media Link',
-                    confirmText: 'Ok',
-                    text: `Enter your ${platform} handle (e.g. ${user.firstname}.${user.lastname})`,
-                    placeholders: [platform],
-                    onSubmit: async ([handle]) => {
-                        if (!handle) return;
-                        link.setter(link.getUrl(cleanHandle(handle.trim())));
-                    },
-                });
-            },
-            onAbort: async () => {
-                await Linking.openURL(link.link).catch(err =>
-                    console.warn('Failed to open link', err)
-                );
-            },
-        });
-    }
-
-    function handleSocialMediaReset() {
-        createDialog({
-            title: 'Reset Links',
-            text: 'Are you sure you want to reset your social media links?',
-            confirmText: 'Reset',
-            confirmButtonStyle: { backgroundColor: colors.negativeRed, borderColor: colors.negativeRed },
-            onConfirm: () => {
-                setInstagramLink('');
-                setFacebookLink('');
-                setTikTokLink('');
-                setXLink('');
-            },
-        })
-    }
-
-    async function handleSubmittion() {
-        const formFillCount = [
-            summary.trim() !== '',
-            education.trim() !== '',
-            images.length > 0,
-            instagramLink.trim() !== '',
-            facebookLink.trim() !== '',
-            tikTokLink.trim() !== '',
-            xLink.trim() !== '',
-        ].filter(Boolean).length;
-
-        if (formFillCount < 2) return createToast({ message: 'Please fill out at least 2 sections before submitting' });
-
-        createDialog({
-            title: 'Submit Application',
-            text: 'Are you sure you want to submit your application?',
-            confirmText: 'Submit',
-            onConfirm: async () => {
-                try {
-                    showSpinner();
-
-                    const uploadedImages = await Promise.all(
-                        images.map(async (image) => {
-                            if (image.url?.includes("res.cloudinary.com")) {
-                                return image;
-                            }
-
-                            try {
-                                const url = await APIService.uploadImageToCloudinary({
-                                    uri: image.url || image.uri,
-                                    folder: "verification_application_images",
-                                    fileName: `user${user.id}_${Date.now()}_${image.fileName}.jpg`,
-                                });
-
-                                return { ...image, url };
-                            } catch (err) {
-                                console.error(`Failed to upload image ${image.fileName}:`, err);
-                                return image;
-                            }
-                        })
-                    );
-
-                    setImages(uploadedImages);
-
-                    const payload = {
-                        userId: user.id,
-                        status: 'pending',
-                        summary,
-                        education,
-                        images: uploadedImages,
-                        links: [
-                            instagramLink || '',
-                            facebookLink || '',
-                            tikTokLink || '',
-                            xLink || '',
-                        ]
+            const uploadedImages = await Promise.all(
+                images.map(async (image) => {
+                    if (image.url?.includes("res.cloudinary.com")) {
+                        return image;
                     }
 
-                    const result = await APIService.verification.apply(payload);
-                    console.log('result', result)
-                    if (result.success) {
-                        createAlert({ title: 'Success', text: 'Your application has been submitted!\n\nYou will be notified when we review your application.', onPress: () => router.replace(routes.SHIELD_APPLICATIONS) });
-                    } else {
-                        createToast({ message: "Failed to update profile." });
+                    try {
+                        const url = await APIService.uploadImageToCloudinary({
+                            uri: image.url || image.uri,
+                            folder: "user_reports_images",
+                            fileName: `user${user.id}_${Date.now()}_${image.fileName}_report_on_${reportedUserId}.jpg`,
+                        });
+
+                        return { ...image, url };
+                    } catch (err) {
+                        console.error(`Failed to upload image ${image.fileName}:`, err);
+                        return image;
                     }
-                }
-                catch (err) {
-                    console.error("Image upload failed:", err);
-                } finally {
-                    hideSpinner();
-                }
+                })
+            );
+
+            setImages(uploadedImages);
+
+            const payload = {
+                userId: user.id,
+                reportedUserId,
+                type: "user",
+                offense,
+                summary,
+                imagesURLS: uploadedImages.map(image => image.url)
             }
-        })
 
+            const result = await APIService.reports.create(payload);
+            if (result.success){
+                createAlert({ title: 'User Report', text: "Your report has been submitted, we will review it as soon as possible and take appropriate action! Thank you for your patience.", onPress: () => router.back() });
+            } else {
+                createAlert({ title: 'Error', text: result.message });
+            }
+        } catch (e) {
+            console.log(e);
+        } finally {
+            hideSpinner();
+        }
     }
 
     return (
@@ -237,37 +119,80 @@ export default function UserReportForm() {
             </FadeInOut>
 
             <FloatingActionButton
-                icon={Images.shield}
-                label={"Submit Application"}
+                icon={Images.email}
+                label={"Submit Report"}
                 iconSize={18}
                 labelStyle={{ fontSize: scaleFont(14) }}
                 style={{ width: '100%', height: 50, backgroundColor: colors.accentGreen }}
                 position={{ bottom: insets.bottom + 20, right: 20, left: 20 }}
                 visible={fabVisible}
-                onPress={handleSubmittion}
+                onPress={handleReport}
             />
 
-            <AppScroll extraBottom={200} onScrollSetStates={setFabVisible}>
+            <AppScroll extraBottom={200} onScrollSetStates={setFabVisible} >
                 <View style={{ alignItems: 'center' }}>
-                    <AppText style={{ color: 'white', fontSize: scaleFont(22), fontWeight: 'bold', marginTop: 25, marginBottom:15 }}>User Report Form</AppText>
+                    <AppText style={{ color: 'white', fontSize: scaleFont(22), fontWeight: 'bold', marginTop: 25, marginBottom: 15 }}>User Report Form</AppText>
                     <AppText style={{ color: colors.mutedText, fontSize: scaleFont(12), textAlign: 'center', lineHeight: 20, marginTop: 5, marginHorizontal: 15 }}>
-                       Fill out the form below - explain briefly about the user's offense. Do not include any personal information or personal exchanges between you and the user. Unserious or unproven allegations should not be included. If the report is deemed to be valid, the user will be penalized.
+                        Fill out the form below - explain briefly about the user's offense. Do not include any personal information or personal exchanges between you and the user. Unserious or unproven allegations should not be included. If the report is deemed to be valid, the user will be penalized.
                     </AppText>
                 </View>
 
-                <Divider orientation='horizontal' style={{ marginVertical: 15 }} />
+                <Divider orientation='horizontal' style={{ marginVertical: 25 }} />
 
-                <View style={styles.section}>
+                <AppText style={{ color: 'white', fontSize: scaleFont(16), fontWeight: 'bold', marginHorizontal: 15 }}>Offense</AppText>
+                {['Hate Speech & Discrimination', 'Harassment', 'Trolling & Toxicity', 'Inappropriate Language', 'False Information', 'Spam', 'Other'].map((item, index) => (
+                    <TouchableOpacity
+                        key={index}
+                        activeOpacity={0.7}
+                        onPress={() => setOffense(item)}
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            marginVertical: 6,
+                            padding: 10,
+                            borderRadius: 10,
+                            backgroundColor: offense === item ? 'rgba(96,165,250,0.12)' : 'rgba(255,255,255,0.05)',
+                            marginHorizontal: 15,
+                        }}
+                    >
+                        <View
+                            style={{
+                                width: 20,
+                                height: 20,
+                                borderRadius: 10,
+                                borderWidth: 2,
+                                borderColor: offense === item ? '#60a5fa' : 'rgba(255,255,255,0.5)',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                marginRight: 10
+                            }}
+                        >
+                            {offense === item && (
+                                <View
+                                    style={{
+                                        width: 10,
+                                        height: 10,
+                                        borderRadius: 5,
+                                        backgroundColor: '#60a5fa'
+                                    }}
+                                />
+                            )}
+                        </View>
+                        <AppText style={{ color: 'white', fontSize: 16 }}>{item}</AppText>
+                    </TouchableOpacity>
+                ))}
+
+                <View style={[styles.section, { marginVertical: 30 }]}>
                     <AppText style={styles.sectionTitle}>Summary</AppText>
                     <AppText style={styles.inputHint}>
-                        Write about your experience as a professional trainer
+                        Explain further about the user's offense in detail. Its best to provide a proper and complete argument.
                     </AppText>
                     <AppTextInput
                         multiline
                         value={summary}
                         onChangeText={setSummary}
                         style={styles.bioInput}
-                        placeholder='Experience, specialties, achievements, and what makes you a great trainer...'
+                        placeholder='Write your summary here...'
                         placeholderTextColor={colors.mutedText}
                         textAlignVertical='top'
                         textAlign='left'
@@ -277,51 +202,31 @@ export default function UserReportForm() {
                     />
                 </View>
 
-                <View style={styles.section}>
-                    <AppText style={styles.sectionTitle}>Education</AppText>
+                <View style={[styles.sectionHeader, { marginHorizontal: 15 }]}>
+                    <AppText style={styles.sectionTitle}>Images</AppText>
                     <AppText style={styles.inputHint}>
-                        Write about your educational background
+                        Your work, certificates and achievements to support your application
                     </AppText>
-                    <AppTextInput
-                        multiline
-                        value={education}
-                        onChangeText={setEducation}
-                        style={styles.bioInput}
-                        placeholder='College, university, or other educational or academic institution...'
-                        placeholderTextColor={colors.mutedText}
-                        textAlignVertical='top'
-                        textAlign='left'
-                        fontSize={14}
-                        color='white'
-                        fontWeight='normal'
-                    />
                 </View>
 
-                <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <AppText style={styles.sectionTitle}>Images</AppText>
-                        <AppText style={styles.inputHint}>
-                            Your work, certificates and achievements to support your application
-                        </AppText>
-                    </View>
+                {images.length > 0 && (
+                    <>
+                        {images.map((image, index) => (
+                            <TouchableOpacity onPress={() => { setSelectedImage(image), setImagePreviewVisible(true) }} key={index}
+                                style={[{
+                                    flexDirection: 'row', justifyContent: 'space-between', padding: 20, backgroundColor: colors.cardBackground,
+                                    borderRadius: 20, marginBottom: 10, alignItems: 'center', marginHorizontal: 15
+                                }]}>
+                                <AppText numberOfLines={1} ellipsizeMode="tail" style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12), width: '91%' }}>{image.fileName}</AppText>
+                                <View style={{ width: '9%', alignItems: 'center', flexDirection: 'row', }}>
+                                    <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white', marginStart: 10 }} />
+                                </View>
+                            </TouchableOpacity>
+                        ))}
+                    </>
+                )}
 
-                    {images.length > 0 && (
-                        <>
-                            {images.map((image, index) => (
-                                <TouchableOpacity onPress={() => { setSelectedImage(image), setImagePreviewVisible(true) }} key={index}
-                                    style={[{
-                                        flexDirection: 'row', justifyContent: 'space-between', width: '100%', padding: 20, backgroundColor: colors.cardBackground,
-                                        borderRadius: 20, marginBottom: 10, alignItems: 'center'
-                                    }]}>
-                                    <AppText numberOfLines={1} ellipsizeMode="tail" style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12), width: '91%' }}>{image.fileName}</AppText>
-                                    <View style={{ width: '9%', alignItems: 'center', flexDirection: 'row', }}>
-                                        <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white', marginStart: 10 }} />
-                                    </View>
-                                </TouchableOpacity>
-                            ))}
-                        </>
-                    )}
-
+                <View style={{ marginHorizontal: 15 }}>
                     <TouchableOpacity
                         onPress={() => {
                             Keyboard.dismiss();
@@ -350,61 +255,6 @@ export default function UserReportForm() {
                         </View>
                     </TouchableOpacity>
                 </View>
-
-                <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <AppText style={styles.sectionTitle}>Social Media</AppText>
-                        <AppText style={styles.inputHint}>
-                            Link your social media profiles if any...
-                        </AppText>
-                    </View>
-
-
-                    <TouchableOpacity onPress={() => handleSocialMediaLink('Instagram')} style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.cardBackground, padding: 12, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.instagram} style={{ width: 30, height: 30 }} />
-                            <AppText style={{ color: 'white', marginStart: 10, fontWeight: 'bold', fontSize: scaleFont(12) }}>{instagramLink || 'Not Linked'}</AppText>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                        </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => handleSocialMediaLink('Facebook')} style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.cardBackground, padding: 12, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.facebook} style={{ width: 30, height: 30 }} />
-                            <AppText style={{ color: 'white', marginStart: 10, fontWeight: 'bold', fontSize: scaleFont(12) }}>{facebookLink || 'Not Linked'}</AppText>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                        </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => handleSocialMediaLink('TikTok')} style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.cardBackground, padding: 12, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.tiktokTwo} style={{ width: 30, height: 30 }} />
-                            <AppText style={{ color: 'white', marginStart: 10, fontWeight: 'bold', fontSize: scaleFont(12) }}>{tikTokLink || 'Not Linked'}</AppText>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                        </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => handleSocialMediaLink('X')} style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: colors.cardBackground, padding: 12, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.xTwo} style={{ width: 30, height: 30, tintColor: 'white' }} />
-                            <AppText style={{ color: 'white', marginStart: 10, fontWeight: 'bold', fontSize: scaleFont(12) }}>{xLink || 'Not Linked'}</AppText>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={Images.arrow} style={{ width: 20, height: 20, tintColor: 'white' }} />
-                        </View>
-                    </TouchableOpacity>
-                </View>
-
-                <TouchableOpacity onPress={handleSocialMediaReset} style={{ width: 150, alignSelf: 'center', backgroundColor: colors.negativeRed, padding: 15, borderRadius: 20, alignItems: 'center', marginBottom: 15 }}>
-                    <AppText style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFont(12) }}>Reset Links</AppText>
-                </TouchableOpacity>
-
             </AppScroll>
         </>
     );
@@ -564,12 +414,12 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.1)',
         borderStyle: 'dashed',
         padding: 30,
-        marginTop: 8,
+        marginTop: 15,
         width: '100%',
         height: 100,
         alignSelf: 'center',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'center'
     },
     uploadContent: {
         alignItems: 'center',
