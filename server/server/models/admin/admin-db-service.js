@@ -12,7 +12,7 @@ export default class AdminDBService {
 
             const query = `
                     SELECT * From Admins
-                    WHERE AccessId = @AccessId
+                    WHERE AccessId = @AccessId COLLATE SQL_Latin1_General_CP1_CS_AS
                     `;
 
             const result = await request.query(query);
@@ -22,7 +22,7 @@ export default class AdminDBService {
             }
 
             const row = result.recordset[0];
-            const isMatch = await PasswordHasher.comparePassword(pass, row.AccessPassword);
+            const isMatch = await PasswordHasher.comparePassword(pass, row.AccessPassword) && id === row.AccessId;
             if (!isMatch) {
                 return { success: false, message: 'One or both credentials are incorrect!' }
             }
