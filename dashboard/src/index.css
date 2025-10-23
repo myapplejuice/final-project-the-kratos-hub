@@ -286,6 +286,44 @@ body {
     box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
 }
 
+.admin-tab-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    color: #183e8b;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 700;
+    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admins-tab-active .admin-tab-btn {
+    color: #3b82f6;
+    font-weight: 600;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.admin-tab-btn:hover {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.admin-tab-arrow {
+    width: 15px;
+    height: 15px;
+    transition: transform 0.2s ease;
+}
+
+.admins-tab-active .admin-tab-arrow {
+    filter: invert(39%) sepia(91%) saturate(748%) hue-rotate(193deg) brightness(97%) contrast(107%);
+}
+
 .admin-main {
     flex: 1;
     padding-inline: 25px;
@@ -422,7 +460,6 @@ body {
     padding: 10px;
     cursor: pointer;
     color: #fff;
-    margin-left: 5px;
     transition: 0.2s;
     background: var(--color-negative-red);
     font-size: 18px;

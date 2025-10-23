@@ -9,6 +9,7 @@ import { routes } from "../utils/constants";
 import colors from "../utils/stylings";
 
 export default function Dashboard() {
+    const admin = SessionStorageService.getItem("admin").admin;
     const { showMessager, hideMessager, showDialog, showSpinner, hideSpinner } = usePopups();
     const nav = useNavigate();
 
@@ -20,13 +21,14 @@ export default function Dashboard() {
     const [visibleUsers, setVisibleUsers] = useState([]);
     const [filterTerminated, setFilterTerminated] = useState(false);
 
-
     useEffect(() => {
+        if (!admin) return;
+
         async function fetchDashboardData() {
             try {
                 showSpinner();
-                const result = await APIService.routes.dashboardData();
-                
+                const result = await APIService.routes.dashboardData({ isSeed: admin.isSeed });
+
                 if (result.success) {
                     const users = result.data.users;
                     const admins = result.data.admins;
@@ -89,7 +91,17 @@ export default function Dashboard() {
                     </ul>
                 </div>
                 <div>
-                    <button className="admin-logout-btn" onClick={handleSignOut}>Sign Out</button>
+                    {admin.isSeed &&
+                        <div className={activeSection === 'Admins' ? "admins-tab-active" : "admins-tab"}>
+                            <button className="admin-tab-btn" onClick={() => setActiveSection('Admins')} style={{ marginBottom: 15 }}>
+                                Admins
+                                <img src={images.arrow} className="admin-tab-arrow" />
+                            </button>
+                        </div>
+                    }
+                    <div>
+                        <button className="admin-logout-btn" onClick={handleSignOut}>Sign Out</button>
+                    </div>
                 </div>
             </aside>
 
@@ -247,6 +259,32 @@ export default function Dashboard() {
                                         <td>{p.id}</td>
                                         <td>{p.author}</td>
                                         <td>{p.content}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                {activeSection === "Admins" && (
+                    <div className="admin-section">
+                        <h2>Admins</h2>
+                        <table className="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Date Created</th>
+                                    <th>Status</th>
+                                    <th>Permissions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {admins.map((admin) => (
+                                    <tr key={admin.id}>
+                                        <td>{admin.id}</td>
+                                        <td>{admin.isActive}</td>
+                                        <td>{admin.dateOfCreation}</td>
+                                        <td>{admin.permissions}</td>
                                     </tr>
                                 ))}
                             </tbody>
