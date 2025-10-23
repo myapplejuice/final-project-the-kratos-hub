@@ -16,6 +16,7 @@ export default function Dashboard() {
     const [searchQuery, setSearchQuery] = useState("");
     const [users, setUsers] = useState([]);
     const [visibleUsers, setVisibleUsers] = useState([]);
+    const [filterTerminated, setFilterTerminated] = useState(false);
 
     useEffect(() => {
         async function fetchUserList() {
@@ -43,10 +44,22 @@ export default function Dashboard() {
     }, []);
 
     useEffect(() => {
-        if(activeSection === "Users") {
-            setVisibleUsers(users);
+        if (activeSection === "Users") {
+            const filtered = users.filter(user => {
+                const matchesSearch =
+                    user.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    user.lastname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    user.id.toLowerCase().includes(searchQuery.toLowerCase());
+
+                const matchesStatus = user.isTerminated === filterTerminated;
+
+                return matchesSearch && matchesStatus;
+            });
+
+            setVisibleUsers(filtered);
         }
-    }, [activeSection, searchQuery]);
+    }, [users, activeSection, searchQuery, filterTerminated]);
+
 
     function handleSignOut() {
         SessionStorageService.removeItem("admin");
@@ -61,12 +74,12 @@ export default function Dashboard() {
                     <ul>
                         {[
                             "Users",
-                            "Reports",
-                            "Food List",
-                            "Community Posts",
                             "Trainer Applications",
+                            "Reports",
+                            //"Community Posts",
+                            //"Food List",
                         ].map((section) => (
-                            <li key={section} className={activeSection === section ? "active" : ""} onClick={() => {setSearchQuery(''), setActiveSection(section)}}>
+                            <li key={section} className={activeSection === section ? "active" : ""} onClick={() => { setSearchQuery(''), setActiveSection(section) }}>
                                 {section}{" "}{section === "Reports" ? "(3)" : section === "Users" ? "(3)" : section === "Food List" ? "(2)" : section === "Community Posts" ? "(2)" : "(2)"}
                             </li>
                         ))}
@@ -79,8 +92,35 @@ export default function Dashboard() {
 
             <main className="admin-main">
                 {activeSection === "Users" && (
-                    <div className="admin-section">
-                        <h2>User Management</h2>
+                    <div className="admin-section" style={{ marginBottom: 300 }}>
+                        <h2>Users</h2>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: 25 }}>
+                            <input
+                                type="text"
+                                placeholder="ID, Firstname, Lastname..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="search-input"
+                                style={{ flex: 1 }}
+                            />
+
+                            <button
+                                onClick={() => setFilterTerminated(false)}
+                                className="status-btn active-btn"
+                                style={{ background: !filterTerminated ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'rgba(233, 233, 233, 0.1)' }}
+                            >
+                                Active
+                            </button>
+
+                            <button
+                                onClick={() => setFilterTerminated(true)}
+                                className="status-btn terminated-btn"
+                                style={{ background: filterTerminated ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)': 'rgba(233, 233, 233, 0.1)'  }}
+                            >
+                                Terminated
+                            </button>
+                        </div>
+
                         <table className="admin-table">
                             <thead>
                                 <tr>
@@ -92,7 +132,7 @@ export default function Dashboard() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.map((user, i) => (
+                                {visibleUsers.map((user, i) => (
                                     <tr key={user.id} onClick={() => nav(routes.user_profile, { state: { user } })}>
                                         <td>{user.id}</td>
                                         <td>{user.firstname} {user.lastname}</td>
