@@ -379,7 +379,7 @@ body {
     cursor: pointer;
 }
 
-.admin-table tr:hover td {
+.admin-table tr:not(.expanded-row):hover td {
     transform: translateX(15px);
 }
 
@@ -483,7 +483,6 @@ body {
 .expanded-row {
     border-bottom: 2px solid rgba(59, 130, 246, 0.3);
     cursor: default;
-    pointer-events: none;
 }
 
 .expanded-row:hover {
@@ -603,4 +602,18 @@ tr {
 
 tr .action-buttons {
     cursor: default;
+}
+
+.edit-admin-btn:hover {
+    background: rgba(59, 130, 246, 0.3) !important;
+    transform: translateY(-1px);
+}
+
+.terminate-admin-btn:hover {
+    background: rgba(239, 68, 68, 0.3) !important;
+    transform: translateY(-1px);
+}
+
+.expanded-actions button {
+    transition: all 0.2s ease;
 }

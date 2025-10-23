@@ -337,7 +337,7 @@ export default function Dashboard() {
                     <>
                         <div style={{ position: 'fixed', bottom: '25px', right: '25px', }}>
                             <button className="add-admin-btn" onClick={handleAddAdmin}>
-                                New Admin Record
+                                New Admin Access
                             </button>
                         </div>
                         <div className="admin-section">
@@ -370,26 +370,73 @@ export default function Dashboard() {
                                                 </td>
                                             </tr>
                                             {expandedAdmin === admin.id && (
-                                                <tr key={`${admin.id}-expanded`} className="expanded-row">
-                                                    <td colSpan="5" style={{ backgroundColor: 'rgba(59, 130, 246, 0.05)', padding: '20px' }}>
-                                                        <div className="admin-details">
-                                                            <div className="details-grid">
-                                                                <div className="detail-item">
-                                                                    <strong>Access ID:</strong> {admin.accessId}
-                                                                </div>
-                                                                <div className="detail-item">
-                                                                    <strong>Seed Admin:</strong> {admin.isSeed ? "Yes" : "No"}
-                                                                </div>
-                                                                <div className="detail-item">
-                                                                    <strong>Created:</strong> {new Date(admin.dateOfCreation).toLocaleString("en-US")}
-                                                                </div>
-                                                                <div className="detail-item">
-                                                                   <strong>Permissions:</strong> {admin.permissions ? admin.permissions.charAt(0).toUpperCase() + admin.permissions.slice(1) : 'No permissions'}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                              <tr key={`${admin.id}-expanded`} className="expanded-row">
+    <td colSpan="5" style={{ backgroundColor: 'rgba(59, 130, 246, 0.05)', padding: '20px' }}>
+        <div className="admin-details">
+            <div className="details-grid">
+                <div className="detail-item">
+                    <strong>Access ID:</strong> {admin.accessId}
+                </div>
+                <div className="detail-item">
+                    <strong>Seed Admin:</strong> {admin.isSeed ? "Yes" : "No"}
+                </div>
+                <div className="detail-item">
+                    <strong>Created:</strong> {new Date(admin.dateOfCreation).toLocaleString("en-US")}
+                </div>
+                <div className="detail-item">
+                    <strong>Permissions:</strong> {admin.permissions ? admin.permissions.charAt(0).toUpperCase() + admin.permissions.slice(1) : 'No permissions'}
+                </div>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="expanded-actions" style={{ 
+                display: 'flex', 
+                gap: '10px', 
+                marginTop: '20px',
+                justifyContent: 'flex-end'
+            }}>
+                <button 
+                    className="edit-admin-btn"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        // Add your edit logic here
+                    }}
+                    style={{
+                        padding: '8px 16px',
+                        background: 'rgba(59, 130, 246, 0.2)',
+                        color: '#3b82f6',
+                        border: '1px solid rgba(59, 130, 246, 0.4)',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '500'
+                    }}
+                >
+                    Edit Admin
+                </button>
+                <button 
+                    className="terminate-admin-btn"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        // Add your terminate logic here
+                    }}
+                    style={{
+                        padding: '8px 16px',
+                        background: 'rgba(239, 68, 68, 0.2)',
+                        color: '#ef4444',
+                        border: '1px solid rgba(239, 68, 68, 0.4)',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '500'
+                    }}
+                >
+                    Terminate Admin
+                </button>
+            </div>
+        </div>
+    </td>
+</tr>
                                             )}
                                         </>
                                     ))}
