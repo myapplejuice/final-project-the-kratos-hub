@@ -80,4 +80,9 @@ export default class AdminController {
         const response = await AdminDBService.fetchUserWarningsHistory(id);
         return res.status(200).json({ success: true, warningsHistory: response });
     }
+
+    static async getApplications(req, res) {
+        const applications = await AdminDBService.fetchApplications();
+        return res.status(200).json({ success: true, applications });
+    }
 }

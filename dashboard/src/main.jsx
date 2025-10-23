@@ -7,18 +7,20 @@ import App from './App';
 import Gate from './screens/gate';
 import Dashboard from './screens/dashboard';
 import UserProfile from './screens/user-profile';
+import VerificationApplication from './screens/verification-application';
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <PopupsProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path={routes.main} element={<App />} />
-          <Route path={routes.gate} element={<Gate />} />
-          <Route path={routes.dashboard} element={<Dashboard />} />
-          <Route path={routes.user_profile} element={<UserProfile />} />
-        </Routes>
-      </BrowserRouter>
-    </PopupsProvider>
-  </StrictMode>
+    <StrictMode>
+        <PopupsProvider>
+            <BrowserRouter>
+                <Routes>
+                    <Route path={routes.main} element={<App />} />
+                    <Route path={routes.gate} element={<Gate />} />
+                    <Route path={routes.dashboard} element={<Dashboard />} />
+                    <Route path={routes.user_profile} element={<UserProfile />} />
+                    <Route path={routes.verification_application} element={<VerificationApplication />} />
+                </Routes>
+            </BrowserRouter>
+        </PopupsProvider>
+    </StrictMode>
 );

@@ -191,4 +191,34 @@ export default class AdminDBService {
             return null;
         }
     }
+
+    static async fetchApplications() {
+        try {
+            const request = Database.getRequest();
+
+            const query = `SELECT * FROM VerificationApplications`;
+            const result = await request.query(query);
+
+            if (!result.recordset.length) {
+                return [];
+            }
+
+            const applications = result.recordset.map(row => {
+                const obj = {};
+                for (const key in row) {
+                    let value = row[key];
+                    if (key === 'Images' || key === 'Links') {
+                        value = value ? JSON.parse(value) : [];
+                    }
+                    obj[ObjectMapper.toCamelCase(key)] = value;
+                }
+                return obj;
+            });
+
+            return applications;
+        } catch (err) {
+            console.error('fetchApplications error:', err);
+            return null;
+        }
+    }
 }

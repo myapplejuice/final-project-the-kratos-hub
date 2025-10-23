@@ -113,5 +113,6 @@ export default class APIService {
          reputationProfile: (payload) => APIService.request(`/admin/user/reputation-profile/${SessionStorageService.getItem("admin")?.admin?.id}`, 'POST', payload),
          warnUser: (payload) => APIService.request(`/admin/user/warn/${SessionStorageService.getItem("admin")?.admin?.id}`, 'POST', payload),
          warningsHistory: (payload) => APIService.request(`/admin/user/warnings-history/${SessionStorageService.getItem("admin")?.admin?.id}`, 'GET', payload),
+         applications: () => APIService.request(`/admin/applications/${SessionStorageService.getItem("admin")?.admin?.id}`, 'GET'),
     }
 }

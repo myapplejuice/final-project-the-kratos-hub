@@ -15,6 +15,7 @@ export default function Dashboard() {
     const [activeSection, setActiveSection] = useState("Users");
     const [searchQuery, setSearchQuery] = useState("");
     const [users, setUsers] = useState([]);
+    const [verificationApps, setVerificationApps] = useState([]);
     const [visibleUsers, setVisibleUsers] = useState([]);
     const [filterTerminated, setFilterTerminated] = useState(false);
 
@@ -32,7 +33,7 @@ export default function Dashboard() {
             catch (err) {
                 showDialog({
                     title: 'Failure',
-                    content: <p>Failed to fetch user list</p>,
+                    content: <p>Failed to users, contact head of operations</p>,
                     actions: [{ label: "Ok", color: "#cc2e2eff", onClick: null }],
                 });
             } finally {
@@ -40,6 +41,29 @@ export default function Dashboard() {
             }
         }
 
+        async function fetchApplicationsList() {
+            try {
+                showSpinner();
+
+                const result = await APIService.routes.applications();
+                if (result.success) {
+                    console.log(result)
+                    const applications = result.data.applications;
+                    setVerificationApps(applications);
+                }
+            }
+            catch (err) {
+                showDialog({
+                    title: 'Failure',
+                    content: <p>Failed to applications, contact head of operations</p>,
+                    actions: [{ label: "Ok", color: "#cc2e2eff", onClick: null }],
+                });
+            } finally {
+                hideSpinner();
+            }
+        }
+
+        fetchApplicationsList();
         fetchUserList();
     }, []);
 
@@ -74,7 +98,7 @@ export default function Dashboard() {
                     <ul>
                         {[
                             "Users",
-                            "Trainer Applications",
+                            "Verification Applications",
                             "Reports",
                             //"Community Posts",
                             //"Food List",
@@ -115,7 +139,7 @@ export default function Dashboard() {
                             <button
                                 onClick={() => setFilterTerminated(true)}
                                 className="status-btn terminated-btn"
-                                style={{ background: filterTerminated ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)': 'rgba(233, 233, 233, 0.1)'  }}
+                                style={{ background: filterTerminated ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'rgba(233, 233, 233, 0.1)' }}
                             >
                                 Terminated
                             </button>
@@ -140,6 +164,39 @@ export default function Dashboard() {
                                         <td style={{ color: user.isTerminated ? '#ff0000ff' : "#00ff00" }}>{user.isTerminated ? 'Terminated' : 'Active'}</td>
                                         <td><img src={images.arrow} style={{ width: '20px', height: '20px', filter: 'brightness(0) invert(1)' }} /> </td>
                                     </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                {activeSection === "Verification Applications" && (
+                    <div className="admin-section">
+                        <h2>Trainer Applications</h2>
+                        <table className="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th>Date Created</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {[...verificationApps].sort((a, b) => new Date(b.dateOfCreation) - new Date(a.dateOfCreation)).map((app, i) => (
+                                    <tr key={app.id} onClick={() => nav(routes.verification_application, { state: { app, user: users.find(u => u.id === app.userId) } })}>
+                                        <td>{app.userId}</td>
+                                        <td>{(users.find(u => u.id === app.userId)?.firstname + " " + users.find(u => u.id === app.userId)?.lastname) || "Unknown / User Discarded"}</td>
+                                        <td style={{ color: app.status === "cancelled" || app.status === "rejected" ? "#ff0000ff" : app.status === "approved" ? "#00ff00" : "#fffb00ff" }}>
+                                            {app.status === "cancelled" ? "Cancelled" : app.status === "approved" ? "Approved" : "Pending"}
+                                        </td>
+                                        <td>{new Date(app.dateOfCreation).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</td>
+                                        <td>
+                                            <img src={images.arrow} style={{ width: 20, height: 20, filter: "brightness(0) invert(1)" }} />
+                                        </td>
+                                    </tr>
+
                                 ))}
                             </tbody>
                         </table>
@@ -217,33 +274,6 @@ export default function Dashboard() {
                         </table>
                     </div>
                 )}
-
-                {activeSection === "Trainer Applications" && (
-                    <div className="admin-section">
-                        <h2>Trainer Applications</h2>
-                        <table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Experience</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {trainerApps.map((t) => (
-                                    <tr key={t.id}>
-                                        <td>{t.name}</td>
-                                        <td>{t.experience}</td>
-                                        <td>
-                                            <button className="admin-approve-btn">Approve</button>
-                                            <button className="admin-reject-btn">Reject</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
             </main>
         </div>
     );
@@ -282,9 +312,4 @@ const communityPosts = [
         author: "user_12",
         content: "Looking for a workout partner in Tel Aviv",
     },
-];
-
-const trainerApps = [
-    { id: 401, name: "Chris Power", experience: "3 years" },
-    { id: 402, name: "Alex Hunter", experience: "5 years" },
 ];
