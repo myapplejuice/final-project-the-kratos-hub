@@ -116,5 +116,6 @@ export default class APIService {
         warnUser: (payload) => APIService.request(`/admin/user/warn/${SessionStorageService.getItem("admin")?.admin?.id}`, 'POST', payload),
         warningsHistory: (payload) => APIService.request(`/admin/user/warnings-history/${SessionStorageService.getItem("admin")?.admin?.id}`, 'GET', payload),
         updateApplication: (payload) => APIService.request(`/admin/applications/${SessionStorageService.getItem("admin")?.admin?.id}`, 'PUT', payload),
+        updateAdmin: (payload) => APIService.request(`/admin/admin/${SessionStorageService.getItem("admin")?.admin?.id}`, 'PUT', payload),
     }
 }

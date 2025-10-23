@@ -127,4 +127,11 @@ export default class AdminController {
         const response = await AdminDBService.insertNewAdmin(accessId, accessPassword, permissions);
         return res.status(200).json({ success: true, message: response.message, admin: response.admin });
     }
+
+    static async updateAdmin(req, res) {
+        const { id, accessId, accessPassword, permissions } = req.body;
+
+        const response = await AdminDBService.updateAdmin(id, accessId, accessPassword, permissions);
+        return res.status(200).json({ success: true, message: response.message, admin: response.admin });
+    }
 }

@@ -310,4 +310,49 @@ export default class AdminDBService {
             return { success: false, message: 'Failed to create admin' };
         }
     }
+
+    static async updateAdmin(id, accessId, accessPassword, permissions) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'Id', sql.UniqueIdentifier, id);
+            Database.addInput(request, 'AccessId', sql.NVarChar(20), accessId);
+            Database.addInput(request, 'Permissions', sql.NVarChar(sql.MAX), permissions);
+
+            let query;
+            if (accessPassword) {
+                const hash = await PasswordHasher.hashPassword(accessPassword);
+                Database.addInput(request, 'AccessPassword', sql.NVarChar(512), hash);
+                query = `
+                   UPDATE Admins
+                   SET AccessId = @AccessId, AccessPassword = @AccessPassword, Permissions = @Permissions
+                   OUTPUT INSERTED.*
+                   WHERE Id = @Id
+               `;
+            } else {
+                query = `
+                    UPDATE Admins
+                    SET AccessId = @AccessId, Permissions = @Permissions
+                   OUTPUT INSERTED.*
+                    WHERE Id = @Id
+                `;
+            }
+
+            const result = await request.query(query);
+
+            if (!result.recordset.length) {
+                return { success: false, message: 'Admin not found' };
+            }
+
+            const admin = {}
+
+            for (const key in result.recordset[0]) {
+                admin[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
+            }
+
+            return { success: true, message: 'Admin updated successfully', admin };
+        } catch (err) {
+            console.error('updateAdmin error:', err);
+            return { success: false, message: 'Failed to update admin' };
+        }
+    }
 }
