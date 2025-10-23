@@ -123,23 +123,26 @@ export default function UserProfile() {
                 });
 
                 if (result.success) {
+                    const warning = result.data.warning;
+
                     showDialog({
                         title: "Warning Issued",
                         content: <p>Warning issued and user will be notified</p>,
                         actions: [{ label: "Ok", color: colors.primary, onClick: null }],
                     });
 
-                    setReputationProfile({
-                        ...reputationProfile,
-                        currentWarningCount: reputationProfile.currentWarningCount + 1,
-                        offenseCount: reputationProfile.offenseCount + 1
-                    });
+                    setReputationProfile(prev => ({
+                        ...prev,
+                        warningsHistory: [warning, ...(prev.warningsHistory || []),],
+                        currentWarningCount: (prev.currentWarningCount || 0) + 1,
+                        offenseCount: (prev.offenseCount || 0) + 1
+                    }));
                 }
             },
         })
     }
 
-     return (
+    return (
         <main className="user-profile-main">
             <div className="user-profile-header">
                 <div className="header-left">
@@ -166,11 +169,13 @@ export default function UserProfile() {
                         <button className="action-button warning" onClick={handleWarningIssue}>Issue Warning</button>
                     </div>
 
-                    <div className="profile-image-wrapper">
-                        <div className="profile-image-border">
-                            <img src={user.imageURL || '/default-avatar.png'} alt="Profile" className="profile-image" />
+                    <a href={user.imageURL || images.profilePic} target="_blank">
+                        <div className="profile-image-wrapper">
+                            <div className="profile-image-border">
+                                <img src={user.imageURL || images.profilePic} alt="Profile" className="profile-image" />
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
 
@@ -233,7 +238,7 @@ export default function UserProfile() {
                     </div>
                 </div>
             </div>
-            
+
             <div className="profile-card" >
                 <div className="card-header">
                     <p className="card-title">Reputation & Compliance</p>
@@ -257,34 +262,51 @@ export default function UserProfile() {
 
                 <div className="warnings-list">
                     {reputationProfile.warningsHistory?.length > 0 ? (
-                        reputationProfile.warningsHistory.map((warning, index) => (
-                            <div key={index} className="warning-item">
-                                <div className="warning-top">
-                                    <span className="warning-date">
-                                        {new Date(warning.dateOfCreation).toLocaleDateString('en-US', {
-                                            month: 'short',
-                                            day: 'numeric',
-                                            year: 'numeric'
-                                        })} {new Date(warning.dateOfCreation).toLocaleTimeString('en-US', {
-                                            hour: 'numeric',
-                                            minute: 'numeric',
-                                            hour12: true
-                                        })}
-                                    </span>
-                                    <span className="warning-admin">Admin ID: {warning.adminId}</span>
-                                </div>
-                                <p className="warning-summary">{warning.summary}</p>
-                                {warning.imagesURLS && warning.imagesURLS !== "[]" && (
-                                    <div className="warning-images">
-                                        {JSON.parse(warning.imagesURLS).map((imgUrl, i) => (
-                                            <a key={i} href={imgUrl} target="_blank" rel="noopener noreferrer" className="warning-image-link">
-                                                {imgUrl.split("/").pop()}
-                                            </a>
-                                        ))}
+                        reputationProfile.warningsHistory.map((warning, index) => {
+                            const isCurrent =
+                                index < reputationProfile.currentWarningCount;
+
+                            return (
+                                <div
+                                    key={index}
+                                    className={`warning-item ${isCurrent ? "current-warning" : ""}`}
+                                >
+                                    <div className="warning-top">
+                                        <span className="warning-date">
+                                            {new Date(warning.dateOfCreation).toLocaleDateString('en-US', {
+                                                month: 'short',
+                                                day: 'numeric',
+                                                year: 'numeric'
+                                            })}{" "}
+                                            {new Date(warning.dateOfCreation).toLocaleTimeString('en-US', {
+                                                hour: 'numeric',
+                                                minute: 'numeric',
+                                                hour12: true
+                                            })}
+                                        </span>
+                                        <span className="warning-admin">Admin ID: {warning.adminId}</span>
                                     </div>
-                                )}
-                            </div>
-                        ))
+
+                                    <p className="warning-summary">{warning.summary}</p>
+
+                                    {warning.imagesURLS && warning.imagesURLS !== "[]" && (
+                                        <div className="warning-images">
+                                            {JSON.parse(warning.imagesURLS).map((imgUrl, i) => (
+                                                <a
+                                                    key={i}
+                                                    href={imgUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="warning-image-link"
+                                                >
+                                                    {imgUrl.split("/").pop()}
+                                                </a>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })
                     ) : (
                         <p className="no-warnings">No warnings found</p>
                     )}

@@ -130,8 +130,9 @@ export default class AdminDBService {
             Database.addInput(request, 'Summary', sql.NVarChar(sql.MAX), summary);
 
             const query = `
-            -- Insert the warning
+            -- Insert the warning and return the inserted row
             INSERT INTO AdminUserWarnings (UserId, AdminId, DateOfCreation, Summary)
+            OUTPUT INSERTED.*
             VALUES (@UserId, @AdminId, @DateOfCreation, @Summary);
 
             -- Increment offense and current warning counts
@@ -143,10 +144,21 @@ export default class AdminDBService {
         `;
 
             const result = await request.query(query);
-            return { success: result.rowsAffected[0] > 0 };
+
+            if (result.recordset?.length > 0) {
+                const insertedWarning = result.recordset[0];
+                const warning = {};
+                for (const key in insertedWarning) {
+                    warning[ObjectMapper.toCamelCase(key)] = insertedWarning[key];
+                }
+
+                return { success: true, warning };
+            }
+
+            return { success: false };
         } catch (err) {
             console.error('createUserWarning error:', err);
-            return null;
+            return { success: false, error: err.message };
         }
     }
 

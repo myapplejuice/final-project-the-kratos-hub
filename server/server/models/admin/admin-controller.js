@@ -71,7 +71,7 @@ export default class AdminController {
         const response = await AdminDBService.createUserWarning(id, adminId, summary);
         if (!response.success) return res.status(400).json({ success: false, message: response.message });
 
-        return res.status(200).json({ success: true, message: response.message });
+        return res.status(200).json({ success: true, message: response.message, warning: response.warning });
     }
 
     static async getUserWarningsHistory(req, res) {
