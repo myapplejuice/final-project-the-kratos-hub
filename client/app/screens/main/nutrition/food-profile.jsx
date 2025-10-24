@@ -528,7 +528,7 @@ export default function FoodProfile() {
                     <AppText style={styles.foodLabel}>{selectedFood.label}</AppText>
                     <AppText style={styles.foodCategory}>{selectedFood.category}</AppText>
                     <Divider orientation="horizontal" style={{ marginVertical: 10 }} />
-                    <TouchableOpacity onPress={()=> selectedFood.creatorId !== user.id && handleCreatorPress()}>
+                    <TouchableOpacity onPress={() => selectedFood.creatorId !== user.id && handleCreatorPress()}>
                         <AppText style={styles.creator}>
                             {selectedFood.isUSDA ? 'United States Department of Agriculture' : selectedFood.creatorId === user.id ? 'Food added by you' : selectedFood.creatorName}
                         </AppText>
@@ -543,6 +543,7 @@ export default function FoodProfile() {
                         const isMealPlanUpdate = intent === "mealplan/update";
                         const isMyFoods = intent === "myfoods";
                         const isOwner = user.id === selectedFood.ownerId;
+                        const isUSDA = selectedFood.isUSDA;
 
                         const icons = [
                             ((isMealAdd && isOwner) || (isMealPlanAdd && isOwner) ||
@@ -565,6 +566,18 @@ export default function FoodProfile() {
                                 source: Images.plus,
                                 tint: "white",
                             },
+
+                            ((isMealAdd || isMealPlanAdd) && (!isOwner && !isUSDA)) && {
+                                onPress: () => { router.push({
+                                    pathname: routes.FOOD_REPORT_FORM,
+                                    params: {
+                                        reportedUserId: selectedFood.creatorId,
+                                        reportedFoodId: selectedFood.id
+                                    }
+                                })},
+                                source: Images.warning,
+                                tint: 'white'
+                            }
                         ].filter(Boolean);
 
                         return (

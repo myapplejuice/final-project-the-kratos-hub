@@ -211,7 +211,7 @@ export default function UserReportForm() {
                 <View style={[styles.sectionHeader, { marginHorizontal: 15 }]}>
                     <AppText style={styles.sectionTitle}>Images</AppText>
                     <AppText style={styles.inputHint}>
-                        Your work, certificates and achievements to support your application
+                        Upload images of the user's offense as evidence (Not required but recommended)
                     </AppText>
                 </View>
 

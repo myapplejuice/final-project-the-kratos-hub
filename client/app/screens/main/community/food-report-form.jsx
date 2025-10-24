@@ -26,11 +26,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBackHandlerContext } from '../../../common/contexts/back-handler-context';
 import FadeInOut from '../../../components/effects/fade-in-out';
 
-export default function CommunityPostReportForm() {
+export default function FoodReportForm() {
     const reportedUserId = useLocalSearchParams().reportedUserId;
-    const reportedPostId = useLocalSearchParams().reportedPostId;
-    const { setLibraryActive } = useContext(LibraryContext);
-    const { setCameraActive } = useContext(CameraContext);
+    const reportedFoodId = useLocalSearchParams().reportedFoodId;
     const { createSelector, createToast, hideSpinner, showSpinner, createDialog, createInput, createAlert, createOptions } = usePopups();
     const { user, setUser } = useContext(UserContext);
     const insets = useSafeAreaInsets();
@@ -50,7 +48,7 @@ export default function CommunityPostReportForm() {
             const payload = {
                 userId: user.id,
                 reportedUserId,
-                type: `post-${reportedPostId}`,
+                type: `food-${reportedFoodId}`,
                 offense,
                 summary,
                 imagesURLS: []
@@ -93,7 +91,7 @@ export default function CommunityPostReportForm() {
                 <Divider orientation='horizontal' style={{ marginVertical: 25 }} />
 
                 <AppText style={{ color: 'white', fontSize: scaleFont(16), fontWeight: 'bold', marginHorizontal: 15 }}>Offense</AppText>
-                {['Hate Speech & Discrimination', 'Harassment', 'Trolling & Toxicity', 'Inappropriate Language', 'False Information', 'Spam', 'Other'].map((item, index) => (
+                {['Inaccurate Nutritional Information', 'Missing Information', 'Offensive Labeling', 'Other'].map((item, index) => (
                     <TouchableOpacity
                         key={index}
                         activeOpacity={0.7}
@@ -138,7 +136,7 @@ export default function CommunityPostReportForm() {
                 <View style={[styles.section, { marginVertical: 30 }]}>
                     <AppText style={styles.sectionTitle}>Summary</AppText>
                     <AppText style={styles.inputHint}>
-                        Explain further what you think is wrong with this post, provide specific details.
+                        Explain further what you think is wrong with this food, provide as much detail as possible.
                     </AppText>
                     <AppTextInput
                         multiline

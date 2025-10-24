@@ -28,6 +28,7 @@ export const routes = {
     POST: '/screens/main/community/post',
     USER_REPORT_FORM: '/screens/main/community/user-report-form',
     COMMUNITY_POST_REPORT_FORM: '/screens/main/community/community-post-report-form',
+    FOOD_REPORT_FORM: '/screens/main/community/food-report-form',
 
     /* HOMEPAGE CHILDREN */
     LEAN_BODY_MASS: '/screens/main/homepage/lean-body-mass',

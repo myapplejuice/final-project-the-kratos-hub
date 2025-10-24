@@ -113,6 +113,7 @@ export default function TopBar({ visible, hideInsetOnScroll = false }) {
         [routes.EXERCISES_LIST]: "Exercises",
         [routes.USER_REPORT_FORM]: 'Report User',
         [routes.COMMUNITY_POST_REPORT_FORM]: 'Report Posted Content',
+        [routes.USER_REPORT_FORM]: 'Report Food',
     };
 
     function handleUserProfilePress() {
