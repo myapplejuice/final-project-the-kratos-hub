@@ -110,7 +110,7 @@ export default function UserReport() {
                             <p className="user-id">Report #{report.id}</p>
                         </div>
                     </div>
-                    
+
                     <img src={images.warning} style={{
                         width: 70,
                         height: 70,
@@ -386,55 +386,59 @@ export default function UserReport() {
                             />
                         </div>
 
-                        <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
-                            <button
-                                onClick={handleResolveReport}
-                                style={{
-                                    flex: 1,
-                                    padding: '15px 20px',
-                                    borderRadius: '12px',
-                                    border: 'none',
-                                    background: isResolved
-                                        ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
-                                        : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                                    color: 'white',
-                                    fontWeight: '600',
-                                    fontSize: '14px',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease',
-                                    boxShadow: isResolved
-                                        ? '0 4px 12px rgba(245, 158, 11, 0.3)'
-                                        : '0 4px 12px rgba(16, 185, 129, 0.3)'
-                                }}
-                                onMouseOver={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-2px)';
-                                    e.currentTarget.style.boxShadow = isResolved
-                                        ? '0 6px 15px rgba(245, 158, 11, 0.4)'
-                                        : '0 6px 15px rgba(16, 185, 129, 0.4)';
-                                }}
-                                onMouseOut={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = isResolved
-                                        ? '0 4px 12px rgba(245, 158, 11, 0.3)'
-                                        : '0 4px 12px rgba(16, 185, 129, 0.3)';
-                                }}
-                            >
-                                {isResolved ? 'Re-open Report' : 'Resolve Report'}
-                            </button>
-                        </div>
+                        {(admin.permissions.includes('all') || admin.permissions.includes('report')) && (
+                            <>
+                                <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
+                                    <button
+                                        onClick={handleResolveReport}
+                                        style={{
+                                            flex: 1,
+                                            padding: '15px 20px',
+                                            borderRadius: '12px',
+                                            border: 'none',
+                                            background: isResolved
+                                                ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+                                                : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                                            color: 'white',
+                                            fontWeight: '600',
+                                            fontSize: '14px',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s ease',
+                                            boxShadow: isResolved
+                                                ? '0 4px 12px rgba(245, 158, 11, 0.3)'
+                                                : '0 4px 12px rgba(16, 185, 129, 0.3)'
+                                        }}
+                                        onMouseOver={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow = isResolved
+                                                ? '0 6px 15px rgba(245, 158, 11, 0.4)'
+                                                : '0 6px 15px rgba(16, 185, 129, 0.4)';
+                                        }}
+                                        onMouseOut={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = isResolved
+                                                ? '0 4px 12px rgba(245, 158, 11, 0.3)'
+                                                : '0 4px 12px rgba(16, 185, 129, 0.3)';
+                                        }}
+                                    >
+                                        {isResolved ? 'Re-open Report' : 'Resolve Report'}
+                                    </button>
+                                </div>
 
-                        <p style={{
-                            color: '#64748b',
-                            margin: 0,
-                            fontSize: '12px',
-                            textAlign: 'center',
-                            fontStyle: 'italic'
-                        }}>
-                            {isResolved
-                                ? 'This report has been resolved. You can re-open it if needed.'
-                                : 'Admin notes are for internal use and will be visible to other administrators'
-                            }
-                        </p>
+                                <p style={{
+                                    color: '#64748b',
+                                    margin: 0,
+                                    fontSize: '12px',
+                                    textAlign: 'center',
+                                    fontStyle: 'italic'
+                                }}>
+                                    {isResolved
+                                        ? 'This report has been resolved. You can re-open it if needed.'
+                                        : 'Admin notes are for internal use and will be visible to other administrators'
+                                    }
+                                </p>
+                            </>
+                        )}
                     </div>
                 </div>
             </main>

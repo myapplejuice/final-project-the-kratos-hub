@@ -29,23 +29,23 @@ export default function FoodProfile() {
             actions: [
                 { label: "Cancel", color: "#6b7280", onClick: null },
                 {
-                    label: "Remove Food", 
-                    color: "#ef4444", 
+                    label: "Remove Food",
+                    color: "#ef4444",
                     onClick: async () => {
                         try {
                             showSpinner();
-                            const result = await APIService.routes.deleteFood({foodId:food.id});
-                            
+                            const result = await APIService.routes.deleteFood({ foodId: food.id });
+
                             if (result.success) {
-                                showAlert({ 
-                                    title: "Food Removed", 
-                                    message: `${food.label} permanently removed from the database` 
+                                showAlert({
+                                    title: "Food Removed",
+                                    message: `${food.label} permanently removed from the database`
                                 });
                                 nav(-1);
                             } else {
-                                showAlert({ 
-                                    title: "Error", 
-                                    message: result.message || "Failed to remove food item" 
+                                showAlert({
+                                    title: "Error",
+                                    message: result.message || "Failed to remove food item"
                                 });
                             }
                         } catch (error) {
@@ -170,17 +170,17 @@ export default function FoodProfile() {
                     };
 
                     const result = await APIService.routes.updateFood(updatedFood);
-                    
+
                     if (result.success) {
                         setFood(updatedFood);
-                        showAlert({ 
-                            title: "Food Updated", 
-                            message: `${values.label} has been successfully updated.` 
+                        showAlert({
+                            title: "Food Updated",
+                            message: `${values.label} has been successfully updated.`
                         });
                     } else {
-                        showAlert({ 
-                            title: "Error", 
-                            message: result.message || "Failed to update food item" 
+                        showAlert({
+                            title: "Error",
+                            message: result.message || "Failed to update food item"
                         });
                     }
                 } catch (error) {
@@ -216,7 +216,7 @@ export default function FoodProfile() {
                         <p className="user-id">Food ID: {food.id}</p>
                     </div>
                 </div>
-                       <img src={images.meals} style={{
+                <img src={images.meals} style={{
                     width: 70,
                     height: 70,
                     filter: "invert(1)"
@@ -227,111 +227,113 @@ export default function FoodProfile() {
             <div className="profile-card" style={{ marginBottom: 30 }}>
                 <div className="card-header">
                     <p className="card-title">Food Overview</p>
-                    <div style={{ display: 'flex', gap: '10px' }}>
-                        <button
-                            onClick={handleAdjustFood}
-                            style={{
-                                padding: '8px 16px',
-                                background: 'rgba(59, 130, 246, 0.2)',
-                                color: '#3b82f6',
-                                border: '1px solid rgba(59, 130, 246, 0.4)',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                fontWeight: '500',
-                                transition: 'all 0.3s ease'
-                            }}
-                            onMouseOver={(e) => {
-                                e.target.style.background = 'rgba(59, 130, 246, 0.3)';
-                                e.target.style.transform = 'translateY(-1px)';
-                            }}
-                            onMouseOut={(e) => {
-                                e.target.style.background = 'rgba(59, 130, 246, 0.2)';
-                                e.target.style.transform = 'translateY(0)';
-                            }}
-                        >
-                           Adjust Food
-                        </button>
-                        <button
-                            onClick={handleRemoveFood}
-                            style={{
-                                padding: '8px 16px',
-                                background: 'rgba(239, 68, 68, 0.2)',
-                                color: '#ef4444',
-                                border: '1px solid rgba(239, 68, 68, 0.4)',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                fontWeight: '500',
-                                transition: 'all 0.3s ease'
-                            }}
-                            onMouseOver={(e) => {
-                                e.target.style.background = 'rgba(239, 68, 68, 0.3)';
-                                e.target.style.transform = 'translateY(-1px)';
-                            }}
-                            onMouseOut={(e) => {
-                                e.target.style.background = 'rgba(239, 68, 68, 0.2)';
-                                e.target.style.transform = 'translateY(0)';
-                            }}
-                        >
-                            Remove Food
-                        </button>
-                    </div>
+                    {(admin.permissions.includes('foods') || admin.permissions.includes('all')) &&
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                            <button
+                                onClick={handleAdjustFood}
+                                style={{
+                                    padding: '8px 16px',
+                                    background: 'rgba(59, 130, 246, 0.2)',
+                                    color: '#3b82f6',
+                                    border: '1px solid rgba(59, 130, 246, 0.4)',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontSize: '14px',
+                                    fontWeight: '500',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseOver={(e) => {
+                                    e.target.style.background = 'rgba(59, 130, 246, 0.3)';
+                                    e.target.style.transform = 'translateY(-1px)';
+                                }}
+                                onMouseOut={(e) => {
+                                    e.target.style.background = 'rgba(59, 130, 246, 0.2)';
+                                    e.target.style.transform = 'translateY(0)';
+                                }}
+                            >
+                                Adjust Food
+                            </button>
+                            <button
+                                onClick={handleRemoveFood}
+                                style={{
+                                    padding: '8px 16px',
+                                    background: 'rgba(239, 68, 68, 0.2)',
+                                    color: '#ef4444',
+                                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontSize: '14px',
+                                    fontWeight: '500',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseOver={(e) => {
+                                    e.target.style.background = 'rgba(239, 68, 68, 0.3)';
+                                    e.target.style.transform = 'translateY(-1px)';
+                                }}
+                                onMouseOut={(e) => {
+                                    e.target.style.background = 'rgba(239, 68, 68, 0.2)';
+                                    e.target.style.transform = 'translateY(0)';
+                                }}
+                            >
+                                Remove Food
+                            </button>
+                        </div>
+                    }
                 </div>
                 <div className="card-details">
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                         <div>
-                            <div className="card-detail-row" style={{marginBottom: 5}}>
+                            <div className="card-detail-row" style={{ marginBottom: 5 }}>
                                 <span className="card-detail-label">Food Name:</span>
                                 <span className="card-detail-value">{food.label}</span>
                             </div>
-                            <div className="card-detail-row" style={{marginBottom: 5}}>
+                            <div className="card-detail-row" style={{ marginBottom: 5 }}>
                                 <span className="card-detail-label">Category:</span>
-                                <span 
+                                <span
                                     className="card-detail-value"
-                                    style={{ 
+                                    style={{
                                         color: 'white',
                                     }}
                                 >
                                     {food.category}
                                 </span>
                             </div>
-                            <div className="card-detail-row" style={{marginBottom: 5}}>
+                            <div className="card-detail-row" style={{ marginBottom: 5 }}>
                                 <span className="card-detail-label">Serving Size:</span>
                                 <span className="card-detail-value">
                                     {food.servingSize} {food.servingUnit}
                                 </span>
                             </div>
-                            <div className="card-detail-row" style={{marginBottom: 5}}>
+                            <div className="card-detail-row" style={{ marginBottom: 5 }}>
                                 <span className="card-detail-label">Food Type:</span>
                                 <span className="card-detail-value">
-                                      <span className="card-detail-value">
+                                    <span className="card-detail-value">
                                         {food.isUSDA ? 'USDA Database' : 'Custom Food'}
                                     </span>
                                 </span>
                             </div>
                         </div>
                         <div>
-                            <div className="card-detail-row"  style={{ marginBottom: 5 }}>
+                            <div className="card-detail-row" style={{ marginBottom: 5 }}>
                                 <span className="card-detail-label">Visibility:</span>
                                 <span className="card-detail-value">
-                                 <span className="card-detail-value">
+                                    <span className="card-detail-value">
                                         {food.isPublic ? 'Public' : 'Private'}
                                     </span>
                                 </span>
                             </div>
-                            <div className="card-detail-row"  style={{ marginBottom: 5 }}>
+                            <div className="card-detail-row" style={{ marginBottom: 5 }}>
                                 <span className="card-detail-label">Dominant Macro:</span>
-                                <span 
+                                <span
                                     className="card-detail-value"
-                                    style={{ 
+                                    style={{
                                         color: 'white',
                                     }}
                                 >
                                     {food.dominantMacro}
                                 </span>
                             </div>
-                            <div className="card-detail-row"  style={{ marginBottom: 5 }}>
+                            <div className="card-detail-row" style={{ marginBottom: 5 }}>
                                 <span className="card-detail-label">Creator:</span>
                                 <span className="card-detail-value">
                                     {creator ? (

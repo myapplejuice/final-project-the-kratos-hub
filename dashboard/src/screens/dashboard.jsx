@@ -126,16 +126,16 @@ export default function Dashboard() {
                 let matchesStatus = true;
                 if (filterReportStatus === "all") {
                     matchesStatus = true;
-                } else if (filterReportStatus === "pending") {
-                    matchesStatus = report.status === "pending";
+                } else if (filterReportStatus === "active") {
+                    matchesStatus = !report.resolved;
                 } else if (filterReportStatus === "resolved") {
-                    matchesStatus = report.status === "resolved";
+                    matchesStatus = report.resolved;
                 }
 
                 return matchesSearch && matchesStatus;
             });
 
-            setVisibleReports(filtered);
+            setVisibleReports(filtered.sort((a, b) => new Date(b.dateOfCreation) - new Date(a.dateOfCreation)));
         }
     }, [users, filterReportStatus, filterAppStatus, verificationApps, activeSection, searchQuery, filterTerminated]);
 
@@ -162,12 +162,42 @@ export default function Dashboard() {
                 {
                     name: "permissions",
                     label: "Permissions",
-                    type: "select",
+                    type: "checkbox-group",
                     options: [
-                        { value: "all", label: "All Permissions" },
-                        { value: "read", label: "Read Only" },
-                        { value: "verifications", label: "Resolving Verifications" },
-                        { value: "termination", label: "Terminating Users" },
+                        {
+                            value: "all",
+                            label: "All Permissions",
+                            onClickRemoveOthers: true
+                        },
+                        {
+                            value: "read",
+                            label: "Read Only",
+                            onClickRemoveOthers: true
+                        },
+                        {
+                            value: "termination",
+                            label: "Terminating Users"
+                        },
+                        {
+                            value: "notify",
+                            label: "Notifying Users"
+                        },
+                        {
+                            value: "warn",
+                            label: "Issueing Warnings"
+                        },
+                        {
+                            value: "verifications",
+                            label: "Resolving Verifications"
+                        },
+                        {
+                            value: "reports",
+                            label: "Resolving Reports"
+                        },
+                        {
+                            value: "foods",
+                            label: "Deleting Foods & Adjusting Foods"
+                        },
                     ],
                     required: true
                 }
@@ -237,10 +267,6 @@ export default function Dashboard() {
                             onClickRemoveOthers: true
                         },
                         {
-                            value: "verifications",
-                            label: "Resolving Verifications"
-                        },
-                        {
                             value: "termination",
                             label: "Terminating Users"
                         },
@@ -251,6 +277,18 @@ export default function Dashboard() {
                         {
                             value: "warn",
                             label: "Issueing Warnings"
+                        },
+                        {
+                            value: "verifications",
+                            label: "Resolving Verifications"
+                        },
+                        {
+                            value: "reports",
+                            label: "Resolving Reports"
+                        },
+                        {
+                            value: "foods",
+                            label: "Deleting Foods & Adjusting Foods"
                         },
                     ],
                     required: false
@@ -438,7 +476,7 @@ export default function Dashboard() {
                 )}
 
                 {activeSection === "Verification" && (
-                    <div className="admin-section" style={{ marginBottom: 300 }}> 
+                    <div className="admin-section" style={{ marginBottom: 300 }}>
                         <h2>{activeSection}</h2>
                         <div>
                             <p style={{ margin: '0 0 0px 0', color: '#6b7280' }}>
@@ -617,6 +655,7 @@ export default function Dashboard() {
                                     <th>Type</th>
                                     <th>Offense</th>
                                     <th>Date of Submittion</th>
+                                    <th>Status</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -628,6 +667,7 @@ export default function Dashboard() {
                                         <td>{report.type ? (report.type.includes('user') ? 'User' : report.type.includes('post') ? 'Post' : 'Food') : 'Type Unspecified'}</td>
                                         <td>{report.offense ? report.offense : 'Violation Unspecified'}</td>
                                         <td>{new Date(report.dateOfCreation).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</td>
+                                        <td style={{ color: report.resolved ? '#10b981' : '#f59e0b' }}>{report.resolved ? 'Resolved' : 'Under Review'}</td>
                                         <td>
                                             <img src={images.arrow} style={{ width: 20, height: 20, filter: "brightness(0) invert(1)" }} />
                                         </td>
@@ -694,7 +734,7 @@ export default function Dashboard() {
                             >
                                 Custom
                             </button>
-                              <button
+                            <button
                                 onClick={() => setFilterFoodType('private')}
                                 className="status-btn active-btn"
                                 style={{
@@ -705,7 +745,7 @@ export default function Dashboard() {
                             >
                                 Private
                             </button>
-                              <button
+                            <button
                                 onClick={() => setFilterFoodType('public')}
                                 className="status-btn active-btn"
                                 style={{
