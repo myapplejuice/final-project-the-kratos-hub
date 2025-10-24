@@ -8,6 +8,7 @@ import Gate from './screens/gate';
 import Dashboard from './screens/dashboard';
 import UserProfile from './screens/user-profile';
 import VerificationApplication from './screens/verification-application';
+import UserReport from './screens/report';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -19,6 +20,7 @@ createRoot(document.getElementById('root')).render(
                     <Route path={routes.dashboard} element={<Dashboard />} />
                     <Route path={routes.user_profile} element={<UserProfile />} />
                     <Route path={routes.verification_application} element={<VerificationApplication />} />
+                    <Route path={routes.report} element={<UserReport />} />
                 </Routes>
             </BrowserRouter>
         </PopupsProvider>

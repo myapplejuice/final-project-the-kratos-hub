@@ -519,7 +519,7 @@ export default function Dashboard() {
                             </thead>
                             <tbody>
                                 {reports.map((report, i) => (
-                                    <tr key={report.id}>
+                                    <tr key={report.id} onClick={() => nav(routes.report, { state: { reporterUser: users.find(u => u.id === report.userId), reportedUser: users.find(u => u.id === report.reportedUserId), report } })}>
                                         <td>{report.id}</td>
                                         <td>{report.reportedUserId}</td>
                                         <td>{report.type ? (report.type.includes('user') ? 'User' : report.type.includes('post') ? 'Community Post' : 'Food') : 'Type Unspecified'}</td>

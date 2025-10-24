@@ -3,5 +3,6 @@ export const routes = {
     gate: '/gate',
     dashboard: '/dashboard',
     user_profile: '/user-profile',
-    verification_application: '/verification-application'
+    verification_application: '/verification-application',
+    report: '/report'
 }
