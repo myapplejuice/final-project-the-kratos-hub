@@ -37,14 +37,13 @@ export default function Dashboard() {
                 showSpinner();
                 const result = await APIService.routes.dashboardData({ isSeed: admin.isSeed });
 
-                console.log(result)
                 if (result.success) {
                     const users = result.data.users;
                     const admins = result.data.admins;
                     const applications = result.data.applications;
                     const reports = result.data.reports;
 
-                    console.log(reports)
+                    console.log(reports);
                     setUsers(users);
                     setAdmins(admins);
                     setVerificationApps(applications);
@@ -366,6 +365,7 @@ export default function Dashboard() {
                         <table className="admin-table">
                             <thead>
                                 <tr>
+                                    <th>#</th>
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Email</th>
@@ -376,6 +376,7 @@ export default function Dashboard() {
                             <tbody>
                                 {visibleUsers.map((user, i) => (
                                     <tr key={user.id} onClick={() => nav(routes.user_profile, { state: { user } })}>
+                                        <td>{i + 1}</td>
                                         <td>{user.id}</td>
                                         <td>{user.firstname} {user.lastname}</td>
                                         <td>{user.email}</td>
@@ -473,7 +474,8 @@ export default function Dashboard() {
                         <table className="admin-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>#</th>
+                                    <th>User ID</th>
                                     <th>Name</th>
                                     <th>Status</th>
                                     <th>Date Created</th>
@@ -484,6 +486,7 @@ export default function Dashboard() {
                                 {[...visibleApps].sort((a, b) => new Date(b.dateOfCreation) - new Date(a.dateOfCreation)).map((app, i) => (
                                     <tr key={app.id} onClick={() => nav(routes.verification_application, { state: { app, user: users.find(u => u.id === app.userId) } })}>
                                         <td>{app.id}</td>
+                                        <td>{app.userId}</td>
                                         <td>{(users.find(u => u.id === app.userId)?.firstname + " " + users.find(u => u.id === app.userId)?.lastname) || "Unknown / User Discarded"}</td>
                                         <td style={{ color: app.status === "cancelled" ? '#6b7280' : app.status === "rejected" ? "#ff0000ff" : app.status === "approved" ? "#00ff00" : "#fffb00ff" }}>
                                             {app.status === "cancelled" ? "Cancelled" : app.status === "approved" ? "Approved" : app.status === "rejected" ? "Rejected" : "Pending"}
@@ -506,19 +509,25 @@ export default function Dashboard() {
                         <table className="admin-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>#</th>
+                                    <th>Reported User ID</th>
                                     <th>Type</th>
-                                    <th>Summary</th>
-                                    <th>Date</th>
+                                    <th>Violation</th>
+                                    <th>Date Created</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {reports.map((report) => (
+                                {reports.map((report, i) => (
                                     <tr key={report.id}>
                                         <td>{report.id}</td>
-                                        <td>{report.userId}</td>
-                                        <td>{report.reprtedUserId}</td>
-                                        <td>{report.date}</td>
+                                        <td>{report.reportedUserId}</td>
+                                        <td>{report.type ? (report.type.includes('user') ? 'User' : report.type.includes('post') ? 'Community Post' : 'Food') : 'Type Unspecified'}</td>
+                                        <td>{report.offense ? report.offense : 'Violation Unspecified'}</td>
+                                        <td>{new Date(report.dateOfCreation).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</td>
+                                        <td>
+                                            <img src={images.arrow} style={{ width: 20, height: 20, filter: "brightness(0) invert(1)" }} />
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -584,15 +593,17 @@ export default function Dashboard() {
                             <table className="admin-table">
                                 <thead>
                                     <tr>
+                                        <th>#</th>
                                         <th>ID</th>
                                         <th>Status</th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {admins.map((admin) => (
+                                    {admins.map((admin, i) => (
                                         <Fragment key={admin.id}>
                                             <tr style={{ background: expandedAdmin === admin.id ? 'rgba(59, 130, 246, 0.1)' : 'none' }} onClick={() => expandedAdmin === admin.id ? setExpandedAdmin(null) : setExpandedAdmin(admin.id)}>
+                                                <td>{i + 1}</td>
                                                 <td>{admin.id}</td>
                                                 <td style={{ color: admin.isActive ? "#00ff00" : "#ff0000" }}>{admin.isActive ? "Active" : "Inactive"}</td>
                                                 <td>
