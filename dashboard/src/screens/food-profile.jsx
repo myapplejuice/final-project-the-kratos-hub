@@ -60,148 +60,6 @@ export default function FoodProfile() {
         });
     }
 
-    function handleAdjustFood() {
-        showInput({
-            title: `Adjust ${food.label}`,
-            message: "Modify the food details below:",
-            inputs: [
-                {
-                    name: "label",
-                    label: "Food Name",
-                    type: "text",
-                    placeholder: "Enter food name",
-                    value: food.label,
-                    required: true
-                },
-                {
-                    name: "category",
-                    label: "Category",
-                    type: "select",
-                    options: [
-                        { value: "Poultry", label: "Poultry" },
-                        { value: "Meat", label: "Meat" },
-                        { value: "Fish", label: "Fish" },
-                        { value: "Vegetables", label: "Vegetables" },
-                        { value: "Fruits", label: "Fruits" },
-                        { value: "Grains", label: "Grains" },
-                        { value: "Dairy", label: "Dairy" },
-                        { value: "Legumes", label: "Legumes" },
-                        { value: "Nuts", label: "Nuts" },
-                        { value: "Beverages", label: "Beverages" }
-                    ],
-                    value: food.category,
-                    required: true
-                },
-                {
-                    name: "servingSize",
-                    label: "Serving Size",
-                    type: "number",
-                    placeholder: "Enter serving size",
-                    value: food.servingSize,
-                    required: true
-                },
-                {
-                    name: "servingUnit",
-                    label: "Serving Unit",
-                    type: "text",
-                    placeholder: "g, ml, oz, etc.",
-                    value: food.servingUnit,
-                    required: true
-                },
-                {
-                    name: "energyKcal",
-                    label: "Calories",
-                    type: "number",
-                    placeholder: "Enter calories",
-                    value: food.energyKcal,
-                    required: true
-                },
-                {
-                    name: "protein",
-                    label: "Protein (g)",
-                    type: "number",
-                    placeholder: "Enter protein",
-                    value: food.protein,
-                    required: true
-                },
-                {
-                    name: "fat",
-                    label: "Fat (g)",
-                    type: "number",
-                    placeholder: "Enter fat",
-                    value: food.fat,
-                    required: true
-                },
-                {
-                    name: "carbs",
-                    label: "Carbs (g)",
-                    type: "number",
-                    placeholder: "Enter carbs",
-                    value: food.carbs,
-                    required: true
-                },
-                {
-                    name: "isPublic",
-                    label: "Visibility",
-                    type: "select",
-                    options: [
-                        { value: "true", label: "Public" },
-                        { value: "false", label: "Private" }
-                    ],
-                    value: food.isPublic.toString(),
-                    required: true
-                }
-            ],
-            onConfirm: async (values) => {
-                try {
-                    showSpinner();
-                    const updatedFood = {
-                        id: food.id,
-                        label: values.label,
-                        category: values.category,
-                        servingSize: Number(values.servingSize),
-                        servingUnit: values.servingUnit,
-                        energyKcal: Number(values.energyKcal),
-                        protein: Number(values.protein),
-                        fat: Number(values.fat),
-                        carbs: Number(values.carbs),
-                        isPublic: values.isPublic === "true",
-                        dominantMacro: getDominantMacro(Number(values.protein), Number(values.fat), Number(values.carbs))
-                    };
-
-                    const result = await APIService.routes.updateFood(updatedFood);
-
-                    if (result.success) {
-                        setFood(updatedFood);
-                        showAlert({
-                            title: "Food Updated",
-                            message: `${values.label} has been successfully updated.`
-                        });
-                    } else {
-                        showAlert({
-                            title: "Error",
-                            message: result.message || "Failed to update food item"
-                        });
-                    }
-                } catch (error) {
-                    console.error("Error updating food:", error);
-                    showAlert({ title: "Error", message: "Failed to update food item" });
-                } finally {
-                    hideSpinner();
-                }
-            },
-            confirmText: "Update Food"
-        });
-    }
-
-    function getDominantMacro(protein, fat, carbs) {
-        const max = Math.max(protein, fat, carbs);
-        if (max === protein) return "Protein";
-        if (max === fat) return "Fat";
-        return "Carbs";
-    }
-
-
     return (
         <main className="user-profile-main">
             <div className="user-profile-header">
@@ -222,63 +80,10 @@ export default function FoodProfile() {
                     filter: "invert(1)"
                 }} />
             </div>
-
-            {/* Food Overview */}
+            
             <div className="profile-card" style={{ marginBottom: 30 }}>
                 <div className="card-header">
                     <p className="card-title">Food Overview</p>
-                    {(admin.permissions.includes('foods') || admin.permissions.includes('all')) &&
-                        <div style={{ display: 'flex', gap: '10px' }}>
-                            <button
-                                onClick={handleAdjustFood}
-                                style={{
-                                    padding: '8px 16px',
-                                    background: 'rgba(59, 130, 246, 0.2)',
-                                    color: '#3b82f6',
-                                    border: '1px solid rgba(59, 130, 246, 0.4)',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    fontSize: '14px',
-                                    fontWeight: '500',
-                                    transition: 'all 0.3s ease'
-                                }}
-                                onMouseOver={(e) => {
-                                    e.target.style.background = 'rgba(59, 130, 246, 0.3)';
-                                    e.target.style.transform = 'translateY(-1px)';
-                                }}
-                                onMouseOut={(e) => {
-                                    e.target.style.background = 'rgba(59, 130, 246, 0.2)';
-                                    e.target.style.transform = 'translateY(0)';
-                                }}
-                            >
-                                Adjust Food
-                            </button>
-                            <button
-                                onClick={handleRemoveFood}
-                                style={{
-                                    padding: '8px 16px',
-                                    background: 'rgba(239, 68, 68, 0.2)',
-                                    color: '#ef4444',
-                                    border: '1px solid rgba(239, 68, 68, 0.4)',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    fontSize: '14px',
-                                    fontWeight: '500',
-                                    transition: 'all 0.3s ease'
-                                }}
-                                onMouseOver={(e) => {
-                                    e.target.style.background = 'rgba(239, 68, 68, 0.3)';
-                                    e.target.style.transform = 'translateY(-1px)';
-                                }}
-                                onMouseOut={(e) => {
-                                    e.target.style.background = 'rgba(239, 68, 68, 0.2)';
-                                    e.target.style.transform = 'translateY(0)';
-                                }}
-                            >
-                                Remove Food
-                            </button>
-                        </div>
-                    }
                 </div>
                 <div className="card-details">
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -356,7 +161,6 @@ export default function FoodProfile() {
                 </div>
             </div>
 
-            {/* Nutrition Information */}
             <div className="profile-card" style={{ marginBottom: 30 }}>
                 <div className="card-header">
                     <p className="card-title">Nutrition Information</p>
@@ -394,9 +198,8 @@ export default function FoodProfile() {
                 </div>
             </div>
 
-            {/* Additional Properties */}
             {food.additionalProps && food.additionalProps.length > 0 && (
-                <div className="profile-card" style={{ marginBottom: 300 }}>
+                <div className="profile-card" style={{ marginBottom: (admin.permissions.includes('foods') || admin.permissions.includes('all')) ? 30 : 300 }}>
                     <div className="card-header">
                         <p className="card-title">Additional Nutrients</p>
                     </div>
@@ -421,6 +224,40 @@ export default function FoodProfile() {
                     </div>
                 </div>
             )}
+
+             {(admin.permissions.includes('foods') || admin.permissions.includes('all')) &&
+              <div className="profile-card" style={{ marginBottom: 300 }}>
+                    <div className="card-header">
+                        <p className="card-title">Admin Actions</p>
+                    </div>
+
+                            <button
+                                onClick={handleRemoveFood}
+                                style={{
+                                    padding: '8px 16px',
+                                    background: 'rgba(239, 68, 68, 0.2)',
+                                    color: '#ef4444',
+                                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontSize: '14px',
+                                    fontWeight: '500',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseOver={(e) => {
+                                    e.target.style.background = 'rgba(239, 68, 68, 0.3)';
+                                    e.target.style.transform = 'translateY(-1px)';
+                                }}
+                                onMouseOut={(e) => {
+                                    e.target.style.background = 'rgba(239, 68, 68, 0.2)';
+                                    e.target.style.transform = 'translateY(0)';
+                                }}
+                            >
+                                Remove Food
+                            </button>
+                            <p style={{ marginTop: '8px', color: '#ef4444', fontSize: '12px' }}>Removing food permanently removes the record from the database</p>
+                        </div>
+                    }
         </main>
     );
 }
