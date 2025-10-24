@@ -694,6 +694,28 @@ export default function Dashboard() {
                             >
                                 Custom
                             </button>
+                              <button
+                                onClick={() => setFilterFoodType('private')}
+                                className="status-btn active-btn"
+                                style={{
+                                    background: filterFoodType === 'private' ?
+                                        'linear-gradient(135deg, #535353ff 0%, #636363ff 100%)' :
+                                        'rgba(233, 233, 233, 0.1)'
+                                }}
+                            >
+                                Private
+                            </button>
+                              <button
+                                onClick={() => setFilterFoodType('public')}
+                                className="status-btn active-btn"
+                                style={{
+                                    background: filterFoodType === 'public' ?
+                                        'linear-gradient(135deg, rgba(65, 98, 206, 1) 0%, #285affff 100%)' :
+                                        'rgba(233, 233, 233, 0.1)'
+                                }}
+                            >
+                                Public
+                            </button>
                         </div>
 
                         <table className="admin-table">
@@ -720,6 +742,10 @@ export default function Dashboard() {
                                             matchesType = food.isUSDA;
                                         } else if (filterFoodType === 'custom') {
                                             matchesType = !food.isUSDA;
+                                        } else if (filterFoodType === 'private') {
+                                            matchesType = !food.isPublic;
+                                        } else if (filterFoodType === 'public') {
+                                            matchesType = food.isPublic;
                                         }
 
                                         return matchesSearch && matchesType;
