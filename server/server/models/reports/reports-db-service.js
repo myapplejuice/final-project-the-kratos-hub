@@ -27,6 +27,11 @@ export default class ReportsDBService {
                 return { success: false, message: 'Failed to create report' };
             }
 
+            const repRequest = Database.getRequest();
+            Database.addInput(repRequest, 'UserId', sql.UniqueIdentifier, details.reportedUserId);
+            const reportQuery = `UPDATE UserReputationProfile SET ReportCount = ReportCount + 1 WHERE UserId = @UserId`;
+            await repRequest.query(reportQuery);
+
             return { success: true, message: 'Report created successfully' };
         } catch (err) {
             console.error('fetchUserId error:', err);
