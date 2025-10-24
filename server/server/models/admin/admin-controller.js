@@ -150,4 +150,10 @@ export default class AdminController {
         const response = await AdminDBService.updateReport(reportId, resolved, adminNote);
         return res.status(200).json({ success: true, message: response.message, report: response.report });
     }
+
+    static async deleteFood(req, res) {
+        const { foodId } = req.body;
+        const response = await AdminDBService.deleteFood(foodId);
+        return res.status(200).json({ success: true, message: response.message });
+    }
 }

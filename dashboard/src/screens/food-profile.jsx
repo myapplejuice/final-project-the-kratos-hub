@@ -22,7 +22,7 @@ export default function FoodProfile() {
                 <div>
                     <p>Are you sure you want to remove this food from the database?</p>
                     <p style={{ color: '#ef4444', fontSize: '14px', margin: '10px 0 0 0' }}>
-                        <strong>Warning:</strong> This action cannot be undone. All users will lose access to this food item.
+                        <strong>Warning:</strong> This action cannot be undone. User will lose access to this food item.
                     </p>
                 </div>
             ),
@@ -34,14 +34,14 @@ export default function FoodProfile() {
                     onClick: async () => {
                         try {
                             showSpinner();
-                            const result = await APIService.routes.deleteFood(food.id);
+                            const result = await APIService.routes.deleteFood({foodId:food.id});
                             
                             if (result.success) {
                                 showAlert({ 
                                     title: "Food Removed", 
-                                    message: `${food.label} has been successfully removed from the database.` 
+                                    message: `${food.label} permanently removed from the database` 
                                 });
-                                nav(-1); // Go back to dashboard
+                                nav(-1);
                             } else {
                                 showAlert({ 
                                     title: "Error", 
@@ -201,30 +201,6 @@ export default function FoodProfile() {
         return "Carbs";
     }
 
-    function getFoodCategoryColor(category) {
-        const categoryColors = {
-            'Poultry': '#ef4444',
-            'Meat': '#dc2626',
-            'Fish': '#3b82f6',
-            'Vegetables': '#10b981',
-            'Fruits': '#f59e0b',
-            'Grains': '#d97706',
-            'Dairy': '#f3f4f6',
-            'Legumes': '#8b5cf6',
-            'Nuts': '#92400e',
-            'Beverages': '#06b6d4'
-        };
-        return categoryColors[category] || '#6b7280';
-    }
-
-    function getMacroColor(macro) {
-        const macroColors = {
-            'Protein': '#3b82f6',
-            'Fat': '#f59e0b',
-            'Carbs': '#10b981'
-        };
-        return macroColors[macro] || '#6b7280';
-    }
 
     return (
         <main className="user-profile-main">
@@ -274,7 +250,7 @@ export default function FoodProfile() {
                                 e.target.style.transform = 'translateY(0)';
                             }}
                         >
-                            ✏️ Adjust Food
+                           Adjust Food
                         </button>
                         <button
                             onClick={handleRemoveFood}
@@ -298,108 +274,68 @@ export default function FoodProfile() {
                                 e.target.style.transform = 'translateY(0)';
                             }}
                         >
-                            🗑️ Remove Food
+                            Remove Food
                         </button>
                     </div>
                 </div>
                 <div className="card-details">
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                         <div>
-                            <div className="card-detail-row">
+                            <div className="card-detail-row" style={{marginBottom: 5}}>
                                 <span className="card-detail-label">Food Name:</span>
                                 <span className="card-detail-value">{food.label}</span>
                             </div>
-                            <div className="card-detail-row">
+                            <div className="card-detail-row" style={{marginBottom: 5}}>
                                 <span className="card-detail-label">Category:</span>
                                 <span 
                                     className="card-detail-value"
                                     style={{ 
-                                        color: getFoodCategoryColor(food.category),
-                                        fontWeight: '600'
+                                        color: 'white',
                                     }}
                                 >
                                     {food.category}
                                 </span>
                             </div>
-                            <div className="card-detail-row">
+                            <div className="card-detail-row" style={{marginBottom: 5}}>
                                 <span className="card-detail-label">Serving Size:</span>
                                 <span className="card-detail-value">
                                     {food.servingSize} {food.servingUnit}
                                 </span>
                             </div>
-                            <div className="card-detail-row">
+                            <div className="card-detail-row" style={{marginBottom: 5}}>
                                 <span className="card-detail-label">Food Type:</span>
                                 <span className="card-detail-value">
-                                    <span style={{
-                                        padding: '4px 8px',
-                                        borderRadius: '12px',
-                                        fontSize: '12px',
-                                        fontWeight: '500',
-                                        background: food.isUSDA ? 
-                                            'rgba(16, 185, 129, 0.2)' : 
-                                            'rgba(139, 92, 246, 0.2)',
-                                        color: food.isUSDA ? '#10b981' : '#8b5cf6',
-                                        border: food.isUSDA ? 
-                                            '1px solid rgba(16, 185, 129, 0.3)' : 
-                                            '1px solid rgba(139, 92, 246, 0.3)'
-                                    }}>
+                                      <span className="card-detail-value">
                                         {food.isUSDA ? 'USDA Database' : 'Custom Food'}
                                     </span>
                                 </span>
                             </div>
                         </div>
                         <div>
-                            <div className="card-detail-row">
+                            <div className="card-detail-row"  style={{ marginBottom: 5 }}>
                                 <span className="card-detail-label">Visibility:</span>
                                 <span className="card-detail-value">
-                                    <span style={{
-                                        padding: '4px 8px',
-                                        borderRadius: '12px',
-                                        fontSize: '12px',
-                                        fontWeight: '500',
-                                        background: food.isPublic ? 
-                                            'rgba(59, 130, 246, 0.2)' : 
-                                            'rgba(107, 114, 128, 0.2)',
-                                        color: food.isPublic ? '#3b82f6' : '#6b7280',
-                                        border: food.isPublic ? 
-                                            '1px solid rgba(59, 130, 246, 0.3)' : 
-                                            '1px solid rgba(107, 114, 128, 0.3)'
-                                    }}>
+                                 <span className="card-detail-value">
                                         {food.isPublic ? 'Public' : 'Private'}
                                     </span>
                                 </span>
                             </div>
-                            <div className="card-detail-row">
+                            <div className="card-detail-row"  style={{ marginBottom: 5 }}>
                                 <span className="card-detail-label">Dominant Macro:</span>
                                 <span 
                                     className="card-detail-value"
                                     style={{ 
-                                        color: getMacroColor(food.dominantMacro),
-                                        fontWeight: '600'
+                                        color: 'white',
                                     }}
                                 >
                                     {food.dominantMacro}
                                 </span>
                             </div>
-                            <div className="card-detail-row">
+                            <div className="card-detail-row"  style={{ marginBottom: 5 }}>
                                 <span className="card-detail-label">Creator:</span>
                                 <span className="card-detail-value">
                                     {creator ? (
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <div style={{
-                                                width: '24px',
-                                                height: '24px',
-                                                borderRadius: '50%',
-                                                background: 'linear-gradient(135deg, #60a5fa, #3b82f6)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                fontSize: '10px',
-                                                fontWeight: 'bold',
-                                                color: 'white'
-                                            }}>
-                                                {creator.firstname?.charAt(0)}
-                                            </div>
                                             {creator.firstname} {creator.lastname}
                                         </div>
                                     ) : (
@@ -428,29 +364,25 @@ export default function FoodProfile() {
                 </div>
                 <div className="card-details">
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-                        <div style={{ textAlign: 'center', padding: '20px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '12px' }}>
-                            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ef4444' }}>⚡</div>
+                        <div style={{ textAlign: 'center', padding: '20px', background: 'rgba(175, 175, 175, 0.1)', borderRadius: '12px' }}>
                             <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', margin: '8px 0' }}>
                                 {food.energyKcal}
                             </div>
                             <div style={{ color: '#94a3b8', fontSize: '14px' }}>Calories</div>
                         </div>
-                        <div style={{ textAlign: 'center', padding: '20px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '12px' }}>
-                            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#3b82f6' }}>🍗</div>
+                        <div style={{ textAlign: 'center', padding: '20px', background: 'rgba(175, 175, 175, 0.1)', borderRadius: '12px' }}>
                             <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', margin: '8px 0' }}>
                                 {food.protein}g
                             </div>
                             <div style={{ color: '#94a3b8', fontSize: '14px' }}>Protein</div>
                         </div>
-                        <div style={{ textAlign: 'center', padding: '20px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '12px' }}>
-                            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#f59e0b' }}>🥑</div>
+                        <div style={{ textAlign: 'center', padding: '20px', background: 'rgba(175, 175, 175, 0.1)', borderRadius: '12px' }}>
                             <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', margin: '8px 0' }}>
                                 {food.fat}g
                             </div>
                             <div style={{ color: '#94a3b8', fontSize: '14px' }}>Fat</div>
                         </div>
-                        <div style={{ textAlign: 'center', padding: '20px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '12px' }}>
-                            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#10b981' }}>🌾</div>
+                        <div style={{ textAlign: 'center', padding: '20px', background: 'rgba(175, 175, 175, 0.1)', borderRadius: '12px' }}>
                             <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', margin: '8px 0' }}>
                                 {food.carbs}g
                             </div>
@@ -473,12 +405,12 @@ export default function FoodProfile() {
                                     padding: '15px',
                                     background: 'rgba(255, 255, 255, 0.05)',
                                     borderRadius: '8px',
-                                    borderLeft: '4px solid #8b5cf6'
+                                    borderLeft: '4px solid #5c92f6ff'
                                 }}>
                                     <div style={{ fontWeight: '600', color: 'white', marginBottom: '4px' }}>
                                         {prop.label}
                                     </div>
-                                    <div style={{ color: '#8b5cf6', fontSize: '18px', fontWeight: 'bold' }}>
+                                    <div style={{ color: '#5c92f6ff', fontSize: '18px', fontWeight: 'bold' }}>
                                         {prop.amount} {prop.unit}
                                     </div>
                                 </div>

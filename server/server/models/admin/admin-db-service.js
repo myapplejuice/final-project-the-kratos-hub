@@ -399,7 +399,6 @@ export default class AdminDBService {
     }
 
     static async updateReport(reportId, resolved, adminNote) {
-        console.log(reportId, resolved, adminNote);
         try {
             const request = Database.getRequest();
             Database.addInput(request, 'Id', sql.Int, reportId);
@@ -518,5 +517,22 @@ export default class AdminDBService {
         console.error('fetchPosts error:', err);
         return { posts: [] };
     }
+    }
+
+    static async deleteFood(foodId) {
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'Id', sql.Int, foodId);
+            const query = `DELETE FROM Foods WHERE Id = @Id`;
+            const result = await request.query(query);
+            if (result.rowsAffected[0] === 0) {
+                return { success: false, message: 'Food not found' };
+            }
+
+            return { success: true };
+        } catch (err) {
+            console.error('deleteFood error:', err);
+            return { success: false, message: 'Failed to delete food' };
+        }
     }
 }
