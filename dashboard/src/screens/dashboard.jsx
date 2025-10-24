@@ -32,6 +32,7 @@ export default function Dashboard() {
     const [filterTerminated, setFilterTerminated] = useState('all');
     const [filterAppStatus, setFilterAppStatus] = useState('all');
     const [filterReportStatus, setFilterReportStatus] = useState('all');
+const [filterFoodType, setFilterFoodType] = useState('all');
 
     useEffect(() => {
         if (!admin) return;
@@ -49,7 +50,7 @@ export default function Dashboard() {
                     const foods = result.data.foods;
                     const posts = result.data.posts;
 
-                    console.log(foods);
+                    console.log(foods)
                     setUsers(users);
                     setAdmins(admins);
                     setVerificationApps(applications);
@@ -311,6 +312,22 @@ export default function Dashboard() {
         })
     }
 
+    function getFoodCategoryColor(category) {
+    const categoryColors = {
+        'Poultry': '#ef4444',
+        'Meat': '#dc2626',
+        'Fish': '#3b82f6',
+        'Vegetables': '#10b981',
+        'Fruits': '#f59e0b',
+        'Grains': '#d97706',
+        'Dairy': '#f3f4f6',
+        'Legumes': '#8b5cf6',
+        'Nuts': '#92400e',
+        'Beverages': '#06b6d4'
+    };
+    return categoryColors[category] || '#6b7280';
+}
+
     return (
         <div className="admin-page">
             <aside className="admin-sidebar">
@@ -321,8 +338,8 @@ export default function Dashboard() {
                             "Users",
                             "Verification",
                             "Reports",
-                            //"Community Posts",
-                            //"Food List",
+                            "Foods",
+                            "Community Posts",
                         ].map((section) => (
                             <li key={section} className={activeSection === section ? "active" : ""} onClick={() => { setSearchQuery(''), setActiveSection(section) }}>
                                 {section}{" "}{section === "Verification" ? `${verificationApps.filter(app => app.status === "pending").length === 0 ? '' : `(${verificationApps.filter(app => app.status === "pending").length})`}` : ""}
@@ -621,7 +638,211 @@ export default function Dashboard() {
                     </div>
                 )}
 
-                
+                {activeSection === "Foods" && (
+    <div className="admin-section">
+        <h2>Foods</h2>
+        <div>
+            <p style={{ margin: '0 0 0px 0', color: '#6b7280' }}>
+                Total: {foods.length} / USDA Foods: {foods.filter(f => f.isUSDA).length} / Custom Foods: {foods.filter(f => !f.isUSDA).length}
+            </p>
+            <p style={{ margin: '0 0 20px 0', color: '#6b7280' }}>
+                Public: {foods.filter(f => f.isPublic).length} / Private: {foods.filter(f => !f.isPublic).length}
+            </p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: 25 }}>
+            <input
+                type="text"
+                placeholder="Search by food name, category, creator..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
+                style={{ flex: 1 }}
+            />
+
+            <button
+                onClick={() => setFilterFoodType('all')}
+                className="status-btn active-btn"
+                style={{
+                    background: filterFoodType === 'all' ?
+                        'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' :
+                        'rgba(233, 233, 233, 0.1)'
+                }}
+            >
+                All
+            </button>
+
+            <button
+                onClick={() => setFilterFoodType('usda')}
+                className="status-btn active-btn"
+                style={{
+                    background: filterFoodType === 'usda' ?
+                        'linear-gradient(135deg, #10b981 0%, #059669 100%)' :
+                        'rgba(233, 233, 233, 0.1)'
+                }}
+            >
+                USDA
+            </button>
+
+            <button
+                onClick={() => setFilterFoodType('custom')}
+                className="status-btn active-btn"
+                style={{
+                    background: filterFoodType === 'custom' ?
+                        'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' :
+                        'rgba(233, 233, 233, 0.1)'
+                }}
+            >
+                Custom
+            </button>
+        </div>
+
+        <table className="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Food Name</th>
+                    <th>Category</th>
+                    <th>Creator</th>
+                    <th>Nutrition</th>
+                    <th>Type</th>
+                    <th>Visibility</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {foods
+                    .filter(food => {
+                        const matchesSearch =
+                            food.label?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            food.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            food.creatorName?.toLowerCase().includes(searchQuery.toLowerCase());
+
+                        let matchesType = true;
+                        if (filterFoodType === 'usda') {
+                            matchesType = food.isUSDA;
+                        } else if (filterFoodType === 'custom') {
+                            matchesType = !food.isUSDA;
+                        }
+
+                        return matchesSearch && matchesType;
+                    })
+                    .map((food, i) => (
+                        <tr key={food.id} onClick={() => {/* You can add a food detail view if needed */}}>
+                            <td>{i + 1}</td>
+                            <td>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <div style={{
+                                        width: '30px',
+                                        height: '30px',
+                                        borderRadius: '6px',
+                                        background: getFoodCategoryColor(food.category),
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '12px',
+                                        fontWeight: 'bold',
+                                        color: 'white'
+                                    }}>
+                                        {food.label?.charAt(0) || 'F'}
+                                    </div>
+                                    <div>
+                                        <div style={{ fontWeight: '600', color: 'white' }}>
+                                            {food.label || 'Unnamed Food'}
+                                        </div>
+                                        <div style={{ fontSize: '12px', color: '#94a3b8' }}>
+                                            {food.servingSize}{food.servingUnit}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span style={{
+                                    padding: '4px 8px',
+                                    borderRadius: '12px',
+                                    fontSize: '12px',
+                                    background: 'rgba(139, 92, 246, 0.2)',
+                                    color: '#8b5cf6',
+                                    border: '1px solid rgba(139, 92, 246, 0.3)'
+                                }}>
+                                    {food.category || 'Uncategorized'}
+                                </span>
+                            </td>
+                            <td>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <div style={{
+                                        width: '24px',
+                                        height: '24px',
+                                        borderRadius: '50%',
+                                        background: 'linear-gradient(135deg, #60a5fa, #3b82f6)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '10px',
+                                        fontWeight: 'bold',
+                                        color: 'white'
+                                    }}>
+                                        {food.creatorName?.charAt(0) || 'U'}
+                                    </div>
+                                    <span style={{ fontSize: '14px' }}>
+                                        {food.creatorName || 'Unknown'}
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '12px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                                        <span style={{ color: '#ef4444' }}>⚡{food.energyKcal}cal</span>
+                                        <span style={{ color: '#3b82f6' }}>🍗{food.protein}g</span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                                        <span style={{ color: '#f59e0b' }}>🥑{food.fat}g</span>
+                                        <span style={{ color: '#10b981' }}>🌾{food.carbs}g</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span style={{
+                                    padding: '4px 8px',
+                                    borderRadius: '12px',
+                                    fontSize: '12px',
+                                    fontWeight: '500',
+                                    background: food.isUSDA ? 
+                                        'rgba(16, 185, 129, 0.2)' : 
+                                        'rgba(139, 92, 246, 0.2)',
+                                    color: food.isUSDA ? '#10b981' : '#8b5cf6',
+                                    border: food.isUSDA ? 
+                                        '1px solid rgba(16, 185, 129, 0.3)' : 
+                                        '1px solid rgba(139, 92, 246, 0.3)'
+                                }}>
+                                    {food.isUSDA ? 'USDA' : 'Custom'}
+                                </span>
+                            </td>
+                            <td>
+                                <span style={{
+                                    padding: '4px 8px',
+                                    borderRadius: '12px',
+                                    fontSize: '12px',
+                                    fontWeight: '500',
+                                    background: food.isPublic ? 
+                                        'rgba(59, 130, 246, 0.2)' : 
+                                        'rgba(107, 114, 128, 0.2)',
+                                    color: food.isPublic ? '#3b82f6' : '#6b7280',
+                                    border: food.isPublic ? 
+                                        '1px solid rgba(59, 130, 246, 0.3)' : 
+                                        '1px solid rgba(107, 114, 128, 0.3)'
+                                }}>
+                                    {food.isPublic ? 'Public' : 'Private'}
+                                </span>
+                            </td>
+                            <td>
+                                <img src={images.arrow} style={{ width: 20, height: 20, filter: "brightness(0) invert(1)" }} />
+                            </td>
+                        </tr>
+                    ))}
+            </tbody>
+        </table>
+    </div>
+)}
 
                 {activeSection === "Admins" && (
                     <>

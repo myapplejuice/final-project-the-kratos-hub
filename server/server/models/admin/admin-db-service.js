@@ -439,7 +439,7 @@ export default class AdminDBService {
             const foods = result.recordset.map(row => {
                 const food = {};
                 for (const key in row) {
-                    if (key === 'AdditionalProperties')
+                    if (key.toLowerCase() === 'additionalprops')
                         food[ObjectMapper.toCamelCase(key)] = JSON.parse(row[key]) || [];
                     else
                         food[ObjectMapper.toCamelCase(key)] = row[key];
