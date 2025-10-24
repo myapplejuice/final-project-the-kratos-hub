@@ -9,6 +9,7 @@ import Dashboard from './screens/dashboard';
 import UserProfile from './screens/user-profile';
 import VerificationApplication from './screens/verification-application';
 import UserReport from './screens/report';
+import FoodProfile from './screens/food-profile';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -21,6 +22,7 @@ createRoot(document.getElementById('root')).render(
                     <Route path={routes.user_profile} element={<UserProfile />} />
                     <Route path={routes.verification_application} element={<VerificationApplication />} />
                     <Route path={routes.report} element={<UserReport />} />
+                    <Route path={routes.food_profile} element={<FoodProfile />} />
                 </Routes>
             </BrowserRouter>
         </PopupsProvider>

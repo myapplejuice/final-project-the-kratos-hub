@@ -98,33 +98,6 @@ export default function UserReport() {
     return (
         <>
             <main className="user-profile-main">
-                <div style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    marginBlock: 40
-                }}>
-                    <div className="user-info-header">
-                        <p style={{
-                            color: 'white',
-                            fontSize: 40,
-                            fontWeight: 'bold',
-                            margin: 0,
-                            backgroundClip: 'text',
-                            WebkitBackgroundClip: 'text',
-                        }}>
-                            Report Review
-                        </p>
-                    </div>
-                    <img src={images.warning} style={{
-                        width: 100,
-                        height: 100,
-                        filter: "invert(1)",
-                        marginTop: 20
-                    }} />
-                </div>
-
                 <div className="user-profile-header">
                     <div className="header-left">
                         <div className="back-button" onClick={() => nav(-1)}>
@@ -137,6 +110,12 @@ export default function UserReport() {
                             <p className="user-id">Report #{report.id}</p>
                         </div>
                     </div>
+                    
+                    <img src={images.warning} style={{
+                        width: 70,
+                        height: 70,
+                        filter: "invert(1)",
+                    }} />
                 </div>
 
                 <div className="profile-card" style={{ marginBottom: 30 }}>

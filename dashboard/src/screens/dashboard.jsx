@@ -751,7 +751,7 @@ export default function Dashboard() {
                                         return matchesSearch && matchesType;
                                     })
                                     .map((food, i) => (
-                                        <tr key={food.id} onClick={() => {/* You can add a food detail view if needed */ }}>
+                                        <tr key={food.id} onClick={() => nav(routes.food_profile, { state: { food, creator: users.find(u => u.id === food.creatorId) } })}>
                                             <td>{i + 1}</td>
                                             <td>
                                                 <span style={{ fontSize: '14px' }}>
