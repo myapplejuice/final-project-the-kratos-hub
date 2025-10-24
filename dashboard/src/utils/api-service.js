@@ -118,5 +118,6 @@ export default class APIService {
         updateApplication: (payload) => APIService.request(`/admin/applications/${SessionStorageService.getItem("admin")?.admin?.id}`, 'PUT', payload),
         updateAdmin: (payload) => APIService.request(`/admin/admin/${SessionStorageService.getItem("admin")?.admin?.id}`, 'PUT', payload),
         terminateAdmin: (payload) => APIService.request(`/admin/admin/${SessionStorageService.getItem("admin")?.admin?.id}`, 'DELETE', payload),
+    updateReport: (payload) => APIService.request(`/admin/reports/${SessionStorageService.getItem("admin")?.admin?.id}`, 'PUT', payload),
     }
 }

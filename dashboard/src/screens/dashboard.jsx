@@ -478,7 +478,7 @@ export default function Dashboard() {
                                     <th>User ID</th>
                                     <th>Name</th>
                                     <th>Status</th>
-                                    <th>Date Created</th>
+                                    <th>Date of Submittion</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -512,8 +512,8 @@ export default function Dashboard() {
                                     <th>#</th>
                                     <th>Reported User ID</th>
                                     <th>Type</th>
-                                    <th>Violation</th>
-                                    <th>Date Created</th>
+                                    <th>Offense</th>
+                                    <th>Date of Submittion</th>
                                     <th></th>
                                 </tr>
                             </thead>

@@ -113,6 +113,24 @@
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
+.action-button-red {
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: none;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    box-shadow: 0 4px 12px rgba(255, 21, 21, 0.3);
+}
+
+.action-button-red:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(185, 16, 16, 0.4);
+}
+
 .notify {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }

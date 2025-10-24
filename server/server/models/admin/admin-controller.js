@@ -141,4 +141,10 @@ export default class AdminController {
         const response = await AdminDBService.setAdminTerminated(id, isActive);
         return res.status(200).json({ success: true, message: response.message });
     }
+
+    static async updateReport(req, res) {
+        const { reportId, resolved, adminNote } = req.body;
+        const response = await AdminDBService.updateReport(reportId, resolved, adminNote);
+        return res.status(200).json({ success: true, message: response.message, report: response.report });
+    }
 }

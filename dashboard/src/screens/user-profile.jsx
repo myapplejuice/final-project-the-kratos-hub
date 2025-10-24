@@ -191,7 +191,7 @@ export default function UserProfile() {
                         <div className="card-detail-row"><span className="card-detail-label">Gender:</span><span className="card-detail-value">{user.gender === 'male' ? 'Male' : 'Female'}</span></div>
                         <div className="card-detail-row"><span className="card-detail-label">Phone:</span><span className="card-detail-value">{user.phone}</span></div>
                         <div className="card-detail-row"><span className="card-detail-label">Email:</span><span className="card-detail-value">{user.email}</span></div>
-                        <div className="card-detail-row"><span className="card-detail-label">Created:</span><span className="card-detail-value">{new Date(user.dateOfCreation).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span></div>
+                        <div className="card-detail-row"><span className="card-detail-label">Date of Creation:</span><span className="card-detail-value">{new Date(user.dateOfCreation).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })}</span></div>
                     </div>
                 </div>
 
@@ -273,14 +273,11 @@ export default function UserProfile() {
                                     <div className="warning-top">
                                         <span className="warning-date">
                                             {new Date(warning.dateOfCreation).toLocaleDateString('en-US', {
-                                                month: 'short',
+                                                month: 'long',
                                                 day: 'numeric',
-                                                year: 'numeric'
-                                            })}{" "}
-                                            {new Date(warning.dateOfCreation).toLocaleTimeString('en-US', {
-                                                hour: 'numeric',
-                                                minute: 'numeric',
-                                                hour12: true
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
                                             })}
                                         </span>
                                         <span className="warning-admin">Admin ID: {warning.adminId}</span>

@@ -13,6 +13,7 @@ export default class AdminRouter {
         this.adminRouter.post('/new-admin/:id',adminAuthorization, asyncHandler(AdminController.createNewAdmin));
         this.adminRouter.put('/admin/:id', adminAuthorization, asyncHandler(AdminController.updateAdmin));
 this.adminRouter.delete('/admin/:id', adminAuthorization, asyncHandler(AdminController.terminateAdmin));
+        this.adminRouter.put('/reports/:id', adminAuthorization, asyncHandler(AdminController.updateReport));
 
         this.adminRouter.get('/test-token/:id', adminAuthorization, asyncHandler(AdminController.testAdminToken));
         this.adminRouter.post('/access', asyncHandler(AdminController.access));

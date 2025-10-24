@@ -149,7 +149,7 @@ export default function VerificationApplication() {
                             <span className="card-detail-value">{app.id}</span>
                         </div>
                         <div className="card-detail-row">
-                            <span className="card-detail-label">Submitted:</span>
+                            <span className="card-detail-label">Date of Submittion:</span>
                             <span className="card-detail-value">
                                 {new Date(app.dateOfCreation).toLocaleDateString('en-US', {
                                     month: 'long',

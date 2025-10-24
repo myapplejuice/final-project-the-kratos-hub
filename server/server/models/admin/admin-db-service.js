@@ -397,4 +397,36 @@ export default class AdminDBService {
             return null;
         }
     }
+
+    static async updateReport(reportId, resolved, adminNote) {
+        console.log(reportId, resolved, adminNote);
+        try {
+            const request = Database.getRequest();
+            Database.addInput(request, 'Id', sql.Int, reportId);
+            Database.addInput(request, 'Resolved', sql.Bit, resolved);
+            Database.addInput(request, 'AdminNote', sql.NVarChar(sql.MAX), adminNote);
+            const query = `
+            UPDATE UserReports 
+            SET Resolved = @Resolved, AdminNote = @AdminNote
+            OUTPUT INSERTED.*
+             WHERE Id = @Id
+             `;
+
+            const result = await request.query(query);
+
+            const report = {}
+
+            for (const key in result.recordset[0]) {
+                if (key === 'ImagesURLS')
+                    report[ObjectMapper.toCamelCase(key)] = JSON.parse(result.recordset[0][key]) || [];
+                else
+                    report[ObjectMapper.toCamelCase(key)] = result.recordset[0][key];
+            }
+
+            return { success: result.rowsAffected[0] > 0, message: 'Report updated successfully', report };
+        } catch (err) {
+            console.error('updateReport error:', err);
+            return { success: false, message: 'Failed to update report' };
+        }
+    }
 }

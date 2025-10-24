@@ -20,9 +20,9 @@ export default function UserReport() {
 
     function handleResolveReport() {
         if (!adminNote && !isResolved) {
-            return showAlert({ 
-                title: "Note Required", 
-                message: "Please provide an admin note before resolving the report" 
+            return showAlert({
+                title: "Note Required",
+                message: "Please provide an admin note before resolving the report"
             });
         }
 
@@ -32,8 +32,8 @@ export default function UserReport() {
             actions: [
                 { label: "Cancel", color: "#5a5a5aff", onClick: null },
                 {
-                    label: "Confirm", 
-                    color: isResolved ? "#f59e0b" : "#10b981", 
+                    label: "Confirm",
+                    color: isResolved ? "#f59e0b" : "#10b981",
                     onClick: async () => {
                         try {
                             showSpinner();
@@ -44,8 +44,8 @@ export default function UserReport() {
                             });
 
                             if (result.success) {
-                                setReport({ 
-                                    ...report, 
+                                setReport({
+                                    ...report,
                                     resolved: !isResolved,
                                     adminNote: adminNote
                                 });
@@ -68,18 +68,6 @@ export default function UserReport() {
         });
     }
 
-    function getOffenseColor(offense) {
-        const offenseColors = {
-            'Spam': '#ef4444',
-            'Trolling & Toxicity': '#f59e0b',
-            'Harassment': '#dc2626',
-            'Inappropriate Content': '#ec4899',
-            'Impersonation': '#8b5cf6',
-            'Other': '#6b7280'
-        };
-        return offenseColors[offense] || '#6b7280';
-    };
-
     function getReportTypeLabel(type) {
         if (type.includes('post')) return 'Content Report';
         if (type.includes('food')) return 'Food Report';
@@ -91,42 +79,20 @@ export default function UserReport() {
         if (report.type === 'user') {
             return reportedUser ? `${reportedUser.firstname} ${reportedUser.lastname}` : 'Unknown User';
         } else if (report.type.includes('post')) {
-            const postId = report.reportedUserId?.replace('post-', '') || 'Unknown';
+            const postId = report.type?.replace('post-', '') || 'Unknown';
             return `Post #${postId}`;
         } else if (report.type.includes('food')) {
-            const foodId = report.reportedUserId?.replace('food-', '') || 'Unknown';
+            const foodId = report.type?.replace('food-', '') || 'Unknown';
             return `Food Item #${foodId}`;
         }
         return 'Unknown';
     }
 
-    function isUserReport() {
-        return report.type === 'user';
-    }
-
-    function isPostReport() {
-        return report.type.includes('post');
-    }
-
-    function isFoodReport() {
-        return report.type.includes('food');
-    }
-
     function getReportedEntityType() {
-        if (isUserReport()) return 'User';
-        if (isPostReport()) return 'Post';
-        if (isFoodReport()) return 'Food Item';
+        if (report.type === 'user') return 'User';
+        if (report.type.includes('post')) return 'Post';
+        if (report.type.includes('food')) return 'Food Item';
         return 'Content';
-    }
-
-    function getReportedEntityId() {
-        if (isPostReport()) {
-            return report.reportedUserId?.replace('post-', '') || 'Unknown';
-        }
-        if (isFoodReport()) {
-            return report.reportedUserId?.replace('food-', '') || 'Unknown';
-        }
-        return report.reportedUserId || 'Unknown';
     }
 
     return (
@@ -178,7 +144,7 @@ export default function UserReport() {
                         <p className="card-title">Report Overview</p>
                         <div
                             className="status-badge"
-                            style={{ 
+                            style={{
                                 background: isResolved ? '#10b981' : '#ef4444',
                                 color: 'white'
                             }}
@@ -188,34 +154,29 @@ export default function UserReport() {
                     </div>
                     <div className="card-details">
                         <div className="card-detail-row">
+                            <span className="card-detail-label">Offense:</span>
+                            <span
+                                className="card-detail-value"
+                                style={{
+                                    color: '#ef4444',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                {report.offense || 'Violation Unspecified'}
+                            </span>
+                        </div>
+                        <div className="card-detail-row">
                             <span className="card-detail-label">Report Type:</span>
                             <span className="card-detail-value">{getReportTypeLabel(report.type)}</span>
                         </div>
                         <div className="card-detail-row">
-                            <span className="card-detail-label">Offense:</span>
-                            <span 
-                                className="card-detail-value"
-                                style={{ 
-                                    color: getOffenseColor(report.offense),
-                                    fontWeight: '600'
-                                }}
-                            >
-                                {report.offense}
-                            </span>
-                        </div>
-                        <div className="card-detail-row">
-                            <span className="card-detail-label">Reported {getReportedEntityType()}:</span>
+                            <span className="card-detail-label">Reported User ID:</span>
                             <span className="card-detail-value">
-                                {getReportedEntity()} 
-                                {!isUserReport() && (
-                                    <span style={{ fontSize: '12px', color: '#94a3b8', marginLeft: '8px' }}>
-                                        (ID: {getReportedEntityId()})
-                                    </span>
-                                )}
+                                {report.reportedUserId}
                             </span>
                         </div>
                         <div className="card-detail-row">
-                            <span className="card-detail-label">Submitted:</span>
+                            <span className="card-detail-label">Date of Submittion:</span>
                             <span className="card-detail-value">
                                 {new Date(report.dateOfCreation).toLocaleDateString('en-US', {
                                     month: 'long',
@@ -241,9 +202,9 @@ export default function UserReport() {
                                 </h4>
                                 {reporterUser ? (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <img 
-                                            src={reporterUser.imageURL || images.profilePic} 
-                                            alt="Reporter" 
+                                        <img
+                                            src={reporterUser.imageURL || images.profilePic}
+                                            alt="Reporter"
                                             style={{
                                                 width: '40px',
                                                 height: '40px',
@@ -266,7 +227,7 @@ export default function UserReport() {
                                 <button
                                     onClick={() => reporterUser && nav(routes.user_profile, { state: { user: reporterUser } })}
                                     className="action-button profile-button"
-                                    style={{ 
+                                    style={{
                                         marginTop: '10px',
                                         padding: '8px 16px',
                                         fontSize: '12px'
@@ -281,11 +242,11 @@ export default function UserReport() {
                                 <h4 style={{ color: '#ef4444', margin: '0 0 10px 0', fontSize: '14px' }}>
                                     Reported {getReportedEntityType()}
                                 </h4>
-                                {isUserReport() && reportedUser ? (
+                                {report.type === 'user' && reportedUser ? (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <img 
-                                            src={reportedUser.imageURL || images.profilePic} 
-                                            alt="Reported User" 
+                                        <img
+                                            src={reportedUser.imageURL || images.profilePic}
+                                            alt="Reported User"
                                             style={{
                                                 width: '40px',
                                                 height: '40px',
@@ -302,7 +263,7 @@ export default function UserReport() {
                                             </p>
                                         </div>
                                     </div>
-                                ) : isUserReport() ? (
+                                ) : report.type === 'user' ? (
                                     <p style={{ color: '#94a3b8', margin: 0 }}>Loading reported user info...</p>
                                 ) : (
                                     <div>
@@ -310,41 +271,41 @@ export default function UserReport() {
                                             {getReportedEntity()}
                                         </p>
                                         <p style={{ color: '#94a3b8', margin: '4px 0 0 0', fontSize: '12px' }}>
-                                            {isPostReport() ? 'Community Post' : 'Food Database Item'}
+                                            {report.type.includes('post') ? 'Community Post' : 'Food Database Item'}
                                         </p>
                                     </div>
                                 )}
-                                {isUserReport() && reportedUser && (
+                                {report.type === 'user' && reportedUser && (
                                     <button
                                         onClick={() => nav(routes.user_profile, { state: { user: reportedUser } })}
-                                        className="action-button profile-button"
-                                        style={{ 
+                                        className="action-button-red profile-button"
+                                        style={{
                                             marginTop: '10px',
                                             padding: '8px 16px',
                                             fontSize: '12px',
-                                            background: 'rgba(239, 68, 68, 0.2)',
+                                            background: 'rgba(239, 68, 68, 1)',
                                             border: '1px solid rgba(239, 68, 68, 0.4)'
                                         }}
                                     >
                                         View Reported Profile
                                     </button>
                                 )}
-                                {(isPostReport() || isFoodReport()) && (
+                                {(report.type.includes('post') || report.type.includes('food')) && (
                                     <button
-                                        onClick={() => showAlert({ 
-                                            title: "Content Management", 
-                                            message: `This would navigate to the ${isPostReport() ? 'post' : 'food item'} management page` 
+                                        onClick={() => showAlert({
+                                            title: "Content Management",
+                                            message: `This would navigate to the ${report.type.includes('post') ? 'post' : 'food item'} management page`
                                         })}
-                                        className="action-button profile-button"
-                                        style={{ 
+                                        className="action-button-red profile-button"
+                                        style={{
                                             marginTop: '10px',
                                             padding: '8px 16px',
                                             fontSize: '12px',
-                                            background: 'rgba(139, 92, 246, 0.2)',
-                                            border: '1px solid rgba(139, 92, 246, 0.4)'
+                                            background: 'rgba(239, 68, 68, 1)',
+                                            border: '1px solid rgba(239, 68, 68, 0.4)'
                                         }}
                                     >
-                                        Manage {isPostReport() ? 'Post' : 'Food Item'}
+                                        {report.type.includes('post') ? 'Post Profile' : 'Food Profile'}
                                     </button>
                                 )}
                             </div>
@@ -360,21 +321,21 @@ export default function UserReport() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                             <div>
                                 <span className="card-detail-label">Summary:</span>
-                                <p className="card-detail-value" style={{ 
-                                    opacity: report.summary ? 1 : 0.7, 
+                                <p className="card-detail-value" style={{
+                                    opacity: report.summary ? 1 : 0.7,
                                     lineHeight: '1.5',
                                     marginTop: '8px',
                                     padding: '12px',
                                     background: 'rgba(255, 255, 255, 0.05)',
                                     borderRadius: '8px'
                                 }}>
-                                    {report.summary || "No summary provided"}
+                                    {report.summary || "No explanation provided."}
                                 </p>
                             </div>
 
                             {report.imagesURLS?.length > 0 && (
                                 <div>
-                                    <span className="card-detail-label">Evidence:</span>
+                                    <span className="card-detail-label">Attached Evidence:</span>
                                     <div className="certificates-list" style={{ marginTop: '8px' }}>
                                         {report.imagesURLS.map((img, i) => (
                                             <a key={i} href={img} target="_blank" rel="noopener noreferrer" className="certificate-link">
@@ -390,7 +351,7 @@ export default function UserReport() {
 
                 <div className="profile-card" style={{ marginBottom: 300 }}>
                     <div className="card-header">
-                        <p className="card-title">Admin Review</p>
+                        <p className="card-title">Admin Review (Internal)</p>
                         {!isResolved && (
                             <div style={{
                                 background: '#f59e0b',
@@ -414,11 +375,11 @@ export default function UserReport() {
                                 marginBottom: '10px',
                                 fontSize: '14px'
                             }}>
-                                Admin Notes (Internal):
+                                Summary:
                             </label>
 
                             <textarea
-                                placeholder="Enter your review notes, actions taken, or internal comments..."
+                                placeholder="Enter your review summary, actions taken and any additional notes..."
                                 style={{
                                     width: '100%',
                                     minHeight: '120px',
@@ -454,7 +415,7 @@ export default function UserReport() {
                                     padding: '15px 20px',
                                     borderRadius: '12px',
                                     border: 'none',
-                                    background: isResolved 
+                                    background: isResolved
                                         ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
                                         : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                                     color: 'white',
@@ -462,19 +423,19 @@ export default function UserReport() {
                                     fontSize: '14px',
                                     cursor: 'pointer',
                                     transition: 'all 0.3s ease',
-                                    boxShadow: isResolved 
+                                    boxShadow: isResolved
                                         ? '0 4px 12px rgba(245, 158, 11, 0.3)'
                                         : '0 4px 12px rgba(16, 185, 129, 0.3)'
                                 }}
                                 onMouseOver={(e) => {
                                     e.currentTarget.style.transform = 'translateY(-2px)';
-                                    e.currentTarget.style.boxShadow = isResolved 
+                                    e.currentTarget.style.boxShadow = isResolved
                                         ? '0 6px 15px rgba(245, 158, 11, 0.4)'
                                         : '0 6px 15px rgba(16, 185, 129, 0.4)';
                                 }}
                                 onMouseOut={(e) => {
                                     e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = isResolved 
+                                    e.currentTarget.style.boxShadow = isResolved
                                         ? '0 4px 12px rgba(245, 158, 11, 0.3)'
                                         : '0 4px 12px rgba(16, 185, 129, 0.3)';
                                 }}
@@ -490,7 +451,7 @@ export default function UserReport() {
                             textAlign: 'center',
                             fontStyle: 'italic'
                         }}>
-                            {isResolved 
+                            {isResolved
                                 ? 'This report has been resolved. You can re-open it if needed.'
                                 : 'Admin notes are for internal use and will be visible to other administrators'
                             }
