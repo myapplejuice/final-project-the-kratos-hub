@@ -429,4 +429,94 @@ export default class AdminDBService {
             return { success: false, message: 'Failed to update report' };
         }
     }
+
+    static async fetchFoods() {
+        try {
+            const request = Database.getRequest();
+            const query = `SELECT * FROM Foods`;
+
+            const result = await request.query(query);
+            const foods = result.recordset.map(row => {
+                const food = {};
+                for (const key in row) {
+                    if (key === 'AdditionalProperties')
+                        food[ObjectMapper.toCamelCase(key)] = JSON.parse(row[key]) || [];
+                    else
+                        food[ObjectMapper.toCamelCase(key)] = row[key];
+                }
+                return food;
+            });
+
+            return foods;
+        } catch (err) {
+            console.error('fetchFoods error:', err);
+            return null;
+        }
+    }
+
+    static async fetchPosts() {
+    try {
+        const request = Database.getRequest();
+        
+        const query = `
+            SELECT p.*,
+                   u.Id AS UserId, u.Firstname, u.Lastname, u.ImageURL,
+                   t.IsVerified, t.TrainerStatus
+            FROM Posts p
+            INNER JOIN Users u ON u.Id = p.UserId
+            LEFT JOIN UserTrainerProfile t ON t.UserId = u.Id
+            ORDER BY p.Id DESC
+        `;
+
+        const result = await request.query(query);
+
+        const posts = result.recordset.map(row => {
+            // Use camelCase keys
+            const mappedRow = {};
+            for (const key in row) {
+                let value = row[key];
+
+                // Fix ImagesURLS to be an array
+                if (key.toLowerCase() === 'imagesurls') {
+                    try {
+                        value = value ? JSON.parse(value) : [];
+                    } catch {
+                        value = [];
+                    }
+                }
+
+                mappedRow[ObjectMapper.toCamelCase(key)] = value;
+            }
+
+            return {
+                id: mappedRow.id,
+                postUser: {
+                    id: Array.isArray(mappedRow.userId) ? mappedRow.userId[0] : mappedRow.userId,
+                    firstname: mappedRow.firstname,
+                    lastname: mappedRow.lastname,
+                    imageURL: mappedRow.imageURL,
+                    trainerProfile: {
+                        trainerStatus: mappedRow.trainerStatus || 'inactive',
+                        isVerified: !!mappedRow.isVerified,
+                    },
+                },
+                imagesURLS: mappedRow.imagesURLS || [],
+                caption: mappedRow.caption || '',
+                likeCount: Array.isArray(mappedRow.likeCount)
+                    ? mappedRow.likeCount.reduce((a, b) => a + b, 0)
+                    : mappedRow.likeCount || 0,
+                shareCount: Array.isArray(mappedRow.shareCount)
+                    ? mappedRow.shareCount.reduce((a, b) => a + b, 0)
+                    : mappedRow.shareCount || 0,
+                dateOfCreation: mappedRow.dateOfCreation,
+                topic: mappedRow.topic || '',
+            };
+        });
+
+        return { posts };
+    } catch (err) {
+        console.error('fetchPosts error:', err);
+        return { posts: [] };
+    }
+    }
 }

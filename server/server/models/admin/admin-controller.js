@@ -2,6 +2,7 @@ import AdminDBService from "./admin-db-service.js";
 import { signJwt } from "../../utils/jwt-utils.js";
 import SocketController from "../socket/socket-controller.js";
 import NotificationsDBService from "../notifications/notifications-db-service.js";
+import CommunityDBService from "../community/community-db-service.js";
 
 export default class AdminController {
     static async testAdminToken(req, res) {
@@ -25,14 +26,16 @@ export default class AdminController {
     static async getDashboardData(req, res) {
         const { isSeed } = req.body;
 
-        const [users, applications, reports, admins] = await Promise.all([
+        const [users, applications, reports, foods, posts, admins] = await Promise.all([
             AdminDBService.fetchUsers(),
             AdminDBService.fetchApplications(),
             AdminDBService.fetchUserReports(),
+            AdminDBService.fetchFoods(),
+            AdminDBService.fetchPosts(),
             isSeed ? AdminDBService.fetchAdmins() : []
         ]);
 
-        return res.status(200).json({ success: true, users, applications, admins, reports });
+        return res.status(200).json({ success: true, users, applications, reports, foods, posts, admins });
     }
 
     static async getUserReputationProfile(req, res) {

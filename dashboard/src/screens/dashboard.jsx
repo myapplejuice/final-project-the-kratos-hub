@@ -22,12 +22,16 @@ export default function Dashboard() {
     const [users, setUsers] = useState([]);
     const [verificationApps, setVerificationApps] = useState([]);
     const [reports, setReports] = useState([]);
+    const [foods, setFoods] = useState([]);
+    const [posts, setPosts] = useState([]);
 
     const [visibleUsers, setVisibleUsers] = useState([]);
     const [visibleApps, setVisibleApps] = useState([]);
+    const [visibleReports, setVisibleReports] = useState([]);
 
     const [filterTerminated, setFilterTerminated] = useState('all');
     const [filterAppStatus, setFilterAppStatus] = useState('all');
+    const [filterReportStatus, setFilterReportStatus] = useState('all');
 
     useEffect(() => {
         if (!admin) return;
@@ -42,12 +46,16 @@ export default function Dashboard() {
                     const admins = result.data.admins;
                     const applications = result.data.applications;
                     const reports = result.data.reports;
+                    const foods = result.data.foods;
+                    const posts = result.data.posts;
 
-                    console.log(reports);
+                    console.log(foods);
                     setUsers(users);
                     setAdmins(admins);
                     setVerificationApps(applications);
                     setReports(reports);
+                    setFoods(foods);
+                    setPosts(posts);
                 }
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
@@ -104,8 +112,31 @@ export default function Dashboard() {
             });
 
             setVisibleApps(filtered);
+        }else if (activeSection === "Reports") {
+            const filtered = reports.filter(report => {
+                const user = users.find(user => user.id === report.reportedUserId);
+                const idString = String(report.id);
+                const matchesSearch =
+                    user.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    idString.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    report.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    report.offense.toLowerCase().includes(searchQuery.toLowerCase());
+
+                let matchesStatus = true;
+                if (filterReportStatus === "all") {
+                    matchesStatus = true;
+                } else if (filterReportStatus === "pending") {
+                    matchesStatus = report.status === "pending";
+                } else if (filterReportStatus === "resolved") {
+                    matchesStatus = report.status === "resolved";
+                }
+
+                return matchesSearch && matchesStatus;
+            });
+
+            setVisibleReports(filtered);
         }
-    }, [users, filterAppStatus, verificationApps, activeSection, searchQuery, filterTerminated]);
+    }, [users, filterReportStatus, filterAppStatus, verificationApps, activeSection, searchQuery, filterTerminated]);
 
 
     function handleAddAdmin() {
@@ -369,7 +400,7 @@ export default function Dashboard() {
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Account Status</th>
+                                    <th>Status</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -506,6 +537,61 @@ export default function Dashboard() {
                 {activeSection === "Reports" && (
                     <div className="admin-section">
                         <h2>Reports</h2>
+                        <div>
+                        <p style={{ margin: '0 0 0px 0', color: '#6b7280' }}>
+                            Total: {reports.length} / Filter: {visibleReports.length}
+                        </p>
+                            <p style={{ margin: '0 0 20px 0', color: '#6b7280' }}>
+                            Resolved: {reports.filter(r => r.isResolved).length} / Active: {reports.filter(r => !r.isResolved).length}
+                        </p>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: 25 }}>
+                            <input
+                                type="text"
+                                placeholder="ID, Type..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="search-input"
+                                style={{ flex: 1 }}
+                            />
+
+                            <button
+                                onClick={() => setFilterReportStatus('all')}
+                                className="status-btn active-btn"
+                                style={{
+                                    background: filterReportStatus === 'all' ?
+                                        'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' :
+                                        'rgba(233, 233, 233, 0.1)'
+                                }}
+                            >
+                                All
+                            </button>
+
+                            <button
+                                onClick={() => setFilterReportStatus("resolved")}
+                                className="status-btn active-btn"
+                                style={{
+                                    background: filterReportStatus === "resolved" ?
+                                        'linear-gradient(135deg, #10b981 0%, #059669 100%)' :
+                                        'rgba(233, 233, 233, 0.1)'
+                                }}
+                            >
+                                Resolved
+                            </button>
+
+                            <button
+                                onClick={() => setFilterReportStatus("active")}
+                                className="status-btn active-btn"
+                                style={{
+                                    background: filterReportStatus === "active" ?
+                                          'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'  :
+                                        'rgba(233, 233, 233, 0.1)'
+                                }}
+                            >
+                                Under Review
+                            </button>
+                        </div>
+
                         <table className="admin-table">
                             <thead>
                                 <tr>
@@ -518,11 +604,11 @@ export default function Dashboard() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {reports.map((report, i) => (
+                                {visibleReports.map((report, i) => (
                                     <tr key={report.id} onClick={() => nav(routes.report, { state: { reporterUser: users.find(u => u.id === report.userId), reportedUser: users.find(u => u.id === report.reportedUserId), report } })}>
                                         <td>{report.id}</td>
                                         <td>{report.reportedUserId}</td>
-                                        <td>{report.type ? (report.type.includes('user') ? 'User' : report.type.includes('post') ? 'Community Post' : 'Food') : 'Type Unspecified'}</td>
+                                        <td>{report.type ? (report.type.includes('user') ? 'User' : report.type.includes('post') ? 'Post' : 'Food') : 'Type Unspecified'}</td>
                                         <td>{report.offense ? report.offense : 'Violation Unspecified'}</td>
                                         <td>{new Date(report.dateOfCreation).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</td>
                                         <td>
@@ -535,51 +621,7 @@ export default function Dashboard() {
                     </div>
                 )}
 
-                {activeSection === "Food List" && (
-                    <div className="admin-section">
-                        <h2>Food List</h2>
-                        <table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {foodList.map((f) => (
-                                    <tr key={f.id}>
-                                        <td>{f.id}</td>
-                                        <td>{f.name}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-
-                {activeSection === "Community Posts" && (
-                    <div className="admin-section">
-                        <h2>Community Posts</h2>
-                        <table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Author</th>
-                                    <th>Content</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {communityPosts.map((p) => (
-                                    <tr key={p.id}>
-                                        <td>{p.id}</td>
-                                        <td>{p.author}</td>
-                                        <td>{p.content}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                
 
                 {activeSection === "Admins" && (
                     <>
