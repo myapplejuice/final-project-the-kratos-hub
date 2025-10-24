@@ -25,13 +25,14 @@ export default class AdminController {
     static async getDashboardData(req, res) {
         const { isSeed } = req.body;
 
-        const [users, applications, admins] = await Promise.all([
+        const [users, applications, reports, admins] = await Promise.all([
             AdminDBService.fetchUsers(),
             AdminDBService.fetchApplications(),
+            AdminDBService.fetchUserReports(),
             isSeed ? AdminDBService.fetchAdmins() : []
         ]);
 
-        return res.status(200).json({ success: true, users, applications, admins });
+        return res.status(200).json({ success: true, users, applications, admins, reports });
     }
 
     static async getUserReputationProfile(req, res) {

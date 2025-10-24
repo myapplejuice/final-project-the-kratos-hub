@@ -22,7 +22,7 @@ export default class AdminDBService {
             }
 
             const row = result.recordset[0];
-            if (!row.IsActive){
+            if (!row.IsActive) {
                 return { success: false, message: 'This admin access is terminated' };
             }
 
@@ -371,6 +371,30 @@ export default class AdminDBService {
         } catch (err) {
             console.error('setAdminTerminated error:', err);
             return { success: false, message: 'Failed to terminate admin' };
+        }
+    }
+
+    static async fetchUserReports() {
+        try {
+            const request = Database.getRequest();
+            const query = `SELECT * FROM UserReports`;
+            const result = await request.query(query);
+
+            const reports = result.recordset.map(row => {
+                const report = {};
+                for (const key in row) {
+                    if (key === 'ImagesURLS')
+                        report[ObjectMapper.toCamelCase(key)] = JSON.parse(row[key]) || [];
+                    else
+                        report[ObjectMapper.toCamelCase(key)] = row[key];
+                }
+                return report;
+            });
+
+            return reports;
+        } catch (err) {
+            console.error('fetchUserReports error:', err);
+            return null;
         }
     }
 }

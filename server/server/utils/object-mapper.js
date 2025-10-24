@@ -147,7 +147,8 @@ export default class ObjectMapper {
             AdminReply: 'adminReply',
             BugThreatLevel: 'bugThreatLevel',
             Resolved: 'resolved',
-            AdminNote: 'adminNote'
+            AdminNote: 'adminNote',
+            ReportedUserId: 'reportedUserId',
 
         };
         return map[key] || (key.charAt(0).toLowerCase() + key.slice(1));
@@ -298,6 +299,8 @@ export default class ObjectMapper {
             offense: 'Offense',
             summary: 'Summary',
             adminReply: 'AdminReply',
+            reportedUserId: 'ReportedUserId',
+
         };
         return map[key] || key;
     }

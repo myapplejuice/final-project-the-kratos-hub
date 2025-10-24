@@ -18,10 +18,14 @@ export default function Dashboard() {
     const [activeSection, setActiveSection] = useState("Users");
     const [searchQuery, setSearchQuery] = useState("");
     const [admins, setAdmins] = useState([]);
+
     const [users, setUsers] = useState([]);
     const [verificationApps, setVerificationApps] = useState([]);
+    const [reports, setReports] = useState([]);
+
     const [visibleUsers, setVisibleUsers] = useState([]);
     const [visibleApps, setVisibleApps] = useState([]);
+
     const [filterTerminated, setFilterTerminated] = useState('all');
     const [filterAppStatus, setFilterAppStatus] = useState('all');
 
@@ -33,14 +37,18 @@ export default function Dashboard() {
                 showSpinner();
                 const result = await APIService.routes.dashboardData({ isSeed: admin.isSeed });
 
+                console.log(result)
                 if (result.success) {
                     const users = result.data.users;
                     const admins = result.data.admins;
                     const applications = result.data.applications;
+                    const reports = result.data.reports;
 
+                    console.log(reports)
                     setUsers(users);
                     setAdmins(admins);
                     setVerificationApps(applications);
+                    setReports(reports);
                 }
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
@@ -71,7 +79,7 @@ export default function Dashboard() {
             });
 
             setVisibleUsers(filtered);
-        } else if (activeSection === "Verification Applications") {
+        } else if (activeSection === "Verification") {
             const filtered = verificationApps.filter(app => {
                 const user = users.find(user => user.id === app.userId);
                 const idString = String(app.id);
@@ -281,13 +289,13 @@ export default function Dashboard() {
                     <ul>
                         {[
                             "Users",
-                            "Verification Applications",
+                            "Verification",
                             "Reports",
                             //"Community Posts",
                             //"Food List",
                         ].map((section) => (
                             <li key={section} className={activeSection === section ? "active" : ""} onClick={() => { setSearchQuery(''), setActiveSection(section) }}>
-                                {section}{" "}{section === "Verification Applications" ? `${verificationApps.filter(app => app.status === "pending").length === 0 ? '' : `(${verificationApps.filter(app => app.status === "pending").length})`}` : ""}
+                                {section}{" "}{section === "Verification" ? `${verificationApps.filter(app => app.status === "pending").length === 0 ? '' : `(${verificationApps.filter(app => app.status === "pending").length})`}` : ""}
                             </li>
                         ))}
                     </ul>
@@ -380,7 +388,7 @@ export default function Dashboard() {
                     </div>
                 )}
 
-                {activeSection === "Verification Applications" && (
+                {activeSection === "Verification" && (
                     <div className="admin-section">
                         <h2>{activeSection}</h2>
                         <div>
@@ -505,12 +513,12 @@ export default function Dashboard() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {reports.map((r) => (
-                                    <tr key={r.id}>
-                                        <td>{r.id}</td>
-                                        <td>{r.type}</td>
-                                        <td>{r.summary}</td>
-                                        <td>{r.date}</td>
+                                {reports.map((report) => (
+                                    <tr key={report.id}>
+                                        <td>{report.id}</td>
+                                        <td>{report.userId}</td>
+                                        <td>{report.reprtedUserId}</td>
+                                        <td>{report.date}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -675,38 +683,3 @@ export default function Dashboard() {
         </div>
     );
 }
-
-const reports = [
-    {
-        id: 101,
-        type: "Bug",
-        summary: "App crashes on login",
-        date: "2025-10-18",
-    },
-    {
-        id: 102,
-        type: "User Report",
-        summary: "Spam messages by user_88",
-        date: "2025-10-19",
-    },
-    {
-        id: 103,
-        type: "Food Report",
-        summary: "Spoiled protein shake",
-        date: "2025-10-19",
-    },
-];
-
-const foodList = [
-    { id: 201, name: "Protein Shake - Chocolate" },
-    { id: 202, name: "Chicken Meal - Grilled" },
-];
-
-const communityPosts = [
-    { id: 301, author: "user_5", content: "My 10kg progress in 2 months!" },
-    {
-        id: 302,
-        author: "user_12",
-        content: "Looking for a workout partner in Tel Aviv",
-    },
-]
